@@ -32,6 +32,7 @@ module.exports = {
 				caughtErrors: 'all'
 			}
 		],
-		'react/prop-types': 'off'
+		// 禁止使用未定义的 propType
+		'react/prop-types': 'error'
 	}
 }

@@ -1,14 +1,9 @@
 import $ from 'dom7'
 import React, { useRef, useState } from 'react'
-import { f7, Navbar, Link, Page, List, ListItem, Messages, Message, Messagebar } from 'framework7-react'
+import { f7, Navbar, Link, Page, Messages, Message, Messagebar } from 'framework7-react'
 import './Messages.less'
 import { chats, contacts } from '@/data'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
-import PropType from 'prop-types'
-
-MessagesPage.propTypes = {
-	f7route: PropType.object.isRequired
-}
 
 export default function MessagesPage({ f7route }) {
 	const userId = parseInt(f7route.params.id, 10)
@@ -19,17 +14,7 @@ export default function MessagesPage({ f7route }) {
 
 	const messagebarRef = useRef(null)
 	const [messages, setMessages] = useState([...messagesData.messages])
-	// 虚拟列表
-	const messagesRef = useRef(null)
-	const [vlData, setVlData] = useState({
-		items: []
-	})
-	const renderExternal = (vl, newData) => {
-		console.table(newData.items)
-		setVlData({ ...newData })
-	}
 	const [messageText, setMessageText] = useState('')
-	console.log(messagesRef.current.f7Messages())
 
 	const messageTime = (message) =>
 		Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(message.date)
@@ -121,7 +106,7 @@ export default function MessagesPage({ f7route }) {
 				)}
 			</Messagebar>
 
-			<Messages ref={messagesRef}>
+			<Messages>
 				{messages.map((message, index) => (
 					<Message
 						key={index}
@@ -140,37 +125,6 @@ export default function MessagesPage({ f7route }) {
 					</Message>
 				))}
 			</Messages>
-
-			{/* <List
-				medialList
-				virtualList
-				virtualListParams={{
-					items: messages,
-					renderExternal
-				}}
-			>
-				<ul>
-					{vlData.items.map((message, index) => (
-						<ListItem
-							key={index}
-							first={isMessageFirst(message)}
-							last={isMessageLast(message)}
-							tail={isMessageLast(message)}
-							type={message.type}
-							text={message.text}
-							title={message.text}
-							className="message-appear-from-bottom"
-							style={{ top: `${vlData.topPosition}px` }}
-							virtualListIndex={messages.indexOf(message)}
-						>
-							<span slot="text-footer">
-								{message.type === 'sent' && <DoubleTickIcon />}
-								{messageTime(message)}
-							</span>
-						</ListItem>
-					))}
-				</ul>
-			</List> */}
 		</Page>
 	)
 }
