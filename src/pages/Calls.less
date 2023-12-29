@@ -1,0 +1,46 @@
+.calls-page {
+  html:not(.dark) & {
+    --f7-page-bg-color: #fff;
+  }
+}
+.calls-navbar {
+  &.navbar-current .title {
+    opacity: 1 !important;
+  }
+  &-segmented {
+    .button {
+      min-width: 80px;
+    }
+  }
+}
+.calls-list {
+  --f7-list-bg-color: transparent;
+  --f7-list-item-after-font-size: 15px;
+  --f7-list-media-item-padding-vertical: 6px;
+
+  .item-media img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .calls-list-item-text {
+    display: flex;
+    align-items: center;
+    i {
+      font-size: 16px;
+      margin-right: 4px;
+      position: relative;
+      top: -2px;
+    }
+  }
+  .calls-list-item-after {
+    display: flex;
+    align-items: center;
+    i {
+      font-size: 26px;
+      margin-left: 8px;
+    }
+  }
+}

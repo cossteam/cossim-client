@@ -1,0 +1,26 @@
+.chats-page {
+  html:not(.dark) & {
+    --f7-page-bg-color: #fff;
+  }
+}
+.chats-list {
+  --f7-list-bg-color: transparent;
+  --f7-list-item-after-font-size: 15px;
+  --f7-swipeout-button-padding-horizontal: 16px;
+  .item-media img {
+    width: 58px;
+    height: 58px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+  }
+  .swipeout-actions-left,
+  .swipeout-actions-right {
+    a {
+      width: 80px;
+      box-sizing: border-box;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+}
