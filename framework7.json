@@ -1,0 +1,35 @@
+{
+  "cwd": "/Users/mac-os12/Documents/project/im/im-demo",
+  "type": [
+    "cordova"
+  ],
+  "name": "IM Demo",
+  "framework": "react",
+  "template": "tabs",
+  "bundler": "vite",
+  "cssPreProcessor": "less",
+  "theming": {
+    "customColor": false,
+    "color": "#007aff",
+    "darkMode": false,
+    "iconFonts": true
+  },
+  "customBuild": false,
+  "pkg": "com.xm.imdemo",
+  "cordova": {
+    "folder": "cordova",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "plugins": [
+      "cordova-plugin-statusbar",
+      "cordova-plugin-keyboard",
+      "cordova-plugin-splashscreen",
+      "cordova-plugin-file",
+      "cordova-plugin-inappbrowser",
+      "cordova-plugin-device",
+      "cordova-plugin-media"
+    ]
+  }
+}
