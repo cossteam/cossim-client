@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "description": "IM Demo",
   "repository": "",
+  "author": "xm",
   "license": "UNLICENSED",
+  "main": "electron/main.js",
   "scripts": {
     "start": "npm run dev",
     "dev": "cross-env NODE_ENV=development vite",
@@ -14,7 +16,9 @@
     "cordova-ios": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && cd cordova && cordova run ios",
     "build-cordova-android": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && cd cordova && cordova build android",
     "cordova-android": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && cd cordova && cordova run android",
-    "postinstall": "cpy --flat ./node_modules/framework7-icons/fonts/*.* ./src/fonts/ && cpy --flat ./node_modules/material-icons/iconfont/*.* ./src/fonts/"
+    "postinstall": "cpy --flat ./node_modules/framework7-icons/fonts/*.* ./src/fonts/ && cpy --flat ./node_modules/material-icons/iconfont/*.* ./src/fonts/",
+    "start:electron": "electron ./electron/main.js",
+    "dev:electron": "cross-env NODE_ENV=development electron./electron/main.js"
   },
   "browserslist": [
     "IOS >= 15",
@@ -38,6 +42,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "cpy-cli": "^5.0.0",
     "cross-env": "^7.0.3",
+    "electron": "^28.1.0",
     "less": "^4.2.0",
     "postcss-preset-env": "^9.3.0",
     "rollup": "^4.9.1",
