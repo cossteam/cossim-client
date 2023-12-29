@@ -17,8 +17,7 @@
     "build-cordova-android": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && cd cordova && cordova build android",
     "cordova-android": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && cd cordova && cordova run android",
     "postinstall": "cpy --flat ./node_modules/framework7-icons/fonts/*.* ./src/fonts/ && cpy --flat ./node_modules/material-icons/iconfont/*.* ./src/fonts/",
-    "start:electron": "electron ./electron/main.js",
-    "dev:electron": "cross-env NODE_ENV=development electron./electron/main.js"
+    "start:electron": "electron ./electron/main.js"
   },
   "browserslist": [
     "IOS >= 15",

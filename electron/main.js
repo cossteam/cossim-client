@@ -11,10 +11,9 @@ const createWindow = () => {
   });
 
   win.loadFile(path.join(__dirname, "../www/index.html"));
-  // win.loadFile("index.html");
 
   // 打开开发工具
-  // mainWindow.webContents.openDevTools()
+  // win.webContents.openDevTools();
 };
 
 // 在窗口中打页面
