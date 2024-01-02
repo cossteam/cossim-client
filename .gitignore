@@ -14,6 +14,52 @@ pids
 
 # Dependency directories
 node_modules/
+dist-electron/
+release/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Misc
+.DS_Store
+Thumbs.db
+
+# Cordova
+cordova/platforms/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Misc
+.DS_Store
+Thumbs.db
+
+# Cordova
+cordova/platforms/
 
 # Optional npm cache directory
 .npm

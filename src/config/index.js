@@ -10,7 +10,7 @@ const f7params = {
 	// ios, md, auto
 	theme: 'auto',
 	routes,
-	darkMode: 'auto',
+	darkMode: false,
 	// 默认主题
 	colors: {
 		primary: '#007aff'

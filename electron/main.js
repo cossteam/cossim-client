@@ -1,16 +1,23 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("node:path");
 
+process.env.DIST = path.join(__dirname, "../www");
+process.env.VITE_PUBLIC = app.isPackaged
+  ? process.env.DIST
+  : path.join(process.env.DIST, "../public");
+
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    // width: 800,
+    // height: 600,
+    icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
   });
 
-  win.loadFile(path.join(__dirname, "../www/index.html"));
+  // win.loadFile(path.join(__dirname, "../www/index.html"));
+  win.loadFile(path.join(process.env.DIST, "index.html"));
 
   // 打开开发工具
   // win.webContents.openDevTools();
