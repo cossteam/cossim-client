@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--f7-tabbar-label-font-size: 10px;
+
+	@media (min-width: 768px) and (min-height: 600px) {
+		--f7-tabbar-label-font-size: 14px;
+	}
+}
+
+html.dark {
+	&,
+	body {
+		background: #000;
+	}
+}
+
+.ios {
+	--f7-navbar-inner-padding-left: 16px;
+}
+
+.no-script-content {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: #000;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	color: #fff;
+	font-size: 18px;
+	
+	img {
+		width: 128px;
+		height: 128px;
+	}
+}
