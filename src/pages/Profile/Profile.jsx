@@ -1,8 +1,8 @@
 import React, { useRef, useEffect } from 'react'
 import { List, ListItem, Navbar, Link, Page, ListButton } from 'framework7-react'
 import './Profile.less'
-import ListColorIcon from '../../components/ListColorIcon'
-import { contacts } from '../../data'
+import ListColorIcon from '@/components/ListColorIcon'
+import { contacts } from '@/data'
 
 export default function Profile(props) {
 	const { f7route } = props
@@ -23,7 +23,7 @@ export default function Profile(props) {
 		<Page ref={pageRef} className="profile-page" noToolbar>
 			<Navbar title="Contact Info" backLink="Back" />
 			<div className="profile-avatar-block" ref={profileAvatarRef}>
-				<img src={`/avatars/${contact.avatar}`} />
+				<img src={`/avatars/${contact.avatar}`} alt="" />
 			</div>
 			<div className="profile-content">
 				<List strong outline dividers mediaList className="no-margin-top">

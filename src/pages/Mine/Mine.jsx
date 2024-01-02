@@ -1,6 +1,6 @@
 import React from 'react'
 import { List, ListItem, Navbar, Link, Page } from 'framework7-react'
-import './Settings.less'
+import './Mine.less'
 import ListColorIcon from '../../components/ListColorIcon'
 
 export default function Settings() {

@@ -13,7 +13,7 @@ import {
 	Icon
 } from 'framework7-react'
 import React from 'react'
-import { contacts } from '../../data/index'
+import { contacts } from '@/data'
 
 import './Contacts.less'
 
@@ -71,7 +71,7 @@ export default function Contacts(props) {
 										popupClose
 										onClick={() => onUserSelect(contact)}
 									>
-										<img slot="media" src={`/avatars/${contact.avatar}`} />
+										<img slot="media" src={`/avatars/${contact.avatar}`} alt="" />
 									</ListItem>
 								))}
 							</ListGroup>

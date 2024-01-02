@@ -42,9 +42,9 @@ export default function Chats(props) {
 	})
 	return (
 		<Page className="chats-page">
-			<Navbar title="聊天" large transparent>
-				<Link slot="left">Edit</Link>
-				<Link
+			{/* <Navbar title="聊天" large transparent> */}
+			{/* <Link slot="left">Edit</Link> */}
+			{/* <Link
 					slot="right"
 					iconF7="square_pencil"
 					href="/contacts/"
@@ -52,7 +52,15 @@ export default function Chats(props) {
 						modalTitle: 'New Chat',
 						onUserSelect
 					}}
-				/>
+				/> */}
+			{/* </Navbar> */}
+			<Navbar title="coss" className="coss-header">
+				{/* <Link slot="right" className="mr-2"> */}
+				<Icon f7="search" slot="right" size="20px" className="mr-3" />
+				{/* </Link> */}
+				{/* <Link slot="right" className="mr-2"> */}
+				<Icon f7="plus" slot="right" size="24px" className="mr-1" />
+				{/* </Link> */}
 			</Navbar>
 			<List noChevron dividers mediaList className="chats-list">
 				{chatsFormatted.map((chat) => (

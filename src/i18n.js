@@ -17,7 +17,7 @@ const locales = Object.assign(
 			const translationModule = await import(`./locales/${key}.json`)
 			return {
 				[key]: {
-					translation: translationModule.default 
+					translation: translationModule.default
 				}
 			}
 		})

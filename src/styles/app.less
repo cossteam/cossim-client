@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import './var.less';
 
 :root {
 	--f7-tabbar-label-font-size: 10px;
@@ -34,9 +35,16 @@ html.dark {
 	justify-content: center;
 	color: #fff;
 	font-size: 18px;
-	
+
 	img {
 		width: 128px;
 		height: 128px;
 	}
+}
+
+/** App 全局样式 */
+
+/** f7 组件自定义样式 */
+.navbar-bg {
+	background: #fff;
 }

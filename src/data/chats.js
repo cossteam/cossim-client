@@ -61,7 +61,7 @@ const chats = [
 	}
 ]
 
-Array.from({ length: 5000 }).map(function (_, i) {
+Array.from({ length: 50 }).map(function (_, i) {
 	chats[0].messages.push({
 		text: `Congrats! 🎉`,
 		type: i % 3 === 0 ? 'sent' : 'received',

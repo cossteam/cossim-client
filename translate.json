@@ -24,7 +24,8 @@
         "language",
         "database",
         "lang",
-        "i18n"
+        "i18n",
+        "locales"
     ],
     "fileSuffix": [
         ".vue",
