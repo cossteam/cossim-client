@@ -1,11 +1,11 @@
 import Chats from '@/pages/Chats/Chats'
 import Contacts from '@/pages/Contacts/Contacts'
 import My from '@/pages/My/My'
-import Login from '@/pages/Auth/Login/Login'
-import Register from '@/pages/Auth/Register/Register'
 import Messages from '@/pages/Messages/Messages'
 import Profile from '@/pages/Profile/Profile'
 import NotFoundPage from '@/pages/NotFound'
+
+import Auth from '@/pages/Auth/Auth'
 
 var routes = [
 	{
@@ -21,12 +21,8 @@ var routes = [
 		component: My
 	},
 	{
-		path: '/login/',
-		component: Login
-	},
-	{
-		path: '/register/',
-		component: Register
+		path: '/auth/',
+		component: Auth
 	},
 	{
 		path: '/chats/:id/',

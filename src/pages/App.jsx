@@ -2,14 +2,16 @@ import React, { useState, useEffect, useRef } from 'react'
 import $ from 'dom7'
 import { f7, f7ready, Views, View, Toolbar, Link } from 'framework7-react'
 import cordovaApp from '@/config/cordova-app'
-import { useUserStore } from '@/stores'
+// import { useUserStore } from '@/stores/user'
 
 const AppComponent = () => {
 	const [activeTab, setActiveTab] = useState('chats')
 	const previousTab = useRef('chats')
-	const { isLogin } = useUserStore()
+	// const { isLogin } = useUserStore()
 
-	console.log('isLogin', isLogin)
+	// if (!isLogin) {
+	// 	return <View id="view-auth" url="/auth/" main />
+	// }
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -32,7 +34,7 @@ const AppComponent = () => {
 	}
 
 	f7ready(() => {
-		// Init cordova APIs (see cordova-app.js)      
+		// Init cordova APIs (see cordova-app.js)
 		if (f7.device.cordova) {
 			cordovaApp.init(f7)
 		}

@@ -12,16 +12,26 @@ export const langs = languages.map((lang, index) => ({
 // 所有语言
 const locales = Object.assign(
 	{},
-	...(await Promise.all(
-		languages.map(async (key) => {
-			const translationModule = await import(`./locales/${key}.json`)
-			return {
-				[key]: {
-					translation: translationModule.default
-				}
+	// ...(await Promise.all(
+	// 	languages.map(async (key) => {
+	// 		const translationModule = await import(`./locales/${key}.json`)
+	// 		return {
+	// 			[key]: {
+	// 				translation: translationModule.default
+	// 			}
+	// 		}
+	// 	})
+	// ))
+	{
+		'zh-CN': {
+			translation: {
+				hello: '你好',
+				'hello-world': '你好, 世界',
+				'hello-name': '你好, {{name}}',
+				'hello-name-world': '你好, {{name}}, 世界'
 			}
-		})
-	))
+		}
+	}
 )
 // console.log('locales', locales)
 
@@ -44,3 +54,6 @@ export function $t(ch) {
 	return t(ch)
 }
 
+// export function $t(ch) {
+// 	return ch
+// }

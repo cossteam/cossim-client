@@ -13,7 +13,7 @@ import 'framework7/css/bundle'
 
 // Import Icons and App Custom Styles
 import './styles/icons.css'
-import './styles/app.css'
+import './styles/app.less'
 
 // Import App Component
 import App from './App.jsx'

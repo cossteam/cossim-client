@@ -8,7 +8,7 @@ import cordovaApp from '@/config/cordova-app'
 import AppComponent from './pages/App'
 import { f7, App, f7ready } from 'framework7-react'
 
-import routes from './config/routes'
+import routes from '@/config/routes'
 // import store from '@/stores'
 
 /**
