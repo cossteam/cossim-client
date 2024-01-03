@@ -1,10 +1,13 @@
 import Chats from '@/pages/Chats/Chats'
 import Contacts from '@/pages/Contacts/Contacts'
-import Mine from '@/pages/Mine/Mine'
-
+import My from '@/pages/My/My'
 import Login from '@/pages/Auth/Login/Login'
+import Register from '@/pages/Auth/Register/Register'
+import Messages from '@/pages/Messages/Messages'
+import Profile from '@/pages/Profile/Profile'
+import NotFoundPage from '@/pages/NotFound'
 
-const routes = [
+var routes = [
 	{
 		path: '/chats/',
 		component: Chats
@@ -14,8 +17,8 @@ const routes = [
 		component: Contacts
 	},
 	{
-		path: '/mine/',
-		component: Mine
+		path: '/my',
+		component: My
 	},
 	{
 		path: '/login/',
@@ -23,19 +26,19 @@ const routes = [
 	},
 	{
 		path: '/register/',
-		asyncComponent: () => import('@/pages/Auth/Register/Register')
+		component: Register
 	},
 	{
 		path: '/chats/:id/',
-		asyncComponent: () => import('@/pages/Messages/Messages')
+		component: Messages
 	},
 	{
 		path: '/profile/:id/',
-		asyncComponent: () => import('@/pages/Profile/Profile')
+		component: Profile
 	},
 	{
 		path: '(.*)',
-		asyncComponent: () => import('@/pages/NotFound')
+		component: NotFoundPage
 	}
 ]
 

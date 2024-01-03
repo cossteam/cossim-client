@@ -1,26 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react'
 import $ from 'dom7'
-import { f7, Views, View, Toolbar, Link } from 'framework7-react'
-
-// import f7params from '@/config'
-// import { clsx } from 'clsx'
-// import i18next from 'i18next'
-import { $t } from '@/i18n'
-// import { useTranslation } from 'react-i18next'
+import { f7, f7ready, Views, View, Toolbar, Link } from 'framework7-react'
+import cordovaApp from '@/config/cordova-app'
 import { useUserStore } from '@/stores'
 
 const AppComponent = () => {
 	const [activeTab, setActiveTab] = useState('chats')
 	const previousTab = useRef('chats')
-
 	const { isLogin } = useUserStore()
 
-	console.log('isLogin', isLogin,f7)
-
-	if (!isLogin) {
-		// 跳转登录页面
-		// f7.views.main.router.navigate('/login')
-	}
+	console.log('isLogin', isLogin)
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -42,30 +31,43 @@ const AppComponent = () => {
 		previousTab.current = tab
 	}
 
+	f7ready(() => {
+		// Init cordova APIs (see cordova-app.js)      
+		if (f7.device.cordova) {
+			cordovaApp.init(f7)
+		}
+		// Call F7 APIs here
+	})
+
 	return (
-		<Views tabs className="safe-area">
+		<Views tabs className="safe-areas">
 			<Toolbar tabbar icons bottom>
 				<Link
 					tabLink="#view-chats"
 					tabLinkActive
 					iconF7="chat_bubble_2"
-					text={$t('聊天')}
+					text="聊天"
 					onClick={() => onTabLinkClick('chats')}
 				/>
 				<Link
 					tabLink="#view-contacts"
 					iconF7="phone"
-					text={$t('联系人')}
+					text="联系人"
 					onClick={() => onTabLinkClick('contacts')}
 				/>
-				<Link tabLink="#view-mine" iconF7="person" text={$t('我的')} onClick={() => onTabLinkClick('mine')} />
+				<Link
+					tabLink="#view-my"
+					iconIos="f7:gear"
+					iconMd="material:settings"
+					text="我的"
+					onClick={() => onTabLinkClick('my')}
+				/>
 			</Toolbar>
 
-			<View id="view-chats" onTabShow={() => setActiveTab('chats')} tab tabActive url="/chats/" main />
+			<View id="view-chats" main onTabShow={() => setActiveTab('chats')} tab tabActive url="/chats/" />
 			<View id="view-contacts" onTabShow={() => setActiveTab('contacts')} tab url="/contacts/" />
-			<View id="view-mine" onTabShow={() => setActiveTab('mine')} tab url="/mine/" />
+			<View id="view-my" onTabShow={() => setActiveTab('my')} name="my" tab url="/my/" />
 		</Views>
 	)
 }
-
 export default AppComponent

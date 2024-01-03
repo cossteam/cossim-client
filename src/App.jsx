@@ -1,12 +1,14 @@
 import React from 'react'
-// import i18next from 'i18next'
-import './i18n'
-import f7params from '@/config'
+import { getDevice } from 'framework7/lite-bundle'
+// import './i18n'
+// import '@/config'
+// import f7params from '@/config'
 import cordovaApp from '@/config/cordova-app'
 
 import AppComponent from './pages/App'
 import { f7, App, f7ready } from 'framework7-react'
 
+import routes from './config/routes'
 // import store from '@/stores'
 
 /**
@@ -14,9 +16,32 @@ import { f7, App, f7ready } from 'framework7-react'
  * @returns
  */
 const Mian = () => {
+	// TODO: 配置提取到一个文件中
+	const device = getDevice()
+	// Framework7 Parameters
+	const f7params = {
+		name: 'IM Demo', // App name
+		theme: 'auto', // Automatic theme detection
+
+		// App store
+		store: [],
+		// App routes
+		routes: routes,
+
+		// Input settings
+		input: {
+			scrollIntoViewOnFocus: device.cordova,
+			scrollIntoViewCentered: device.cordova
+		},
+		// Cordova Statusbar settings
+		statusbar: {
+			iosOverlaysWebView: true,
+			androidOverlaysWebView: false
+		}
+	}
+
 	// TODO: 国际化
 	// i18next.changeLanguage('zh-CN')
-
 	f7ready(() => {
 		// 注册 cordova API
 		if (f7.device.cordova) {
