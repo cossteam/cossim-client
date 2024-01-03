@@ -1,3 +1,4 @@
+/*eslint no-undef: "off"*/
 const rollup = require('rollup')
 const fs = require('fs')
 const path = require('path')

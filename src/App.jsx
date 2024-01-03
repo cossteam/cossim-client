@@ -4,7 +4,7 @@ import { f7, App, Views, View, Toolbar, Link } from 'framework7-react'
 
 import f7params from '@/config'
 // import { clsx } from 'clsx'
-import i18next from 'i18next'
+// import i18next from 'i18next'
 import './i18n'
 import { useTranslation } from 'react-i18next'
 

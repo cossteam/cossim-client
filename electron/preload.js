@@ -1,3 +1,4 @@
+/*eslint no-undef: "off"*/
 // 通过预加载脚本从渲染器访问Node.js
 
 // 所有的 Node.js API接口 都可以在 preload 进程中被调用.

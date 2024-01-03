@@ -1,3 +1,4 @@
+/*eslint no-undef: "off"*/
 module.exports = {
     "env": {
         "browser": true,
@@ -16,7 +17,7 @@ module.exports = {
                 ".eslintrc.src/**/*.{js,cjs}"
             ],
             "parserOptions": {
-                "sourceType": "script"
+                "sourceType": "module"
             }
         }
     ],
