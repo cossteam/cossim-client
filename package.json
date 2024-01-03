@@ -42,7 +42,8 @@
         "react-i18next": "^14.0.0",
         "skeleton-elements": "^4.0.1",
         "swiper": "^11.0.5",
-        "vue-auto-translate": "^1.1.12"
+        "vue-auto-translate": "^1.1.12",
+        "zustand": "^4.4.7"
     },
     "devDependencies": {
         "@types/node": "^20.10.6",

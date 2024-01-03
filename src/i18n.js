@@ -1,5 +1,5 @@
 import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
+import { initReactI18next, useTranslation } from 'react-i18next'
 
 export const languages = ['zh-CN', 'ja', 'en', 'zh-TW']
 export const defaultLanguage = 'zh-CN'
@@ -23,7 +23,7 @@ const locales = Object.assign(
 		})
 	))
 )
-console.log('locales', locales)
+// console.log('locales', locales)
 
 export default i18n.use(initReactI18next).init({
 	resources: locales,
@@ -34,4 +34,13 @@ export default i18n.use(initReactI18next).init({
 	}
 })
 
-// export const { t: $t } = useTranslation()
+/**
+ * 简易翻译函数, 后续翻译插件匹配 $t
+ * @param {string} ch 翻译的 key
+ * @returns {string}
+ */
+export function $t(ch) {
+	const { t } = useTranslation()
+	return t(ch)
+}
+

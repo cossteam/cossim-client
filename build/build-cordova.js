@@ -16,10 +16,10 @@ const build = async () => {
 
 	await bundle.write({
 		file: path.resolve(__dirname, '../cordova/www/assets/', `index-${hash}.js`),
-		format: 'es',
+		format: 'iife',
 		name: 'MyApp',
-		sourcemap: false,
-		inlineDynamicImports: true
+		sourcemap: false
+		// inlineDynamicImports: true
 	})
 
 	// Remove old chunk files

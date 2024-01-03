@@ -50,9 +50,6 @@ export default async () => {
 			rollupOptions: {
 				treeshake: false
 			}
-			// output: {
-			// 	inlineDynamicImports: true
-			// }
 		},
 		resolve: {
 			alias: {

@@ -29,5 +29,15 @@ module.exports = {
         "react"
     ],
     "rules": {
+        // 未使用变量
+        "no-unused-vars": [
+            "error",
+            {
+                "vars": "all",
+                "args": "after-used",
+                "ignoreRestSiblings": true,
+                "caughtErrors": "all"
+            }
+        ]
     }
 }

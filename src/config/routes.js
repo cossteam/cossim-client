@@ -2,6 +2,8 @@ import Chats from '@/pages/Chats/Chats'
 import Contacts from '@/pages/Contacts/Contacts'
 import Mine from '@/pages/Mine/Mine'
 
+import Login from '@/pages/Auth/Login/Login'
+
 const routes = [
 	{
 		path: '/chats/',
@@ -14,6 +16,14 @@ const routes = [
 	{
 		path: '/mine/',
 		component: Mine
+	},
+	{
+		path: '/login/',
+		component: Login
+	},
+	{
+		path: '/register/',
+		asyncComponent: () => import('@/pages/Auth/Register/Register')
 	},
 	{
 		path: '/chats/:id/',

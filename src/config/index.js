@@ -16,6 +16,7 @@ const f7params = {
 		primary: '#007aff'
 	},
 	serviceWorker:
+		// eslint-disable-next-line no-undef
 		process.env.NODE_ENV === 'production'
 			? {
 					path: '/service-worker.js'

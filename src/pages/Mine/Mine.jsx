@@ -1,9 +1,9 @@
 import React from 'react'
 import { List, ListItem, Navbar, Link, Page } from 'framework7-react'
 import './Mine.less'
-import ListColorIcon from '../../components/ListColorIcon'
+import ListColorIcon from '@/components/ListColorIcon'
 
-export default function Settings() {
+export default function Mine() {
 	return (
 		<Page className="settings-page">
 			<Navbar title="Settings" large transparent />
