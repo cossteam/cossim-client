@@ -12,15 +12,17 @@ import Framework7React from 'framework7-react'
 import 'framework7/css/bundle'
 
 // Import Icons and App Custom Styles
-import './styles/icons.css'
+// import 'framework7-icons/css/framework7-icons.css'
+// import './styles/icons.css'
+import 'framework7-icons'
 import './styles/app.less'
 
 // Import App Component
-import App from './App.jsx'
+import Home from './Home.jsx'
 
 // Init F7 React Plugin
 Framework7.use(Framework7React)
 
 // Mount React App
 const root = createRoot(document.getElementById('app'))
-root.render(React.createElement(App))
+root.render(React.createElement(Home))

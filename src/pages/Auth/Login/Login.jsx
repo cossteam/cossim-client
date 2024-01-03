@@ -1,20 +1,28 @@
 import React, { useState } from 'react'
-import { ListInput, List, Button, LoginScreenTitle, BlockFooter, Icon } from 'framework7-react'
+import { f7, ListInput, List, LoginScreenTitle, BlockFooter, Icon, ListButton, Button } from 'framework7-react'
 import { $t } from '@/i18n'
-// import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 
 export default function Login() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 
-	// const userStore = useUserStore()
+	const userStore = useUserStore()
 
 	const signIn = () => {
-		// f7.dialog.alert(`Username: ${username}<br>Password: ${password}`, () => {
-		// 	f7.loginScreen.close()
-		// })
-		// TODO: 登录
-		// userStore.updateLogin(true)
+		if (username === '' || password === '') {
+			f7.dialog.alert('内容不能为空')
+			return
+		}
+
+		// TODO: 登录对接接口
+		userStore.updateLogin(true)
+
+		f7.dialog.preloader()
+		setTimeout(() => {
+			f7.dialog.close()
+			window.location.href = '/'
+		}, 1000)
 	}
 
 	return (
@@ -51,12 +59,19 @@ export default function Login() {
 				</p> */}
 			</List>
 			<List inset>
-				<Button onClick={signIn} large fill text={$t('登录')} className="mx-[16px] rounded"></Button>
-				<BlockFooter>
+				<ListButton
+					onClick={signIn}
+					large
+					fill
+					text={$t('登录')}
+					className="mx-[16px] rounded bg-primary"
+					color="white"
+				></ListButton>
+				{/* <BlockFooter>
 					Some text about login information.
 					<br />
 					Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-				</BlockFooter>
+				</BlockFooter> */}
 			</List>
 		</>
 	)

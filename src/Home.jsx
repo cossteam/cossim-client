@@ -15,12 +15,12 @@ import routes from '@/config/routes'
  * 这里主要做一些全局配置之类的事情
  * @returns
  */
-const Mian = () => {
+const Home = () => {
 	// TODO: 配置提取到一个文件中
 	const device = getDevice()
 	// Framework7 Parameters
 	const f7params = {
-		name: 'IM Demo', // App name
+		name: 'Coss', // App name
 		theme: 'auto', // Automatic theme detection
 
 		// App store
@@ -37,11 +37,16 @@ const Mian = () => {
 		statusbar: {
 			iosOverlaysWebView: true,
 			androidOverlaysWebView: false
+		},
+
+		colors: {
+			primary:"#33a854"
 		}
 	}
 
 	// TODO: 国际化
 	// i18next.changeLanguage('zh-CN')
+	
 	f7ready(() => {
 		// 注册 cordova API
 		if (f7.device.cordova) {

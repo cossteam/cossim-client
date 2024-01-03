@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Page, LoginScreen, Block, Button } from 'framework7-react'
+import { Page, LoginScreen, Block, Button, Icon } from 'framework7-react'
 import { $t } from '@/i18n'
 
 import Login from './Login/Login'
@@ -57,36 +57,15 @@ export default function Auth() {
 					setLoginScreenOpened(false)
 				}}
 			>
-				<Page loginScreen>
-					{/* <LoginScreenTitle>Framework7</LoginScreenTitle>
-					<List form>
-						<ListInput
-							label="Username"
-							type="text"
-							placeholder="Your username"
-							value={username}
-							onInput={(e) => {
-								setUsername(e.target.value)
-							}}
-						/>
-						<ListInput
-							label="Password"
-							type="password"
-							placeholder="Your password"
-							value={password}
-							onInput={(e) => {
-								setPassword(e.target.value)
-							}}
-						/>
-					</List>
-					<List inset>
-						<ListButton onClick={signIn}>Sign In</ListButton>
-						<BlockFooter>
-							Some text about login information.
-							<br />
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-						</BlockFooter>
-					</List> */}
+				<Page loginScreen className="relative">
+					<Button
+						className="fixed top-5 left-3"
+						onClick={() => {
+							setLoginScreenOpened(false)
+						}}
+					>
+						<i className="icon-back"></i>
+					</Button>
 					{login ? <Login /> : <Register />}
 				</Page>
 			</LoginScreen>
