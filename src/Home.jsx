@@ -6,7 +6,7 @@ import { getDevice } from 'framework7/lite-bundle'
 import cordovaApp from '@/config/cordova-app'
 
 import AppComponent from './pages/App'
-import { f7, App, f7ready } from 'framework7-react'
+import { f7, App, f7ready, Views } from 'framework7-react'
 
 import routes from '@/config/routes'
 // import store from '@/stores'
@@ -51,9 +51,11 @@ const Mian = () => {
 
 	return (
 		<App {...f7params}>
-			<AppComponent />
+			<Views tabs className="safe-area">
+				<AppComponent />
+			</Views>
 		</App>
 	)
 }
 
-export default Mian
+export default Home

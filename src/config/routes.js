@@ -24,6 +24,10 @@ var routes = [
 		path: '/auth/',
 		component: Auth
 	},
+	// {
+	// 	path: '/register/',
+	// 	asyncComponent: () => import('@/pages/Auth/Register/Register')
+	// },
 	{
 		path: '/chats/:id/',
 		component: Messages

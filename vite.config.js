@@ -43,7 +43,7 @@ export default async () => {
 		base: '',
 		publicDir: PUBLIC_DIR,
 		build: {
-			target: 'ES2022',
+			// target: 'ES2022',
 			outDir: BUILD_DIR,
 			assetsInlineLimit: 0,
 			emptyOutDir: true,

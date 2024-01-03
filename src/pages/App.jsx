@@ -13,6 +13,9 @@ const AppComponent = () => {
 	// 	return <View id="view-auth" url="/auth/" main />
 	// }
 
+	const [activeTab, setActiveTab] = useState('chats')
+	const previousTab = useRef('chats')
+
 	useEffect(() => {
 		// 修复手机上的视口比例
 		if ((f7.device.ios || f7.device.android) && f7.device.standalone) {
