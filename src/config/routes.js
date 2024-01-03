@@ -2,7 +2,7 @@ import Chats from '@/pages/Chats/Chats'
 import Contacts from '@/pages/Contacts/Contacts'
 import Mine from '@/pages/Mine/Mine'
 
-import Login from '@/pages/Auth/Login/Login'
+import Auth from '@/pages/Auth/Auth'
 
 const routes = [
 	{
@@ -18,13 +18,13 @@ const routes = [
 		component: Mine
 	},
 	{
-		path: '/login/',
-		component: Login
+		path: '/auth/',
+		component: Auth
 	},
-	{
-		path: '/register/',
-		asyncComponent: () => import('@/pages/Auth/Register/Register')
-	},
+	// {
+	// 	path: '/register/',
+	// 	asyncComponent: () => import('@/pages/Auth/Register/Register')
+	// },
 	{
 		path: '/chats/:id/',
 		asyncComponent: () => import('@/pages/Messages/Messages')

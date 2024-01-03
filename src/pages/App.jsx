@@ -1,26 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react'
 import $ from 'dom7'
-import { f7, Views, View, Toolbar, Link } from 'framework7-react'
+import { f7, View, Toolbar, Link } from 'framework7-react'
+// import Login from '@/pages/Auth/Login/Login'
 
 // import f7params from '@/config'
 // import { clsx } from 'clsx'
 // import i18next from 'i18next'
 import { $t } from '@/i18n'
-// import { useTranslation } from 'react-i18next'
-import { useUserStore } from '@/stores'
+import { useUserStore } from '@/stores/user'
 
 const AppComponent = () => {
+	const { isLogin } = useUserStore()
+	
+	if (!isLogin) {
+		return <View id="view-auth"  url="/auth/" main/>
+	}
+
 	const [activeTab, setActiveTab] = useState('chats')
 	const previousTab = useRef('chats')
-
-	const { isLogin } = useUserStore()
-
-	console.log('isLogin', isLogin,f7)
-
-	if (!isLogin) {
-		// 跳转登录页面
-		// f7.views.main.router.navigate('/login')
-	}
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -43,7 +40,7 @@ const AppComponent = () => {
 	}
 
 	return (
-		<Views tabs className="safe-area">
+		<>
 			<Toolbar tabbar icons bottom>
 				<Link
 					tabLink="#view-chats"
@@ -64,7 +61,7 @@ const AppComponent = () => {
 			<View id="view-chats" onTabShow={() => setActiveTab('chats')} tab tabActive url="/chats/" main />
 			<View id="view-contacts" onTabShow={() => setActiveTab('contacts')} tab url="/contacts/" />
 			<View id="view-mine" onTabShow={() => setActiveTab('mine')} tab url="/mine/" />
-		</Views>
+		</>
 	)
 }
 

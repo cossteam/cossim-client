@@ -13,7 +13,7 @@ const f7params = {
 	darkMode: false,
 	// 默认主题
 	colors: {
-		primary: '#007aff'
+		primary: '#33a854'
 	},
 	serviceWorker:
 		// eslint-disable-next-line no-undef

@@ -8,7 +8,7 @@ import './styles/framework7-custom.less'
 import './styles/icons.css'
 import './styles/app.less'
 
-import App from './App'
+import Home from './Home'
 
 Framework7.use(Framework7React)
-createRoot(document.getElementById('root')).render(React.createElement(App))
+createRoot(document.getElementById('root')).render(React.createElement(Home))

@@ -48,3 +48,14 @@ html.dark {
 .navbar-bg {
 	background: #fff;
 }
+
+
+#root {
+	html:not(.dark) & {
+		--f7-page-bg-color: #fff;
+	}
+
+	html.dark & {
+		--f7-page-bg-color: #000;
+	}
+}
