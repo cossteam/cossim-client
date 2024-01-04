@@ -21,8 +21,18 @@ import { persist, createJSONStorage, devtools } from 'zustand/middleware'
 
 const userStore = (set) => ({
 	isLogin: false,
+	token: '',
 	user: {},
-	updateLogin: (isLogin) => set({ isLogin })
+	updateLogin: (isLogin) => set({ isLogin }),
+	updateUser: (user) =>
+		set((state) => ({
+			user: {
+				...state.user,
+				...user
+			}
+		})),
+	removeUser: () => set({ user: {}, isLogin: false }),
+	updateToken: (token) => set({ token })
 })
 
 export const useUserStore = create(

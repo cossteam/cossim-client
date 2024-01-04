@@ -6,10 +6,10 @@ import { getDevice } from 'framework7/lite-bundle'
 import cordovaApp from '@/config/cordova-app'
 
 import AppComponent from './pages/App'
-import { f7, App, f7ready, Views } from 'framework7-react'
+import { f7, App, f7ready, Views, View } from 'framework7-react'
 
 import routes from '@/config/routes'
-// import store from '@/stores'
+import { useUserStore } from '@/stores/user'
 
 /**
  * 这里主要做一些全局配置之类的事情
@@ -20,7 +20,7 @@ const Home = () => {
 	const device = getDevice()
 	// Framework7 Parameters
 	const f7params = {
-		name: 'Coss', // App name
+		name: '', // App name
 		theme: 'auto', // Automatic theme detection
 
 		// App store
@@ -40,13 +40,13 @@ const Home = () => {
 		},
 
 		colors: {
-			primary:"#33a854"
+			primary: '#33a854'
 		}
 	}
 
 	// TODO: 国际化
 	// i18next.changeLanguage('zh-CN')
-	
+
 	f7ready(() => {
 		// 注册 cordova API
 		if (f7.device.cordova) {
@@ -54,10 +54,12 @@ const Home = () => {
 		}
 	})
 
+	const { isLogin } = useUserStore()
+
 	return (
 		<App {...f7params}>
 			<Views tabs className="safe-area">
-				<AppComponent />
+				{isLogin ? <AppComponent isLogin={isLogin} /> : <View id="view-auth" name="auth" url="/auth/" />}
 			</Views>
 		</App>
 	)

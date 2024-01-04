@@ -2,16 +2,22 @@ import React, { useState, useEffect, useRef } from 'react'
 import $ from 'dom7'
 import { f7, f7ready, Views, View, Toolbar, Link } from 'framework7-react'
 import cordovaApp from '@/config/cordova-app'
-import { useUserStore } from '@/stores/user'
+// import { useUserStore } from '@/stores/user'
+// import PropTypes from 'prop-types' 
 
-const AppComponent = () => {
+// AppComponent.propTypes = {
+// 	isLogin: PropTypes.bool
+// }
+
+export default function AppComponent() {
+
+	// console.log("AppComponent",isLogin);
+	// if(!isLogin) {
+	// 	return <View id="view-auth" name="auth" url="/auth/" />
+	// }
+
 	const [activeTab, setActiveTab] = useState('chats')
 	const previousTab = useRef('chats')
-	const { isLogin } = useUserStore()
-
-	useEffect(() => {
-		!isLogin && $(`#view-${activeTab}`)[0].f7View.router.navigate(`/auth/`)
-	}, [isLogin])
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -43,32 +49,32 @@ const AppComponent = () => {
 
 	return (
 		<Views tabs className="safe-areas">
-			{isLogin && (
-				<>
-					<Toolbar tabbar icons bottom>
-						<Link
-							tabLink="#view-chats"
-							tabLinkActive
-							iconF7="chat_bubble_2"
-							text="聊天"
-							onClick={() => onTabLinkClick('chats')}
-						/>
-						<Link
-							tabLink="#view-contacts"
-							iconF7="phone"
-							text="联系人"
-							onClick={() => onTabLinkClick('contacts')}
-						/>
-						<Link
-							tabLink="#view-my"
-							iconIos="f7:gear"
-							iconMd="material:settings"
-							text="我的"
-							onClick={() => onTabLinkClick('my')}
-						/>
-					</Toolbar>
-				</>
-			)}
+			{/* {isLogin && ( */}
+			<>
+				<Toolbar tabbar icons bottom>
+					<Link
+						tabLink="#view-chats"
+						tabLinkActive
+						iconF7="chat_bubble_2"
+						text="聊天"
+						onClick={() => onTabLinkClick('chats')}
+					/>
+					<Link
+						tabLink="#view-contacts"
+						iconF7="phone"
+						text="联系人"
+						onClick={() => onTabLinkClick('contacts')}
+					/>
+					<Link
+						tabLink="#view-my"
+						iconIos="f7:gear"
+						iconMd="material:settings"
+						text="我的"
+						onClick={() => onTabLinkClick('my')}
+					/>
+				</Toolbar>
+			</>
+			{/* )} */}
 
 			<View id="view-chats" onTabShow={() => setActiveTab('chats')} tab tabActive url="/chats/" main />
 			<View id="view-contacts" onTabShow={() => setActiveTab('contacts')} tab url="/contacts/" />
@@ -78,4 +84,3 @@ const AppComponent = () => {
 		</Views>
 	)
 }
-export default AppComponent

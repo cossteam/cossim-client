@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Page, LoginScreen, Block, Button, Icon } from 'framework7-react'
+import { Page, LoginScreen, Block, Button } from 'framework7-react'
 import { $t } from '@/i18n'
 
 import Login from './Login/Login'
@@ -8,6 +8,8 @@ import Register from './Register/Register'
 export default function Auth() {
 	const [loginScreenOpened, setLoginScreenOpened] = useState('')
 	const [login, setLogin] = useState(true)
+
+	const [disabled, setDisabled] = useState(false)
 
 	function handleClick(isLogin) {
 		setLogin(isLogin)
@@ -26,7 +28,7 @@ export default function Auth() {
 	return (
 		<Page>
 			<Block className="flex justify-center h-3/5 pt-10">
-				<h1 className="text-3xl font-semibold">Coss</h1>
+				<h1 className="text-3xl font-semibold">COSS</h1>
 			</Block>
 
 			<Block>
@@ -37,6 +39,7 @@ export default function Auth() {
 						handleClick(true)
 					}}
 					className="mb-5"
+					round
 				>
 					{$t('登录')}
 				</Button>
@@ -46,6 +49,7 @@ export default function Auth() {
 					onClick={() => {
 						handleClick(false)
 					}}
+					round
 				>
 					{$t('注册')}
 				</Button>
@@ -61,12 +65,13 @@ export default function Auth() {
 					<Button
 						className="fixed top-5 left-3"
 						onClick={() => {
+							setDisabled(true)
 							setLoginScreenOpened(false)
 						}}
 					>
 						<i className="icon-back"></i>
 					</Button>
-					{login ? <Login /> : <Register />}
+					{login ? <Login disabled={disabled} /> : <Register disabled={disabled} />}
 				</Page>
 			</LoginScreen>
 		</Page>

@@ -1,7 +1,7 @@
 /*eslint no-undef: "off"*/
 import path from 'path'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
 // import electron from 'vite-plugin-electron/simple'
 
@@ -12,7 +12,9 @@ const PUBLIC_DIR = path.resolve(__dirname, './public')
 const BUILD_DIR = path.resolve(__dirname, isCordova ? './cordova/www' : './www')
 
 /*** @type {import('vite').UserConfig} */
-export default async () => {
+export default async ({ mode }) => {
+	const http = loadEnv(mode, process.cwd())
+	console.log("http",http,mode);
 	return defineConfig({
 		plugins: [
 			react(),
@@ -57,7 +59,14 @@ export default async () => {
 			}
 		},
 		server: {
-			host: true
+			// host: true,
+			// proxy: {
+			// 	'/api/v1': {
+			// 		target: mode === 'development' ? http.VITE_DEV_BASE_URL : http.VITE_PROD_BASE_URL,
+			// 		changeOrigin: true,
+			// 		rewrite: (path) => path.replace(/^\/api\/v1/, '')
+			// 	}
+			// }
 		}
 	})
 }
