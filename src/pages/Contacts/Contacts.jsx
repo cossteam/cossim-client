@@ -44,11 +44,9 @@ export default function Contacts(props) {
 		}
 	}
 
-	console.log(getFriendList())
+	// console.log(getFriendList())
 
 	return (
-		// <Popup push>
-		// 	<View>
 		<Page className="contacts-page">
 			<Navbar title="联系人">
 				<Link slot="right" popupClose>
@@ -91,7 +89,5 @@ export default function Contacts(props) {
 				))}
 			</List>
 		</Page>
-		// </View>
-		// </Popup>
 	)
 }

@@ -37,7 +37,7 @@ const userStore = (set) => ({
 
 const ProStroeName = 'COSS_USER_STRORAGE'
 const DevStroeName = 'COSS_DEV_STRORAGE'
-const storageName = import.meta.env.MODE === 'development' ? DevStroeName : ProStroeName
+export const storageName = import.meta.env.MODE === 'development' ? DevStroeName : ProStroeName
 
 export const useUserStore = create(
 	devtools(
@@ -52,16 +52,3 @@ export const useUserStore = create(
 	)
 )
 
-/**
- * 获取本地存储
- * @param {string} name	存储名称
- * @returns
- */
-export function getUserStorage(name = storageName) {
-	const storage = window.localStorage.getItem(name)
-	if (storage) {
-		return JSON.parse(storage)
-	} else {
-		return null
-	}
-}
