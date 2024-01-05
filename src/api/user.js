@@ -1,15 +1,17 @@
 import request from '@/utils/request'
 
+const baseApi = '/user'
+
 /**
  * 登录接口
  * @param {*} data
- * @param {*} data.email     	邮箱
- * @param {*} data.password     密码
+ * @param {string} data.email     		邮箱
+ * @param {string} data.password     	密码
  * @returns
  */
 export function loginApi(data) {
 	return request({
-		url:'/user/login',
+		url: `${baseApi}/login`,
 		method: 'post',
 		data
 	})
@@ -18,15 +20,15 @@ export function loginApi(data) {
 /**
  * 注册接口
  * @param {*} data
- * @param {*} data.email     	邮箱
- * @param {*} data.password     密码
- * @param {*} data.nickname     昵称
- * @param {*} data.avatar       头像
+ * @param {string} data.email     		邮箱
+ * @param {string} data.password     	密码
+ * @param {string} data.nickname     	昵称
+ * @param {string} data.avatar       	头像
  * @returns
  */
- export function registerApi(data) {
+export function registerApi(data) {
 	return request({
-		url:'/user/register',
+		url: `${baseApi}/register`,
 		method: 'post',
 		data
 	})
