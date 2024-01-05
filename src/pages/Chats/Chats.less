@@ -1,8 +1,8 @@
 // .chats-page {
-// 	html:not(.dark) & {
-// 		// --f7-page-bg-color: #fff;
-// 		--f7-popover-bg-color: #333;
-// 	}
+// html:not(.dark) & {
+// 	// --f7-page-bg-color: #fff;
+// 	--f7-popover-bg-color: #333;
+// }
 // }
 
 .chats-list {
@@ -27,5 +27,21 @@
 			flex-direction: column;
 			justify-content: center;
 		}
+	}
+}
+
+.el-list {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+
+	.el-list__icon {
+		font-size: 20px;
+	}
+
+	.el-text {
+		font-size: 15px;
+		margin-left: 10px;
+		white-space: nowrap;
 	}
 }

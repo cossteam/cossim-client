@@ -15,9 +15,11 @@ import './Chats.less'
 import { contacts, chats } from '@/data'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 
-import { Search } from 'framework7-icons/react'
+import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
+import { $t } from '@/i18n'
+import SearchComponent from '@/components/Search/Search'
 
-export default function Chats(props) {
+export default function Chats() {
 	// const { f7router } = props
 
 	const swipeoutUnread = () => {
@@ -57,17 +59,15 @@ export default function Chats(props) {
 
 	return (
 		<Page className="chats-page">
-			{/* </Navbar> */}
-			<Navbar title="coss" className="coss-header">
-				{/* <Link slot="right" className="mr-2"> */}
-				{/* <Icon f7="search" slot="right" size="20px" className="mr-3" /> */}
-				{/* </Link> */}
-				{/* <Link slot="right" className="mr-2"> */}
+			<Navbar title="COSS" className="coss-header">
 				<Link slot="right" popoverOpen=".popover-menu">
-					<Icon f7="plus" size="28px" className="mr-1" />
+					<Search className="w-[24px] h-[24px]" />
 				</Link>
-				{/* </Link> */}
+				<Link slot="right" popoverOpen=".popover-menu">
+					<Plus className="w-[28px] h-[28px] mr-2" />
+				</Link>
 			</Navbar>
+
 			<List noChevron dividers mediaList className="chats-list">
 				{chatsFormatted.map((chat) => (
 					<ListItem
@@ -85,7 +85,6 @@ export default function Chats(props) {
 						/>
 						<span slot="text">
 							{chat.lastMessageType === 'sent' && <DoubleTickIcon />}
-
 							{chat.lastMessageText}
 						</span>
 						{/* <SwipeoutActions left>
@@ -111,24 +110,25 @@ export default function Chats(props) {
 								<Icon f7="ellipsis" />
 								<span>删除</span>
 							</SwipeoutButton>
-							{/* <SwipeoutButton close overswipe color="light-blue" onClick={swipeoutArchive}>
-								<Icon f7="archivebox_fill" />
-								<span>删除</span>
-							</SwipeoutButton> */}
 						</SwipeoutActions>
 					</ListItem>
 				))}
 			</List>
 
-			<Popover className="popover-menu w-36" backdrop={false}>
+			<Popover className="popover-menu w-[160px]" backdrop={false} arrow={false}>
 				<List className="text-white" dividersIos outlineIos strongIos>
-					<ListItem link="/dialog/" popoverClose title="Dialog" />
-					<ListItem link="/tabs/" popoverClose title="Tabs" />
-					<ListItem link="/panel/" popoverClose title="Side Panels" />
-					<ListItem link="/list/" popoverClose title="List View" />
-					<ListItem link="/inputs/" popoverClose title="Form Inputs" />
+					<ListItem link="/dialog/" popoverClose className="el-list">
+						<Person2Alt className="el-list__icon" />
+						<span className="el-text">{$t('发起群聊')}</span>
+					</ListItem>
+					<ListItem link popoverClose className="el-list" popupOpen=".search-popup">
+						<PersonBadgePlusFill className="el-list__icon" />
+						<span className="el-text">{$t('添加朋友/群')}</span>
+					</ListItem>
 				</List>
 			</Popover>
+
+			<SearchComponent title={$t('添加朋友')} placeholder={$t('邮箱')} className='z-[9999999]' />
 		</Page>
 	)
 }

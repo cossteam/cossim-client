@@ -12,8 +12,10 @@ import Framework7React from 'framework7-react'
 import 'framework7/css/bundle'
 
 // Import Icons and App Custom Styles
+// import 
 // import 'framework7-icons/css/framework7-icons.css'
 // import './styles/icons.css'
+// import './styles/framework7-custom.less'
 import 'framework7-icons'
 import './styles/app.less'
 
