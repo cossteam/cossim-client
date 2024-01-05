@@ -89,3 +89,4 @@ cordova/www/
 
 # Production build
 www/
+package-lock.json
