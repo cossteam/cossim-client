@@ -29,7 +29,7 @@ export default function MessagesPage({ f7route }) {
 		setVlData({ ...newData })
 	}
 	const [messageText, setMessageText] = useState('')
-	console.log(messagesRef.current.f7Messages())
+	// console.log(messagesRef.current.f7Messages())
 
 	const messageTime = (message) =>
 		Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(message.date)

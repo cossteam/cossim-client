@@ -3,12 +3,12 @@ import axios from 'axios'
 const mode = import.meta.env.MODE || 'development'
 
 const baseURL = {
-	development: 'http://192.168.1.8:8081/api/v1',
-	production: 'http://192.168.1.8:8081/api/v1'
+	development: 'http://192.168.1.8:8083/api/v1',
+	production: 'http://192.168.1.8:8083/api/v1'
 }
 
 const request = axios.create({
-	baseURL: baseURL[mode] ,
+	baseURL: baseURL[mode],
 	// baseURL:'/api/v1',
 	timeout: 10000
 	//   headers: {
