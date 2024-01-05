@@ -17,6 +17,9 @@ import { contacts } from '@/data'
 
 import './Contacts.less'
 
+import { friendListApi } from '@/api/relation'
+import { useUserStore } from '@/stores/user'
+
 export default function Contacts(props) {
 	const { modalTitle, onUserSelect } = props
 	const contactsSorted = [...contacts].sort((a, b) => (b.name > a.name ? -1 : 1))
@@ -28,6 +31,21 @@ export default function Contacts(props) {
 	contactsSorted.forEach((contact) => {
 		groups[contact.name[0].toUpperCase()].push(contact)
 	})
+
+	const { user } = useUserStore()
+
+	// 获取好友列表
+	const getFriendList = async () => {
+		try {
+			const res = await friendListApi({ user_id: user.user_id })
+			if (res.code !== 200) return
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
+	console.log(getFriendList())
+
 	return (
 		// <Popup push>
 		// 	<View>

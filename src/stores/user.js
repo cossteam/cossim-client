@@ -35,16 +35,33 @@ const userStore = (set) => ({
 	updateToken: (token) => set({ token })
 })
 
+const ProStroeName = 'COSS_USER_STRORAGE'
+const DevStroeName = 'COSS_DEV_STRORAGE'
+const storageName = import.meta.env.MODE === 'development' ? DevStroeName : ProStroeName
+
 export const useUserStore = create(
 	devtools(
 		persist(userStore, {
-			name: 'user-storage',
+			name: storageName,
 			storage: createJSONStorage(() => localStorage)
-		}),
-		{
-			// eslint-disable-next-line no-undef
-			enabled: process.env.NODE_ENV === 'development',
-			name: 'coss-storage'
-		}
+		})
+		// {
+		// 	enabled: import.meta.env.MODE === 'development',
+		// 	name: DevStroeName
+		// }
 	)
 )
+
+/**
+ * 获取本地存储
+ * @param {string} name	存储名称
+ * @returns
+ */
+export function getUserStorage(name = storageName) {
+	const storage = window.localStorage.getItem(name)
+	if (storage) {
+		return JSON.parse(storage)
+	} else {
+		return null
+	}
+}

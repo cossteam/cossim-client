@@ -5,7 +5,7 @@ import { contacts, chats } from '@/data'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 
 export default function Chats(props) {
-	const { f7router } = props
+	// const { f7router } = props
 
 	const swipeoutUnread = () => {
 		f7.dialog.alert('Unread')
@@ -16,15 +16,16 @@ export default function Chats(props) {
 	const swipeoutMore = () => {
 		f7.dialog.alert('More')
 	}
-	const swipeoutArchive = () => {
-		f7.dialog.alert('Archive')
-	}
-	const onUserSelect = (user) => {
-		console.log('start new chat with', user)
-		setTimeout(() => {
-			f7router.navigate(`/chats/${user.id}/`)
-		}, 300)
-	}
+	// const swipeoutArchive = () => {
+	// 	f7.dialog.alert('Archive')
+	// }
+	// const onUserSelect = (user) => {
+	// 	console.log('start new chat with', user)
+	// 	setTimeout(() => {
+	// 		f7router.navigate(`/chats/${user.id}/`)
+	// 	}, 300)
+	// }
+
 	const chatsFormatted = chats.map((chat) => {
 		const contact = contacts.filter((contact) => contact.id === chat.userId)[0]
 		const lastMessage = chat.messages[chat.messages.length - 1]
@@ -40,6 +41,7 @@ export default function Chats(props) {
 			contact
 		}
 	})
+
 	return (
 		<Page className="chats-page">
 			{/* <Navbar title="聊天" large transparent> */}
