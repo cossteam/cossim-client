@@ -1,14 +1,15 @@
 import axios from 'axios'
+import { getUserStorage } from '@/stores/user'
 
 const mode = import.meta.env.MODE || 'development'
 
 const baseURL = {
-	development: 'http://192.168.1.8:8081/api/v1',
+	development: 'http://192.168.1.12:8080/api/v1',
 	production: 'http://192.168.1.8:8081/api/v1'
 }
 
 const request = axios.create({
-	baseURL: baseURL[mode] ,
+	baseURL: baseURL[mode],
 	// baseURL:'/api/v1',
 	timeout: 10000
 	//   headers: {
@@ -21,8 +22,11 @@ const request = axios.create({
 
 request.interceptors.request.use(
 	(config) => {
-		// Do something before request is sent
-		// console.log(config)
+		const storage = getUserStorage()
+		console.log(storage);
+		if (storage && storage.state.isLogin && storage.state.token) {
+			config.headers.Authorization = 'Bearer ' +  storage.state.token
+		}
 		return config
 	},
 	(error) => {

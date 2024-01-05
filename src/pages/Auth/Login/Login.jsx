@@ -34,34 +34,42 @@ export default function Login({ disabled }) {
 	const errorList = {
 		emailEmpty: $t('邮箱不能为空'),
 		emailFormat: $t('邮箱格式不正确'),
-		passwordEmpty: $t('密码不能为空')
+		passwordEmpty: $t('密码不能为空'),
+		errorMessage: $t('登录失败，请稍后重试！'),
+		serverError: $t('服务器错误，请稍后重试！')
 	}
 
 	// 登录
 	const signIn = async () => {
-		// 判断是否正在登录
-		if (loading) return
+		try {
+			// 判断是否正在登录
+			if (loading) return
 
-		// 初步校验
-		if (!fromData.email.trim()) return setEmailError(errorList.emailEmpty)
-		if (!validEmail(fromData.email.trim())) return setEmailError(errorList.emailFormat)
-		if (!fromData.password.trim()) return setPasswordError(errorList.passwordEmpty)
+			// 初步校验
+			if (!fromData.email.trim()) return setEmailError(errorList.emailEmpty)
+			if (!validEmail(fromData.email.trim())) return setEmailError(errorList.emailFormat)
+			if (!fromData.password.trim()) return setPasswordError(errorList.passwordEmpty)
 
-		// loading
-		setLoading(true)
+			// loading
+			setLoading(true)
 
-		// 登录
-		const res = await loginApi(fromData)
+			// 登录
+			const res = await loginApi(fromData)
 
-		// 无论登录成功与否都需要关闭 loading
-		if (res) setLoading(false)
+			// 无论登录成功与否都需要关闭 loading
+			if (res) setLoading(false)
 
-		if (res.code !== 200) return f7.dialog.alert(res.msg || $t('登录失败'))
-		if (res.data.token) userStore.updateToken(res.data.token)
-		if (res.data.user_info) userStore.updateUser(res.data.user_info)
+			if (res.code !== 200) return f7.dialog.alert(res.msg || errorList.errorMessage)
+			if (res.data.token) userStore.updateToken(res.data.token)
+			if (res.data.user_info) userStore.updateUser(res.data.user_info)
 
-		userStore.updateLogin(true)
-		window.location.href = '/'
+			userStore.updateLogin(true)
+			window.location.href = '/'
+		} catch (err) {
+			console.log(err)
+			f7.dialog.alert(errorList.serverError)
+			setLoading(false)
+		}
 	}
 
 	// 返回时需要操作
