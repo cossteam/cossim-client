@@ -8,7 +8,7 @@ import PropTypes from 'prop-types'
 
 import { loginApi } from '@/api/user'
 import { validEmail } from '@/utils/validate'
-
+import { initConnect } from '@/utils/ws'
 import '../Auth.less'
 
 import clsx from 'clsx'
@@ -62,8 +62,8 @@ export default function Login({ disabled }) {
 			if (res.code !== 200) return f7.dialog.alert(res.msg || errorList.errorMessage)
 			if (res.data.token) userStore.updateToken(res.data.token)
 			if (res.data.user_info) userStore.updateUser(res.data.user_info)
-
 			userStore.updateLogin(true)
+			setLoading(false)
 			window.location.href = '/'
 		} catch (err) {
 			console.log(err)
