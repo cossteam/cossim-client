@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getUserStorage } from '@/stores/user'
+import { getStorage } from '@/utils/stroage'
 
 const mode = import.meta.env.MODE || 'development'
 
@@ -22,8 +22,7 @@ const request = axios.create({
 
 request.interceptors.request.use(
 	(config) => {
-		const storage = getUserStorage()
-		console.log(storage);
+		const storage = getStorage()
 		if (storage && storage.state.isLogin && storage.state.token) {
 			config.headers.Authorization = 'Bearer ' +  storage.state.token
 		}

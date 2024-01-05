@@ -1,8 +1,22 @@
 import React from 'react'
-import { f7, List, ListItem, Navbar, Link, Page, SwipeoutActions, SwipeoutButton, Icon } from 'framework7-react'
+import {
+	f7,
+	List,
+	ListItem,
+	Navbar,
+	Link,
+	Page,
+	SwipeoutActions,
+	SwipeoutButton,
+	Icon,
+	Popover
+} from 'framework7-react'
 import './Chats.less'
 import { contacts, chats } from '@/data'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
+
+import { Search } from 'framework7-icons/react'
+
 
 export default function Chats(props) {
 	// const { f7router } = props
@@ -44,24 +58,15 @@ export default function Chats(props) {
 
 	return (
 		<Page className="chats-page">
-			{/* <Navbar title="聊天" large transparent> */}
-			{/* <Link slot="left">Edit</Link> */}
-			{/* <Link
-					slot="right"
-					iconF7="square_pencil"
-					href="/contacts/"
-					routeProps={{
-						modalTitle: 'New Chat',
-						onUserSelect
-					}}
-				/> */}
 			{/* </Navbar> */}
 			<Navbar title="coss" className="coss-header">
 				{/* <Link slot="right" className="mr-2"> */}
-				<Icon f7="search" slot="right" size="20px" className="mr-3" />
+				{/* <Icon f7="search" slot="right" size="20px" className="mr-3" /> */}
 				{/* </Link> */}
 				{/* <Link slot="right" className="mr-2"> */}
-				<Icon f7="plus" slot="right" size="24px" className="mr-1" />
+				<Link slot="right" popoverOpen=".popover-menu">
+					<Icon f7="plus" size="28px" className="mr-1" />
+				</Link>
 				{/* </Link> */}
 			</Navbar>
 			<List noChevron dividers mediaList className="chats-list">
@@ -115,6 +120,16 @@ export default function Chats(props) {
 					</ListItem>
 				))}
 			</List>
+
+			<Popover className="popover-menu w-36" backdrop={false}>
+				<List className="text-white" dividersIos outlineIos strongIos>
+					<ListItem link="/dialog/" popoverClose title="Dialog" />
+					<ListItem link="/tabs/" popoverClose title="Tabs" />
+					<ListItem link="/panel/" popoverClose title="Side Panels" />
+					<ListItem link="/list/" popoverClose title="List View" />
+					<ListItem link="/inputs/" popoverClose title="Form Inputs" />
+				</List>
+			</Popover>
 		</Page>
 	)
 }
