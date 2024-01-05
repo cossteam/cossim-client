@@ -1,102 +1,53 @@
-# IM Demo
+# 目录结构
 
-## Framework7 CLI Options
-
-Framework7 app created with following options:
-
-```
-{
-  "cwd": "/Users/mac-os12/Documents/project/im/im-demo",
-  "type": [
-    "cordova"
-  ],
-  "name": "IM Demo",
-  "framework": "react",
-  "template": "tabs",
-  "bundler": "vite",
-  "cssPreProcessor": "less",
-  "theming": {
-    "customColor": false,
-    "color": "#007aff",
-    "darkMode": false,
-    "iconFonts": true
-  },
-  "customBuild": false,
-  "pkg": "com.xm.imdemo",
-  "cordova": {
-    "folder": "cordova",
-    "platforms": [
-      "ios",
-      "android"
-    ],
-    "plugins": [
-      "cordova-plugin-statusbar",
-      "cordova-plugin-keyboard",
-      "cordova-plugin-splashscreen",
-      "cordova-plugin-file",
-      "cordova-plugin-inappbrowser",
-      "cordova-plugin-device",
-      "cordova-plugin-media"
-    ]
-  }
-}
+```json
+|-node_modules                      // 依赖包
+|-public                            // 静态资源目录
+|-build                             // 打包移动端端文件夹，
+|  |-platforms                      // 打包后存放 android ios 目录
+|  |-www                            // 项目打包后源文件
+|  |-config.xml                     // 项目配置文件
+|  |-build.js                       // 打包脚本
+|-electron                          // electron 项目目录
+|-src                               // 项目源码
+|-package.json                      // 项目配置文件
+|-README.md                         // 项目说明文件
 ```
 
-## Install Dependencies
+# 命名规范
 
-First of all we need to install dependencies, run in terminal
-```
-npm install
-```
+1. 所有模块都应该使用驼峰命名法，如 `index.js`、`App.jsx`、`AppPage.vue` 等。
+2. 所有组件都应该使用 PascalCase 命名法，如 `HelloWorld.jsx` 等。
 
-## NPM Scripts
+# 项目结构
 
-* 🔥 `start` - run development server
-* 🔧 `dev` - run development server
-* 🔧 `build` - build web app for production
-* 📱 `build-cordova` - build cordova app
-* 📱 `build-cordova-ios` - build cordova iOS app
-* 📱 `cordova-ios` - run dev build cordova iOS app
-* 📱 `build-cordova-android` - build cordova Android app
-* 📱 `cordova-android` - run dev build cordova Android app
-
-## Vite
-
-There is a [Vite](https://vitejs.dev) bundler setup. It compiles and bundles all "front-end" resources. You should work only with files located in `/src` folder. Vite config located in `vite.config.js`.
-## Cordova
-
-Cordova project located in `cordova` folder. You shouldn't modify content of `cordova/www` folder. Its content will be correctly generated when you call `npm run cordova-build-prod`.
-
-
-
-## Assets
-
-Assets (icons, splash screens) source images located in `assets-src` folder. To generate your own icons and splash screen images, you will need to replace all assets in this directory with your own images (pay attention to image size and format), and run the following command in the project directory:
-
-```
-framework7 assets
+```json
+|-src                               // 项目源码
+|  |-assets                         // 静态资源
+|  |-components                     // 组件
+|  |-pages                          // 页面
+|  |-config                         // 项目配置目录
+|  |-store                          // 状态管理
+|  |-utils                          // 工具库
+|  |-App.jsx                        // 入口文件
+|  |-index.js                       // 入口文件
 ```
 
-Or launch UI where you will be able to change icons and splash screens:
+# Git 提交规范
 
-```
-framework7 assets --ui
-```
+- fix: 修复 bug
+- feat: 新功能
+- docs: 文档
+- style: 格式
+- refactor: 重构
+- perf: 性能优化
+- test: 测试
+- build: 构建
+- ci: 持续集成
+- chore: 其他修改
 
+# 国际化规范
 
+- json：一个中文 key 对应其他语言的 value
 
-## Documentation & Resources
-
-* [Framework7 Core Documentation](https://framework7.io/docs/)
-
-* [Framework7 React Documentation](https://framework7.io/react/)
-
-* [Framework7 Icons Reference](https://framework7.io/icons/)
-* [Community Forum](https://forum.framework7.io)
-
-## Support Framework7
-
-Love Framework7? Support project by donating or pledging on:
-- Patreon: https://patreon.com/framework7
-- OpenCollective: https://opencollective.com/framework7
 
