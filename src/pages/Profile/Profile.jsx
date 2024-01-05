@@ -9,6 +9,8 @@ export default function Profile(props) {
 	const userId = parseInt(f7route.params.id, 10)
 	const contact = contacts.filter(({ id }) => id === userId)[0]
 
+	console.log("contact",contact)
+
 	const pageRef = useRef(null)
 	const profileAvatarRef = useRef(null)
 	useEffect(() => {
@@ -16,8 +18,6 @@ export default function Profile(props) {
 		const profileAvatarHeight = profileAvatarRef.current.offsetHeight
 		pageRef.current.el.querySelector('.page-content').scrollTop = profileAvatarHeight / 2
 	}, [])
-
-	console.log('Profile')
 
 	return (
 		<Page ref={pageRef} className="profile-page" noToolbar>

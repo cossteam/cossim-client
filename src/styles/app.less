@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import './var.less';
+// @import './framework7-custom.less';
 
 :root {
 	--f7-tabbar-label-font-size: 10px;
@@ -12,6 +13,7 @@
 }
 
 html.dark {
+
 	&,
 	body {
 		background: #000;
@@ -40,6 +42,11 @@ html.dark {
 		width: 128px;
 		height: 128px;
 	}
+}
+
+/* iOS Cordova Tweak */
+.device-cordova.device-ios {
+	height: 100vh;
 }
 
 /** App 全局样式 */

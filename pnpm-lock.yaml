@@ -26,6 +26,9 @@ dependencies:
   i18next:
     specifier: ^23.7.13
     version: 23.7.13
+  lodash-es:
+    specifier: ^4.17.21
+    version: 4.17.21
   material-icons:
     specifier: ^1.13.12
     version: 1.13.12
@@ -4094,6 +4097,10 @@ packages:
     dependencies:
       p-locate: 5.0.0
     dev: true
+
+  /lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+    dev: false
 
   /lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}

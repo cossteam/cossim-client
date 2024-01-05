@@ -7,11 +7,11 @@ import { useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import { registerApi } from '@/api/user'
-import { validEmail,validPassword } from '@/utils/validate'
+import { validEmail, validPassword } from '@/utils/validate'
 
 import '../Auth.less'
 
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
@@ -51,7 +51,7 @@ export default function Login({ disabled }) {
 		// 判断是否正在登录
 		if (loading) return
 
-		// 初步校验 
+		// 初步校验
 		// if (!fromData.nickname.trim()) return setNicknameError(errorList.usernameEmpty)
 
 		// 校验邮箱
@@ -64,8 +64,9 @@ export default function Login({ disabled }) {
 
 		// 校验确认密码
 		if (!fromData.confirm_password.trim()) return setConfirmPasswordError(errorList.confirmPasswordEmpty)
-		if (fromData.password.trim()!== fromData.confirm_password.trim()) return setConfirmPasswordError(errorList.passwordConfirm)
- 
+		if (fromData.password.trim() !== fromData.confirm_password.trim())
+			return setConfirmPasswordError(errorList.passwordConfirm)
+
 		// loading
 		setLoading(true)
 
