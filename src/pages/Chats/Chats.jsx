@@ -17,7 +17,6 @@ import DoubleTickIcon from '@/components/DoubleTickIcon'
 
 import { Search } from 'framework7-icons/react'
 
-
 export default function Chats(props) {
 	// const { f7router } = props
 

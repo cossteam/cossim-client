@@ -2,16 +2,21 @@ import $ from 'dom7'
 import React, { useRef, useState } from 'react'
 import { f7, Navbar, Link, Page, List, ListItem, Messages, Message, Messagebar } from 'framework7-react'
 import './Messages.less'
-import { chats, contacts } from '@/data'
+import { useChatsStore } from '@/stores/chats'
+import { useContactsStore } from '@/stores/contacts'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import PropType from 'prop-types'
+import { senToUser } from '@/api/message'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
 }
 
 export default function MessagesPage({ f7route }) {
-	const userId = parseInt(f7route.params.id, 10)
+	const { contacts } = useContactsStore()
+	const { chats, updateChats } = useChatsStore()
+	// const userId = parseInt(f7route.params.id, 10)
+	const userId = '69f316b1-e992-43ab-8cc9-a14093cca5e0'
 	const messagesData = chats.filter((chat) => chat.userId === userId)[0] || {
 		messages: []
 	}
@@ -45,16 +50,39 @@ export default function MessagesPage({ f7route }) {
 	}
 
 	const sendMessage = () => {
-		messages.push({
-			text: messageText,
-			date: new Date(),
-			type: 'sent'
+		let isErr = false
+		senToUser({
+			content: messageText,
+			receiver_id: '69f316b1-e992-43ab-8cc9-a14093cca5e0' || userId, // 临时调式
+			// replay_id: ,
+			type: 1
 		})
-		setMessageText('')
-		setMessages([...messages])
-		setTimeout(() => {
-			messagebarRef.current.f7Messagebar().focus()
-		})
+			.then(({ code }) => {
+				if (code === 200) {
+					isErr = false
+				} else {
+					isErr = true
+				}
+			})
+			.catch((err) => {
+				console.log(err)
+				isErr = true
+			})
+			.finally(() => {
+				messagesData.messages.push({
+					text: `${messageText}${isErr ? '[未发送]' : ''}`,
+					date: new Date(),
+					type: 'sent'
+				})
+				setMessageText('')
+				console.log(messagesData.messages)
+				setMessages([...messagesData.messages])
+				console.log(chats)
+				updateChats(chats)
+				setTimeout(() => {
+					messagebarRef.current.f7Messagebar().focus()
+				})
+			})
 	}
 
 	// Fix for iOS web app scroll body when

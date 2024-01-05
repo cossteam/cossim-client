@@ -10,6 +10,8 @@ import { f7, App, f7ready, Views, View } from 'framework7-react'
 
 import routes from '@/config/routes'
 import { useUserStore } from '@/stores/user'
+import { useChatsStore } from '@/stores/chats'
+import { initConnect } from '@/utils/ws'
 
 /**
  * 这里主要做一些全局配置之类的事情
@@ -54,7 +56,31 @@ const Home = () => {
 		}
 	})
 
+	// 连接ws
 	const { isLogin } = useUserStore()
+	const { chats, updateChats } = useChatsStore()
+	if (isLogin) {
+		const ws = initConnect()
+		ws?.removeEventListener('message', () => {})
+		ws.addEventListener('message', (e) => {
+			const data = JSON.parse(e.data)
+			// event: 1 => 用户上线，2 => 用户下线，3 => 用户发送消息，4 => 群聊发送消息，5 => 系统推送消息
+			if (data.event === 3) {
+				const userId = '69f316b1-e992-43ab-8cc9-a14093cca5e0'
+				const messagesData = chats.filter((chat) => chat.userId === userId)[0] || {
+					messages: []
+				}
+				console.log(messagesData)
+				messagesData.messages.push({
+					text: data.data.content,
+					type: 'received',
+					date: new Date().getTime() - 2 * 60 * 60 * 1000
+				})
+				console.log(chats)
+				updateChats(chats)
+			}
+		})
+	}
 
 	return (
 		<App {...f7params}>

@@ -8,17 +8,17 @@ import PropTypes from 'prop-types'
 
 import { loginApi } from '@/api/user'
 import { validEmail } from '@/utils/validate'
-import { initConnect } from '@/utils/ws'
 import '../Auth.less'
 
-import clsx from 'clsx'
+import { clsx } from 'clsx'
+
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
 }
 
 export default function Login({ disabled }) {
 	// 表单数据
-	const [fromData, setFromData] = useState({ email: 'f.wkbdzpcw@qq.com', password: '123123Aa' })
+	const [fromData, setFromData] = useState({ email: '123132@qq.com', password: '123456qq' })
 
 	// 错误提示
 	const [emailError, setEmailError] = useState('')
