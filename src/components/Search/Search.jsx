@@ -1,25 +1,11 @@
 import React, { useState } from 'react'
-import {
-	Navbar,
-	NavLeft,
-	NavTitle,
-	Link,
-	Page,
-	Block,
-	Popup,
-	Subnavbar,
-	Searchbar,
-	List,
-	ListItem,
-	ListGroup
-} from 'framework7-react'
+import { Navbar, NavLeft, NavTitle, Link, Page, Block, Popup, Subnavbar, Searchbar, f7 } from 'framework7-react'
 import PropTypes from 'prop-types'
-import { ChevronLeft } from 'framework7-icons/react'
+import { ChevronLeft, Search as SearchIcon } from 'framework7-icons/react'
 import { clsx } from 'clsx'
 import { $t } from '@/i18n'
-import DoubleTickIcon from '@/components/DoubleTickIcon'
+import { getUserInfoApi } from '@/api/user'
 
-// import { debounce } from 'lodash-es'
 import './Search.less'
 
 Search.propTypes = {
@@ -29,26 +15,20 @@ Search.propTypes = {
 }
 
 export default function Search(props) {
-	// const [keywords, setKeywords] = useState('')
+	const [keywords, setKeywords] = useState('')
 
-	// 用户列表
-	const [list, setList] = useState([])
+	const tips = $t('搜索')
 
-	const handleInput = (e) => {
-		// setKeywords(e.target.value)
-		console.log(e.target.value)
-		// TODO: 请求搜索接口
-	}
-
-	// 获取用户列表
-	const getUserList = async (keywords) => {}
-
-	// 搜索
-	const handleKeyPress = (e) => {
-		console.log(e);
-		if (e.keyCode === 13) {
-			// TODO: 跳转到用户详情页
-			console.log('11')
+	const search = async () => {
+		try {
+			const res = await getUserInfoApi({ email: keywords, type: 0 })
+			console.log('res', res)
+			if (res.code !== 200) {
+				// f7.dialog.alert(res.msg)
+				f7.dialog.alert(res.msg)
+			}
+		} catch (error) {
+			f7.dialog.alert(error.message)
 		}
 	}
 
@@ -68,27 +48,18 @@ export default function Search(props) {
 					<Searchbar
 						placeholder={props.placeholder}
 						disableButtonText={$t('取消')}
-						onInput={handleInput}
-						onKeyDown={(e) => handleKeyPress(e)}
+						onInput={(e) => setKeywords(e.target.value)}
 					/>
 				</Subnavbar>
 
 				<Block className="my-5">
-					<List>
-						{list.map((contact) => (
-							<ListItem
-								key={contact.nick_name}
-								// link={`/profile/${contact.user_id}/`}
-								link
-								title={contact.nick_name}
-								footer={contact.status}
-								popupClose
-								// onClick={() => handleUserSelect(contact)}
-							>
-								<img slot="media" src={contact.avatar} alt="" />
-							</ListItem>
-						))}
-					</List>
+					{keywords && (
+						<div className="flex items-center text-[1rem]" onClick={search}>
+							<SearchIcon className="w-5 h-5 text-icon-cc" />
+							<span className="ml-2">{tips}：</span>
+							<span className="text-primary">{keywords}</span>
+						</div>
+					)}
 				</Block>
 			</Page>
 		</Popup>

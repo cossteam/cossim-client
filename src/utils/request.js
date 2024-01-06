@@ -4,8 +4,8 @@ import { getStorage } from '@/utils/stroage'
 const mode = import.meta.env.MODE || 'development'
 
 const baseURL = {
-	development: 'http://localhost:8080/api/v1',
-	production: 'http://192.168.1.8:8081/api/v1'
+	development: 'http://43.229.28.107:8080/api/v1',
+	production: 'http://192.168.1.12:8080/api/v1'
 }
 
 const request = axios.create({
@@ -37,10 +37,12 @@ request.interceptors.request.use(
 
 request.interceptors.response.use(
 	(response) => {
+		
 		return response.data
 	},
 	(error) => {
 		console.log(error)
+		// return error.response.data
 		return Promise.reject(error)
 	}
 )

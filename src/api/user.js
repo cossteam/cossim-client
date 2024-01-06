@@ -33,3 +33,18 @@ export function registerApi(data) {
 		data
 	})
 }
+
+/**
+ * 查询用户信息
+ * @param {*} params
+ * @param {string} params.user_id     	用户 邮箱 | id
+ * @param {string} params.type     		指定根据id还是邮箱类型查找
+ * @returns
+ */
+export function getUserInfoApi(params) {
+	return request({
+		url: `${baseApi}/info`,
+		method: 'get',
+		params
+	})
+}

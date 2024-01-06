@@ -19,7 +19,7 @@ import DoubleTickIcon from '@/components/DoubleTickIcon'
 
 import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
-import SearchComponent from '@/components/Search/Search'
+// import SearchComponent from '@/components/Search/Search'
 
 export default function Chats() {
 	// const { f7router } = props
@@ -122,20 +122,21 @@ export default function Chats() {
 				))}
 			</List>
 
+			{/* 标题栏右侧加号弹出层 */}
 			<Popover className="popover-menu w-[160px]" backdrop={false} arrow={false}>
 				<List className="text-white" dividersIos outlineIos strongIos>
 					<ListItem link="/dialog/" popoverClose className="el-list">
 						<Person2Alt className="el-list__icon" />
 						<span className="el-text">{$t('发起群聊')}</span>
 					</ListItem>
-					<ListItem link popoverClose className="el-list" popupOpen=".search-popup">
+					<ListItem link="/add_friend/" popoverClose className="el-list">
 						<PersonBadgePlusFill className="el-list__icon" />
 						<span className="el-text">{$t('添加朋友/群')}</span>
 					</ListItem>
 				</List>
 			</Popover>
 
-			<SearchComponent title={$t('添加朋友')} placeholder={$t('邮箱')} className="z-[9999999]" />
+			{/* <SearchComponent title={$t('添加朋友')} placeholder={$t('邮箱')} className="z-[13000]" /> */}
 		</Page>
 	)
 }
