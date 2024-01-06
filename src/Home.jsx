@@ -11,7 +11,7 @@ import { f7, App, f7ready, Views, View } from 'framework7-react'
 import routes from '@/config/routes'
 import { useUserStore } from '@/stores/user'
 import { useChatsStore } from '@/stores/chats'
-import { initConnect } from '@/utils/ws'
+import WebSocketClient from '@/utils/WebSocketClient'
 
 /**
  * 这里主要做一些全局配置之类的事情
@@ -58,30 +58,35 @@ const Home = () => {
 		}
 	})
 
+	// 连接ws并监听消息推送
 	useEffect(() => {
-		// 连接ws并监听消息
-		if (isLogin) {
-			const ws = initConnect()
-			console.log(user.nick_name, user.user_id)
-			ws?.removeEventListener('message', () => {})
-			ws.addEventListener('message', (e) => {
-				const data = JSON.parse(e.data)
-				// event: 1 => 用户上线，2 => 用户下线，3 => 用户发送消息，4 => 群聊发送消息，5 => 系统推送消息
-				if (data.event === 3) {
-					// 接收者
-					const userId = data.data.uid
-					const messagesData = chats.filter((chat) => chat.userId === userId)[0] || {
-						messages: []
-					}
-					messagesData.messages.push({
-						text: data.data.content,
-						type: 'received',
-						date: new Date().getTime() - 2 * 60 * 60 * 1000
-					})
-					updateChats(chats)
+		if (!isLogin) return
+		console.log(user.nick_name, user.user_id)
+		WebSocketClient.closeConnection()
+		WebSocketClient.connect()
+		WebSocketClient.addListener('onWsMessage', (e) => {
+			const data = JSON.parse(e.data)
+			// event: 1 => 用户上线，2 => 用户下线，3 => 用户发送消息，4 => 群聊发送消息，5 => 系统推送消息
+			if (data.event === 3 || data.event === 4 || data.event === 5) {
+				WebSocketClient.triggerEvent('onMessage', data)
+			}
+		})
+		WebSocketClient.addListener('onMessage', (msg) => {
+			if (msg.event === 3) {
+                // 将接收到的消息保存到指定的用户的消息列表中
+				const userId = msg.data.uid
+				const messagesData = chats.filter((chat) => chat.userId === userId)[0] || {
+					messages: []
 				}
-			})
-		}
+				messagesData.messages.push({
+					text: msg.data.content,
+					date: new Date().getTime() - 2 * 60 * 60 * 1000,
+					type: 'received'
+				})
+				// 更新消息列表
+				updateChats(chats)
+			}
+		})
 	}, [isLogin])
 
 	return (

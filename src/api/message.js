@@ -11,7 +11,7 @@ const baseApi = '/msg/send'
  * @param {*} data.type             消息类型
  * @returns
  */
-export function senToUser(data) {
+export function sendToUser(data) {
 	return request({
 		url: baseApi + '/user',
 		method: 'post',

@@ -1,12 +1,12 @@
 import $ from 'dom7'
 import React, { useRef, useState } from 'react'
-import { f7, Navbar, Link, Page, List, ListItem, Messages, Message, Messagebar } from 'framework7-react'
+import { f7, Navbar, Link, Page, /*List, ListItem,*/ Messages, Message, Messagebar } from 'framework7-react'
 import './Messages.less'
 import { useChatsStore } from '@/stores/chats'
 import { useContactsStore } from '@/stores/contacts'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import PropType from 'prop-types'
-import { senToUser } from '@/api/message'
+import { sendToUser } from '@/api/message'
 import { useEffect } from 'react'
 
 MessagesPage.propTypes = {
@@ -14,31 +14,50 @@ MessagesPage.propTypes = {
 }
 
 export default function MessagesPage({ f7route }) {
-	const { contacts } = useContactsStore()
-	const { chats, updateChats } = useChatsStore()
-	// 接收者
-	const userId = f7route.params.id
+	const { contacts } = useContactsStore() // 全部联系人
+	const { chats, updateChats } = useChatsStore() // 全部聊天记录
+	const userId = f7route.params.id // 好友id/群聊id
+	const contact = contacts.filter((contact) => contact.id === userId)[0] // 好友信息/群聊信息
 	const messagesData = chats.filter((chat) => chat.userId === userId)[0] || {
 		messages: []
-	}
-	const contact = contacts.filter((contact) => contact.id === userId)[0]
+	} // 聊天记录
 
 	const messagebarRef = useRef(null)
 	const [messages, setMessages] = useState([...messagesData.messages])
 	// 虚拟列表
 	const messagesRef = useRef(null)
-	const [vlData, setVlData] = useState({
-		items: []
-	})
-	const renderExternal = (vl, newData) => {
-		console.table(newData.items)
-		setVlData({ ...newData })
-	}
+	// const [vlData, setVlData] = useState({
+	// 	items: []
+	// })
+	// const renderExternal = (vl, newData) => {
+	// 	console.table(newData.items)
+	// 	setVlData({ ...newData })
+	// }
 	const [messageText, setMessageText] = useState('')
-	// console.log(messagesRef.current.f7Messages())
+	useEffect(() => {
+		// WebSocketClient.addListener('onMessage', (msg) => {
+		// 	console.log('收到消息', msg)
+		// })
+		const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
+		// console.log(messagesContent)
+		messagesContent?.addEventListener('scroll', () => {
+			if (messagesContent.scrollTop === 0) {
+				console.log('已滚动到顶部')
+			}
+		})
+		// console.log(messagesRef)
+		// const listDOM = messagesRef.current.f7Messages().el
+		// console.log(listDOM)
+		// listDOM.addEventListener('scroll', () => {
+		// 	console.log(listDOM.scrollTop)
+		// 	if (listDOM.scrollTop === 0) {
+		// 		console.log('已滚动到顶部')
+		// 	}
+		// })
+	}, [])
 
 	const messageTime = (message) =>
-		Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(message.date)
+		Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.date))
 	const isMessageFirst = (message) => {
 		const messageIndex = messages.indexOf(message)
 		const previousMessage = messages[messageIndex - 1]
@@ -51,36 +70,38 @@ export default function MessagesPage({ f7route }) {
 	}
 
 	const sendMessage = () => {
-		let isErr = false
-		senToUser({
+		const message = {
+			text: messageText,
+			date: new Date(),
+			type: 'sent',
+			state: 'sending'
+		}
+		messagesData.messages.push(message)
+		setMessageText('')
+		setMessages([...messagesData.messages])
+		updateChats(chats)
+		setTimeout(() => {
+			messagebarRef.current.f7Messagebar().focus()
+		})
+		sendToUser({
 			content: messageText,
-			receiver_id: userId, // 临时调式
+			receiver_id: userId,
 			// replay_id: ,
 			type: 1
 		})
 			.then(({ code }) => {
 				if (code === 200) {
-					isErr = false
+					message.state = 'ok'
 				} else {
-					isErr = true
+					message.state = 'error'
 				}
 			})
 			.catch((err) => {
 				console.log(err)
-				isErr = true
+				message.state = 'error'
 			})
 			.finally(() => {
-				messagesData.messages.push({
-					text: `${messageText}${isErr ? '[未发送]' : ''}`,
-					date: new Date(),
-					type: 'sent'
-				})
-				setMessageText('')
 				setMessages([...messagesData.messages])
-				updateChats(chats)
-				setTimeout(() => {
-					messagebarRef.current.f7Messagebar().focus()
-				})
 			})
 	}
 
@@ -89,15 +110,15 @@ export default function MessagesPage({ f7route }) {
 	useEffect(
 		() =>
 			useChatsStore.subscribe(
-				(newData) => {
-					console.log('数据发生变化：', newData)
+				({ chats }) => {
+					// console.log('数据发生变化：', chats)
 					// 在这里执行你的逻辑，例如更新组件的状态
-					const chat = newData.chats.filter((chat) => chat.userId === userId)[0] || {
+					const chat = chats.filter((chat) => chat.userId === userId)[0] || {
 						messages: []
 					}
 					setMessages([...chat.messages])
 				},
-				(state) => state.data // 监听的状态属性，可以是单一属性或整个状态对象
+				(state) => state.chats // 监听的状态属性，可以是单一属性或整个状态对象
 			),
 		[]
 	)
@@ -179,7 +200,15 @@ export default function MessagesPage({ f7route }) {
 						className="message-appear-from-bottom"
 					>
 						<span slot="text-footer">
-							{message.type === 'sent' && <DoubleTickIcon />}
+							{message?.state ? (
+								message.type === 'sent' && message.state === 'ok' ? (
+									<DoubleTickIcon />
+								) : (
+									message.state
+								)
+							) : (
+								''
+							)}
 							{messageTime(message)}
 						</span>
 					</Message>

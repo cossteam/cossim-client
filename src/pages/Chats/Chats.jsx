@@ -58,7 +58,7 @@ export default function Chats() {
 					month: 'short',
 					year: 'numeric',
 					day: 'numeric'
-				}).format(lastMessage.date),
+				}).format(new Date(lastMessage.date)),
 				lastMessageType: lastMessage.type,
 				contact
 			}
