@@ -66,7 +66,6 @@ const Home = () => {
 			ws?.removeEventListener('message', () => {})
 			ws.addEventListener('message', (e) => {
 				const data = JSON.parse(e.data)
-				console.log(data)
 				// event: 1 => 用户上线，2 => 用户下线，3 => 用户发送消息，4 => 群聊发送消息，5 => 系统推送消息
 				if (data.event === 3) {
 					// 接收者
@@ -74,13 +73,11 @@ const Home = () => {
 					const messagesData = chats.filter((chat) => chat.userId === userId)[0] || {
 						messages: []
 					}
-					console.log(messagesData.messages)
 					messagesData.messages.push({
 						text: data.data.content,
 						type: 'received',
 						date: new Date().getTime() - 2 * 60 * 60 * 1000
 					})
-					console.log(chats)
 					updateChats(chats)
 				}
 			})
