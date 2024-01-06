@@ -24,7 +24,7 @@ request.interceptors.request.use(
 	(config) => {
 		const storage = getStorage()
 		if (storage && storage.state.isLogin && storage.state.token) {
-			config.headers.Authorization = 'Bearer ' +  storage.state.token
+			config.headers.Authorization = 'Bearer ' + storage.state.token
 		}
 		return config
 	},
