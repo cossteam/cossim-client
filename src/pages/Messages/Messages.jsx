@@ -99,6 +99,7 @@ export default function MessagesPage({ f7route }) {
 			.catch((err) => {
 				console.log(err)
 				message.state = 'error'
+				// TODO: 消息发送失败后提供重新发送支持
 			})
 			.finally(() => {
 				setMessages([...messagesData.messages])
@@ -200,16 +201,16 @@ export default function MessagesPage({ f7route }) {
 						className="message-appear-from-bottom"
 					>
 						<span slot="text-footer">
+							{messageTime(message)}
 							{message?.state ? (
 								message.type === 'sent' && message.state === 'ok' ? (
 									<DoubleTickIcon />
 								) : (
-									message.state
+									`[${message.state}]`
 								)
 							) : (
 								''
 							)}
-							{messageTime(message)}
 						</span>
 					</Message>
 				))}

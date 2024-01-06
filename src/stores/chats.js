@@ -4,7 +4,7 @@ import { persist, createJSONStorage, devtools } from 'zustand/middleware'
 const chatsStore = (set) => ({
 	chats: [
 		{
-			userId: 'f0ac5c48-23d7-4299-b479-88c883b0e8e9',
+			userId: '09896ad3-8f78-49ec-80c2-ecf33a8db3f5',
 			messages: [
 				{
 					text: '今晚有空吗，一起吃个饭？',
@@ -19,7 +19,7 @@ const chatsStore = (set) => ({
 			]
 		},
 		{
-			userId: 'cc4e8ba2-ecc9-464c-b016-01d95bc52b72',
+			userId: '334f4b6e-d731-4428-98f8-9b624eed6e9f',
 			messages: [
 				{
 					text: '今晚有空吗，一起吃个饭？',
