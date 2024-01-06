@@ -7,11 +7,11 @@ import { $t } from '@/i18n'
 import { getUserInfoApi } from '@/api/user'
 import PropTypes from 'prop-types'
 
-Profile.propTypes = {
+AddDetails.propTypes = {
 	f7route: PropTypes.object
 }
 
-export default function Profile(props) {
+export default function AddDetails(props) {
 	const { f7route } = props
 
 	const [info, setInfo] = useState({})

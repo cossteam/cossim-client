@@ -4,6 +4,7 @@ import My from '@/pages/My/My'
 import Messages from '@/pages/Messages/Messages'
 import Profile from '@/pages/Profile/Profile'
 import NotFoundPage from '@/pages/NotFound'
+import AddFriend from '@/pages/AddFriend/AddFriend'
 
 import Auth from '@/pages/Auth/Auth'
 
@@ -17,17 +18,17 @@ var routes = [
 		component: Contacts
 	},
 	{
-		path: '/my',
+		path: '/my/',
 		component: My
 	},
 	{
 		path: '/auth/',
 		component: Auth
 	},
-	// {
-	// 	path: '/register/',
-	// 	asyncComponent: () => import('@/pages/Auth/Register/Register')
-	// },
+	{
+		path: '/add_friend/',
+		component:AddFriend
+	},
 	{
 		path: '/chats/:id/',
 		component: Messages
