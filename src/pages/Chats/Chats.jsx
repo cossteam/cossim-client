@@ -12,7 +12,9 @@ import {
 	Popover
 } from 'framework7-react'
 import './Chats.less'
-import { contacts, chats } from '@/data'
+import { useUserStore } from '@/stores/user'
+import { useChatsStore } from '@/stores/chats'
+import { useContactsStore } from '@/stores/contacts'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 
 import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
@@ -21,6 +23,9 @@ import SearchComponent from '@/components/Search/Search'
 
 export default function Chats() {
 	// const { f7router } = props
+	const { user } = useUserStore()
+	const { contacts } = useContactsStore()
+	const { chats } = useChatsStore()
 
 	const swipeoutUnread = () => {
 		f7.dialog.alert('Unread')
@@ -41,21 +46,23 @@ export default function Chats() {
 	// 	}, 300)
 	// }
 
-	const chatsFormatted = chats.map((chat) => {
-		const contact = contacts.filter((contact) => contact.id === chat.userId)[0]
-		const lastMessage = chat.messages[chat.messages.length - 1]
-		return {
-			...chat,
-			lastMessageText: lastMessage.text,
-			lastMessageDate: Intl.DateTimeFormat('en', {
-				month: 'short',
-				year: 'numeric',
-				day: 'numeric'
-			}).format(lastMessage.date),
-			lastMessageType: lastMessage.type,
-			contact
-		}
-	})
+	const chatsFormatted = chats
+		.filter((chat) => user.user_id !== chat.userId) // remove self
+		.map((chat) => {
+			const contact = contacts.filter((contact) => contact.id === chat.userId)[0]
+			const lastMessage = chat.messages[chat.messages.length - 1]
+			return {
+				...chat,
+				lastMessageText: lastMessage.text,
+				lastMessageDate: Intl.DateTimeFormat('en', {
+					month: 'short',
+					year: 'numeric',
+					day: 'numeric'
+				}).format(lastMessage.date),
+				lastMessageType: lastMessage.type,
+				contact
+			}
+		})
 
 	return (
 		<Page className="chats-page">
@@ -128,7 +135,7 @@ export default function Chats() {
 				</List>
 			</Popover>
 
-			<SearchComponent title={$t('添加朋友')} placeholder={$t('邮箱')} className='z-[9999999]' />
+			<SearchComponent title={$t('添加朋友')} placeholder={$t('邮箱')} className="z-[9999999]" />
 		</Page>
 	)
 }

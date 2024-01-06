@@ -7,6 +7,7 @@ import { useContactsStore } from '@/stores/contacts'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import PropType from 'prop-types'
 import { senToUser } from '@/api/message'
+import { useEffect } from 'react'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -15,8 +16,8 @@ MessagesPage.propTypes = {
 export default function MessagesPage({ f7route }) {
 	const { contacts } = useContactsStore()
 	const { chats, updateChats } = useChatsStore()
-	// const userId = parseInt(f7route.params.id, 10)
-	const userId = '69f316b1-e992-43ab-8cc9-a14093cca5e0'
+	// 接收者
+	const userId = f7route.params.id
 	const messagesData = chats.filter((chat) => chat.userId === userId)[0] || {
 		messages: []
 	}
@@ -53,7 +54,7 @@ export default function MessagesPage({ f7route }) {
 		let isErr = false
 		senToUser({
 			content: messageText,
-			receiver_id: '69f316b1-e992-43ab-8cc9-a14093cca5e0' || userId, // 临时调式
+			receiver_id: userId, // 临时调式
 			// replay_id: ,
 			type: 1
 		})
@@ -75,15 +76,31 @@ export default function MessagesPage({ f7route }) {
 					type: 'sent'
 				})
 				setMessageText('')
-				console.log(messagesData.messages)
 				setMessages([...messagesData.messages])
-				console.log(chats)
 				updateChats(chats)
 				setTimeout(() => {
 					messagebarRef.current.f7Messagebar().focus()
 				})
 			})
 	}
+
+	// 订阅状态变化
+	// 在组件卸载时取消订阅，以避免潜在的内存泄漏
+	useEffect(
+		() =>
+			useChatsStore.subscribe(
+				(newData) => {
+					console.log('数据发生变化：', newData)
+					// 在这里执行你的逻辑，例如更新组件的状态
+					const chat = newData.chats.filter((chat) => chat.userId === userId)[0] || {
+						messages: []
+					}
+					setMessages([...chat.messages])
+				},
+				(state) => state.data // 监听的状态属性，可以是单一属性或整个状态对象
+			),
+		[]
+	)
 
 	// Fix for iOS web app scroll body when
 	const resizeTimeout = useRef(null)

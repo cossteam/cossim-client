@@ -4,7 +4,7 @@ import { getStorage } from '@/utils/stroage'
 const mode = import.meta.env.MODE || 'development'
 
 const baseURL = {
-	development: 'http://192.168.1.12:8080/api/v1',
+	development: 'http://localhost:8080/api/v1',
 	production: 'http://192.168.1.8:8081/api/v1'
 }
 
@@ -24,7 +24,7 @@ request.interceptors.request.use(
 	(config) => {
 		const storage = getStorage()
 		if (storage && storage.state.isLogin && storage.state.token) {
-			config.headers.Authorization = 'Bearer ' +  storage.state.token
+			config.headers.Authorization = 'Bearer ' + storage.state.token
 		}
 		return config
 	},

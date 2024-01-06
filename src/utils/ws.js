@@ -1,9 +1,9 @@
-const baseURL = 'ws://192.168.1.12:8080/api/v1/msg/ws'
+const baseURL = 'ws://localhost:8080/api/v1/msg/ws'
 let ws = null
 // const listener = new Map()
 
 function onOpen(e) {
-	console.log('WebSocket连接成功', e)
+	// console.log('WebSocket连接成功', e)
 	// TODO: 发送登录消息
 }
 function onMessage(e) {

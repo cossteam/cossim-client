@@ -4,11 +4,17 @@ import { persist, createJSONStorage, devtools } from 'zustand/middleware'
 const contactsStore = (set) => ({
 	contacts: [
 		{
-			id: '69f316b1-e992-43ab-8cc9-a14093cca5e0',
+			id: 'f0ac5c48-23d7-4299-b479-88c883b0e8e9',
 			avatar: 'mark-zuckerberg.jpg',
-			name: 'Mark Zuckerberg',
+			name: 'xm',
 			status: 'Life is good'
-		}
+		},
+        {
+            id: 'cc4e8ba2-ecc9-464c-b016-01d95bc52b72',
+            avatar: 'tim-cook.jpg',
+            name: 'feng',
+            status: 'I like apples 🍎'
+        }
 	],
 	updateContacts: (contacts) => set({ contacts })
 })
