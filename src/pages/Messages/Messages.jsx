@@ -6,7 +6,7 @@ import { useChatsStore } from '@/stores/chats'
 import { useContactsStore } from '@/stores/contacts'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import PropType from 'prop-types'
-import { sendToUser } from '@/api/message'
+import { sendToUser } from '@/api/msg'
 import { useEffect } from 'react'
 
 MessagesPage.propTypes = {
