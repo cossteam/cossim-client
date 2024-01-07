@@ -6,7 +6,7 @@ import { useChatsStore } from '@/stores/chats'
 import { useContactsStore } from '@/stores/contacts'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import PropType from 'prop-types'
-import { sendToUser } from '@/api/msg'
+import { getMsgByUser, sendToUser } from '@/api/msg'
 import { useEffect } from 'react'
 
 MessagesPage.propTypes = {
@@ -40,11 +40,24 @@ export default function MessagesPage({ f7route }) {
 		// })
 		const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
 		// console.log(messagesContent)
-		messagesContent?.addEventListener('scroll', () => {
-			if (messagesContent.scrollTop === 0) {
-				console.log('已滚动到顶部')
-			}
-		})
+		setTimeout(() => {
+			messagesContent?.addEventListener('scroll', () => {
+				if (messagesContent.scrollTop === 0) {
+					console.log('已滚动到顶部')
+					getMsgByUser({
+						user_id: userId,
+						page_num: 1,
+						page_size: 10
+					})
+						.then((res) => {
+							console.log(res)
+						})
+						.catch((err) => {
+							console.log(err)
+						})
+				}
+			})
+		}, 2000)
 		// console.log(messagesRef)
 		// const listDOM = messagesRef.current.f7Messages().el
 		// console.log(listDOM)

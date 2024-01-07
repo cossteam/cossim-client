@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const baseApi = '/msg/send'
+const baseApi = '/msg'
 
 /**
  * 获取私聊消息
@@ -14,7 +14,7 @@ const baseApi = '/msg/send'
  */
 export function getMsgByUser(data) {
 	return request({
-		url: baseApi + '/user',
+		url: baseApi + '/list/user',
 		method: 'GET',
 		params: data
 	})
@@ -31,7 +31,7 @@ export function getMsgByUser(data) {
  */
 export function sendToUser(data) {
 	return request({
-		url: baseApi + '/user',
+		url: baseApi + '/send/user',
 		method: 'POST',
 		data
 	})
@@ -48,7 +48,7 @@ export function sendToUser(data) {
  */
 export function sentToGroup(data) {
 	return request({
-		url: baseApi + '/group',
+		url: baseApi + '/send/group',
 		method: 'POST',
 		data
 	})
