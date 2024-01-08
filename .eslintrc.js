@@ -33,6 +33,8 @@ module.exports = {
 			}
 		],
 		// 禁止使用未定义的 propType
-		'react/prop-types': 'error'
+		'react/prop-types': 'error',
+		'no-async-promise-executor': 'off',
+		'no-extra-semi': 'off'
 	}
 }

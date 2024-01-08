@@ -1,4 +1,5 @@
 import axios from 'axios'
+import '@/utils/PGP'
 import { getStorage } from '@/utils/stroage'
 
 const mode = import.meta.env.MODE || 'development'
@@ -37,7 +38,6 @@ request.interceptors.request.use(
 
 request.interceptors.response.use(
 	(response) => {
-		
 		return response.data
 	},
 	(error) => {
