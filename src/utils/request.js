@@ -1,5 +1,5 @@
 import axios from 'axios'
-import '@/utils/PGP'
+import myPGP from '@/utils/PGP'
 import { getStorage } from '@/utils/stroage'
 
 const mode = import.meta.env.MODE || 'development'
@@ -8,6 +8,14 @@ const baseURL = {
 	development: 'http://43.229.28.107:8080/api/v1',
 	production: 'http://192.168.1.12:8080/api/v1'
 }
+
+myPGP.generateKeys().then(() => {
+    myPGP.encrypt('hello world').then(encryptedText => {
+        myPGP.decrypt(encryptedText).then(decryptedText => {
+            console.log(decryptedText);
+        })
+    })
+})
 
 const request = axios.create({
 	baseURL: baseURL[mode],
@@ -21,6 +29,7 @@ const request = axios.create({
 	//   },
 })
 
+// 请求拦截器
 request.interceptors.request.use(
 	(config) => {
 		const storage = getStorage()
@@ -36,6 +45,7 @@ request.interceptors.request.use(
 	}
 )
 
+// 响应拦截器
 request.interceptors.response.use(
 	(response) => {
 		return response.data

@@ -2,6 +2,14 @@ import request from '@/utils/request'
 
 const baseApi = '/user'
 
+export function getPgpKeyApi(params) {
+	return request({
+		url: `${baseApi}/system/key/get`,
+		method: 'get',
+		params
+	})
+}
+
 /**
  * 登录接口
  * @param {*} data
