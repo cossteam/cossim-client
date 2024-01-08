@@ -5,12 +5,11 @@ import { useUserStore } from '@/stores/user'
 import { At, Lock } from 'framework7-icons/react'
 import { useEffect } from 'react'
 import PropTypes from 'prop-types'
-
 import { loginApi } from '@/api/user'
 import { validEmail } from '@/utils/validate'
 import '../Auth.less'
-
 import { clsx } from 'clsx'
+import PGP from '@/utils/PGP'
 
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
@@ -46,6 +45,10 @@ export default function Login({ disabled }) {
 			if (loading) return
 
 			// 初步校验
+            if (!userStore.serviceKey.trim()) {
+                f7.dialog.alert($t('请先导入服务端公钥'))
+                return
+            }
 			if (!fromData.email.trim()) return setEmailError(errorList.emailEmpty)
 			if (!validEmail(fromData.email.trim())) return setEmailError(errorList.emailFormat)
 			if (!fromData.password.trim()) return setPasswordError(errorList.passwordEmpty)
@@ -54,6 +57,15 @@ export default function Login({ disabled }) {
 			setLoading(true)
 
 			// 登录
+            const { privateKey, publicKey, revocationCertificate } = await PGP.generateKeys()
+            userStore.updateClientKeys({ privateKey, publicKey, revocationCertificate })
+            // 添加客户端公钥
+            setFromData({ ...fromData, public_key: publicKey })
+            // 使用服务端公钥加密
+            console.log(await PGP.encrypt({
+                text: JSON.stringify(fromData),
+                key: userStore.serviceKey
+            }));
 			const res = await loginApi(fromData)
 
 			// 无论登录成功与否都需要关闭 loading

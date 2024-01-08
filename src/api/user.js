@@ -10,6 +10,14 @@ export function getPgpKeyApi(params) {
 	})
 }
 
+export function setPgpKeyApi(data) {
+	return request({
+		url: `${baseApi}/key/set`,
+		method: 'post',
+		data
+	})
+}
+
 /**
  * 登录接口
  * @param {*} data
