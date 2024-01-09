@@ -4,8 +4,8 @@ import PGP from '@/utils/PGP'
 
 const mode = import.meta.env.MODE || 'development'
 const baseURL = {
-	// development: 'http://43.229.28.107:8080/api/v1',
-	development: 'http://192.168.100.150:8080/api/v1',
+	development: 'http://43.229.28.107:8080/api/v1',
+	// development: 'http://192.168.100.150:8080/api/v1',
 	production: 'http://192.168.1.12:8080/api/v1'
 }
 const axiosConfig = {
@@ -46,9 +46,7 @@ request.interceptors.request.use(
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		if (encrypt !== 'encrypt') return config
 		// 获取服务器公钥
-		console.log(clientKey.serverPublicKey)
 		clientKey.serverPublicKey = clientKey?.serverPublicKey ? clientKey.serverPublicKey : await getServerPublicKey()
-		console.log(clientKey.serverPublicKey)
 		// 生成客户端公钥
 		const { privateKey, publicKey, revocationCertificate } = await PGP.generateKeys()
 		clientKey.privateKey = privateKey
@@ -86,16 +84,12 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
 	async (response) => {
-		console.log('响应拦截器', response.data)
-		console.log(clientKey)
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		// PGP 解密 Start
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		if (encrypt !== 'encrypt') return response.data
 		const responseData = response.data
-		console.log(clientKey.privateKey)
 		const aesKey = await PGP.decrypt(responseData.secret)
-		console.log(aesKey)
 		const decryptedData = await PGP.decryptAES256(responseData.message, aesKey)
 		response.data = JSON.parse(decryptedData)
 		/////////////////////////////////////////////////////////////////////////////////////////////
