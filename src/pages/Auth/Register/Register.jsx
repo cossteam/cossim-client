@@ -1,17 +1,15 @@
 import React, { useState } from 'react'
 import { f7, ListInput, List, LoginScreenTitle, Button, theme, Preloader } from 'framework7-react'
 import { $t } from '@/i18n'
-// import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 import { Lock, At } from 'framework7-icons/react'
 import { useEffect } from 'react'
 import PropTypes from 'prop-types'
-
 import { registerApi } from '@/api/user'
 import { validEmail, validPassword } from '@/utils/validate'
-
 import '../Auth.less'
-
 import { clsx } from 'clsx'
+import PGP from '@/utils/PGP'
 
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
@@ -33,7 +31,7 @@ export default function Login({ disabled }) {
 	// 表单触焦图标的颜色
 
 	// 用户信息
-	// const userStore = useUserStore()
+	const userStore = useUserStore()
 
 	// 错误信息列表
 	const errorList = {
@@ -52,6 +50,10 @@ export default function Login({ disabled }) {
 		if (loading) return
 
 		// 初步校验
+		if (!userStore?.serviceKey.trim()) {
+			f7.dialog.alert($t('服务端公钥获取失败，请稍后重新打开应用...'))
+			return
+		}
 		// if (!fromData.nickname.trim()) return setNicknameError(errorList.usernameEmpty)
 
 		// 校验邮箱
@@ -70,17 +72,38 @@ export default function Login({ disabled }) {
 		// loading
 		setLoading(true)
 
+		// 生成客户端公钥
+		const { privateKey, publicKey, revocationCertificate } = await PGP.generateKeys()
+		userStore.updateClientKeys({ privateKey, publicKey, revocationCertificate })
+		const newFromData = { ...fromData, public_key: publicKey }
+		setFromData(newFromData)
+		// AES256 加密表单数据
+		const passwords = ['coss']
+		const messageEncrypted = await PGP.encryptAES256(JSON.stringify(newFromData), passwords[0])
+		// 使用服务端公钥加密AES256密钥
+		const passwordsEncrypted = await PGP.encrypt({
+			text: passwords[0],
+			key: userStore.serviceKey
+		})
+
 		// 登录
-		const res = await registerApi(fromData)
+		const res = await registerApi({
+			message: messageEncrypted,
+			secret: passwordsEncrypted
+		})
+		// AES256解密
+		const decrypted = await PGP.decryptAES256(res.message, await PGP.decrypt(res.secret))
+		const decryptedData = JSON.parse(decrypted)
+		console.log('res', decryptedData)
 
 		// 无论登录成功与否都需要关闭 loading
-		if (res) setLoading(false)
+		if (decryptedData) setLoading(false)
 
-		if (res.code !== 200) return f7.dialog.alert(res.msg || $t('注册失败'))
+		if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || $t('注册失败'))
 
 		f7.dialog.alert(`注册成功! TODO: 跳转到登录页面或跳转到首页（待定）`)
-		// if (res.data.token) userStore.updateToken(res.data.token)
-		// if (res.data.user_info) userStore.updateUser(res.data.user_info)
+		// if (decryptedData.data.token) userStore.updateToken(decryptedData.data.token)
+		// if (decryptedData.data.user_info) userStore.updateUser(decryptedData.data.user_info)
 
 		// userStore.updateLogin(true)
 		// window.location.href = '/'

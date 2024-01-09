@@ -25,19 +25,22 @@ export default function Auth() {
 	// 		f7.loginScreen.close()
 	// 	})
 	// }
+    
 	// 用户信息
 	const userStore = useUserStore()
-	const [loading, setLoading] = useState(true)
-    useEffect(() => {
-        getPgpKeyApi().then(({ code, data }) => {
-            if (code === 200) {
-                const {public_key } = data;
-                userStore.updateServiceKey(public_key)
-            }
-        }).finally(() => {
-            setLoading(false)
-        })
-    },[])
+	const [loading, setLoading] = useState(false)
+	useEffect(() => {
+		getPgpKeyApi()
+			.then(({ code, data }) => {
+				if (code === 200) {
+					const { public_key } = data
+					userStore.updateServiceKey(public_key)
+				}
+			})
+			.finally(() => {
+				setLoading(false)
+			})
+	}, [])
 
 	return (
 		<Page>

@@ -4,7 +4,7 @@ import { getStorage } from '@/utils/stroage'
 const mode = import.meta.env.MODE || 'development'
 
 const baseURL = {
-	development: 'http://43.229.28.107:8080/api/v1',
+	development: 'http://192.168.100.150:8083/api/v1',
 	production: 'http://192.168.1.12:8080/api/v1'
 }
 

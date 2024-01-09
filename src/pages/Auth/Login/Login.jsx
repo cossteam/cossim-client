@@ -11,13 +11,15 @@ import '../Auth.less'
 import { clsx } from 'clsx'
 import PGP from '@/utils/PGP'
 
+window?.PGP && (window.PGP = PGP)
+
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
 }
 
 export default function Login({ disabled }) {
 	// 表单数据
-	const [fromData, setFromData] = useState({ email: '123132@qq.com', password: '123456qq' })
+	const [fromData, setFromData] = useState({ email: '123@qq.com', password: '1234qq', public_key: '' })
 
 	// 错误提示
 	const [emailError, setEmailError] = useState('')
@@ -45,10 +47,10 @@ export default function Login({ disabled }) {
 			if (loading) return
 
 			// 初步校验
-            if (!userStore.serviceKey.trim()) {
-                f7.dialog.alert($t('请先导入服务端公钥'))
-                return
-            }
+			if (!userStore?.serviceKey.trim()) {
+				f7.dialog.alert($t('服务端公钥获取失败，请稍后重新打开应用...'))
+				return
+			}
 			if (!fromData.email.trim()) return setEmailError(errorList.emailEmpty)
 			if (!validEmail(fromData.email.trim())) return setEmailError(errorList.emailFormat)
 			if (!fromData.password.trim()) return setPasswordError(errorList.passwordEmpty)
@@ -56,24 +58,37 @@ export default function Login({ disabled }) {
 			// loading
 			setLoading(true)
 
+			// 生成客户端公钥
+			const { privateKey, publicKey, revocationCertificate } = await PGP.generateKeys()
+			userStore.updateClientKeys({ privateKey, publicKey, revocationCertificate })
+			const newFromData = { ...fromData, public_key: publicKey }
+			setFromData(newFromData)
+			// AES256 加密表单数据
+			const passwords = ['coss']
+			const messageEncrypted = await PGP.encryptAES256(JSON.stringify(newFromData), passwords[0])
+			// 使用服务端公钥加密AES256密钥
+			const passwordsEncrypted = await PGP.encrypt({
+				text: passwords[0],
+				key: userStore.serviceKey
+			})
+
 			// 登录
-            const { privateKey, publicKey, revocationCertificate } = await PGP.generateKeys()
-            userStore.updateClientKeys({ privateKey, publicKey, revocationCertificate })
-            // 添加客户端公钥
-            setFromData({ ...fromData, public_key: publicKey })
-            // 使用服务端公钥加密
-            console.log(await PGP.encrypt({
-                text: JSON.stringify(fromData),
-                key: userStore.serviceKey
-            }));
-			const res = await loginApi(fromData)
+			const res = await loginApi({
+				message: messageEncrypted,
+				secret: passwordsEncrypted
+			})
+			// AES256解密
+			const decrypted = await PGP.decryptAES256(res.message, await PGP.decrypt(res.secret))
+			const decryptedData = JSON.parse(decrypted)
+			console.log('res', decryptedData)
 
 			// 无论登录成功与否都需要关闭 loading
-			if (res) setLoading(false)
+			if (decryptedData) setLoading(false)
 
-			if (res.code !== 200) return f7.dialog.alert(res.msg || errorList.errorMessage)
-			if (res.data.token) userStore.updateToken(res.data.token)
-			if (res.data.user_info) userStore.updateUser(res.data.user_info)
+			if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || errorList.errorMessage)
+			if (decryptedData.data.token) userStore.updateToken(decryptedData.data.token)
+			if (decryptedData.data.user_info) userStore.updateUser(decryptedData.data.user_info)
+
 			userStore.updateLogin(true)
 			setLoading(false)
 			window.location.href = '/'
