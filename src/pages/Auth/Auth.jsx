@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { Page, LoginScreen, Block, Button, Preloader } from 'framework7-react'
+import React, { useState } from 'react'
+import { Page, LoginScreen, Block, Button } from 'framework7-react'
 import { $t } from '@/i18n'
-import { useUserStore } from '@/stores/user'
 import Login from './Login/Login'
 import Register from './Register/Register'
-import { getPgpKeyApi } from '@/api/user'
 
 export default function Auth() {
 	const [loginScreenOpened, setLoginScreenOpened] = useState('')
@@ -25,22 +23,6 @@ export default function Auth() {
 	// 		f7.loginScreen.close()
 	// 	})
 	// }
-    
-	// 用户信息
-	const userStore = useUserStore()
-	const [loading, setLoading] = useState(false)
-	useEffect(() => {
-		getPgpKeyApi()
-			.then(({ code, data }) => {
-				if (code === 200) {
-					const { public_key } = data
-					userStore.updateServiceKey(public_key)
-				}
-			})
-			.finally(() => {
-				setLoading(false)
-			})
-	}, [])
 
 	return (
 		<Page>
@@ -53,24 +35,22 @@ export default function Auth() {
 					large
 					fill
 					onClick={() => {
-						!loading && handleClick(true)
+						handleClick(true)
 					}}
 					className="mb-5"
 					round
 				>
 					{$t('登录')}
-					{loading && <Preloader size="16" color="white" className="" />}
 				</Button>
 				<Button
 					large
 					tonal
 					onClick={() => {
-						!loading && handleClick(false)
+						handleClick(false)
 					}}
 					round
 				>
 					{$t('注册')}
-					{loading && <Preloader size="16" color="white" className="" />}
 				</Button>
 			</Block>
 

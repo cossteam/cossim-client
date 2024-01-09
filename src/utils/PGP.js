@@ -73,16 +73,19 @@ class PGP {
 	// 解密
 	decrypt(data) {
 		return new Promise(async (resolve, reject) => {
-			console.log(this.privateKeyObj)
 			try {
+				console.log(typeof data)
 				if (typeof data === 'string') {
 					data = {
 						text: data,
 						key: this.privateKeyObj
 					}
 				} else if (typeof data === 'object') {
-					const inputKey = data.key || data.privateKeyObj
+					console.log(data.key)
+					const inputKey = data.key || data.privateKey
+					console.log(inputKey)
 					const key = inputKey ? await openpgp.readKey({ armoredKey: inputKey }) : null
+					console.log(key)
 					data = {
 						text: data.text || '',
 						key: key || this.privateKeyObj

@@ -11,15 +11,13 @@ import '../Auth.less'
 import { clsx } from 'clsx'
 import PGP from '@/utils/PGP'
 
-window?.PGP && (window.PGP = PGP)
-
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
 }
 
 export default function Login({ disabled }) {
 	// 表单数据
-	const [fromData, setFromData] = useState({ email: '123@qq.com', password: '1234qq', public_key: '' })
+	const [fromData, setFromData] = useState({ email: '1005@qq.com', password: '123456qq', public_key: '1' })
 
 	// 错误提示
 	const [emailError, setEmailError] = useState('')
@@ -47,17 +45,16 @@ export default function Login({ disabled }) {
 			if (loading) return
 
 			// 初步校验
-			if (!userStore?.serviceKey.trim()) {
-				f7.dialog.alert($t('服务端公钥获取失败，请稍后重新打开应用...'))
-				return
-			}
 			if (!fromData.email.trim()) return setEmailError(errorList.emailEmpty)
 			if (!validEmail(fromData.email.trim())) return setEmailError(errorList.emailFormat)
 			if (!fromData.password.trim()) return setPasswordError(errorList.passwordEmpty)
 
 			// loading
 			setLoading(true)
+			// 登录
+			let decryptedData = await loginApi({ ...fromData, public_key: '1' })
 
+			/*
 			// 生成客户端公钥
 			const { privateKey, publicKey, revocationCertificate } = await PGP.generateKeys()
 			userStore.updateClientKeys({ privateKey, publicKey, revocationCertificate })
@@ -77,10 +74,11 @@ export default function Login({ disabled }) {
 				message: messageEncrypted,
 				secret: passwordsEncrypted
 			})
+			 */
 			// AES256解密
-			const decrypted = await PGP.decryptAES256(res.message, await PGP.decrypt(res.secret))
-			const decryptedData = JSON.parse(decrypted)
-			console.log('res', decryptedData)
+			// const decrypted = await PGP.decryptAES256(decryptedData.message, await PGP.decrypt(decryptedData.secret))
+			// decryptedData = JSON.parse(decrypted)
+			// console.log('res', decryptedData)
 
 			// 无论登录成功与否都需要关闭 loading
 			if (decryptedData) setLoading(false)

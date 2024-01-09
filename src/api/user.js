@@ -2,14 +2,6 @@ import request from '@/utils/request'
 
 const baseApi = '/user'
 
-export function getPgpKeyApi(params) {
-	return request({
-		url: `${baseApi}/system/key/get`,
-		method: 'get',
-		params
-	})
-}
-
 export function setPgpKeyApi(data) {
 	return request({
 		url: `${baseApi}/key/set`,

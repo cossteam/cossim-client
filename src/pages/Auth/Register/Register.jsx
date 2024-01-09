@@ -9,7 +9,7 @@ import { registerApi } from '@/api/user'
 import { validEmail, validPassword } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
-import PGP from '@/utils/PGP'
+// import PGP from '@/utils/PGP'
 
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
@@ -17,7 +17,13 @@ Login.propTypes = {
 
 export default function Login({ disabled }) {
 	// 表单数据
-	const [fromData, setFromData] = useState({ nickname: '', email: '', password: '', confirm_password: '' })
+	const [fromData, setFromData] = useState({
+		nickname: '',
+		email: '',
+		password: '',
+		confirm_password: '',
+		public_key: '1'
+	})
 
 	// 错误提示
 	const [nicknameError, setNicknameError] = useState(false)
@@ -50,10 +56,6 @@ export default function Login({ disabled }) {
 		if (loading) return
 
 		// 初步校验
-		if (!userStore?.serviceKey.trim()) {
-			f7.dialog.alert($t('服务端公钥获取失败，请稍后重新打开应用...'))
-			return
-		}
 		// if (!fromData.nickname.trim()) return setNicknameError(errorList.usernameEmpty)
 
 		// 校验邮箱
@@ -72,6 +74,10 @@ export default function Login({ disabled }) {
 		// loading
 		setLoading(true)
 
+		// 登录
+		const decryptedData = await registerApi({ ...fromData, public_key: '1' })
+
+		/*
 		// 生成客户端公钥
 		const { privateKey, publicKey, revocationCertificate } = await PGP.generateKeys()
 		userStore.updateClientKeys({ privateKey, publicKey, revocationCertificate })
@@ -95,6 +101,7 @@ export default function Login({ disabled }) {
 		const decrypted = await PGP.decryptAES256(res.message, await PGP.decrypt(res.secret))
 		const decryptedData = JSON.parse(decrypted)
 		console.log('res', decryptedData)
+        */
 
 		// 无论登录成功与否都需要关闭 loading
 		if (decryptedData) setLoading(false)
