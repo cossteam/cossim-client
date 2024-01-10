@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { List, ListGroup, ListItem, Navbar, Page, Searchbar, Subnavbar, ListIndex, Icon, f7 } from 'framework7-react'
 import React from 'react'
 import { friendListApi } from '@/api/relation'
@@ -8,53 +8,86 @@ import './Contacts.less'
 import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 
-console.log(WebDB.contacts)
-
 export default function Contacts(props) {
 	// const { f7router } = props
 
-	const allItems = useLiveQuery(() => WebDB.contacts.toArray())
-	console.log(allItems)
-	const [groups, setGroups] = useState({})
+	const groups = arrayToGroups(useLiveQuery(() => WebDB.contacts.toArray()) || [])
 	const { user } = useUserStore()
 
+	function groupsToArray(obj) {
+		obj = typeof obj !== 'object' ? {} : obj
+		return Object.entries(obj)
+			.map(([group, users]) => {
+				return users.map((user) => ({ group, ...user }))
+			})
+			.flat()
+	}
+	function arrayToGroups(array) {
+		array = !Array.isArray(array) ? [] : array
+		return array.reduce((result, user) => {
+			const group = user.group
+
+			if (!result[group]) {
+				result[group] = []
+			}
+
+			result[group].push({
+				user_id: user.user_id,
+				nick_name: user.nick_name,
+				email: user.email,
+				signature: user.signature,
+				status: user.status
+			})
+			return result
+		}, {})
+	}
 	// 获取好友列表
 	useEffect(() => {
 		;(async () => {
 			const res = await friendListApi({ user_id: user.user_id })
 			if (res.code !== 200) return
-			setGroups(res.data || {})
-			/*
-			// IndexedDB 存储测试
-			for (const group in res.data) {
-				if (Object.hasOwnProperty.call(res.data, group)) {
-					for (let i = 0; i < 20; i++) {
-						res.data[group].push({
-							user_id: '334f4b6e-d731-4428-98f8-9b624eed6e9f' + i,
-							nick_name: 'feng' + i,
-							email: '1005@qq.com',
-							signature: '',
-							status: 1,
-							group: 'F',
-							id: 1
-						})
-					}
-					res.data[group].forEach((item) => {
-						item['group'] = group
+			let groupsData = res.data || {}
+			for (const key in groupsData) {
+				if (Object.hasOwnProperty.call(groupsData, key)) {
+					groupsData[key] = groupsData[key].map((user) => {
+						return {
+							...user,
+							name: user.nick_name || '',
+							avatar: user.avatar || 'mark-zuckerberg.jpg'
+						}
 					})
-					console.log(res.data[group])
-					// 将数据插入到 contacts 表中
-					WebDB.contacts
-						.bulkPut(res.data[group])
-						.then(() => {
-							console.log('数据存储成功！')
-						})
-						.catch((error) => {
-							console.error('数据存储失败:', error)
-						})
 				}
 			}
+			console.log(groupsData)
+
+			// 转换为目标数据结构
+			const transformedData = groupsToArray(groupsData)
+
+			/*
+			// 伪数据
+			for (let i = 0; i < 20; i++) {
+				const item = {
+					...transformedData[0],
+					user_id: transformedData[0]['user_id'] + i,
+					nick_name: transformedData[0]['nick_name'] + i
+				}
+				i % 2 === 0 && (item['group'] += i)
+				transformedData.push(item)
+			}
+			console.log(transformedData)
             */
+
+			// 插入数据到 WebDB.contacts 表中
+			WebDB.contacts
+				.bulkPut(transformedData)
+				.then(() => {
+					console.log('联系人插入成功！')
+				})
+				.catch((error) => {
+					console.error('联系人插入失败:', error)
+				})
+			// 本地存储（弃用）
+			// setGroups(arrayToGroups(transformedData))
 		})()
 	}, [])
 

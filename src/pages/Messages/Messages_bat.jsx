@@ -2,107 +2,31 @@ import $ from 'dom7'
 import React, { useRef, useState } from 'react'
 import { f7, Navbar, Link, Page, /*List, ListItem,*/ Messages, Message, Messagebar } from 'framework7-react'
 import './Messages.less'
+import { useChatsStore } from '@/stores/chats'
+import { useContactsStore } from '@/stores/contacts'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import PropType from 'prop-types'
 import { getMsgByUser, sendToUser } from '@/api/msg'
 import { useEffect } from 'react'
 import _ from 'lodash-es'
-import WebDB from '@/db'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { useUserStore } from '@/stores/user'
+// import WebDB from '@/db'
+// import { useLiveQuery } from 'dexie-react-hooks'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
 }
 
 export default function MessagesPage({ f7route }) {
-	const { user } = useUserStore()
-	const senderId = user?.UserId
-	const receiverId = f7route?.params?.id // 好友id/群聊id
+	const { contacts } = useContactsStore() // 全部联系人
+	const { chats, updateChats } = useChatsStore() // 全部聊天记录
+	const userId = f7route.params.id // 好友id/群聊id
+	const contact = contacts.filter((contact) => contact.id === userId)[0] // 好友信息/群聊信息
+	const messagesData = chats.filter((chat) => chat.userId === userId)[0] || {
+		messages: []
+	} // 聊天记录
 
-	// 联系人
-	const [contact, setContact] = useState({})
-	useEffect(() => {
-		if (!receiverId) return
-		WebDB.contacts
-			.where('user_id')
-			.equals(receiverId)
-			.first()
-			.then((contact) => {
-				console.log(contact)
-				setContact(contact)
-			})
-	}, [receiverId])
-
-	/*
-	// 获取消息
-	let pageNum = 1
-	let pageSize = 20
-	let total = 0
-	const getMessage = () => {
-		return new Promise((resolve, reject) => {
-			getMsgByUser({
-				user_id: receiverId,
-				page_num: pageNum,
-				page_size: pageSize
-			})
-				.then(({ data }) => {
-					data = data?.msg_list || data
-					total = data?.total
-					console.log(data)
-					resolve(data)
-				})
-				.catch((err) => {
-					reject(err)
-				})
-				.finally(() => {
-					if (total / pageSize === 0) return
-					pageNum += 1
-				})
-		})
-	}
-	useEffect(() => {
-		getMessage().then(({ user_messages }) => {
-            const messages = user_messages?.map((msg) => {
-                // Id, SenderId, ReceiverId, Content, Type, CreatedAt
-                // ||
-                // sender_id, receiver_id, text, type, date, send_state, is_read
-                return {
-                    ...msg,
-                    type: msg.Type,
-                    date: msg.created_at,
-                    send_state: 'sending', // 'sending' => 'ok' or 'err'
-                    is_read: true // TODO: 是否已读
-                }
-            })
-			WebDB.messages
-            .bulkPut(messages)
-            .then(() => {
-                console.log('消息插入成功！')
-            })
-            .catch((error) => {
-                console.error('消息插入失败:', error)
-            })
-		})
-	}, [])
-    */
-
-	// 聊天记录
-	const messages = useLiveQuery(() => WebDB.messages.toArray()) || []
-	console.log(messages)
-	// 滚动到顶部加载更多
-	useEffect(() => {
-		const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
-		messagesContent?.addEventListener(
-			'scroll',
-			_.throttle(() => {
-				if (messagesContent.scrollTop === 0) {
-					console.log('已滚动到顶部')
-				}
-			}, 1000)
-		)
-	}, [])
-
+	const messagebarRef = useRef(null)
+	const [messages, setMessages] = useState([...messagesData.messages])
 	// 虚拟列表
 	const messagesRef = useRef(null)
 	// const [vlData, setVlData] = useState({
@@ -112,13 +36,45 @@ export default function MessagesPage({ f7route }) {
 	// 	console.table(newData.items)
 	// 	setVlData({ ...newData })
 	// }
+	const [messageText, setMessageText] = useState('')
+	useEffect(() => {
+		// WebSocketClient.addListener('onMessage', (msg) => {
+		// 	console.log('收到消息', msg)
+		// })
+		const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
+		// console.log(messagesContent)
+		messagesContent?.addEventListener(
+			'scroll',
+			_.throttle(() => {
+				if (messagesContent.scrollTop === 0) {
+					console.log('已滚动到顶部')
+					getMsgByUser({
+						user_id: userId,
+						page_num: 1,
+						page_size: 10
+					})
+						.then((res) => {
+							console.log(res)
+						})
+						.catch((err) => {
+							console.log(err)
+						})
+				}
+			}, 1000)
+		)
+		// console.log(messagesRef)
+		// const listDOM = messagesRef.current.f7Messages().el
+		// console.log(listDOM)
+		// listDOM.addEventListener('scroll', () => {
+		// 	console.log(listDOM.scrollTop)
+		// 	if (listDOM.scrollTop === 0) {
+		// 		console.log('已滚动到顶部')
+		// 	}
+		// })
+	}, [])
 
-	// 消息渲染处理
-	const messageTime = (message) => {
-		return message?.date
-			? Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.date))
-			: ''
-	}
+	const messageTime = (message) =>
+		Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.date))
 	const isMessageFirst = (message) => {
 		const messageIndex = messages.indexOf(message)
 		const previousMessage = messages[messageIndex - 1]
@@ -130,63 +86,77 @@ export default function MessagesPage({ f7route }) {
 		return !nextMessage || nextMessage.type !== message.type
 	}
 
-	// 发送消息
-	const messagebarRef = useRef(null)
-	const [messageText, setMessageText] = useState('')
-	const sendMessage = async () => {
+	const sendMessage = () => {
 		const message = {
-			sender_id: senderId,
-			receiver_id: receiverId,
-			type: 'sent', // 发送方
-			content: messageText,
-			content_type: 1, // 1: 文本消息
+			text: messageText,
 			date: new Date(),
-			send_state: 'sending',
-			is_read: true
+			type: 'sent',
+			state: 'sending'
 		}
-		// 消息持久化
-		const messagesId = await WebDB.messages.add(message)
-		// 恢复输入框状态
+		messagesData.messages.push(message)
 		setMessageText('')
+		setMessages([...messagesData.messages])
+		updateChats(chats)
 		setTimeout(() => {
 			messagebarRef.current.f7Messagebar().focus()
 		})
-		// 发送消息
-		const messageFilter = _.mapKeys(_.pick(message, ['content', 'receiver_id', 'content_type']), (value, key) => {
-			if (key === 'content_type') return 'type'
-			return key
-		})
 		sendToUser({
-			...messageFilter,
-			receiver_id: '787bb5d3-7e63-43d0-ad4f-4c3e5f31a71c',
-			dialog_id: 1
+			content: messageText,
+			receiver_id: userId,
+            // dialog_id: 3,
+			// replay_id: ,
+			type: 1
 		})
 			.then(({ code }) => {
-				WebDB.messages.update(messagesId, {
-					send_state: code === 200 ? 'ok' : 'error'
-				})
+				if (code === 200) {
+					message.state = 'ok'
+				} else {
+					message.state = 'error'
+				}
 			})
 			.catch((err) => {
 				console.log(err)
-				WebDB.messages.update(messagesId, {
-					send_state: 'error'
-				})
+				message.state = 'error'
 				// TODO: 消息发送失败后提供重新发送支持
+			})
+			.finally(() => {
+				setMessages([...messagesData.messages])
 			})
 	}
 
+	// 订阅状态变化
+	// 在组件卸载时取消订阅，以避免潜在的内存泄漏
+	useEffect(
+		() =>
+			useChatsStore.subscribe(
+				({ chats }) => {
+					// console.log('数据发生变化：', chats)
+					// 在这里执行你的逻辑，例如更新组件的状态
+					const chat = chats.filter((chat) => chat.userId === userId)[0] || {
+						messages: []
+					}
+					setMessages([...chat.messages])
+				},
+				(state) => state.chats // 监听的状态属性，可以是单一属性或整个状态对象
+			),
+		[]
+	)
+
 	// Fix for iOS web app scroll body when
 	const resizeTimeout = useRef(null)
+
 	const onViewportResize = () => {
 		$('html, body').css('height', `${visualViewport.height}px`)
 		$('html, body').scrollTop(0)
 	}
+
 	const onMessagebarFocus = () => {
 		const { device } = f7
 		if (!device.ios || device.cordova || device.capacitor) return
 		clearTimeout(resizeTimeout.current)
 		visualViewport.addEventListener('resize', onViewportResize)
 	}
+
 	const onMessagebarBlur = () => {
 		const { device } = f7
 		if (!device.ios || device.cordova || device.capacitor) return
@@ -203,7 +173,7 @@ export default function MessagesPage({ f7route }) {
 			<Navbar className="messages-navbar" backLink backLinkShowText={false}>
 				<Link slot="right" iconF7="videocam" />
 				<Link slot="right" iconF7="phone" />
-				<Link slot="title" href={`/profile/${receiverId}/`} className="title-profile-link">
+				<Link slot="title" href={`/profile/${userId}/`} className="title-profile-link">
 					<img src={`/avatars/${contact.avatar}`} loading="lazy" />
 					<div>
 						<div>{contact.name}</div>
@@ -244,17 +214,17 @@ export default function MessagesPage({ f7route }) {
 						first={isMessageFirst(message)}
 						last={isMessageLast(message)}
 						tail={isMessageLast(message)}
-						type={message.content_type}
-						text={message.content}
+						type={message.type}
+						text={message.text}
 						className="message-appear-from-bottom"
 					>
 						<span slot="text-footer">
 							{messageTime(message)}
-							{message?.send_state ? (
-								message.type === 'sent' && message.send_state === 'ok' ? (
+							{message?.state ? (
+								message.type === 'sent' && message.state === 'ok' ? (
 									<DoubleTickIcon />
 								) : (
-									`[${message.send_state}]`
+									`[${message.state}]`
 								)
 							) : (
 								''

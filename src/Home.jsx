@@ -61,7 +61,7 @@ const Home = () => {
 	// 连接ws并监听消息推送
 	useEffect(() => {
 		if (!isLogin) return
-		console.log(user.nick_name, user.user_id)
+		console.log(user)
 		WebSocketClient.closeConnection()
 		WebSocketClient.connect()
 		WebSocketClient.addListener('onWsMessage', (e) => {
@@ -73,7 +73,7 @@ const Home = () => {
 		})
 		WebSocketClient.addListener('onMessage', (msg) => {
 			if (msg.event === 3) {
-                // 将接收到的消息保存到指定的用户的消息列表中
+				// 将接收到的消息保存到指定的用户的消息列表中
 				const userId = msg.data.uid
 				const messagesData = chats.filter((chat) => chat.userId === userId)[0] || {
 					messages: []

@@ -2,6 +2,14 @@ import request from '@/utils/request'
 
 const baseApi = '/msg'
 
+export function getChatList(params) {
+	return request({
+		url: baseApi + '/dialog/list',
+		method: 'GET',
+		params
+	})
+}
+
 /**
  * 获取私聊消息
  * @param {*} data

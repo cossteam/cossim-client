@@ -12,20 +12,18 @@ import {
 	Popover
 } from 'framework7-react'
 import './Chats.less'
-import { useUserStore } from '@/stores/user'
-import { useChatsStore } from '@/stores/chats'
-import { useContactsStore } from '@/stores/contacts'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
-
 import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
 // import SearchComponent from '@/components/Search/Search'
+import WebDB from '@/db'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { getChatList } from '@/api/msg'
+import { useEffect } from 'react'
 
 export default function Chats() {
 	// const { f7router } = props
-	const { user } = useUserStore()
-	const { contacts } = useContactsStore()
-	const { chats } = useChatsStore()
+	const contact = useLiveQuery(() => WebDB.contacts.toArray()) || []
 
 	const swipeoutUnread = () => {
 		f7.dialog.alert('Unread')
@@ -46,23 +44,62 @@ export default function Chats() {
 	// 	}, 300)
 	// }
 
-	const chatsFormatted = chats
-		.filter((chat) => user.user_id !== chat.userId) // remove self
-		.map((chat) => {
-			const contact = contacts.filter((contact) => contact.id === chat.userId)[0]
-			const lastMessage = chat.messages[chat.messages.length - 1]
+	// 加载会话列表
+	useEffect(() => {
+		getChatList().then(({ data }) => {
+			/*
+            {
+                "dialog_id": 1,
+                "user_id": "787bb5d3-7e63-43d0-ad4f-4c3e5f31a71c",
+                "dialog_type": 0,
+                "dialog_name": "feng",
+                "dialog_avatar": "",
+                "dialog_unread_count": 10,
+                "last_message": {
+                    "msg_type": 0,
+                    "content": "",
+                    "sender_id": "",
+                    "send_time": 0,
+                    "msg_id": 0
+                }
+            }
+            */
+			console.log(data)
+			data.map((item) => {
+				return {
+					...item,
+					...item.last_message
+				}
+			})
+		})
+		// WebDB.chats
+		// 	.bulkPut(transformedData)
+		// 	.then(() => {
+		// 		console.log('联系人插入成功！')
+		// 	})
+		// 	.catch((error) => {
+		// 		console.error('联系人插入失败:', error)
+		// 	})
+	}, [])
+	// 根据联系人表生成会话列表数据
+	const chatsFormatted =
+		contact?.map((item) => {
 			return {
-				...chat,
-				lastMessageText: lastMessage.text,
+				userId: item.user_id || '',
+				messages: item.messages || [],
+				lastMessageText: item.lastMessageText || '',
 				lastMessageDate: Intl.DateTimeFormat('en', {
 					month: 'short',
 					year: 'numeric',
 					day: 'numeric'
-				}).format(new Date(lastMessage.date)),
-				lastMessageType: lastMessage.type,
-				contact
+				}).format(new Date(item?.date || new Date())),
+				lastMessageType: item.lastMessageType || '',
+				contact: {
+					...item,
+					avatar: 'mark-zuckerberg.jpg'
+				}
 			}
-		})
+		}) || []
 
 	return (
 		<Page className="chats-page">
