@@ -5,6 +5,7 @@ import Messages from '@/pages/Messages/Messages'
 import Profile from '@/pages/Profile/Profile'
 import NotFoundPage from '@/pages/NotFound'
 import AddFriend from '@/pages/AddFriend/AddFriend'
+import AddDetails from '@/pages/AddDetails/AddDetails'
 
 import Auth from '@/pages/Auth/Auth'
 
@@ -28,6 +29,10 @@ var routes = [
 	{
 		path: '/add_friend/',
 		component:AddFriend
+	},
+	{
+		path: '/add_details/:id/',
+		component:AddDetails
 	},
 	{
 		path: '/chats/:id/',

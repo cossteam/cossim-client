@@ -1,11 +1,13 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { List, ListItem, Navbar, Link, Page, ListButton } from 'framework7-react'
-import './Profile.less'
+import { List, ListItem, Navbar, Link, Page, ListButton,f7 } from 'framework7-react'
+// import './Profile.less'
 import ListColorIcon from '@/components/ListColorIcon'
 import { contacts } from '@/data'
 import { $t } from '@/i18n'
 import { getUserInfoApi } from '@/api/user'
 import PropTypes from 'prop-types'
+import { addFriendApi } from '@/api/relation'
+import { useUserStore } from '@/stores/user'
 
 AddDetails.propTypes = {
 	f7route: PropTypes.object
@@ -15,6 +17,8 @@ export default function AddDetails(props) {
 	const { f7route } = props
 
 	const [info, setInfo] = useState({})
+
+	const userStore = useUserStore()
 
 	// const userId = parseInt(f7route.params.id, 10)
 	// const contact = contacts.filter(({ id }) => id === userId)[0]
@@ -35,10 +39,16 @@ export default function AddDetails(props) {
 			const res = await getUserInfoApi({ user_id: f7route.params.id, type: 1 })
 			console.log('res', res)
 			if (res.code !== 200) return
-			setInfo(res.data?.user_info)
+			setInfo(res.data)
 		}
 		getUserInfo()
 	}, [])
+
+	const addFriend = async () => {
+		const res = await addFriendApi({ user_id: userStore.user?.user_id, friend_id: f7route.params.id })
+		if(res.code !== 200) return f7.dialog.alert(res.msg)
+		f7.dialog.alert('添加好友成功')
+	}
 
 	return (
 		<Page ref={pageRef} className="profile-page" noToolbar>
@@ -48,14 +58,14 @@ export default function AddDetails(props) {
 			</div>
 			<div className="profile-content">
 				<List strong outline dividers mediaList className="no-margin-top">
-					<ListItem title={info?.name} text="+1 222 333-44-55">
-						<div slot="after" className="profile-actions-links">
+					<ListItem title={info?.nick_name} text={info?.tel}>
+						{/* <div slot="after" className="profile-actions-links">
 							<Link iconF7="chat_bubble_fill" />
 							<Link iconF7="camera_fill" />
 							<Link iconF7="phone_fill" />
-						</div>
+						</div> */}
 					</ListItem>
-					<ListItem subtitle={info?.status} text="27 Jun 2021" />
+					<ListItem subtitle={info?.status}  />
 				</List>
 				{/* <List strong outline dividers>
 					<ListItem link title={$t('媒体、链接和文档')} after="1 758">
@@ -111,9 +121,9 @@ export default function AddDetails(props) {
 				</List> */}
 
 				<List strong outline dividers>
-					<ListButton>Share Contact</ListButton>
-					<ListButton>Export Chat</ListButton>
-					<ListButton color="red">Clear Chat</ListButton>
+					<ListButton onClick={addFriend}>{ $t('添加好友')}</ListButton>
+					{/* <ListButton>Export Chat</ListButton> */}
+					{/* <ListButton color="red">Clear Chat</ListButton> */}
 				</List>
 			</div>
 		</Page>

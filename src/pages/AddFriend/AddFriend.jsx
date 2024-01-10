@@ -19,7 +19,7 @@ export default function AddFriend(props) {
 	// 	console.log('$(f7router.selector)[0]', $(f7router.selector))
 	// }, [])
 
-	const [keywords, setKeywords] = useState('123132@qq.com')
+	const [keywords, setKeywords] = useState('123@qq.com')
 
 	const tips = $t('搜索')
 
@@ -29,9 +29,9 @@ export default function AddFriend(props) {
 			const res = await getUserInfoApi({ email: keywords, type: 0 })
 			if (res.code !== 200) return f7.dialog.alert(res.msg)
 			// 跳转页面
-			const path = `/profile/${res.data.user_info.user_id}`
+			const path = `/add_details/${res.data.user_id}`
 			console.log('path', path)
-			f7router.navigate(`/profile/${res.data.user_info.user_id}/`)
+			f7router.navigate(`/add_details/${res.data.user_id}/`)
 		} catch (error) {
 			// 这里可以上报异常
 			f7.dialog.alert(error.message)
