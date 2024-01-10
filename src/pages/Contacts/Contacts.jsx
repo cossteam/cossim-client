@@ -58,7 +58,6 @@ export default function Contacts(props) {
 					})
 				}
 			}
-			console.log(groupsData)
 
 			// 转换为目标数据结构
 			const transformedData = groupsToArray(groupsData)
@@ -84,7 +83,7 @@ export default function Contacts(props) {
 					console.log('联系人插入成功！')
 				})
 				.catch((error) => {
-					console.error('联系人插入失败:', error)
+					console.error('联系人插入失败:', error?.message)
 				})
 			// 本地存储（弃用）
 			// setGroups(arrayToGroups(transformedData))

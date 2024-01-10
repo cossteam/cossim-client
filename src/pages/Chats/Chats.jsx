@@ -20,10 +20,10 @@ import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { getChatList } from '@/api/msg'
 import { useEffect } from 'react'
+import _ from 'lodash-es'
 
 export default function Chats() {
 	// const { f7router } = props
-	const contact = useLiveQuery(() => WebDB.contacts.toArray()) || []
 
 	const swipeoutUnread = () => {
 		f7.dialog.alert('Unread')
@@ -45,47 +45,39 @@ export default function Chats() {
 	// }
 
 	// 加载会话列表
+	const contact = useLiveQuery(() => WebDB.chats.toArray()) || []
 	useEffect(() => {
 		getChatList().then(({ data }) => {
-			/*
-            {
-                "dialog_id": 1,
-                "user_id": "787bb5d3-7e63-43d0-ad4f-4c3e5f31a71c",
-                "dialog_type": 0,
-                "dialog_name": "feng",
-                "dialog_avatar": "",
-                "dialog_unread_count": 10,
-                "last_message": {
-                    "msg_type": 0,
-                    "content": "",
-                    "sender_id": "",
-                    "send_time": 0,
-                    "msg_id": 0
-                }
-            }
-            */
-			console.log(data)
-			data.map((item) => {
-				return {
-					...item,
-					...item.last_message
-				}
+			const newData = data?.map((item) => {
+				return _.mapKeys(
+					{
+						..._.omit(item, ['last_message']),
+						...item.last_message
+					},
+					(value, key) => {
+						if (key === 'content') return 'last_message'
+						return key
+					}
+				)
 			})
+			WebDB.chats
+				.bulkPut(newData)
+				.then(() => {
+					console.log('会话插入成功！')
+				})
+				.catch((error) => {
+					console.error('会话插入失败:', error?.message)
+				})
 		})
-		// WebDB.chats
-		// 	.bulkPut(transformedData)
-		// 	.then(() => {
-		// 		console.log('联系人插入成功！')
-		// 	})
-		// 	.catch((error) => {
-		// 		console.error('联系人插入失败:', error)
-		// 	})
 	}, [])
-	// 根据联系人表生成会话列表数据
+
+	// 会话列表数据
 	const chatsFormatted =
 		contact?.map((item) => {
+			console.error('TODO: 返回数据不正确，这里需要后端处理一下')
 			return {
-				userId: item.user_id || '',
+				// TODO: 返回数据不正确，这里需要后端处理一下 'f6dea9f4-88c5-4413-b4a7-7f1ecadc5a3d' ||
+				userId: 'f6dea9f4-88c5-4413-b4a7-7f1ecadc5a3d' || item.user_id || '',
 				messages: item.messages || [],
 				lastMessageText: item.lastMessageText || '',
 				lastMessageDate: Intl.DateTimeFormat('en', {
@@ -116,7 +108,7 @@ export default function Chats() {
 				{chatsFormatted.map((chat) => (
 					<ListItem
 						key={chat.userId}
-						link={`/chats/${chat.userId}/`}
+						link={`/chats/${chat.userId}/?dialog_id=${chat?.contact?.dialog_id || ''}`}
 						title={chat.contact.name}
 						after={chat.lastMessageDate}
 						swipeout

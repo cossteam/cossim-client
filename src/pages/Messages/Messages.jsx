@@ -4,7 +4,7 @@ import { f7, Navbar, Link, Page, /*List, ListItem,*/ Messages, Message, Messageb
 import './Messages.less'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import PropType from 'prop-types'
-import { getMsgByUser, sendToUser } from '@/api/msg'
+import { sendToUser } from '@/api/msg'
 import { useEffect } from 'react'
 import _ from 'lodash-es'
 import WebDB from '@/db'
@@ -18,7 +18,8 @@ MessagesPage.propTypes = {
 export default function MessagesPage({ f7route }) {
 	const { user } = useUserStore()
 	const senderId = user?.UserId
-	const receiverId = f7route?.params?.id // 好友id/群聊id
+	const receiverId = f7route.params.id // 好友id/群聊id
+	const dialogId = f7route.query.dialog_id
 
 	// 联系人
 	const [contact, setContact] = useState({})
@@ -29,7 +30,6 @@ export default function MessagesPage({ f7route }) {
 			.equals(receiverId)
 			.first()
 			.then((contact) => {
-				console.log(contact)
 				setContact(contact)
 			})
 	}, [receiverId])
@@ -89,7 +89,6 @@ export default function MessagesPage({ f7route }) {
 
 	// 聊天记录
 	const messages = useLiveQuery(() => WebDB.messages.toArray()) || []
-	console.log(messages)
 	// 滚动到顶部加载更多
 	useEffect(() => {
 		const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
@@ -156,10 +155,10 @@ export default function MessagesPage({ f7route }) {
 			if (key === 'content_type') return 'type'
 			return key
 		})
+		console.error('TODO: 后端限制类型，一定要数值类型')
 		sendToUser({
 			...messageFilter,
-			receiver_id: '787bb5d3-7e63-43d0-ad4f-4c3e5f31a71c',
-			dialog_id: 1
+			dialog_id: parseInt(dialogId) // 后端限制类型，一定要数值类型
 		})
 			.then(({ code }) => {
 				WebDB.messages.update(messagesId, {
@@ -204,9 +203,9 @@ export default function MessagesPage({ f7route }) {
 				<Link slot="right" iconF7="videocam" />
 				<Link slot="right" iconF7="phone" />
 				<Link slot="title" href={`/profile/${receiverId}/`} className="title-profile-link">
-					<img src={`/avatars/${contact.avatar}`} loading="lazy" />
+					<img src={`/avatars/${contact?.avatar}`} loading="lazy" />
 					<div>
-						<div>{contact.name}</div>
+						<div>{contact?.name}</div>
 						<div className="subtitle">online</div>
 					</div>
 				</Link>
@@ -244,7 +243,7 @@ export default function MessagesPage({ f7route }) {
 						first={isMessageFirst(message)}
 						last={isMessageLast(message)}
 						tail={isMessageLast(message)}
-						type={message.content_type}
+						type={message.type}
 						text={message.content}
 						className="message-appear-from-bottom"
 					>
