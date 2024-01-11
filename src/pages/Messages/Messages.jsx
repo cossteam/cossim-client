@@ -20,6 +20,7 @@ export default function MessagesPage({ f7route }) {
 	const senderId = user?.UserId
 	const receiverId = f7route.params.id // 好友id/群聊id
 	const dialogId = f7route.query.dialog_id
+	console.log('接收人', receiverId)
 
 	// 联系人
 	const [contact, setContact] = useState({})
@@ -30,7 +31,8 @@ export default function MessagesPage({ f7route }) {
 			.equals(receiverId)
 			.first()
 			.then((contact) => {
-				setContact(contact)
+				setContact(contact || {})
+				console.log('联系人', contact)
 			})
 	}, [receiverId])
 
@@ -155,7 +157,6 @@ export default function MessagesPage({ f7route }) {
 			if (key === 'content_type') return 'type'
 			return key
 		})
-		console.error('TODO: 后端限制类型，一定要数值类型')
 		sendToUser({
 			...messageFilter,
 			dialog_id: parseInt(dialogId) // 后端限制类型，一定要数值类型
@@ -203,7 +204,7 @@ export default function MessagesPage({ f7route }) {
 				<Link slot="right" iconF7="videocam" />
 				<Link slot="right" iconF7="phone" />
 				<Link slot="title" href={`/profile/${receiverId}/`} className="title-profile-link">
-					<img src={`/avatars/${contact?.avatar}`} loading="lazy" />
+					<img src={contact?.avatar} loading="lazy" />
 					<div>
 						<div>{contact?.name}</div>
 						<div className="subtitle">online</div>

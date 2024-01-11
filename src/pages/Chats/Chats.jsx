@@ -96,7 +96,7 @@ export default function Chats() {
 			<List noChevron dividers mediaList className="chats-list">
 				{chats.map((chat) => (
 					<ListItem
-						key={chat.user_id}
+						key={chat.dialog_id}
 						link={`/chats/${chat.user_id}/?dialog_id=${chat?.dialog_id || ''}`}
 						title={chat.dialog_name}
 						after={chatsTimeFormat(chat.send_time)}

@@ -1,43 +1,43 @@
 {
-  "name": "com.xm.imdemo",
-  "displayName": "IM Demo",
-  "version": "1.0.0",
-  "description": "A sample Apache Cordova application that responds to the deviceready event.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "ecosystem:cordova"
-  ],
-  "author": "Apache Cordova Team",
-  "license": "Apache-2.0",
-  "devDependencies": {
-    "cordova-android": "^12.0.1",
-    "cordova-ios": "^7.0.1",
-    "cordova-plugin-device": "^2.1.0",
-    "cordova-plugin-file": "^8.0.1",
-    "cordova-plugin-inappbrowser": "^6.0.0",
-    "cordova-plugin-keyboard": "^1.2.0",
-    "cordova-plugin-media": "^7.0.0",
-    "cordova-plugin-splashscreen": "^6.0.2",
-    "cordova-plugin-statusbar": "^4.0.0"
-  },
-  "cordova": {
-    "plugins": {
-      "cordova-plugin-statusbar": {},
-      "cordova-plugin-keyboard": {},
-      "cordova-plugin-splashscreen": {},
-      "cordova-plugin-file": {},
-      "cordova-plugin-inappbrowser": {},
-      "cordova-plugin-device": {},
-      "cordova-plugin-media": {
-        "KEEP_AVAUDIOSESSION_ALWAYS_ACTIVE": "NO"
-      }
-    },
-    "platforms": [
-      "ios",
-      "android"
-    ]
-  }
+	"name": "com.xm.coss",
+	"displayName": "COSS",
+	"version": "1.0.0",
+	"description": "A sample Apache Cordova application that responds to the deviceready event.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"ecosystem:cordova"
+	],
+	"author": "Apache Cordova Team",
+	"license": "Apache-2.0",
+	"devDependencies": {
+		"cordova-android": "^12.0.1",
+		"cordova-ios": "^7.0.1",
+		"cordova-plugin-device": "^2.1.0",
+		"cordova-plugin-file": "^8.0.1",
+		"cordova-plugin-inappbrowser": "^6.0.0",
+		"cordova-plugin-keyboard": "^1.2.0",
+		"cordova-plugin-media": "^7.0.0",
+		"cordova-plugin-splashscreen": "^6.0.2",
+		"cordova-plugin-statusbar": "^4.0.0"
+	},
+	"cordova": {
+		"plugins": {
+			"cordova-plugin-statusbar": {},
+			"cordova-plugin-keyboard": {},
+			"cordova-plugin-splashscreen": {},
+			"cordova-plugin-file": {},
+			"cordova-plugin-inappbrowser": {},
+			"cordova-plugin-device": {},
+			"cordova-plugin-media": {
+				"KEEP_AVAUDIOSESSION_ALWAYS_ACTIVE": "NO"
+			}
+		},
+		"platforms": [
+			"ios",
+			"android"
+		]
+	}
 }
