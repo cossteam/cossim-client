@@ -72,6 +72,13 @@ export default function AppComponent() {
 						text="我的"
 						onClick={() => onTabLinkClick('my')}
 					/>
+					<Link
+						tabLink="#view-chattest"
+						iconIos="f7:gear"
+						iconMd="material:settings"
+						text="chat"
+						onClick={() => onTabLinkClick('chattest')}
+					/>
 				</Toolbar>
 			</>
 			{/* )} */}
@@ -80,7 +87,9 @@ export default function AppComponent() {
 			<View id="view-contacts" onTabShow={() => setActiveTab('contacts')} tab url="/contacts/" />
 			<View id="view-my" onTabShow={() => setActiveTab('my')} name="my" tab url="/my/" />
 
-			<View id="view-auth" name="auth" tab url="/auth/" />
+			<View id="view-chattest" onTabShow={() => setActiveTab('chattest')} name="chattest" tab url="/chat_test/" />
+
+			{/* <View id="view-auth" name="auth" tab url="/auth/" /> */}
 		</Views>
 	)
 }
