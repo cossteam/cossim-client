@@ -38,10 +38,10 @@ export default function Contacts(props) {
 		;(async () => {
 			const res = await friendListApi({ user_id: user.user_id })
 			if (res.code !== 200) return
-			let groupsData = res.data || {}
-			for (const key in groupsData) {
-				if (Object.hasOwnProperty.call(groupsData, key)) {
-					groupsData[key] = groupsData[key].map((user) => {
+			let respData = res.data || {}
+			for (const key in respData) {
+				if (Object.hasOwnProperty.call(respData, key)) {
+					respData[key] = respData[key].map((user) => {
 						return {
 							...user,
 							name: user.nick_name || '',
@@ -50,19 +50,14 @@ export default function Contacts(props) {
 					})
 				}
 			}
-
-			// 转换为目标数据结构
-			const transformedData = groupsToArray(groupsData)
-
-			// 插入数据到 WebDB.contacts 表中
-			WebDB.contacts
-				.bulkPut(transformedData)
-				.then(() => {
-					console.log('联系人插入成功！')
-				})
-				.catch((error) => {
-					console.error('联系人插入失败:', error?.message)
-				})
+			respData = groupsToArray(respData) // 转换为目标数据结构
+			const oldData = (await WebDB.contacts.toArray()) || []
+			// 校验新数据和旧数据 => 更新数据 or 插入数据库
+			for (let i = 0; i < respData.length; i++) {
+				const item = respData[i]
+				const oldItem = oldData.find((oldItem) => oldItem.user_id === item.user_id)
+				oldItem ? await WebDB.contacts.update(oldItem.user_id, item) : await WebDB.contacts.put(item)
+			}
 		})()
 	}, [])
 
