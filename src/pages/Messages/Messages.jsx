@@ -36,6 +36,23 @@ export default function MessagesPage({ f7route }) {
 	let pageNum = 1
 	let pageSize = 18
 	let total = 0
+	// 倒序分页查询
+	async function reversePageQuery(pageSize, pageIndex) {
+		// 计算起始位置
+		const offset = (pageIndex - 1) * pageSize
+		// 执行倒序查询
+		console.log(pageSize, pageNum)
+		const arr = await WebDB.messages
+			.orderBy('id')
+			// .reverse() // 倒序
+			.offset(offset)
+			.limit(pageSize)
+			.toArray()
+		console.log(arr)
+		arr && (pageNum += 1)
+		return arr
+	}
+	// const messages = useLiveQuery(() => reversePageQuery(pageSize, pageNum)) || []
 	const messages = useLiveQuery(() => WebDB.messages.toArray()) || []
 	// 获取服务端消息数据
 	const getMessage = () => {
@@ -61,10 +78,7 @@ export default function MessagesPage({ f7route }) {
 	// 更新本地消息
 	const refreshMessage = async () => {
 		try {
-			console.log('更新本地消息1')
 			const { user_messages } = await getMessage()
-			console.log('ddd', user_messages)
-
 			const respData = user_messages?.map((msg) => {
 				// id, sender_id, receiver_id, content, type, replay_id, is_read, read_at, created_at, dialog_id
 				// ||
@@ -82,7 +96,6 @@ export default function MessagesPage({ f7route }) {
 				const oldItem = oldData.find((oldItem) => oldItem.id === item.id)
 				oldItem ? await WebDB.messages.update(oldItem.id, item) : await WebDB.messages.put(item)
 			}
-			console.log('更新本地消息2')
 		} catch (error) {
 			console.log(error)
 		}
@@ -97,7 +110,8 @@ export default function MessagesPage({ f7route }) {
 			_.throttle(async () => {
 				if (messagesContent.scrollTop === 0) {
 					console.log('触顶')
-					await refreshMessage()
+					// await refreshMessage()
+					reversePageQuery(pageSize, pageNum)
 				}
 			}, 1000)
 		)
@@ -119,8 +133,8 @@ export default function MessagesPage({ f7route }) {
 
 	// 消息渲染处理
 	const messageTime = (message) => {
-		return message?.date
-			? Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.date))
+		return message?.created_at
+			? Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.created_at))
 			: ''
 	}
 	const isMessageFirst = (message) => {

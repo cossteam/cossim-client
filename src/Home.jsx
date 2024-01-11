@@ -74,20 +74,25 @@ const Home = () => {
 		})
 		WebSocketClient.addListener('onMessage', (msg) => {
 			if (msg.event === 3) {
+				console.log(msg)
 				const message = {
-					sender_id: msg.data.uid,
-					receiver_id: msg.uid,
-					type: 'received', // 接收方
+					// id: '', // msg_id: '', // 消息id
+					sender_id: '', // 发送者id
+					receiver_id: msg.uid, // 接收者id
 					content: msg.data.content,
-					content_type: msg.data.msgType, // 1: 文本消息
-					date: new Date().getTime() - 2 * 60 * 60 * 1000,
-					send_state: 'ok',
-					is_read: true
+					content_type: msg.data.msgType, // 消息类型 => 1: 文本消息
+					type: 'received', // 接收方
+					reply_id: msg.data.reply_id, // 所回复消息的id
+					read_at: null, // 接收时间/读取时间
+					created_at: msg.data.send_at, // 发送时间
+					dialog_id: msg.data.dialog_id, // 会话id
+					send_state: 'ok' // 发送成功/接收成功
 				}
+				console.log(message)
 				// 消息持久化
 				WebDB.messages.add(message)
-				// await WebDB.messages.add(message)
-				// TODO：更新会话列表数据
+				// TODO：检查当前会话是否存在 => 新建会话数据 or 更新会话列表数据
+				// 检查当前会话是否存在 ? WebDB.chats.add({}) : WebDB.chats.update(msg.data.msg_id, {})
 			}
 		})
 	}, [isLogin])
