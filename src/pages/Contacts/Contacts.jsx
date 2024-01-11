@@ -10,8 +10,6 @@ import { useLiveQuery } from 'dexie-react-hooks'
 
 export default function Contacts(props) {
 	// const { f7router } = props
-
-	const groups = arrayToGroups(useLiveQuery(() => WebDB.contacts.toArray()) || [])
 	const { user } = useUserStore()
 
 	function groupsToArray(obj) {
@@ -26,22 +24,16 @@ export default function Contacts(props) {
 		array = !Array.isArray(array) ? [] : array
 		return array.reduce((result, user) => {
 			const group = user.group
-
 			if (!result[group]) {
 				result[group] = []
 			}
-
-			result[group].push({
-				user_id: user.user_id,
-				nick_name: user.nick_name,
-				email: user.email,
-				signature: user.signature,
-				status: user.status
-			})
+			result[group].push(user)
 			return result
 		}, {})
 	}
+
 	// 获取好友列表
+	const groups = arrayToGroups(useLiveQuery(() => WebDB.contacts.toArray()) || [])
 	useEffect(() => {
 		;(async () => {
 			const res = await friendListApi({ user_id: user.user_id })
@@ -62,20 +54,6 @@ export default function Contacts(props) {
 			// 转换为目标数据结构
 			const transformedData = groupsToArray(groupsData)
 
-			/*
-			// 伪数据
-			for (let i = 0; i < 20; i++) {
-				const item = {
-					...transformedData[0],
-					user_id: transformedData[0]['user_id'] + i,
-					nick_name: transformedData[0]['nick_name'] + i
-				}
-				i % 2 === 0 && (item['group'] += i)
-				transformedData.push(item)
-			}
-			console.log(transformedData)
-            */
-
 			// 插入数据到 WebDB.contacts 表中
 			WebDB.contacts
 				.bulkPut(transformedData)
@@ -85,8 +63,6 @@ export default function Contacts(props) {
 				.catch((error) => {
 					console.error('联系人插入失败:', error?.message)
 				})
-			// 本地存储（弃用）
-			// setGroups(arrayToGroups(transformedData))
 		})()
 	}, [])
 
@@ -129,7 +105,7 @@ export default function Contacts(props) {
 								// link={`/profile/${contact.user_id}/`}
 								link
 								title={contact.nick_name}
-								footer={contact.status}
+								footer={contact.signature}
 								popupClose
 								onClick={() => handleUserSelect(contact)}
 							>
