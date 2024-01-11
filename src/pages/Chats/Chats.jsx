@@ -74,10 +74,8 @@ export default function Chats() {
 	// 会话列表数据
 	const chatsFormatted =
 		contact?.map((item) => {
-			console.error('TODO: 返回数据不正确，这里需要后端处理一下')
 			return {
-				// TODO: 返回数据不正确，这里需要后端处理一下 'f6dea9f4-88c5-4413-b4a7-7f1ecadc5a3d' ||
-				userId: 'f6dea9f4-88c5-4413-b4a7-7f1ecadc5a3d' || item.user_id || '',
+				userId: item.user_id || '',
 				messages: item.messages || [],
 				lastMessageText: item.lastMessageText || '',
 				lastMessageDate: Intl.DateTimeFormat('en', {
