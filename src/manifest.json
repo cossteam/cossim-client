@@ -1,7 +1,7 @@
 {
-  "name": "WhatsApp",
-  "short_name": "WhatsApp",
-  "description": "WhatsApp",
+  "name": "COSS",
+  "short_name": "COSS",
+  "description": "COSS",
   "lang": "en-US",
   "start_url": "/",
   "display": "standalone",

@@ -45,7 +45,7 @@ export default function Chats() {
 	// }
 
 	// 加载会话列表
-	const contact = useLiveQuery(() => WebDB.chats.toArray()) || []
+	const chats = useLiveQuery(() => WebDB.chats.toArray()) || []
 	useEffect(() => {
 		getChatList().then(({ data }) => {
 			const newData = data?.map((item) => {
@@ -71,27 +71,16 @@ export default function Chats() {
 		})
 	}, [])
 
-	// 会话列表数据
-	const chatsFormatted =
-		contact?.map((item) => {
-			console.error('TODO: 返回数据不正确，这里需要后端处理一下')
-			return {
-				// TODO: 返回数据不正确，这里需要后端处理一下 'f6dea9f4-88c5-4413-b4a7-7f1ecadc5a3d' ||
-				userId: 'f6dea9f4-88c5-4413-b4a7-7f1ecadc5a3d' || item.user_id || '',
-				messages: item.messages || [],
-				lastMessageText: item.lastMessageText || '',
-				lastMessageDate: Intl.DateTimeFormat('en', {
-					month: 'short',
-					year: 'numeric',
-					day: 'numeric'
-				}).format(new Date(item?.date || new Date())),
-				lastMessageType: item.lastMessageType || '',
-				contact: {
-					...item,
-					avatar: 'mark-zuckerberg.jpg'
-				}
-			}
-		}) || []
+	// 会话时间格式化
+	const chatsTimeFormat = (date) => {
+		return (
+			Intl.DateTimeFormat('en', {
+				month: 'short',
+				year: 'numeric',
+				day: 'numeric'
+			}).format(new Date(date)) || '-'
+		)
+	}
 
 	return (
 		<Page className="chats-page">
@@ -105,23 +94,18 @@ export default function Chats() {
 			</Navbar>
 
 			<List noChevron dividers mediaList className="chats-list">
-				{chatsFormatted.map((chat) => (
+				{chats.map((chat) => (
 					<ListItem
-						key={chat.userId}
-						link={`/chats/${chat.userId}/?dialog_id=${chat?.contact?.dialog_id || ''}`}
-						title={chat.contact.name}
-						after={chat.lastMessageDate}
+						key={chat.dialog_id}
+						link={`/chats/${chat.user_id}/?dialog_id=${chat?.dialog_id || ''}`}
+						title={chat.dialog_name}
+						after={chatsTimeFormat(chat.send_time)}
 						swipeout
 					>
-						<img
-							slot="media"
-							src={`/avatars/${chat.contact.avatar}`}
-							loading="lazy"
-							alt={chat.contact.name}
-						/>
+						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
 						<span slot="text">
-							{chat.lastMessageType === 'sent' && <DoubleTickIcon />}
-							{chat.lastMessageText}
+							{chat.send_time === 'sent' && <DoubleTickIcon />}
+							{chat.last_message}
 						</span>
 						{/* <SwipeoutActions left>
 							<SwipeoutButton close overswipe color="blue" onClick={swipeoutUnread}>

@@ -23,7 +23,7 @@ export const useContactsStore = create(
 	devtools(
 		persist(contactsStore, {
 			name: 'contactsStore-storage',
-			storage: createJSONStorage(() => localStorage) // 本地存储 TODO: 改为本地数据库
+			storage: createJSONStorage(() => localStorage)
 		})
 	)
 )

@@ -37,7 +37,6 @@ const chatsStore = (set) => ({
 	updateChats: (chats) => set({ chats })
 })
 
-// 本地存储 TODO: 改为本地数据库
 export const useChatsStore = create(
 	devtools(
 		persist(chatsStore, {
