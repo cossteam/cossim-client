@@ -9,6 +9,8 @@ import AddDetails from '@/pages/AddDetails/AddDetails'
 
 import Auth from '@/pages/Auth/Auth'
 
+import ChatTest from '@/pages/ChatTest'
+
 var routes = [
 	{
 		path: '/chats/',
@@ -29,6 +31,10 @@ var routes = [
 	{
 		path: '/add_friend/',
 		component:AddFriend
+	},
+	{
+		path: '/chat_test/',
+		component: ChatTest
 	},
 	{
 		path: '/add_details/:id/',

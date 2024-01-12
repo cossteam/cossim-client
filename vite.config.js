@@ -7,6 +7,9 @@ import { createHtmlPlugin } from 'vite-plugin-html'
 // import { VitePluginNode } from 'vite-plugin-node'
 // import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
+import requireTransform from 'vite-plugin-require-transform'
+// import commonjs from '@rollup/plugin-commonjs'
+
 process.env.TARGET = process.env.TARGET || 'web'
 const isCordova = process.env.TARGET === 'cordova'
 const SRC_DIR = path.resolve(__dirname, './src')
@@ -28,6 +31,10 @@ export default async ({ mode }) => {
 					}
 				}
 			}),
+			// commonjs()
+			requireTransform({
+				fileRegex: /.js$|.vue$|.ts$|.tsx$|.jsx$/
+			})
 			// electron({
 			// 	main: {
 			// 		// Shortcut of `build.lib.entry`.
@@ -120,6 +127,10 @@ export default async ({ mode }) => {
 			// 		rewrite: (path) => path.replace(/^\/api\/v1/, '')
 			// 	}
 			// }
+		},
+		define: {
+			// 'process': true
+			'process.env': {},
 		}
 	})
 }
