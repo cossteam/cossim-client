@@ -10,6 +10,9 @@ import { validEmail } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
 // import PGP from '@/utils/PGP'
+import { SignalDirectory } from '@/utils/signal-directory'
+import { createIdentity } from '@/utils/protocol'
+import WebDB from '@/db'
 
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
@@ -37,6 +40,9 @@ export default function Login({ disabled }) {
 		errorMessage: $t('登录失败，请稍后重试！'),
 		serverError: $t('服务器错误，请稍后重试！')
 	}
+
+	// signal 目录
+	const signalDirectory = new SignalDirectory()
 
 	// 登录
 	const signIn = async () => {
@@ -86,6 +92,11 @@ export default function Login({ disabled }) {
 			if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || errorList.errorMessage)
 			if (decryptedData.data.token) userStore.updateToken(decryptedData.data.token)
 			if (decryptedData.data.user_info) userStore.updateUser(decryptedData.data.user_info)
+
+			const deviceId = Math.floor(10000 * Math.random())
+			const info = await createIdentity(fromData.nickname, decryptedData.data.user_id, deviceId, signalDirectory)
+
+			userStore.updateIdentity({ ...info })
 
 			userStore.updateLogin(true)
 			setLoading(false)

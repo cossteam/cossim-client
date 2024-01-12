@@ -45,7 +45,7 @@ export default function AddDetails(props) {
 	}, [])
 
 	const addFriend = async () => {
-		const res = await addFriendApi({ user_id: userStore.user?.user_id, friend_id: f7route.params.id })
+		const res = await addFriendApi({ user_id: f7route.params.id, p2public_key: '', msg: ''})
 		if(res.code !== 200) return f7.dialog.alert(res.msg)
 		f7.dialog.alert('添加好友成功')
 	}

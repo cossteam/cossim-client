@@ -10,13 +10,9 @@ import { validEmail, validPassword } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
 // import PGP from '@/utils/PGP'
-import DB from '@/db'
-
-import { KeyHelper, MessageType, PreKeyType, SessionBuilder, SessionCipher, SignalProtocolAddress, SignedPublicPreKeyType } from "@privacyresearch/libsignal-protocol-typescript"
-import { SignalProtocolStore } from "@/utils/storage-type"
-import { SignalDirectory } from "@/utils/signal-directory"
+// import DB from '@/db'
+import { SignalDirectory } from '@/utils/signal-directory'
 import { createIdentity } from '@/utils/protocol'
-
 
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
@@ -84,14 +80,6 @@ export default function Login({ disabled }) {
 		// loading
 		setLoading(true)
 
-		// 生成用户信息
-		const deviceId = Math.floor(10000 * Math.random())
-		const info = await createIdentity(fromData.nickname,fromData.email, deviceId, signalDirectory)
-
-		console.log("info",info)
-
-		return
-
 		// 登录
 		const decryptedData = await registerApi({ ...fromData, public_key: '1' })
 
@@ -125,6 +113,12 @@ export default function Login({ disabled }) {
 		if (decryptedData) setLoading(false)
 
 		if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || $t('注册失败'))
+
+		// 生成用户信息
+		const deviceId = Math.floor(10000 * Math.random())
+		const info = await createIdentity(fromData.nickname, decryptedData.data.user_id, deviceId, signalDirectory)
+
+		userStore.updateIdentity({ ...info, directory: signalDirectory })
 
 		f7.dialog.alert(`注册成功! TODO: 跳转到登录页面或跳转到首页（待定）`)
 		// if (decryptedData.data.token) userStore.updateToken(decryptedData.data.token)

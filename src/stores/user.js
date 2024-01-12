@@ -23,8 +23,9 @@ const userStore = (set) => ({
 	isLogin: false,
 	token: '',
 	user: {},
-    serviceKey: '',
-    clientKeys: {},
+	serviceKey: '',
+	clientKeys: {},
+	identity: {},
 	updateLogin: (isLogin) => set({ isLogin }),
 	updateUser: (user) =>
 		set((state) => ({
@@ -35,14 +36,21 @@ const userStore = (set) => ({
 		})),
 	removeUser: () => set({ user: {}, isLogin: false }),
 	updateToken: (token) => set({ token }),
-    updateServiceKey: (serviceKey) => set({ serviceKey }),
+	updateServiceKey: (serviceKey) => set({ serviceKey }),
 	updateClientKeys: (clientKeys) =>
-        set((state) => ({
-            clientKeys: {
+		set((state) => ({
+			clientKeys: {
 				...state.clientKeys,
 				...clientKeys
 			}
-        }))
+		})),
+	updateIdentity: (identity) =>
+		set((state) => ({
+			identity: {
+				...state.identity,
+				...identity
+			}
+		}))
 })
 
 const ProStroeName = 'COSS_USER_STRORAGE'

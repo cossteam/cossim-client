@@ -4,6 +4,7 @@ import { f7, f7ready, Views, View, Toolbar, Link } from 'framework7-react'
 import cordovaApp from '@/config/cordova-app'
 // import { useUserStore } from '@/stores/user'
 // import PropTypes from 'prop-types' 
+import WebDB from '@/db'
 
 // AppComponent.propTypes = {
 // 	isLogin: PropTypes.bool
@@ -38,6 +39,19 @@ export default function AppComponent() {
 		}
 		previousTab.current = tab
 	}
+
+	// WebDB.keypairs.put({
+	// 	sender_id:,
+	// 	sender_name,
+	// 	sender_device_id,
+	// 	signed_pre_key,
+	// 	sender_identity_key,
+	// 	sender_pre_key_id,
+	// 	sender_public_key,
+	// 	sender_registration_id,
+	// 	sender_signed_pre_key,
+	// 	sender_signature
+	// })
 
 	f7ready(() => {
 		// Init cordova APIs (see cordova-app.js)

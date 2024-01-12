@@ -1,243 +1,162 @@
-import React, { useState, useEffect } from 'react'
-import { Page } from 'framework7-react'
-
+import React from 'react'
 import {
-	KeyHelper,
-	SignalProtocolAddress,
-	SessionBuilder,
-	SessionCipher
-} from '@privacyresearch/libsignal-protocol-typescript'
+	f7,
+	List,
+	ListItem,
+	Navbar,
+	Link,
+	Page,
+	SwipeoutActions,
+	SwipeoutButton,
+	Icon,
+	Popover
+} from 'framework7-react'
+import './Chats/Chats.less'
+import DoubleTickIcon from '@/components/DoubleTickIcon'
+import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
+import { $t } from '@/i18n'
+// import SearchComponent from '@/components/Search/Search'
+import WebDB from '@/db'
+import { getChatList } from '@/api/msg'
+import { useEffect } from 'react'
+import _ from 'lodash-es'
+import { useLiveQuery } from 'dexie-react-hooks'
 
-import { SignalProtocolStore } from '@/utils/storage-type'
-import { SignalDirectory } from '@/utils/signal-directory'
+export default function Chats() {
+	// const { f7router } = props
 
-let msgID = 0
-
-function getNewMessageID() {
-	return msgID++
-}
-
-const adalheidAddress = new SignalProtocolAddress('adalheid', 1)
-const brunhildeAddress = new SignalProtocolAddress('brünhild', 1)
-
-export default function ChatTest() {
-	//  客户端1仓库
-	const [adiStore] = useState(new SignalProtocolStore())
-	// 客户端2仓库
-	const [brunhildeStore] = useState(new SignalProtocolStore())
-
-	// 客户端1身份
-	const [aHasIdentity, setAHasIdentity] = useState(false)
-	// 客户端2身份
-	const [bHasIdentity, setBHasIdentity] = useState(false)
-
-	const [directory] = useState(new SignalDirectory())
-	const [messages, setMessages] = useState([])
-	const [processedMessages, setProcessedMessages] = useState([])
-
-	const [hasSession, setHasSession] = useState(false)
-
-	const [adalheidTyping, setAdalheidTyping] = useState('')
-	const [brunhildeTyping, setBrunhildeTyping] = useState('')
-
-	const [processing, setProcessing] = useState(false)
-
-	// 发送消息
-	const sendMessage = (to, from, message) => {
-		const msg = { to, from, message, delivered: false, id: getNewMessageID() }
-		setMessages([...messages, msg])
+	const swipeoutUnread = () => {
+		f7.dialog.alert('Unread')
 	}
+	const swipeoutPin = () => {
+		f7.dialog.alert('Pin')
+	}
+	const swipeoutMore = () => {
+		f7.dialog.alert('More')
+	}
+	// const swipeoutArchive = () => {
+	// 	f7.dialog.alert('Archive')
+	// }
+	// const onUserSelect = (user) => {
+	// 	console.log('start new chat with', user)
+	// 	setTimeout(() => {
+	// 		f7router.navigate(`/chats/${user.id}/`)
+	// 	}, 300)
+	// }
 
+	/**
+	 * 页面初始化时加载会话列表
+	 * 1、默认空数据
+	 * 2、拉取服务端数据
+	 * 3、校验新数据和旧数据 => 更新数据 or 插入数据库
+	 */
+	const chats = useLiveQuery(() => WebDB.chats.toArray()) || []
 	useEffect(() => {
-		if (!messages.find((m) => !m.delivered) || processing) {
-			return
-		}
-
-		const getReceivingSessionCipherForRecipient = (to) => {
-			// send from Brünhild to Adalheid so use his store
-			const store = to === 'brünhild' ? brunhildeStore : adiStore
-			const address = to === 'brünhild' ? adalheidAddress : brunhildeAddress
-			return new SessionCipher(store, address)
-		}
-
-		const doProcessing = async () => {
-			while (messages.length > 0) {
-				const nextMsg = messages.shift()
-				if (!nextMsg) {
-					continue
-				}
-				const cipher = getReceivingSessionCipherForRecipient(nextMsg.to)
-				const processed = await readMessage(nextMsg, cipher)
-				processedMessages.push(processed)
+		;(async () => {
+			const { data } = await getChatList()
+			// 响应数据格式化
+			const respData = data?.map((item) => {
+				// 将 last_message 字段数据提取出来
+				return _.mapKeys(
+					{
+						..._.omit(item, ['last_message']), // 排除 last_message
+						...item.last_message // 提取 last_message 数据
+					},
+					(value, key) => {
+						if (key === 'content') return 'last_message' // 将 content 改为 last_message
+						return key
+					}
+				)
+			})
+			const oldData = (await WebDB.chats.toArray()) || []
+			// 校验新数据和旧数据 => 更新数据 or 插入数据库
+			for (let i = 0; i < respData.length; i++) {
+				const item = respData[i]
+				const oldItem = oldData.find((oldItem) => oldItem.dialog_id === item.dialog_id)
+				oldItem ? await WebDB.chats.update(oldItem.dialog_id, item) : await WebDB.chats.put(item)
 			}
-			setMessages([...messages])
-			setProcessedMessages([...processedMessages])
-		}
-		setProcessing(true)
-		doProcessing().then(() => {
-			setProcessing(false)
-		})
-	}, [adiStore, brunhildeStore, messages, processedMessages, processing])
+		})()
+	}, [])
 
-	// 阅读消息
-	const readMessage = async (msg, cipher) => {
-		let plaintext = new Uint8Array().buffer
-		if (msg.message.type === 3) {
-			console.log({ msg })
-			plaintext = await cipher.decryptPreKeyWhisperMessage(msg.message.body, 'binary')
-			setHasSession(true)
-		} else if (msg.message.type === 1) {
-			plaintext = await cipher.decryptWhisperMessage(msg.message.body, 'binary')
-		}
-		const stringPlaintext = new TextDecoder().decode(new Uint8Array(plaintext))
-		console.log('readMessage', stringPlaintext)
-
-		const { id, to, from } = msg
-		return { id, to, from, messageText: stringPlaintext }
+	// 会话时间格式化
+	const chatsTimeFormat = (date) => {
+		return (
+			Intl.DateTimeFormat('en', {
+				month: 'short',
+				year: 'numeric',
+				day: 'numeric'
+			}).format(new Date(date)) || '-'
+		)
 	}
 
-	
-	// 存储在安全的地方
-	const storeSomewhereSafe = (store) => (key, value) => {
-		store.put(key, value)
-	}
+	return (
+		<Page className="chats-page">
+			<Navbar title="COSS" className="coss-header">
+				<Link slot="right" popoverOpen=".popover-menu">
+					<Search className="w-[24px] h-[24px]" />
+				</Link>
+				<Link slot="right" popoverOpen=".popover-menu">
+					<Plus className="w-[28px] h-[28px] mr-2" />
+				</Link>
+			</Navbar>
 
-	// 生成ID
-	const createID = async (name, store) => {
-		const registrationId = KeyHelper.generateRegistrationId()
-		// 将 RegistrationId 存储在持久且安全的地方...或者这样做。
-		storeSomewhereSafe(store)(`registrationID`, registrationId)
+			<List noChevron dividers mediaList className="chats-list">
+				{chats.map((chat) => (
+					<ListItem
+						key={chat.dialog_id}
+						link={`/chats_test/${chat.user_id}/?dialog_id=${chat?.dialog_id || ''}`}
+						title={chat.dialog_name}
+						after={chatsTimeFormat(chat.send_time)}
+						swipeout
+					>
+						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
+						<span slot="text">
+							{chat.send_time === 'sent' && <DoubleTickIcon />}
+							{chat.last_message}
+						</span>
+						{/* <SwipeoutActions left>
+							<SwipeoutButton close overswipe color="blue" onClick={swipeoutUnread}>
+								<Icon f7="chat_bubble_fill" />
+								<span>Unread</span>
+							</SwipeoutButton>
+							<SwipeoutButton close color="gray" onClick={swipeoutPin}>
+								<Icon f7="pin_fill" />
+								<span>Pin</span>
+							</SwipeoutButton>
+						</SwipeoutActions> */}
+						<SwipeoutActions right>
+							<SwipeoutButton close overswipe color="blue" onClick={swipeoutUnread}>
+								<Icon f7="chat_bubble_fill" />
+								<span>Unread</span>
+							</SwipeoutButton>
+							<SwipeoutButton close color="gray" onClick={swipeoutPin}>
+								<Icon f7="pin_fill" />
+								<span>Pin</span>
+							</SwipeoutButton>
+							<SwipeoutButton close color="gray" onClick={swipeoutMore}>
+								<Icon f7="ellipsis" />
+								<span>删除</span>
+							</SwipeoutButton>
+						</SwipeoutActions>
+					</ListItem>
+				))}
+			</List>
 
-		const identityKeyPair = await KeyHelper.generateIdentityKeyPair()
-		// 将 IdentityKeyPair 存储在持久且安全的地方......或者这样做。
-		storeSomewhereSafe(store)('identityKey', identityKeyPair)
+			{/* 标题栏右侧加号弹出层 */}
+			<Popover className="popover-menu w-[160px]" backdrop={false} arrow={false}>
+				<List className="text-white" dividersIos outlineIos strongIos>
+					<ListItem link="/dialog/" popoverClose className="el-list">
+						<Person2Alt className="el-list__icon" />
+						<span className="el-text">{$t('发起群聊')}</span>
+					</ListItem>
+					<ListItem link="/add_friend/" popoverClose className="el-list">
+						<PersonBadgePlusFill className="el-list__icon" />
+						<span className="el-text">{$t('添加朋友/群')}</span>
+					</ListItem>
+				</List>
+			</Popover>
 
-		const baseKeyId = Math.floor(10000 * Math.random())
-		const preKey = await KeyHelper.generatePreKey(baseKeyId)
-		store.storePreKey(`${baseKeyId}`, preKey.keyPair)
-
-		const signedPreKeyId = Math.floor(10000 * Math.random())
-		const signedPreKey = await KeyHelper.generateSignedPreKey(identityKeyPair, signedPreKeyId)
-		store.storeSignedPreKey(signedPreKeyId, signedPreKey.keyPair)
-		const publicSignedPreKey = {
-			keyId: signedPreKeyId,
-			publicKey: signedPreKey.keyPair.pubKey,
-			signature: signedPreKey.signature
-		}
-
-		// 现在我们将其注册到服务器，以便所有用户都可以看到它们
-		const publicPreKey = {
-			keyId: preKey.keyId,
-			publicKey: preKey.keyPair.pubKey
-		}
-		directory.storeKeyBundle(name, {
-			registrationId,
-			identityPubKey: identityKeyPair.pubKey,
-			signedPreKey: publicSignedPreKey,
-			oneTimePreKeys: [publicPreKey]
-		})
-	}
-
-	// 创建Adalheid身份
-	const createAdalheidIdentity = async () => {
-		await createID('adalheid', adiStore)
-		console.log({ adiStore })
-		setAHasIdentity(true)
-	}
-
-	// 创建Brunhilde身份
-	const createBrunhildeIdentity = async () => {
-		await createID('brünhild', brunhildeStore)
-		setBHasIdentity(true)
-	}
-
-	const starterMessageBytes = Uint8Array.from([
-		0xce, 0x93, 0xce, 0xb5, 0xce, 0xb9, 0xce, 0xac, 0x20, 0xcf, 0x83, 0xce, 0xbf, 0xcf, 0x85
-	])
-
-	// 起始消息字节
-	const startSessionWithBrunhilde = async () => {
-		// get Brünhild' key bundle
-		const brunhildeBundle = directory.getPreKeyBundle('brünhild')
-		console.log({ brunhildeBundle })
-
-		const recipientAddress = brunhildeAddress
-
-		// Instantiate a SessionBuilder for a remote recipientId + deviceId tuple.
-		const sessionBuilder = new SessionBuilder(adiStore, recipientAddress)
-
-		// Process a prekey fetched from the server. Returns a promise that resolves
-		// once a session is created and saved in the store, or rejects if the
-		// identityKey differs from a previously seen identity for this address.
-		console.log('adalheid processing prekey')
-		await sessionBuilder.processPreKey(brunhildeBundle)
-
-		// Now we can send an encrypted message
-		const adalheidSessionCipher = new SessionCipher(adiStore, recipientAddress)
-		const ciphertext = await adalheidSessionCipher.encrypt(starterMessageBytes.buffer)
-
-		sendMessage('brünhild', 'adalheid', ciphertext)
-		// updateStory('startSessionWithBrunhilde')
-	}
-
-	// 与Adalheid 开始会话
-	const startSessionWithAdalheid = async () => {
-		// 获得阿达尔海德的钥匙包
-		const adalheidBundle = directory.getPreKeyBundle('adalheid')
-		console.log({ adalheidBundle })
-
-		const recipientAddress = adalheidAddress
-
-		// 为远程recipientId + deviceId元组实例化SessionBuilder。
-		const sessionBuilder = new SessionBuilder(brunhildeStore, recipientAddress)
-
-		// 处理从服务器获取的预密钥。返回一个解决的承诺
-		// 一旦会话被创建并保存在商店中，或者如果会话被拒绝，
-		// IdentityKey 与该地址之前看到的身份不同。
-		console.log('brünhild processing prekey')
-		await sessionBuilder.processPreKey(adalheidBundle)
-
-		// 现在我们可以发送加密消息
-		const brunhildeSessionCipher = new SessionCipher(brunhildeStore, recipientAddress)
-		const ciphertext = await brunhildeSessionCipher.encrypt(starterMessageBytes.buffer)
-
-		sendMessage('adalheid', 'brünhild', ciphertext)
-		// updateStory('startSessionWithAdalheid')
-	}
-
-	// 显示消息
-	const displayMessages = (sender) => {
-		return processedMessages.map((m) => <p>{m.messageText}</p>)
-	}
-
-	// 获取收件人的会话密码
-	const getSessionCipherForRecipient = (to) => {
-		// 从布伦希尔德发送到阿达尔海德，所以使用他的商店
-		const store = to === 'adalheid' ? brunhildeStore : adiStore
-		const address = to === 'adalheid' ? adalheidAddress : brunhildeAddress
-		return new SessionCipher(store, address)
-	}
-
-	// 加密并发送消息
-	const encryptAndSendMessage = async (to, message) => {
-		const cipher = getSessionCipherForRecipient(to)
-		const from = to === 'adalheid' ? 'brünhild' : 'adalheid'
-		const ciphertext = await cipher.encrypt(new TextEncoder().encode(message).buffer)
-		if (from === 'adalheid') {
-			setAdalheidTyping('')
-		} else {
-			setBrunhildeTyping('')
-		}
-		sendMessage(to, from, ciphertext)
-		// updateStory(sendMessageMD)
-	}
-
-	// 发送消息控制
-	const sendMessageControl = (to) => {
-		const value = to === 'adalheid' ? brunhildeTyping : adalheidTyping
-		const onTextChange = to === 'adalheid' ? setBrunhildeTyping : setAdalheidTyping
-		return 'sendMessageControl'
-	}
-
-	return <Page></Page>
+			{/* <SearchComponent title={$t('添加朋友')} placeholder={$t('邮箱')} className="z-[13000]" /> */}
+		</Page>
+	)
 }

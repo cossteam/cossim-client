@@ -4,6 +4,7 @@ export class SignalDirectory {
 
 	storeKeyBundle(address, bundle) {
 		this._data[address] = bundle
+		console.log(address,bundle)
 	}
 
 	addOneTimePreKeys(address, keys) {

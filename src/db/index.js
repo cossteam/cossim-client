@@ -21,7 +21,20 @@ WebDB.version(WEBDB_VERSION).stores({
 	chats: '++id, &dialog_id, user_id, dialog_type, dialog_name, dialog_avatar, dialog_unread_count, msg_type, last_message, sender_id, send_time, msg_id',
 	// 消息：send_state(客户端消息发送时状态)：'sending' => 'ok' or 'err'
 	messages:
-		'++id, msg_id, sender_id, receiver_id, content, content_type, type, reply_id, read_at, created_at, dialog_id, send_state'
+		'++id, msg_id, sender_id, receiver_id, content, content_type, type, reply_id, read_at, created_at, dialog_id, send_state',
+	keypairs:`
+		++id,
+		sender_id,
+		sender_name,
+		sender_device_id,
+		signed_pre_key,
+		sender_identity_key,
+		sender_pre_key_id,
+		sender_public_key,
+		sender_registration_id,
+		sender_signed_pre_key,
+		sender_signature
+	`
 })
 
 export default WebDB
