@@ -3,14 +3,13 @@ import $ from 'dom7'
 import { f7, f7ready, Views, View, Toolbar, Link } from 'framework7-react'
 import cordovaApp from '@/config/cordova-app'
 // import { useUserStore } from '@/stores/user'
-// import PropTypes from 'prop-types' 
+// import PropTypes from 'prop-types'
 
 // AppComponent.propTypes = {
 // 	isLogin: PropTypes.bool
 // }
 
 export default function AppComponent() {
-
 	// console.log("AppComponent",isLogin);
 	// if(!isLogin) {
 	// 	return <View id="view-auth" name="auth" url="/auth/" />
@@ -65,18 +64,11 @@ export default function AppComponent() {
 						text="联系人"
 						onClick={() => onTabLinkClick('contacts')}
 					/>
-					<Link
-						tabLink="#view-my"
-						iconIos="f7:gear"
-						iconMd="material:settings"
-						text="我的"
-						onClick={() => onTabLinkClick('my')}
-					/>
+					<Link tabLink="#view-my" iconF7="person" text="我的" onClick={() => onTabLinkClick('my')} />
 					<Link
 						tabLink="#view-chattest"
-						iconIos="f7:gear"
-						iconMd="material:settings"
-						text="chat"
+						iconF7="thermometer"
+						text="测试"
 						onClick={() => onTabLinkClick('chattest')}
 					/>
 				</Toolbar>
