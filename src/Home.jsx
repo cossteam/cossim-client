@@ -13,6 +13,7 @@ import { useUserStore } from '@/stores/user'
 // import { useChatsStore } from '@/stores/chats'
 import WebSocketClient from '@/utils/WebSocketClient'
 import WebDB from '@/db'
+// import { useLiveQuery } from 'dexie-react-hooks'
 
 /**
  * 这里主要做一些全局配置之类的事情
@@ -92,7 +93,10 @@ const Home = () => {
 				// 消息持久化
 				WebDB.messages.add(message)
 				// TODO：检查当前会话是否存在 => 新建会话数据 or 更新会话列表数据
+				// const chats = useLiveQuery(() => WebDB.chats.toArray()) || []
 				// 检查当前会话是否存在 ? WebDB.chats.add({}) : WebDB.chats.update(msg.data.msg_id, {})
+				console.log(msg.data.dialog_id)
+				console.log(WebDB.chats.where('dialog_id').equals(msg.data.dialog_id).fiest())
 			}
 		})
 	}, [isLogin])

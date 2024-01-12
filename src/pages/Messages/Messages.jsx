@@ -23,7 +23,7 @@ import _ from 'lodash-es'
 import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useUserStore } from '@/stores/user'
-import { emojis } from './emojis'
+import { emojis, emojisImg } from './emojis'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -37,82 +37,6 @@ export default function MessagesPage({ f7route }) {
 	console.log('接收人', receiverId)
 
 	// 图片表情
-	const emojisImg = [
-		'https://cdn.framework7.io/placeholder/cats-300x300-1.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-10.jpg'
-	]
 	const [attachments, setAttachments] = useState([])
 	const [sheetVisible, setSheetVisible] = useState(false)
 	const [showImgEmojis, setShowImgEmojis] = useState(false)
@@ -280,60 +204,90 @@ export default function MessagesPage({ f7route }) {
 		return !nextMessage || nextMessage.type !== message.type
 	}
 	const messageType = (message) => {
+		console.log(message)
 		return message.receiver_id === receiverId ? 'sent' : 'received'
 	}
-	const isJSONString = (jsonString) => {
-		if (jsonString[0] === '{' && jsonString[jsonString.length - 1] === '}') return true
-		return false
-	}
+	// const isJSONString = (jsonString) => {
+	// 	if (jsonString[0] === '{' && jsonString[jsonString.length - 1] === '}') return true
+	// 	return false
+	// }
 
 	// 发送消息
 	const messagebarRef = useRef(null)
 	const [messageText, setMessageText] = useState('')
 	const sendMessage = async () => {
-		const message = {
-			sender_id: senderId,
-			receiver_id: receiverId,
-			type: 'sent', // 发送方
-			content: messageText,
-			content_type: 1, // 1: 文本消息
-			date: new Date(),
-			send_state: 'sending',
-			is_read: true
-		}
+		const allMsg = []
+		// 选择多个图片表情时拆分为多条消息发送
+		attachments.map((item) => {
+			allMsg.push({
+				sender_id: senderId,
+				receiver_id: receiverId,
+				type: 'sent', // 发送方
+				content: item,
+				content_type: 3, // 3: 图片消息
+				date: new Date(),
+				send_state: 'sending',
+				is_read: true
+			})
+		})
+		messageText &&
+			allMsg.push({
+				sender_id: senderId,
+				receiver_id: receiverId,
+				type: 'sent', // 发送方
+				content: messageText,
+				content_type: 1, // 1: 文本消息
+				date: new Date(),
+				send_state: 'sending',
+				is_read: true
+			})
 		// 消息持久化
-		const messagesId = await WebDB.messages.add(message)
+		const allMsgIds = await Promise.all(allMsg.map(async (item) => WebDB.messages.add(item)))
+		console.log(allMsg)
+		console.log(allMsgIds)
 		// 恢复输入框状态
 		setMessageText('')
 		setAttachments([])
 		setTimeout(() => {
 			messagebarRef.current.f7Messagebar().focus()
 		})
-		// 发送消息
-		const messageFilter = _.mapKeys(_.pick(message, ['content', 'receiver_id', 'content_type']), (value, key) => {
-			if (key === 'content_type') return 'type'
-			return key
-		})
-		sendToUser({
-			...messageFilter,
-			content: JSON.stringify({
-				attachments,
-				text: messageFilter.content
-			}),
-			dialog_id: parseInt(dialogId) // 后端限制类型，一定要数值类型
-		})
-			.then(({ code }) => {
-				WebDB.messages.update(messagesId, {
-					send_state: code === 200 ? 'ok' : 'error'
-				})
+		// 发送消息前格式化数据
+		const reqMsg = allMsg.map((item) => {
+			const messageFilter = _.mapKeys(_.pick(item, ['content', 'receiver_id', 'content_type']), (value, key) => {
+				if (key === 'content_type') return 'type'
+				return key
 			})
-			.catch((err) => {
-				console.log(err)
-				WebDB.messages.update(messagesId, {
-					send_state: 'error'
+			return {
+				...messageFilter,
+				dialog_id: parseInt(dialogId) // 后端限制类型，一定要数值类型
+			}
+		})
+		console.log(reqMsg)
+		try {
+			const respMsgs = await Promise.all(
+				reqMsg.map(async (item, index) => {
+					return new Promise((resolve, reject) => {
+						sendToUser(item)
+							.then(({ code }) => {
+								WebDB.messages.update(allMsgIds[index], {
+									send_state: code === 200 ? 'ok' : 'error'
+								})
+								code === 200 ? resolve(allMsgIds[index]) : reject(allMsgIds[index])
+							})
+							.catch(() => {
+								WebDB.messages.update(allMsgIds[index], {
+									send_state: 'error'
+								})
+								// TODO: 消息发送失败后提供重新发送支持
+								reject(allMsgIds[index])
+							})
+					})
 				})
-				// TODO: 消息发送失败后提供重新发送支持
-			})
+			)
+			console.log(respMsgs)
+		} catch (errors) {
+			console.log(errors)
+		}
 	}
 
 	// Fix for iOS web app scroll body when
@@ -452,17 +406,23 @@ export default function MessagesPage({ f7route }) {
 						first={isMessageFirst(message)}
 						last={isMessageLast(message)}
 						tail={isMessageLast(message)}
-						// image={['https://cdn.framework7.io/placeholder/cats-300x300-1.jpg']}
+						image={message.content_type === 3 ? [message.content] : []}
 						type={messageType(message)}
-						text={isJSONString(message.content) ? JSON.parse(message.content).text : message.content}
+						text={message.content_type === 3 ? '' : message.content}
 					>
 						<span slot="text-footer">
 							{messageTime(message)}
-							{message?.send_state ? (
-								message.type === 'sent' && message.send_state === 'ok' ? (
+							{/* 发送状态 */}
+							{message?.send_state && message.type === 'sent' ? (
+								message.send_state === 'ok' ? (
 									<DoubleTickIcon />
 								) : (
-									`[${message.send_state}]`
+									// message.send_state
+									<Icon
+										className="text-base"
+										f7={message.send_state === 'sending' ? 'slowmo' : 'wifi_slash'}
+										color="primary"
+									/>
 								)
 							) : (
 								''
