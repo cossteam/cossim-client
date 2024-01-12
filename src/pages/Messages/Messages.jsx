@@ -1,6 +1,19 @@
 import $ from 'dom7'
 import React, { useRef, useState } from 'react'
-import { f7, Navbar, Link, Page, /*List, ListItem,*/ Messages, Message, Messagebar } from 'framework7-react'
+import {
+	f7,
+	Navbar,
+	Link,
+	Page,
+	/*List, ListItem,*/ Messages,
+	Message,
+	Messagebar,
+	MessagebarSheet,
+	MessagebarSheetImage,
+	MessagebarAttachments,
+	MessagebarAttachment,
+	Icon
+} from 'framework7-react'
 import './Messages.less'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import PropType from 'prop-types'
@@ -10,6 +23,7 @@ import _ from 'lodash-es'
 import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useUserStore } from '@/stores/user'
+import { emojis } from './emojis'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -21,6 +35,123 @@ export default function MessagesPage({ f7route }) {
 	const receiverId = f7route.params.id // 好友id/群聊id
 	const dialogId = f7route.query.dialog_id
 	console.log('接收人', receiverId)
+
+	// 图片表情
+	const emojisImg = [
+		'https://cdn.framework7.io/placeholder/cats-300x300-1.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
+		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
+		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
+		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
+		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
+		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
+		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
+		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
+		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
+		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
+		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
+		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
+		'https://cdn.framework7.io/placeholder/cats-300x150-10.jpg'
+	]
+	const [attachments, setAttachments] = useState([])
+	const [sheetVisible, setSheetVisible] = useState(false)
+	const [showImgEmojis, setShowImgEmojis] = useState(false)
+	const IconComponent = (props) => (
+		<span onClick={() => setShowImgEmojis(!showImgEmojis)}>
+			<Icon f7={props.fill ? 'smiley_fill' : 'smiley'} color="primary" />
+		</span>
+	)
+	IconComponent.propTypes = {
+		fill: PropType.bool
+	}
+	const deleteAttachment = (image) => {
+		const index = attachments.indexOf(image)
+		attachments.splice(index, 1)
+		setAttachments([...attachments])
+	}
+	const attachmentsVisible = () => {
+		return attachments.length > 0
+	}
+	const placeholder = () => {
+		return attachments.length > 0 ? 'Add comment or Send' : 'Message'
+	}
+	const handleAttachment = (e) => {
+		const index = f7.$(e.target).parents('label.checkbox').index()
+		const image = emojisImg[index]
+		if (e.target.checked) {
+			// Add to attachments
+			attachments.unshift(image)
+		} else {
+			// Remove from attachments
+			attachments.splice(attachments.indexOf(image), 1)
+		}
+		setAttachments([...attachments])
+	}
+	const addEmojis = (emoji) => {
+		setMessageText(messageText + emoji)
+		// messagebarRef.current.f7Messagebar().focus()
+		// setSheetVisible(!sheetVisible)
+	}
 
 	// 联系人
 	const [contact, setContact] = useState({})
@@ -101,6 +232,7 @@ export default function MessagesPage({ f7route }) {
 		}
 	}
 
+	// 初始化后执行
 	useEffect(() => {
 		refreshMessage()
 		const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
@@ -150,6 +282,10 @@ export default function MessagesPage({ f7route }) {
 	const messageType = (message) => {
 		return message.receiver_id === receiverId ? 'sent' : 'received'
 	}
+	const isJSONString = (jsonString) => {
+		if (jsonString[0] === '{' && jsonString[jsonString.length - 1] === '}') return true
+		return false
+	}
 
 	// 发送消息
 	const messagebarRef = useRef(null)
@@ -169,6 +305,7 @@ export default function MessagesPage({ f7route }) {
 		const messagesId = await WebDB.messages.add(message)
 		// 恢复输入框状态
 		setMessageText('')
+		setAttachments([])
 		setTimeout(() => {
 			messagebarRef.current.f7Messagebar().focus()
 		})
@@ -179,6 +316,10 @@ export default function MessagesPage({ f7route }) {
 		})
 		sendToUser({
 			...messageFilter,
+			content: JSON.stringify({
+				attachments,
+				text: messageFilter.content
+			}),
 			dialog_id: parseInt(dialogId) // 后端限制类型，一定要数值类型
 		})
 			.then(({ code }) => {
@@ -233,15 +374,24 @@ export default function MessagesPage({ f7route }) {
 			</Navbar>
 			<Messagebar
 				ref={messagebarRef}
-				placeholder=""
+				placeholder={placeholder()}
 				value={messageText}
+				sheetVisible={sheetVisible}
+				attachmentsVisible={attachmentsVisible()}
 				onInput={(e) => setMessageText(e.target.value)}
 				onFocus={onMessagebarFocus}
 				onBlur={onMessagebarBlur}
 			>
 				<Link slot="inner-start" iconF7="plus" />
-				<Link className="messagebar-sticker-link" slot="after-area" iconF7="sticker" />
-				{messageText.trim().length ? (
+				<Link
+					className="messagebar-sticker-link"
+					slot="after-area"
+					iconF7="smiley"
+					onClick={() => {
+						setSheetVisible(!sheetVisible)
+					}}
+				/>
+				{messageText.trim().length || attachments.length > 0 ? (
 					<Link
 						slot="inner-end"
 						className="messagebar-send-link"
@@ -254,19 +404,57 @@ export default function MessagesPage({ f7route }) {
 						<Link slot="inner-end" iconF7="mic" />
 					</>
 				)}
+				{/* 表情、图片选择 */}
+				<MessagebarAttachments>
+					{attachments.map((image, index) => (
+						<MessagebarAttachment
+							key={index}
+							image={image}
+							onAttachmentDelete={() => deleteAttachment(image)}
+						/>
+					))}
+				</MessagebarAttachments>
+				<MessagebarSheet>
+					<div onClick={(e) => e.stopPropagation()}>
+						<div className="m-1 p-1">{showImgEmojis ? <IconComponent /> : <IconComponent fill />}</div>
+						{!showImgEmojis ? (
+							// emojis
+							<div className="pl-3.5" onClick={(e) => e.stopPropagation()}>
+								{emojis.map((emoji, eKey) => (
+									<span key={eKey} className="m-1 p-1 text-2xl" onClick={() => addEmojis(emoji)}>
+										{emoji}
+									</span>
+								))}
+							</div>
+						) : (
+							// 图片表情
+							<div className="p-1">
+								{emojisImg.map((image, index) => (
+									<MessagebarSheetImage
+										key={index}
+										image={image}
+										checked={attachments.indexOf(image) >= 0}
+										onChange={handleAttachment}
+									/>
+								))}
+							</div>
+						)}
+					</div>
+				</MessagebarSheet>
 			</Messagebar>
 
 			<Messages ref={messagesRef}>
 				{messages.map((message, index) => (
 					<Message
 						key={index}
+						className="message-appear-from-bottom"
 						data-key={index}
 						first={isMessageFirst(message)}
 						last={isMessageLast(message)}
 						tail={isMessageLast(message)}
+						// image={['https://cdn.framework7.io/placeholder/cats-300x300-1.jpg']}
 						type={messageType(message)}
-						text={message.content}
-						className="message-appear-from-bottom"
+						text={isJSONString(message.content) ? JSON.parse(message.content).text : message.content}
 					>
 						<span slot="text-footer">
 							{messageTime(message)}
