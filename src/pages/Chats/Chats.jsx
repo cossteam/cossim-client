@@ -17,10 +17,10 @@ import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/
 import { $t } from '@/i18n'
 // import SearchComponent from '@/components/Search/Search'
 import WebDB from '@/db'
-import { useLiveQuery } from 'dexie-react-hooks'
 import { getChatList } from '@/api/msg'
 import { useEffect } from 'react'
 import _ from 'lodash-es'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 export default function Chats() {
 	// const { f7router } = props
@@ -44,31 +44,38 @@ export default function Chats() {
 	// 	}, 300)
 	// }
 
-	// 加载会话列表
+	/**
+	 * 页面初始化时加载会话列表
+	 * 1、默认空数据
+	 * 2、拉取服务端数据
+	 * 3、校验新数据和旧数据 => 更新数据 or 插入数据库
+	 */
 	const chats = useLiveQuery(() => WebDB.chats.toArray()) || []
 	useEffect(() => {
-		getChatList().then(({ data }) => {
-			const newData = data?.map((item) => {
+		;(async () => {
+			const { data } = await getChatList()
+			// 响应数据格式化
+			const respData = data?.map((item) => {
+				// 将 last_message 字段数据提取出来
 				return _.mapKeys(
 					{
-						..._.omit(item, ['last_message']),
-						...item.last_message
+						..._.omit(item, ['last_message']), // 排除 last_message
+						...item.last_message // 提取 last_message 数据
 					},
 					(value, key) => {
-						if (key === 'content') return 'last_message'
+						if (key === 'content') return 'last_message' // 将 content 改为 last_message
 						return key
 					}
 				)
 			})
-			WebDB.chats
-				.bulkPut(newData)
-				.then(() => {
-					console.log('会话插入成功！')
-				})
-				.catch((error) => {
-					console.error('会话插入失败:', error?.message)
-				})
-		})
+			const oldData = await WebDB.chats.toArray() || []
+			// 校验新数据和旧数据 => 更新数据 or 插入数据库
+			for (let i = 0; i < respData.length; i++) {
+				const item = respData[i]
+				const oldItem = oldData.find((oldItem) => oldItem.dialog_id === item.dialog_id)
+				oldItem ? await WebDB.chats.update(oldItem.dialog_id, item) : await WebDB.chats.put(item)
+			}
+		})()
 	}, [])
 
 	// 会话时间格式化

@@ -19,8 +19,9 @@ WebDB.version(WEBDB_VERSION).stores({
 	contacts: '++id, group, &user_id, avatar, name, nick_name, email, signature, status',
 	// 会话
 	chats: '++id, &dialog_id, user_id, dialog_type, dialog_name, dialog_avatar, dialog_unread_count, msg_type, last_message, sender_id, send_time, msg_id',
-	// 消息：type => send: 发送方， receive: 接收方
-	messages: '++id, sender_id, receiver_id, content, content_type, type, date, send_state, is_read'
+	// 消息：send_state(客户端消息发送时状态)：'sending' => 'ok' or 'err'
+	messages:
+		'++id, msg_id, sender_id, receiver_id, content, content_type, type, reply_id, read_at, created_at, dialog_id, send_state'
 })
 
 export default WebDB

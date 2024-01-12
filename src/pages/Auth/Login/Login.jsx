@@ -9,7 +9,7 @@ import { loginApi } from '@/api/user'
 import { validEmail } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
-import PGP from '@/utils/PGP'
+// import PGP from '@/utils/PGP'
 
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
@@ -91,8 +91,8 @@ export default function Login({ disabled }) {
 			setLoading(false)
 			window.location.href = '/'
 		} catch (err) {
-			console.log(err)
-			f7.dialog.alert(errorList.serverError)
+			console.log(err.message)
+			f7.dialog.alert(err.message || errorList.serverError)
 			setLoading(false)
 		}
 	}

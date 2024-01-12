@@ -4,7 +4,7 @@ import { f7, Navbar, Link, Page, /*List, ListItem,*/ Messages, Message, Messageb
 import './Messages.less'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import PropType from 'prop-types'
-import { sendToUser } from '@/api/msg'
+import { getMsgByUser, sendToUser } from '@/api/msg'
 import { useEffect } from 'react'
 import _ from 'lodash-es'
 import WebDB from '@/db'
@@ -26,21 +26,35 @@ export default function MessagesPage({ f7route }) {
 	const [contact, setContact] = useState({})
 	useEffect(() => {
 		if (!receiverId) return
-		WebDB.contacts
-			.where('user_id')
-			.equals(receiverId)
-			.first()
-			.then((contact) => {
-				setContact(contact || {})
-				console.log('联系人', contact)
-			})
+		;async () => {
+			const contact = await WebDB.contacts.where('user_id').equals(receiverId).first()
+			setContact(contact || {})
+		}
 	}, [receiverId])
 
-	/*
 	// 获取消息
 	let pageNum = 1
-	let pageSize = 20
+	let pageSize = 18
 	let total = 0
+	// 倒序分页查询
+	async function reversePageQuery(pageSize, pageIndex) {
+		// 计算起始位置
+		const offset = (pageIndex - 1) * pageSize
+		// 执行倒序查询
+		console.log(pageSize, pageNum)
+		const arr = await WebDB.messages
+			.orderBy('id')
+			// .reverse() // 倒序
+			.offset(offset)
+			.limit(pageSize)
+			.toArray()
+		console.log(arr)
+		arr && (pageNum += 1)
+		return arr
+	}
+	// const messages = useLiveQuery(() => reversePageQuery(pageSize, pageNum)) || []
+	const messages = useLiveQuery(() => WebDB.messages.toArray()) || []
+	// 获取服务端消息数据
 	const getMessage = () => {
 		return new Promise((resolve, reject) => {
 			getMsgByUser({
@@ -51,57 +65,60 @@ export default function MessagesPage({ f7route }) {
 				.then(({ data }) => {
 					data = data?.msg_list || data
 					total = data?.total
-					console.log(data)
+					if (total / pageSize > pageNum) {
+						pageNum += 1
+					}
 					resolve(data)
 				})
 				.catch((err) => {
 					reject(err)
 				})
-				.finally(() => {
-					if (total / pageSize === 0) return
-					pageNum += 1
-				})
 		})
 	}
-	useEffect(() => {
-		getMessage().then(({ user_messages }) => {
-            const messages = user_messages?.map((msg) => {
-                // Id, SenderId, ReceiverId, Content, Type, CreatedAt
-                // ||
-                // sender_id, receiver_id, text, type, date, send_state, is_read
-                return {
-                    ...msg,
-                    type: msg.Type,
-                    date: msg.created_at,
-                    send_state: 'sending', // 'sending' => 'ok' or 'err'
-                    is_read: true // TODO: 是否已读
-                }
-            })
-			WebDB.messages
-            .bulkPut(messages)
-            .then(() => {
-                console.log('消息插入成功！')
-            })
-            .catch((error) => {
-                console.error('消息插入失败:', error)
-            })
-		})
-	}, [])
-    */
+	// 更新本地消息
+	const refreshMessage = async () => {
+		try {
+			const { user_messages } = await getMessage()
+			const respData = user_messages?.map((msg) => {
+				// id, sender_id, receiver_id, content, type, replay_id, is_read, read_at, created_at, dialog_id
+				// ||
+				// id, sender_id, receiver_id, content, type, replay_id, is_read, read_at, created_at, dialog_id, send_state
+				return {
+					...msg,
+					send_state: 'ok' // 'sending' => 'ok' or 'err'
+				}
+			})
+			console.log(respData)
+			const oldData = (await WebDB.messages.toArray()) || []
+			// 校验新数据和旧数据 => 更新数据 or 插入数据库
+			for (let i = 0; i < respData.length; i++) {
+				const item = respData[i]
+				const oldItem = oldData.find((oldItem) => oldItem.id === item.id)
+				oldItem ? await WebDB.messages.update(oldItem.id, item) : await WebDB.messages.put(item)
+			}
+		} catch (error) {
+			console.log(error)
+		}
+	}
 
-	// 聊天记录
-	const messages = useLiveQuery(() => WebDB.messages.toArray()) || []
-	// 滚动到顶部加载更多
 	useEffect(() => {
+		refreshMessage()
 		const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
+		// 滚动到顶部加载更多
 		messagesContent?.addEventListener(
 			'scroll',
-			_.throttle(() => {
+			_.throttle(async () => {
 				if (messagesContent.scrollTop === 0) {
-					console.log('已滚动到顶部')
+					console.log('触顶')
+					// await refreshMessage()
+					reversePageQuery(pageSize, pageNum)
 				}
 			}, 1000)
 		)
+
+		return () => {
+			messagesContent?.removeEventListener('scroll', () => {})
+		}
 	}, [])
 
 	// 虚拟列表
@@ -116,8 +133,8 @@ export default function MessagesPage({ f7route }) {
 
 	// 消息渲染处理
 	const messageTime = (message) => {
-		return message?.date
-			? Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.date))
+		return message?.created_at
+			? Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.created_at))
 			: ''
 	}
 	const isMessageFirst = (message) => {
@@ -129,6 +146,9 @@ export default function MessagesPage({ f7route }) {
 		const messageIndex = messages.indexOf(message)
 		const nextMessage = messages[messageIndex + 1]
 		return !nextMessage || nextMessage.type !== message.type
+	}
+	const messageType = (message) => {
+		return message.receiver_id === receiverId ? 'sent' : 'received'
 	}
 
 	// 发送消息
@@ -244,7 +264,7 @@ export default function MessagesPage({ f7route }) {
 						first={isMessageFirst(message)}
 						last={isMessageLast(message)}
 						tail={isMessageLast(message)}
-						type={message.type}
+						type={messageType(message)}
 						text={message.content}
 						className="message-appear-from-bottom"
 					>
