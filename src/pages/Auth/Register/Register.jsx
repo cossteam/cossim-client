@@ -10,6 +10,13 @@ import { validEmail, validPassword } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
 // import PGP from '@/utils/PGP'
+import DB from '@/db'
+
+import { KeyHelper, MessageType, PreKeyType, SessionBuilder, SessionCipher, SignalProtocolAddress, SignedPublicPreKeyType } from "@privacyresearch/libsignal-protocol-typescript"
+import { SignalProtocolStore } from "@/utils/storage-type"
+import { SignalDirectory } from "@/utils/signal-directory"
+import { createIdentity } from '@/utils/protocol'
+
 
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
@@ -18,10 +25,10 @@ Login.propTypes = {
 export default function Login({ disabled }) {
 	// 表单数据
 	const [fromData, setFromData] = useState({
-		nickname: '',
-		email: '',
-		password: '',
-		confirm_password: '',
+		nickname: '123',
+		email: '123@qq.com',
+		password: '123456qq',
+		confirm_password: '123456qq',
 		public_key: '1'
 	})
 
@@ -38,6 +45,9 @@ export default function Login({ disabled }) {
 
 	// 用户信息
 	const userStore = useUserStore()
+
+	// signal 目录
+	const signalDirectory = new SignalDirectory()
 
 	// 错误信息列表
 	const errorList = {
@@ -73,6 +83,14 @@ export default function Login({ disabled }) {
 
 		// loading
 		setLoading(true)
+
+		// 生成用户信息
+		const deviceId = Math.floor(10000 * Math.random())
+		const info = await createIdentity(fromData.nickname,fromData.email, deviceId, signalDirectory)
+
+		console.log("info",info)
+
+		return
 
 		// 登录
 		const decryptedData = await registerApi({ ...fromData, public_key: '1' })
