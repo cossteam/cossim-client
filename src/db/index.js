@@ -1,7 +1,9 @@
 import Dexie from 'dexie'
+import { getStorage } from '@/utils/stroage'
 
 // COSSIM 客户端数据库
-const WebDB = new Dexie('COSSIM')
+const user_id = getStorage()?.state?.user?.user_id
+const WebDB = new Dexie(`COSSIM_${user_id}`)
 
 /**
  * 数据库版本号
@@ -22,7 +24,7 @@ WebDB.version(WEBDB_VERSION).stores({
 	// 消息：send_state(客户端消息发送时状态)：'sending' => 'ok' or 'err'
 	messages:
 		'++id, msg_id, sender_id, receiver_id, content, content_type, type, reply_id, read_at, created_at, dialog_id, send_state',
-	keypairs:`
+	keypairs: `
 		++id,
 		sender_id,
 		sender_name,
@@ -38,4 +40,4 @@ WebDB.version(WEBDB_VERSION).stores({
 })
 
 export default WebDB
-console.log('IndexedDB Ready...')
+console.log(`IndexedDB\n【COSSIM_${user_id}】\nReady...`)

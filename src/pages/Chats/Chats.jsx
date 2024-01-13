@@ -68,7 +68,7 @@ export default function Chats() {
 					}
 				)
 			})
-			const oldData = await WebDB.chats.toArray() || []
+			const oldData = (await WebDB.chats.toArray()) || []
 			// 校验新数据和旧数据 => 更新数据 or 插入数据库
 			for (let i = 0; i < respData.length; i++) {
 				const item = respData[i]
@@ -109,7 +109,13 @@ export default function Chats() {
 						after={chatsTimeFormat(chat.send_time)}
 						swipeout
 					>
-						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
+						{/* <img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} /> */}
+						<img
+							slot="media"
+							src="../../assets/avatars/elena-k.jpg"
+							loading="lazy"
+							alt={chat.dialog_name}
+						/>
 						<span slot="text">
 							{chat.send_time === 'sent' && <DoubleTickIcon />}
 							{chat.last_message}
