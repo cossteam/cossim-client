@@ -1,9 +1,18 @@
 import React from 'react'
-import { List, ListItem, Navbar, Link, Page } from 'framework7-react'
+import { f7, List, ListItem, Navbar, Link, Page, Button } from 'framework7-react'
 import './My.less'
 import ListColorIcon from '../../components/ListColorIcon'
+import { useUserStore } from '@/stores/user'
 
 export default function My() {
+	const userStore = useUserStore()
+
+	const logout = () => {
+		f7.dialog.confirm('退出登录', '确定要退出登录吗？', () => {
+			userStore.removeUser()
+			window.location.href = '/login'
+		})
+	}
 	return (
 		<Page className="settings-page">
 			<Navbar title="Settings" large transparent />
@@ -53,6 +62,11 @@ export default function My() {
 					<ListColorIcon color="#FF2C55" icon="heart_fill" slot="media" />
 				</ListItem>
 			</List>
+			<div>
+				<Button className="m-10 p-5" color="red" raised fill round onClick={() => logout()}>
+					退出
+				</Button>
+			</div>
 		</Page>
 	)
 }
