@@ -166,8 +166,8 @@ export default function MessagesPage({ f7route }) {
 			_.throttle(async () => {
 				if (messagesContent.scrollTop === 0) {
 					console.log('触顶')
-					// await refreshMessage()
-					reversePageQuery(pageSize, pageNum)
+					await refreshMessage()
+					// reversePageQuery(pageSize, pageNum)
 				}
 			}, 1000)
 		)
@@ -204,7 +204,6 @@ export default function MessagesPage({ f7route }) {
 		return !nextMessage || nextMessage.type !== message.type
 	}
 	const messageType = (message) => {
-		console.log(message)
 		return message.receiver_id === receiverId ? 'sent' : 'received'
 	}
 	// const isJSONString = (jsonString) => {
