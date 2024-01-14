@@ -14,7 +14,7 @@ import {
 	MessagebarAttachment,
 	Icon
 } from 'framework7-react'
-import './Messages/Messages.less'
+import './Messages.less'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import PropType from 'prop-types'
 import { getMsgByUser, sendToUser } from '@/api/msg'
@@ -23,102 +23,20 @@ import _ from 'lodash-es'
 import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useUserStore } from '@/stores/user'
-import { emojis } from './Messages/emojis/emojis'
-
-import { SessionBuilder, SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
-import { createSession, encryptMessage } from '@/utils/protocol'
-import { SignalDirectory } from '@/utils/signal-directory'
+import { emojis, emojisImg } from './emojis/emojis'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
 }
 
 export default function MessagesPage({ f7route }) {
-	console.log('MessagesPage-TEST')
-
-	const { user, identity } = useUserStore()
+	const { user } = useUserStore()
 	const senderId = user?.UserId
 	const receiverId = f7route.params.id // 好友id/群聊id
 	const dialogId = f7route.query.dialog_id
 	console.log('接收人', receiverId)
 
 	// 图片表情
-	const emojisImg = [
-		'https://cdn.framework7.io/placeholder/cats-300x300-1.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-2.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-3.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-4.jpg',
-		'https://cdn.framework7.io/placeholder/cats-150x300-5.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-6.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x300-7.jpg',
-		'https://cdn.framework7.io/placeholder/cats-200x300-8.jpg',
-		'https://cdn.framework7.io/placeholder/cats-400x300-9.jpg',
-		'https://cdn.framework7.io/placeholder/cats-300x150-10.jpg'
-	]
 	const [attachments, setAttachments] = useState([])
 	const [sheetVisible, setSheetVisible] = useState(false)
 	const [showImgEmojis, setShowImgEmojis] = useState(false)
@@ -173,27 +91,24 @@ export default function MessagesPage({ f7route }) {
 	let pageNum = 1
 	let pageSize = 18
 	let total = 0
-
 	// 倒序分页查询
-	async function reversePageQuery(pageSize, pageIndex) {
-		// 计算起始位置
-		const offset = (pageIndex - 1) * pageSize
-		// 执行倒序查询
-		console.log(pageSize, pageNum)
-		const arr = await WebDB.messages
-			.orderBy('id')
-			// .reverse() // 倒序
-			.offset(offset)
-			.limit(pageSize)
-			.toArray()
-		console.log(arr)
-		arr && (pageNum += 1)
-		return arr
-	}
-
+	// async function reversePageQuery(pageSize, pageIndex) {
+	// 	// 计算起始位置
+	// 	const offset = (pageIndex - 1) * pageSize
+	// 	// 执行倒序查询
+	// 	console.log(pageSize, pageNum)
+	// 	const arr = await WebDB.messages
+	// 		.orderBy('id')
+	// 		// .reverse() // 倒序
+	// 		.offset(offset)
+	// 		.limit(pageSize)
+	// 		.toArray()
+	// 	console.log(arr)
+	// 	arr && (pageNum += 1)
+	// 	return arr
+	// }
 	// const messages = useLiveQuery(() => reversePageQuery(pageSize, pageNum)) || []
 	const messages = useLiveQuery(() => WebDB.messages.toArray()) || []
-
 	// 获取服务端消息数据
 	const getMessage = () => {
 		return new Promise((resolve, reject) => {
@@ -215,7 +130,6 @@ export default function MessagesPage({ f7route }) {
 				})
 		})
 	}
-
 	// 更新本地消息
 	const refreshMessage = async () => {
 		try {
@@ -252,8 +166,8 @@ export default function MessagesPage({ f7route }) {
 			_.throttle(async () => {
 				if (messagesContent.scrollTop === 0) {
 					console.log('触顶')
-					// await refreshMessage()
-					reversePageQuery(pageSize, pageNum)
+					await refreshMessage()
+					// reversePageQuery(pageSize, pageNum)
 				}
 			}, 1000)
 		)
@@ -265,6 +179,13 @@ export default function MessagesPage({ f7route }) {
 
 	// 虚拟列表
 	const messagesRef = useRef(null)
+	// const [vlData, setVlData] = useState({
+	// 	items: []
+	// })
+	// const renderExternal = (vl, newData) => {
+	// 	console.table(newData.items)
+	// 	setVlData({ ...newData })
+	// }
 
 	// 消息渲染处理
 	const messageTime = (message) => {
@@ -272,146 +193,100 @@ export default function MessagesPage({ f7route }) {
 			? Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.created_at))
 			: ''
 	}
-
 	const isMessageFirst = (message) => {
 		const messageIndex = messages.indexOf(message)
 		const previousMessage = messages[messageIndex - 1]
 		return !previousMessage || previousMessage.type !== message.type
 	}
-
 	const isMessageLast = (message) => {
 		const messageIndex = messages.indexOf(message)
 		const nextMessage = messages[messageIndex + 1]
 		return !nextMessage || nextMessage.type !== message.type
 	}
-
 	const messageType = (message) => {
 		return message.receiver_id === receiverId ? 'sent' : 'received'
 	}
-
-	const isJSONString = (jsonString) => {
-		if (jsonString[0] === '{' && jsonString[jsonString.length - 1] === '}') return true
-		return false
-	}
+	// const isJSONString = (jsonString) => {
+	// 	if (jsonString[0] === '{' && jsonString[jsonString.length - 1] === '}') return true
+	// 	return false
+	// }
 
 	// 发送消息
 	const messagebarRef = useRef(null)
 	const [messageText, setMessageText] = useState('')
-
-	// 生成对方地址
-	// TODO： 这些信息从 indexDB 拿获取从后端拿
-	const address = new SignalProtocolAddress('test2', 2)
-
-	// const directory = new SignalDirectory()
-	const sessionCipher = new SessionCipher(identity.store, address)
-	// directory._data = identity.directory._data
-	// console.log("directory",directory);
-
-	// TODO: 这个后续由后端推或者本地拿
-	const bundle = {
-		identityKey: 'BW4hk6tGBRRFmSCgDdYM8cu9ZMOf+1Au9bSPDDn2j9wB',
-		signedPreKey: {
-			keyId: 7497,
-			publicKey: 'BaWVGemCIAApt+j8avKEw5g4/rJbawVCEIA247jc0S9O',
-			signature: 'dAmrdLLzwBinJU7KTuxDaBLGoALPEvCS35w4Z6Tjusd8pTuydsZbddkqLUUjfhJf22nqYN51+ILNwPhAM3F9gQ=='
-		},
-		preKey: {
-			keyId: 5639,
-			publicKey: 'BX1H7iXUcv82Yd8bp7PE8slj+/X6jMax8Mu3AIgBEFUj'
-		},
-		registrationId: 3964
-	}
-
-	// 将字符串变成 ArrayBuffer
-	function stringToArrayBuffer(base64String) {
-		// 使用atob将Base64字符串转换为二进制字符串
-		const binaryString = atob(base64String)
-
-		// 创建一个Uint8Array视图
-		const uint8Array = new Uint8Array(binaryString.length)
-
-		// 将二进制字符串的每个字符转换为Uint8Array的元素
-		for (let i = 0; i < binaryString.length; i++) {
-			uint8Array[i] = binaryString.charCodeAt(i)
-		}
-
-		// 现在，uint8Array是包含解码后数据的Uint8Array
-		const buffer = uint8Array.buffer
-
-		return buffer
-	}
-
-	for (const key in bundle) {
-		// obj[key] = bundle[key]
-		if (typeof bundle[key] === 'object') {
-			for (const k in bundle[key]) {
-				// 如果是 ArrayBuffer
-				if (typeof bundle[key][k] === 'string') {
-					// 把 ArrayBuffer 转成字符串
-					bundle[key][k] = stringToArrayBuffer(bundle[key][k])
-				}
-			}
-		}
-
-		if (typeof bundle[key] === 'string') {
-			// 把 ArrayBuffer 转成字符串
-			bundle[key] = stringToArrayBuffer(bundle[key])
-		}
-	}
-
-	console.log('stringToArrayBuffer', bundle)
-
-	createSession(identity.store, address, bundle)
-
-	//! 发送
-	// TODO：在此之前要有对方的一些基本信息， 如果对方没有，就先发送一个请求获取对方的基本信息
 	const sendMessage = async () => {
-		const ciphertext = await encryptMessage(messageText, sessionCipher)
-		console.log('ciphertext', ciphertext)
-
-		const message = {
-			sender_id: senderId,
-			receiver_id: receiverId,
-			type: 'sent', // 发送方
-			content: messageText,
-			content_type: 1, // 1: 文本消息
-			date: new Date(),
-			send_state: 'sending',
-			is_read: true
-		}
+		const allMsg = []
+		// 选择多个图片表情时拆分为多条消息发送
+		attachments.map((item) => {
+			allMsg.push({
+				sender_id: senderId,
+				receiver_id: receiverId,
+				type: 'sent', // 发送方
+				content: item,
+				content_type: 3, // 3: 图片消息
+				date: new Date(),
+				send_state: 'sending',
+				is_read: true
+			})
+		})
+		messageText &&
+			allMsg.push({
+				sender_id: senderId,
+				receiver_id: receiverId,
+				type: 'sent', // 发送方
+				content: messageText,
+				content_type: 1, // 1: 文本消息
+				date: new Date(),
+				send_state: 'sending',
+				is_read: true
+			})
 		// 消息持久化
-		const messagesId = await WebDB.messages.add(message)
+		const allMsgIds = await Promise.all(allMsg.map(async (item) => WebDB.messages.add(item)))
+		console.log(allMsg)
+		console.log(allMsgIds)
 		// 恢复输入框状态
 		setMessageText('')
 		setAttachments([])
 		setTimeout(() => {
 			messagebarRef.current.f7Messagebar().focus()
 		})
-		// 发送消息
-		const messageFilter = _.mapKeys(_.pick(message, ['content', 'receiver_id', 'content_type']), (value, key) => {
-			if (key === 'content_type') return 'type'
-			return key
-		})
-		sendToUser({
-			...messageFilter,
-			content: JSON.stringify({
-				attachments,
-				text: messageFilter.content
-			}),
-			dialog_id: parseInt(dialogId) // 后端限制类型，一定要数值类型
-		})
-			.then(({ code }) => {
-				WebDB.messages.update(messagesId, {
-					send_state: code === 200 ? 'ok' : 'error'
-				})
+		// 发送消息前格式化数据
+		const reqMsg = allMsg.map((item) => {
+			const messageFilter = _.mapKeys(_.pick(item, ['content', 'receiver_id', 'content_type']), (value, key) => {
+				if (key === 'content_type') return 'type'
+				return key
 			})
-			.catch((err) => {
-				console.log(err)
-				WebDB.messages.update(messagesId, {
-					send_state: 'error'
+			return {
+				...messageFilter,
+				dialog_id: parseInt(dialogId) // 后端限制类型，一定要数值类型
+			}
+		})
+		console.log(reqMsg)
+		try {
+			const respMsgs = await Promise.all(
+				reqMsg.map(async (item, index) => {
+					return new Promise((resolve, reject) => {
+						sendToUser(item)
+							.then(({ code }) => {
+								WebDB.messages.update(allMsgIds[index], {
+									send_state: code === 200 ? 'ok' : 'error'
+								})
+								code === 200 ? resolve(allMsgIds[index]) : reject(allMsgIds[index])
+							})
+							.catch(() => {
+								WebDB.messages.update(allMsgIds[index], {
+									send_state: 'error'
+								})
+								// TODO: 消息发送失败后提供重新发送支持
+								reject(allMsgIds[index])
+							})
+					})
 				})
-				// TODO: 消息发送失败后提供重新发送支持
-			})
+			)
+			console.log(respMsgs)
+		} catch (errors) {
+			console.log(errors)
+		}
 	}
 
 	// Fix for iOS web app scroll body when
@@ -530,17 +405,23 @@ export default function MessagesPage({ f7route }) {
 						first={isMessageFirst(message)}
 						last={isMessageLast(message)}
 						tail={isMessageLast(message)}
-						// image={['https://cdn.framework7.io/placeholder/cats-300x300-1.jpg']}
+						image={message.content_type === 3 ? [message.content] : []}
 						type={messageType(message)}
-						text={isJSONString(message.content) ? JSON.parse(message.content).text : message.content}
+						text={message.content_type === 3 ? '' : message.content}
 					>
 						<span slot="text-footer">
 							{messageTime(message)}
-							{message?.send_state ? (
-								message.type === 'sent' && message.send_state === 'ok' ? (
+							{/* 发送状态 */}
+							{message?.send_state && message.type === 'sent' ? (
+								message.send_state === 'ok' ? (
 									<DoubleTickIcon />
 								) : (
-									`[${message.send_state}]`
+									// message.send_state
+									<Icon
+										className="text-base"
+										f7={message.send_state === 'sending' ? 'slowmo' : 'wifi_slash'}
+										color="primary"
+									/>
 								)
 							) : (
 								''

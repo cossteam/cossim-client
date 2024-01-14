@@ -73,9 +73,9 @@ const Home = () => {
 				WebSocketClient.triggerEvent('onMessage', data)
 			}
 		})
-		WebSocketClient.addListener('onMessage', (msg) => {
+		WebSocketClient.addListener('onMessage', async (msg) => {
 			if (msg.event === 3) {
-				console.log(msg)
+				// console.log(msg)
 				const message = {
 					// id: '', // msg_id: '', // 消息id
 					sender_id: '', // 发送者id
@@ -89,14 +89,16 @@ const Home = () => {
 					dialog_id: msg.data.dialog_id, // 会话id
 					send_state: 'ok' // 发送成功/接收成功
 				}
-				console.log(message)
+				// console.log(message)
 				// 消息持久化
-				WebDB.messages.add(message)
+				const msgId = await WebDB.messages.add(message)
+				console.log(msgId)
 				// TODO：检查当前会话是否存在 => 新建会话数据 or 更新会话列表数据
 				// const chats = useLiveQuery(() => WebDB.chats.toArray()) || []
 				// 检查当前会话是否存在 ? WebDB.chats.add({}) : WebDB.chats.update(msg.data.msg_id, {})
-				console.log(msg.data.dialog_id)
-				console.log(WebDB.chats.where('dialog_id').equals(msg.data.dialog_id).fiest())
+				const chat = await WebDB.chats.where('dialog_id').equals(msg?.data?.dialog_id).first()
+				// 更新会话列表数据
+				chat && WebDB.chats.update(chat.id, { last_message: message.content, msg_id: msgId })
 			}
 		})
 	}, [isLogin])
