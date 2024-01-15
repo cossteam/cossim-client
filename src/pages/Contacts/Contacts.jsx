@@ -36,7 +36,8 @@ export default function Contacts(props) {
 	const groups = arrayToGroups(useLiveQuery(() => WebDB.contacts.toArray()) || [])
 	useEffect(() => {
 		;(async () => {
-			const res = await friendListApi({ user_id: user.user_id })
+			// const res = await friendListApi({ user_id: user.user_id })
+			const res = await friendListApi()
 			if (res.code !== 200) return
 			let respData = res.data || {}
 			for (const key in respData) {
