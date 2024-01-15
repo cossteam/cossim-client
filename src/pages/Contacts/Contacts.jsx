@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { List, ListGroup, ListItem, Navbar, Page, Searchbar, Subnavbar, ListIndex, Icon, f7 } from 'framework7-react'
 import React from 'react'
 import { friendListApi } from '@/api/relation'
-import { useUserStore } from '@/stores/user'
 import { $t } from '@/i18n'
 import './Contacts.less'
 import WebDB from '@/db'
@@ -10,7 +9,6 @@ import { useLiveQuery } from 'dexie-react-hooks'
 
 export default function Contacts(props) {
 	// const { f7router } = props
-	const { user } = useUserStore()
 
 	function groupsToArray(obj) {
 		obj = typeof obj !== 'object' ? {} : obj

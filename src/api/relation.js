@@ -1,7 +1,6 @@
-import request from "@/utils/request"
+import request from '@/utils/request'
 
-
-const baseApi = "/relation"
+const baseApi = '/relation/user'
 
 /**
  * 获取好友列表
@@ -10,11 +9,11 @@ const baseApi = "/relation"
  * @returns {Promise<Object>}
  */
 export function friendListApi(params) {
-  return request({
-    url: `${baseApi}/friend_list`,
-    method: "get",
-    params
-  })
+	return request({
+		url: `${baseApi}/friend_list`,
+		method: 'get',
+		params
+	})
 }
 
 /**
@@ -25,11 +24,11 @@ export function friendListApi(params) {
  * @returns {Promise<Object>}
  */
 export function addBlackListApi(data) {
-  return request({
-    url: `${baseApi}/add_blacklist`,
-    method: "post",
-    data
-  })
+	return request({
+		url: `${baseApi}/add_blacklist`,
+		method: 'post',
+		data
+	})
 }
 
 /**
@@ -40,11 +39,11 @@ export function addBlackListApi(data) {
  * @returns {Promise<Object>}
  */
 export function addFriendApi(data) {
-  return request({
-    url: `${baseApi}/add_friend`,
-    method: "post",
-    data
-  })
+	return request({
+		url: `${baseApi}/add_friend`,
+		method: 'post',
+		data
+	})
 }
 
 /**
@@ -54,11 +53,11 @@ export function addFriendApi(data) {
  * @returns {Promise<Object>}
  */
 export function blackListApi(params) {
-  return request({
-    url: `${baseApi}/blacklist`,
-    method: "get",
-    params
-  })
+	return request({
+		url: `${baseApi}/blacklist`,
+		method: 'get',
+		params
+	})
 }
 
 /**
@@ -69,11 +68,11 @@ export function blackListApi(params) {
  * @returns {Promise<Object>}
  */
 export function confirmAddFriendApi(data) {
-  return request({
-    url: `${baseApi}/confirm_friend`,
-    method: "post",
-    data
-  })
+	return request({
+		url: `${baseApi}/confirm_friend`,
+		method: 'post',
+		data
+	})
 }
 
 /**
@@ -84,11 +83,11 @@ export function confirmAddFriendApi(data) {
  * @returns {Promise<Object>}
  */
 export function deleteBlackListApi(data) {
-  return request({
-    url: `${baseApi}/delete_blacklist`,
-    method: "post",
-    data
-  })
+	return request({
+		url: `${baseApi}/delete_blacklist`,
+		method: 'post',
+		data
+	})
 }
 
 /**
@@ -99,9 +98,9 @@ export function deleteBlackListApi(data) {
  * @returns {Promise<Object>}
  */
 export function deleteFriendApi(data) {
-  return request({
-    url: `${baseApi}/delete_friend`,
-    method: "post",
-    data
-  })
+	return request({
+		url: `${baseApi}/delete_friend`,
+		method: 'post',
+		data
+	})
 }

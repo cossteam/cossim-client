@@ -36,8 +36,8 @@ export default function MessagesPage({ f7route }) {
 	}, [receiverId])
 
 	// 聊天记录
-	let pageNum = 1
-	let pageSize = 18
+	// let pageNum = 1
+	// let pageSize = 18
 	// let total = 0
 	const messages = useLiveQuery(() => WebDB.messages.toArray()) || []
 	// const [messages, setMessages] = useState([])
