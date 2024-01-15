@@ -67,7 +67,7 @@ export default function Chats() {
 						return key
 					}
 				)
-			})
+			}) || []
 			const oldData = (await WebDB.chats.toArray()) || []
 			// 校验新数据和旧数据 => 更新数据 or 插入数据库
 			for (let i = 0; i < respData.length; i++) {

@@ -66,7 +66,6 @@ export default function AppComponent() {
 				<Toolbar tabbar icons bottom>
 					<Link
 						tabLink="#view-chats"
-						tabLinkActive
 						iconF7="chat_bubble_2"
 						text="聊天"
 						onClick={() => onTabLinkClick('chats')}
@@ -77,7 +76,13 @@ export default function AppComponent() {
 						text="联系人"
 						onClick={() => onTabLinkClick('contacts')}
 					/>
-					<Link tabLink="#view-my" iconF7="person" text="我的" onClick={() => onTabLinkClick('my')} />
+					<Link
+						tabLink="#view-my"
+						tabLinkActive
+						iconF7="person"
+						text="我的"
+						onClick={() => onTabLinkClick('my')}
+					/>
 					<Link
 						tabLink="#view-chattest"
 						iconF7="thermometer"
@@ -88,9 +93,9 @@ export default function AppComponent() {
 			</>
 			{/* )} */}
 
-			<View id="view-chats" onTabShow={() => setActiveTab('chats')} tab tabActive url="/chats/" main />
+			<View id="view-chats" onTabShow={() => setActiveTab('chats')} tab url="/chats/" main />
 			<View id="view-contacts" onTabShow={() => setActiveTab('contacts')} tab url="/contacts/" />
-			<View id="view-my" onTabShow={() => setActiveTab('my')} name="my" tab url="/my/" />
+			<View id="view-my" onTabShow={() => setActiveTab('my')} name="my" tabActive tab url="/my/" />
 
 			<View id="view-chattest" onTabShow={() => setActiveTab('chattest')} name="chattest" tab url="/chat_test/" />
 

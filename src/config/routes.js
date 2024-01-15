@@ -6,11 +6,11 @@ import Profile from '@/pages/Profile/Profile'
 import NotFoundPage from '@/pages/NotFound'
 import AddFriend from '@/pages/AddFriend/AddFriend'
 import AddDetails from '@/pages/AddDetails/AddDetails'
-
 import Auth from '@/pages/Auth/Auth'
-
 import ChatTest from '@/pages/ChatTest'
 import MessageTest from '@/pages/MessageTest'
+import UserInfo from '@/pages/UserInfo/Userinfo'
+import UpdateUserInfo from '@/pages/UpdateUserInfo/UpdateUserInfo'
 
 var routes = [
 	{
@@ -31,7 +31,7 @@ var routes = [
 	},
 	{
 		path: '/add_friend/',
-		component:AddFriend
+		component: AddFriend
 	},
 	{
 		path: '/chat_test/',
@@ -43,7 +43,7 @@ var routes = [
 	},
 	{
 		path: '/add_details/:id/',
-		component:AddDetails
+		component: AddDetails
 	},
 	{
 		path: '/chats/:id/',
@@ -52,6 +52,14 @@ var routes = [
 	{
 		path: '/profile/:id/',
 		component: Profile
+	},
+	{
+		path: '/userinfo/:id/',
+		component: UserInfo
+	},
+	{
+		path: '/updateuserinfo/:key/',
+		component: UpdateUserInfo
 	},
 	{
 		path: '(.*)',

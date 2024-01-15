@@ -11,6 +11,21 @@ export function setPgpKeyApi(data) {
 }
 
 /**
+ * 交换E2EKey
+ * @param {*} data
+ * @param {*} data.public_key
+ * @param {*} data.user_id
+ * @returns
+ */
+export function switchE2EKey(data) {
+	return request({
+		url: `${baseApi}/switch/e2e/key`,
+		method: 'POST',
+		data
+	})
+}
+
+/**
  * 登录接口
  * @param {*} data
  * @param {string} data.email     		邮箱
@@ -54,5 +69,23 @@ export function getUserInfoApi(params) {
 		url: `${baseApi}/info`,
 		method: 'get',
 		params
+	})
+}
+
+/**
+ * 修改用户信息
+ * @param {*} data
+ * @param {*} data.avatar
+ * @param {*} data.nickname
+ * @param {*} data.signature
+ * @param {*} data.status
+ * @param {*} data.tel
+ * @returns
+ */
+export function updateUserInfoApi(data) {
+	return request({
+		url: `${baseApi}/info/modify`,
+		method: 'POST',
+		data
 	})
 }

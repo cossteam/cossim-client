@@ -10,6 +10,9 @@ import { useUserStore } from '@/stores/user'
 import WebDB from '@/db'
 import _ from 'lodash-es'
 import { sendToUser } from '@/api/msg'
+// TODO: 添加好友时交换双方密钥（地址）
+import Signal from '@/utils/signal/signal-protocol.ts'
+import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -24,16 +27,76 @@ export default function MessagesPage({ f7route }) {
 	const UserId = user?.UserId
 
 	// 好友信息
-	const receiverId = f7route.params.id // 好友id/群聊id
+	const ReceiverId = f7route.params.id // 好友id/群聊id
 	const [contact, setContact] = useState({})
 	useEffect(() => {
-		console.log('接收人', receiverId)
-		if (!receiverId) return
+		console.log('接收人', ReceiverId)
+		if (!ReceiverId) return
 		;async () => {
-			const contact = await WebDB.contacts.where('user_id').equals(receiverId).first()
+			const contact = await WebDB.contacts.where('user_id').equals(ReceiverId).first()
 			setContact(contact || {})
 		}
-	}, [receiverId])
+	}, [ReceiverId])
+
+	const DESKTOP1 = UserId
+	const DESKTOP2 = ReceiverId
+
+	// 创建实例
+	const [signal1] = useState(new Signal())
+	const [signal2] = useState(new Signal())
+
+	// 身份信息
+	const [desktop1, setDesktop1] = useState({})
+	const [desktop2, setDesktop2] = useState({})
+
+	// 地址
+	const [address1] = useState(new SignalProtocolAddress(DESKTOP1, 1))
+	const [address2] = useState(new SignalProtocolAddress(DESKTOP2, 2))
+
+	// 会话 session
+	const [sessionCipher1] = useState(new SessionCipher(signal1.store, address2))
+	const [sessionCipher2] = useState(new SessionCipher(signal2.store, address2))
+
+	// 消息
+	const [msg1, setMsg1] = useState('')
+	const [msg2, setMsg2] = useState('')
+
+	// 加密的消息
+	const [message, setMessage] = useState([])
+	// 解密后的消息
+	const [chats, setChats] = useState([])
+
+	// 初始化
+	async function init() {
+		const desktop1 = await signal1.ceeateIdentity(DESKTOP1)
+		const desktop2 = await signal2.ceeateIdentity(DESKTOP2)
+
+		setDesktop1(desktop1)
+		setDesktop2(desktop2)
+
+		console.log('%c第一步:', 'color:#f36;font-size:24px;')
+		console.info('为客户端1生成身份：', desktop1)
+		console.info('为客户端2生成身份：', desktop2)
+
+		//* 生成个人信息后，把 bundle 暴露出
+		const bundle1Buffer = signal1.directory.getPreKeyBundle(DESKTOP1)
+		const bundle2Buffer = signal2.directory.getPreKeyBundle(DESKTOP2)
+
+		// *建立会话
+		await signal1.cretaeSession(signal1.store, address2, bundle2Buffer)
+		await signal2.cretaeSession(signal2.store, address1, bundle1Buffer)
+
+		console.log('%c第二步:', 'color:#f36;font-size:24px;')
+		console.info('与客户端2建立会话')
+		console.info('与客户端1建立会话')
+	}
+	useEffect(() => {
+		// ;(async () => {
+		// 	await init()
+		// 	console.log(desktop1, desktop2)
+		// 	console.log(sessionCipher1, sessionCipher2)
+		// })()
+	}, [])
 
 	// 聊天记录
 	// let pageNum = 1
@@ -68,7 +131,7 @@ export default function MessagesPage({ f7route }) {
 	// const getMessage = () => {
 	// 	return new Promise((resolve, reject) => {
 	// 		getMsgByUser({
-	// 			user_id: receiverId,
+	// 			user_id: ReceiverId,
 	// 			page_num: pageNum,
 	// 			page_size: pageSize
 	// 		})
@@ -150,7 +213,7 @@ export default function MessagesPage({ f7route }) {
 		return !nextMessage || nextMessage.type !== message.type
 	}
 	const messageType = (message) => {
-		return message.receiver_id === receiverId ? 'sent' : 'received'
+		return message.receiver_id === ReceiverId ? 'sent' : 'received'
 	}
 
 	// 发送消息
@@ -170,7 +233,7 @@ export default function MessagesPage({ f7route }) {
 			let send_state = 'sending'
 			const dbMsg = {
 				sender_id: UserId,
-				receiver_id: receiverId,
+				receiver_id: ReceiverId,
 				type: 'sent', // 发送方
 				content,
 				content_type: type, // 1: 文本, 2: 语音, 3: 图片
@@ -237,7 +300,7 @@ export default function MessagesPage({ f7route }) {
 			<Navbar className="messages-navbar" backLink backLinkShowText={false}>
 				<Link slot="right" iconF7="videocam" />
 				<Link slot="right" iconF7="phone" />
-				<Link slot="title" href={`/profile/${receiverId}/`} className="title-profile-link">
+				<Link slot="title" href={`/profile/${ReceiverId}/`} className="title-profile-link">
 					<img src={contact?.avatar} loading="lazy" />
 					<div>
 						<div>{contact?.name}</div>
