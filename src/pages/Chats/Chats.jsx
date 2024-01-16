@@ -55,19 +55,20 @@ export default function Chats() {
 		;(async () => {
 			const { data } = await getChatList()
 			// 响应数据格式化
-			const respData = data?.map((item) => {
-				// 将 last_message 字段数据提取出来
-				return _.mapKeys(
-					{
-						..._.omit(item, ['last_message']), // 排除 last_message
-						...item.last_message // 提取 last_message 数据
-					},
-					(value, key) => {
-						if (key === 'content') return 'last_message' // 将 content 改为 last_message
-						return key
-					}
-				)
-			}) || []
+			const respData =
+				data?.map((item) => {
+					// 将 last_message 字段数据提取出来
+					return _.mapKeys(
+						{
+							..._.omit(item, ['last_message']), // 排除 last_message
+							...item.last_message // 提取 last_message 数据
+						},
+						(value, key) => {
+							if (key === 'content') return 'last_message' // 将 content 改为 last_message
+							return key
+						}
+					)
+				}) || []
 			const oldData = (await WebDB.chats.toArray()) || []
 			// 校验新数据和旧数据 => 更新数据 or 插入数据库
 			for (let i = 0; i < respData.length; i++) {
@@ -109,13 +110,13 @@ export default function Chats() {
 						after={chatsTimeFormat(chat.send_time)}
 						swipeout
 					>
-						{/* <img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} /> */}
-						<img
+						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
+						{/* <img
 							slot="media"
 							src="../../assets/avatars/elena-k.jpg"
 							loading="lazy"
 							alt={chat.dialog_name}
-						/>
+						/> */}
 						<span slot="text">
 							{chat.send_time === 'sent' && <DoubleTickIcon />}
 							{chat.last_message}
