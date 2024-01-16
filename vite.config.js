@@ -7,7 +7,7 @@ import { createHtmlPlugin } from 'vite-plugin-html'
 // import { VitePluginNode } from 'vite-plugin-node'
 // import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
-import requireTransform from 'vite-plugin-require-transform'
+// import requireTransform from 'vite-plugin-require-transform'
 // import commonjs from '@rollup/plugin-commonjs'
 
 process.env.TARGET = process.env.TARGET || 'web'
@@ -32,9 +32,9 @@ export default async ({ mode }) => {
 				}
 			}),
 			// commonjs()
-			requireTransform({
-				fileRegex: /.js$|.vue$|.ts$|.tsx$|.jsx$/
-			})
+			// requireTransform({
+			// 	fileRegex: /.js$|.vue$|.ts$|.tsx$|.jsx$/
+			// })
 			// electron({
 			// 	main: {
 			// 		// Shortcut of `build.lib.entry`.

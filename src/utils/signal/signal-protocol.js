@@ -1,29 +1,31 @@
-import {
-	KeyHelper,
-	SignedPublicPreKeyType,
-	SignalProtocolAddress,
-	SessionBuilder,
-	PreKeyType,
-	SessionCipher,
-	MessageType,
-	DeviceType
-} from '@privacyresearch/libsignal-protocol-typescript'
+import { KeyHelper, SessionBuilder, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 import { SignalProtocolStore } from './storage-type'
 import { cloneDeep } from 'lodash-es'
 import { SignalDirectory } from './signal-directory'
 
 export default class Signal {
-	public directory: SignalDirectory = new SignalDirectory()
+	directory = new SignalDirectory()
 
 	// todo: 后续仓库可能需要修改，在添加时可以添加到 indexDB 中, 或者初始化的时候读取数据到仓库中
-	public store: SignalProtocolStore = new SignalProtocolStore()
+	store = new SignalProtocolStore()
+
+	address = null
+
+	/**
+	 * 实例化
+	 * @param {*} name 			名称
+	 * @param {*} deviceId 		设备id
+	 */
+	constructor(name,deviceId) {
+		this.address = new SignalProtocolAddress(name,deviceId)
+	}
 
 	/**
 	 * 创建身份
 	 * @param {string} name     这个用于标识 directory 的 key 值，建议用用户 id 或者 一个唯一的值
 	 * @returns
 	 */
-	async ceeateIdentity(name: string) {
+	async ceeateIdentity(name) {
 		// 生成一个注册id
 		const registrationId = KeyHelper.generateRegistrationId()
 
@@ -43,14 +45,14 @@ export default class Signal {
 		const signedPreKey = await KeyHelper.generateSignedPreKey(identityKeyPair, signedPreKeyId)
 
 		// 公共签名预密钥
-		const publicSignedPreKey: SignedPublicPreKeyType = {
+		const publicSignedPreKey = {
 			keyId: signedPreKeyId,
 			publicKey: signedPreKey.keyPair.pubKey,
 			signature: signedPreKey.signature
 		}
 
 		// 公共预密钥
-		const publicPreKey: PreKeyType = {
+		const publicPreKey = {
 			keyId: preKey.keyId,
 			publicKey: preKey.keyPair.pubKey
 		}
@@ -89,7 +91,7 @@ export default class Signal {
 	 * 创建会话
 	 * @returns {Promise<IdentityType>}
 	 */
-	async cretaeSession(userStore: SignalProtocolStore, recipientAddress: SignalProtocolAddress, bundle: DeviceType) {
+	async cretaeSession(userStore, recipientAddress, bundle) {
 		const sessionBuilder = new SessionBuilder(userStore, recipientAddress)
 		await sessionBuilder.processPreKey(bundle)
 	}
@@ -100,7 +102,7 @@ export default class Signal {
 	 * @param {SessionCipher} cipher
 	 * @returns
 	 */
-	async encrypt(msg: string, cipher: SessionCipher) {
+	async encrypt(msg, cipher) {
 		// 把消息转为 ArrayBuffer
 		const buffer = new TextEncoder().encode(msg).buffer
 
@@ -110,7 +112,7 @@ export default class Signal {
 		const result = {
 			...ciphertext,
 			// 把消息转为 base64
-			body: stringToBase64(ciphertext.body!)
+			body: stringToBase64(ciphertext.body)
 		}
 
 		return result
@@ -122,13 +124,13 @@ export default class Signal {
 	 * @param {SessionCipher} cipher
 	 * @returns {SessionCipher}
 	 */
-	async decrypt(msg: MessageType, cipher: SessionCipher) {
-		let plaintext: ArrayBuffer = new Uint8Array().buffer
+	async decrypt(msg, cipher) {
+		let plaintext = new Uint8Array().buffer
 
 		if (msg.type === 3) {
-			plaintext = await cipher.decryptPreKeyWhisperMessage(base64ToString(msg.body!), 'binary')
+			plaintext = await cipher.decryptPreKeyWhisperMessage(base64ToString(msg.body), 'binary')
 		} else if (msg.type === 1) {
-			plaintext = await cipher.decryptWhisperMessage(base64ToString(msg.body!), 'binary')
+			plaintext = await cipher.decryptWhisperMessage(base64ToString(msg.body), 'binary')
 		}
 		const stringPlaintext = new TextDecoder().decode(new Uint8Array(plaintext))
 
@@ -141,7 +143,7 @@ export default class Signal {
  * @param {ArrayBuffer} arr
  * @returns {string}
  */
-export function arrayBufferToBase64(arr: ArrayBuffer) {
+export function arrayBufferToBase64(arr) {
 	let binary = ''
 	const bytes = new Uint8Array(arr)
 	const len = bytes.byteLength
@@ -158,7 +160,7 @@ export function arrayBufferToBase64(arr: ArrayBuffer) {
  * @param str
  * @returns
  */
-export function base64ArrayBuffer(str: string) {
+export function base64ArrayBuffer(str) {
 	// 使用atob将Base64字符串转换为二进制字符串
 	const binaryString = atob(str)
 
@@ -180,7 +182,7 @@ export function base64ArrayBuffer(str: string) {
  * 把对象中的 ArrayBuffer 转 base64
  * @returns {Promise<IdentityType>}
  */
-export function toBase64(obj: any, isClone: boolean = true) {
+export function toBase64(obj, isClone = true) {
 	const clone = isClone ? cloneDeep(obj) : obj
 	Object.keys(clone).forEach(async (key) => {
 		if (clone[key] instanceof ArrayBuffer) {
@@ -197,7 +199,7 @@ export function toBase64(obj: any, isClone: boolean = true) {
  * 把对象中的 base64 转 ArrayBuffer(33)
  * @returns {Promise<ArrayBuffer>}
  */
-export function toArrayBuffer(obj: any, isClone: boolean = true) {
+export function toArrayBuffer(obj, isClone = true) {
 	const clone = isClone ? cloneDeep(obj) : obj
 	Object.keys(clone).forEach(async (key) => {
 		// 判断是否是 base64 字符
@@ -217,7 +219,7 @@ export function toArrayBuffer(obj: any, isClone: boolean = true) {
  * 字符串转 base 64
  * @returns {Promise<ArrayBuffer>}
  */
-export function stringToBase64(str: string) {
+export function stringToBase64(str) {
 	return arrayBufferToBase64(new TextEncoder().encode(str).buffer)
 }
 
@@ -225,6 +227,6 @@ export function stringToBase64(str: string) {
  * base64 转字符串
  * @returns {Promise<ArrayBuffer>}
  */
-export function base64ToString(str: string) {
+export function base64ToString(str) {
 	return new TextDecoder().decode(base64ArrayBuffer(str))
 }

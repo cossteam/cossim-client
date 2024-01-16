@@ -10,9 +10,9 @@ import { validEmail } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
 // import PGP from '@/utils/PGP'
-import { SignalDirectory } from '@/utils/signal-directory'
-import { createIdentity } from '@/utils/protocol'
-import WebDB from '@/db'
+// import { SignalDirectory } from '@/utils/signal-directory'
+import Signal from '@/utils/signal/signal-protocol'
+// import WebDB from '@/db'
 
 Login.propTypes = {
 	disabled: PropTypes.bool.isRequired
@@ -41,8 +41,10 @@ export default function Login({ disabled }) {
 		serverError: $t('服务器错误，请稍后重试！')
 	}
 
+	const [signal] = useState(new Signal())
+
 	// signal 目录
-	const signalDirectory = new SignalDirectory()
+	// const signalDirectory = new SignalDirectory()
 
 	// 登录
 	const signIn = async () => {
@@ -94,7 +96,8 @@ export default function Login({ disabled }) {
 			if (decryptedData.data.user_info) userStore.updateUser(decryptedData.data.user_info)
 
 			const deviceId = Math.floor(10000 * Math.random())
-			const info = await createIdentity(fromData.nickname, decryptedData.data.user_id, deviceId, signalDirectory)
+			// const info = await createIdentity(fromData.nickname, decryptedData.data.user_id, deviceId, signalDirectory)
+			const info = signal.ceeateIdentity()
 
 			userStore.updateIdentity({ ...info })
 
