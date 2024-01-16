@@ -34,14 +34,13 @@ export default function Userinfo({ f7router }) {
 			<List strong dividers outline>
 				<ListItem link title="头像" noChevron>
 					<div slot="after">
-						{/* <img src={user.avatar} alt="" /> */}
-						<img className="w-16 h-16 rounded-full" src="/avatars/vladimir-kharlampidi.jpg" alt="" />
+						<img className="w-16 h-16 rounded-full" src={user.avatar} alt="" />
 					</div>
 				</ListItem>
 				<ListItem link={`/updateuserinfo/${'nickname'}/?title=${encodeURIComponent('昵称')}`} title="昵称">
 					<div slot="after">{user?.nick_name}</div>
 				</ListItem>
-				<ListItem link={`/updateuserinfo/${'status'}/?title=${encodeURIComponent('状态')}`} title="状态">
+				<ListItem link title="状态" noChevron>
 					<div slot="after">{user?.status}</div>
 				</ListItem>
 				<ListItem

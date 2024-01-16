@@ -32,7 +32,7 @@ export default function UpdateUserInfo({ f7route, f7router }) {
 				})
 				console.log(userInfo)
 				updateUser({
-					...userInfo.data.data
+					...userInfo.data
 				})
 				f7router.back()
 			}
