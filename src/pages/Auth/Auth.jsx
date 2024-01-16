@@ -3,6 +3,7 @@ import { Page, LoginScreen, Block, Button } from 'framework7-react'
 import { $t } from '@/i18n'
 import Login from './Login/Login'
 import Register from './Register/Register'
+import { mode, baseURL } from '@/utils/request'
 
 export default function Auth() {
 	const [loginScreenOpened, setLoginScreenOpened] = useState('')
@@ -29,7 +30,9 @@ export default function Auth() {
 			<Block className="flex justify-center h-3/5 pt-10">
 				<h1 className="text-3xl font-semibold">COSS</h1>
 			</Block>
-
+			<Block>
+				<h2>{baseURL[mode]}</h2>
+			</Block>
 			<Block>
 				<Button
 					large

@@ -1,11 +1,15 @@
 import React from 'react'
 import { f7, Page, Navbar, NavTitle, List, ListItem, Button } from 'framework7-react'
+import PropType from 'prop-types'
 import './UserInfo.less'
 import { useUserStore } from '@/stores/user'
 import { useState } from 'react'
 import { useEffect } from 'react'
 
-export default function Userinfo() {
+Userinfo.propTypes = {
+	f7router: PropType.object.isRequired
+}
+export default function Userinfo({ f7router }) {
 	const userStore = useUserStore()
 	const [user, setUser] = useState(userStore.user)
 	useEffect(() => {
@@ -16,7 +20,7 @@ export default function Userinfo() {
 	const logout = () => {
 		f7.dialog.confirm('退出登录', '确定要退出登录吗？', () => {
 			userStore.removeUser()
-			window.location.href = '/login'
+			f7router.navigate('/auth/')
 		})
 	}
 

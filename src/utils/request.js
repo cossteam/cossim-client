@@ -2,11 +2,11 @@ import axios from 'axios'
 import { getStorage } from '@/utils/stroage'
 import PGP from '@/utils/PGP'
 
-const mode = import.meta.env.MODE || 'development'
-const baseURL = {
+export const mode = import.meta.env.MODE || 'development'
+export const baseURL = {
 	development: 'http://43.229.28.107:8080/api/v1',
 	// development: 'http://192.168.100.150:8080/api/v1',
-	production: 'http://192.168.1.12:8080/api/v1'
+	production: 'http://43.229.28.107:8080/api/v1'
 }
 const axiosConfig = {
 	baseURL: baseURL[mode],
