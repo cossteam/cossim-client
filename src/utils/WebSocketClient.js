@@ -71,7 +71,7 @@ class WebSocketClient {
 			this.listeners[eventType] = this.listeners[eventType].filter((cb) => cb !== callback)
 		}
 	}
-
+	
 	// 触发监听器
 	triggerEvent(eventType, event) {
 		if (this.listeners[eventType]) {

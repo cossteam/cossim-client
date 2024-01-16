@@ -12,7 +12,7 @@ import { clsx } from 'clsx'
 
 // import PGP from '@/utils/PGP'
 // import { SignalDirectory } from '@/utils/signal-directory'
-import Signal from '@/utils/signal/signal-protocol'
+import Signal, { toBase64 } from '@/utils/signal/signal-protocol'
 // import WebDB from '@/db'
 
 Login.propTypes = {
@@ -45,7 +45,7 @@ export default function Login({ disabled }) {
 	// todo： 这里确认自己的名字和设备id
 	const deviceName = Math.random().toString(36).slice(-8)
 	const deviceId = Math.floor(10000 * Math.random())
-	const [signal] = useState(new Signal(deviceName,deviceId))
+	const [signal] = useState(new Signal(deviceName, deviceId))
 
 	// signal 目录
 	// const signalDirectory = new SignalDirectory()
@@ -106,6 +106,17 @@ export default function Login({ disabled }) {
 			userStore.updateIdentity({ ...info })
 			userStore.updateSignal(signal)
 
+			const directory = signal.directory?.getPreKeyBundle(signal.deviceName) || {}
+			const obj = {
+				...directory,
+				deviceName: signal.deviceName,
+				deviceId: signal.deviceId
+			}
+			const data = JSON.stringify(toBase64(obj))
+
+			userStore.updateDirectory(data)
+
+			window.signal = signal
 			// const directory = signal.directory.getPreKeyBundle(deviceName)
 			// const obj = {
 			// 	...directory,
@@ -117,7 +128,7 @@ export default function Login({ disabled }) {
 
 			// // 交换信令
 			// switchE2EKeyApi({public_key:data, user_id:userStore.user.user_id})
-			// return 
+			// return
 
 			userStore.updateLogin(true)
 			setLoading(false)

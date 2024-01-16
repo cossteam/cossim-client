@@ -10,7 +10,7 @@ import { addFriendApi } from '@/api/relation'
 import { useUserStore } from '@/stores/user'
 
 // import { switchE2EKeyApi } from '@/api/relation'
-import { toBase64 } from '@/utils/signal/signal-protocol'
+// import { toBase64 } from '@/utils/signal/signal-protocol'
 
 AddDetails.propTypes = {
 	f7route: PropTypes.object
@@ -21,7 +21,7 @@ export default function AddDetails(props) {
 
 	const [info, setInfo] = useState({})
 
-	const { signal } = useUserStore()
+	const { directory } = useUserStore()
 
 	// const userId = parseInt(f7route.params.id, 10)
 	// const contact = contacts.filter(({ id }) => id === userId)[0]
@@ -49,17 +49,7 @@ export default function AddDetails(props) {
 
 	const addFriend = async () => {
 		try {
-			// console.log("signal",signal.directory._data[signal.deviceName])
-			const directory = signal.directory._data[signal.deviceName]
-			const obj = {
-				...directory,
-				deviceName: signal.deviceName,
-				deviceId: signal.deviceId
-			}
-			// console.log('obj', obj)
-			const data = JSON.stringify(toBase64(obj))
-			// console.log('userStore', data)
-			const res = await addFriendApi({ user_id: f7route.params.id, e2e_public_key: data, msg: '' })
+			const res = await addFriendApi({ user_id: f7route.params.id, e2e_public_key: directory, msg: '' })
 			if (res.code !== 200) return f7.dialog.alert(res.msg)
 			f7.dialog.alert('发送成功，等待对方同意')
 		} catch (error) {

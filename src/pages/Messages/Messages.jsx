@@ -10,9 +10,12 @@ import { useUserStore } from '@/stores/user'
 import WebDB from '@/db'
 import _ from 'lodash-es'
 import { sendToUser } from '@/api/msg'
+import { switchE2EKeyApi } from '@/api/relation'
+
+import WebSocketClient from '@/utils/WebSocketClient'
 
 // TODO: 添加好友时交换双方密钥（地址）
-// import Signal from '@/utils/signal/signal-protocol.ts'
+import Signal, { toArrayBuffer } from '@/utils/signal/signal-protocol'
 import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 
 MessagesPage.propTypes = {
@@ -23,13 +26,21 @@ export default function MessagesPage({ f7route }) {
 	// 会话信息
 	const dialogId = f7route.query.dialog_id
 
+	const [newSignal, setNewSignal] = useState(new Signal())
+
 	// 用户信息
-	const { user, signal } = useUserStore()
+	const { user, signal, directory } = useUserStore()
 	const UserId = user?.UserId
+
+	// 地址
+	const [address, setAddress] = useState()
+	// 会话 session
+	const [sessionCipher, setSessionCipher] = useState()
 
 	// 好友信息
 	const ReceiverId = f7route.params.id // 好友id/群聊id
 	const [contact, setContact] = useState({})
+
 	useEffect(() => {
 		console.log('接收人', ReceiverId)
 		if (!ReceiverId) return
@@ -49,18 +60,39 @@ export default function MessagesPage({ f7route }) {
 
 	// 初始化
 	async function init() {
-		//* 生成个人信息后，把 bundle 暴露出
-		// const bundle = signal2.directory.getPreKeyBundle(DESKTOP2)
+		try {
+			newSignal.store._store = toArrayBuffer(signal.store._store)
 
-		// *建立会话
-		// await signal.cretaeSession(signal.store, address, bundle)
+			// 获取对方信息
+			const data = await WebDB.keypairs.where('user_id').equals(ReceiverId).first()
+
+			// 如果找不到用户，就交换公钥
+			const res = await switchE2EKeyApi({ user_id: ReceiverId, public_key: JSON.stringify(directory) })
+			if (res.code !== 200) return f7.dialog.alert(res.msg)
+
+			// 初始化地址
+			const addr = new SignalProtocolAddress(data.deviceName, data.deviceId)
+			// 初始化会话
+			const cipher = new SessionCipher(newSignal.store, addr)
+
+			setAddress(addr)
+			setSessionCipher(cipher)
+
+			delete data.deviceName
+			delete data.user_id
+			delete data.deviceId
+
+			setNewSignal(newSignal)
+
+			console.log('获取用户信息', data)
+
+			// 创建会话
+			await newSignal.cretaeSession(newSignal.store, addr, toArrayBuffer(data))
+		} catch (error) {
+			console.log('消息初始化失败', error)
+		}
 	}
 	useEffect(() => {
-		// ;(async () => {
-		// 	await init()
-		// 	console.log(desktop1, desktop2)
-		// 	console.log(sessionCipher1, sessionCipher2)
-		// })()
 		init()
 	}, [])
 
@@ -68,9 +100,28 @@ export default function MessagesPage({ f7route }) {
 	// let pageNum = 1
 	// let pageSize = 18
 	// let total = 0
-	const messages = useLiveQuery(() => WebDB.messages.toArray()) || []
-	// const [messages, setMessages] = useState([])
-	console.log(messages)
+	// const messages = useLiveQuery(() => WebDB.messages.toArray()) || []
+	const allMsg = useLiveQuery(() => WebDB.messages.toArray()) || []
+	const [messages, setMessages] = useState([])
+
+	// const [isActive, setIsActive] = useState(true)
+
+	useEffect(() => {
+		// ;(async() => {
+		// 	if (allMsg.length > 0 && sessionCipher) {
+		// 		// console.log(await newSignal.decrypt(JSON.parse(allMsg[0].content), sessionCipher))
+		// 		console.log(allMsg);
+		// 		console.log(allMsg.map(m => {
+		// 			return newSignal.decrypt(JSON.parse(m.content), sessionCipher).then(e => {
+		// 				console.log(e);
+		// 				return e
+		// 			})
+		// 		}))
+		// 	}
+		// })()
+		setMessages(allMsg)
+	}, [allMsg, sessionCipher])
+
 	// 倒序分页查询
 	// async function reversePageQuery(pageSize, pageIndex) {
 	// 	// 计算起始位置
@@ -140,6 +191,14 @@ export default function MessagesPage({ f7route }) {
 	// 	}
 	// }
 
+	WebSocketClient.addListener('onMessage', async (message) => {
+		if (sessionCipher) {
+			console.log('message', message.data.content)
+			const emd = await newSignal.decrypt(JSON.parse(message.data.content), sessionCipher)
+			console.log('解密', emd)
+		}
+	})
+
 	// 初始化后执行
 	useEffect(() => {
 		// refreshMessage()
@@ -156,7 +215,6 @@ export default function MessagesPage({ f7route }) {
 				}
 			}, 1000)
 		)
-
 		return () => {
 			messagesContent?.removeEventListener('scroll', () => {})
 		}
@@ -196,12 +254,14 @@ export default function MessagesPage({ f7route }) {
 	}
 	const sendMessage = async (type, content) => {
 		try {
+			const encrypted = await newSignal.encrypt(content, sessionCipher)
+			console.log('发送消息', encrypted)
 			let send_state = 'sending'
 			const dbMsg = {
 				sender_id: UserId,
 				receiver_id: ReceiverId,
 				type: 'sent', // 发送方
-				content,
+				content: JSON.stringify(encrypted),
 				content_type: type, // 1: 文本, 2: 语音, 3: 图片
 				date: new Date(),
 				send_state,
@@ -259,7 +319,6 @@ export default function MessagesPage({ f7route }) {
 			$('html, body').scrollTop(0)
 		}, 100)
 	}
-	// End of iOS web app fix
 
 	return (
 		<Page className="messages-page" noToolbar messagesContent>

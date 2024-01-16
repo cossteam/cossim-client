@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { List, ListGroup, ListItem, Navbar, Page, Searchbar, Subnavbar, ListIndex, Icon, f7 } from 'framework7-react'
+import { useEffect } from 'react'
+import { List, ListGroup, ListItem, Navbar, Page, Searchbar, Subnavbar, ListIndex, Icon } from 'framework7-react'
 import React from 'react'
 import { friendListApi, friendApplyListApi } from '@/api/relation'
 import { $t } from '@/i18n'
@@ -7,11 +7,11 @@ import './Contacts.less'
 import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 
-export default function Contacts(props) {
+export default function Contacts() {
 	// const { f7router } = props
 
 	// 申请好友列表
-	const [users, setUsers] = useState([])
+	// const [users, setUsers] = useState([])
 
 	function groupsToArray(obj) {
 		obj = typeof obj !== 'object' ? {} : obj
@@ -47,7 +47,7 @@ export default function Contacts(props) {
 						return {
 							...user,
 							name: user.nick_name || '',
-							avatar: user.avatar || 'mark-zuckerberg.jpg'
+							avatar: user.avatar || ''
 						}
 					})
 				}
@@ -58,7 +58,7 @@ export default function Contacts(props) {
 			for (let i = 0; i < respData.length; i++) {
 				const item = respData[i]
 				const oldItem = oldData.find((oldItem) => oldItem.user_id === item.user_id)
-				oldItem ? await WebDB.contacts.update(oldItem.user_id, item) : await WebDB.contacts.put(item)
+				oldItem ? await WebDB.contacts.update(oldItem.id, item) : await WebDB.contacts.put(item)
 			}
 		})()
 	}, [])
@@ -72,10 +72,10 @@ export default function Contacts(props) {
 	})
 
 	// 选择用户
-	const handleUserSelect = (user) => {
-		console.log(user, props,groups)
-		f7.dialog.alert('TODO:个人列表')
-	}
+	// const handleUserSelect = (user) => {
+	// 	console.log(user, props,groups)
+	// 	f7.dialog.alert('TODO:个人列表')
+	// }
 
 	return (
 		<Page className="contacts-page">
@@ -113,7 +113,7 @@ export default function Contacts(props) {
 								title={contact.nick_name}
 								footer={contact.signature}
 								popupClose
-								onClick={() => handleUserSelect(contact)}
+								// onClick={() => handleUserSelect(contact)}
 								data-test={contact.email}
 							>
 								<img slot="media" src={contact.avatar} alt="" />

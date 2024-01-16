@@ -58,16 +58,13 @@ WebDB.version(WEBDB_VERSION).stores({
 		send_state`,
 	keypairs: `
 		++id,
-		sender_id,
-		sender_name,
-		sender_device_id,
-		signed_pre_key,
-		sender_identity_key,
-		sender_pre_key_id,
-		sender_public_key,
-		sender_registration_id,
-		sender_signed_pre_key,
-		sender_signature
+		deviceId,
+		deviceName,
+		identityKey,
+		preKey,
+		registrationId,
+		signedPreKey,
+		user_id
 	`
 })
 

@@ -18,6 +18,7 @@ export default class Signal {
 	// 设备 ID
 	deviceId = 0
 
+
 	/**
 	 * 实例化
 	 * @param {*} name 			名称

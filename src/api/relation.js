@@ -62,7 +62,7 @@ export function blackListApi(params) {
 }
 
 /**
- * 确认添加好友
+ * 确认添加或拒绝好友
  * @param {Object} data
  * @param {String} data.user_id         用户id
  * @param {String} data.e2e_public_key      
@@ -70,7 +70,7 @@ export function blackListApi(params) {
  */
 export function confirmAddFriendApi(data) {
 	return request({
-		url: `${baseApi}/confirm_friend`,
+		url: `${baseApi}/manage_friend`,
 		method: 'post',
 		data
 	})
@@ -95,7 +95,6 @@ export function deleteBlackListApi(data) {
  * 删除好友
  * @param {Object} data
  * @param {String} data.user_id         用户id
- * @param {String} data.friend_id       好友id
  * @returns {Promise<Object>}
  */
 export function deleteFriendApi(data) {

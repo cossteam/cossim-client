@@ -1,31 +1,30 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { List, ListItem, Navbar, Link, Page, ListButton } from 'framework7-react'
+import { List, ListItem, Navbar, Link, Page, ListButton, f7 } from 'framework7-react'
 import './Profile.less'
-import ListColorIcon from '@/components/ListColorIcon'
-import { contacts } from '@/data'
+// import ListColorIcon from '@/components/ListColorIcon'
+// import { contacts } from '@/data'
 import { $t } from '@/i18n'
 import { getUserInfoApi } from '@/api/user'
+import { deleteFriendApi } from '@/api/relation'
 import PropTypes from 'prop-types'
 
+import WebDB from '@/db'
+
 Profile.propTypes = {
-	f7route: PropTypes.object
+	f7route: PropTypes.object,
+	f7router: PropTypes.object
 }
 
 export default function Profile(props) {
-	const { f7route } = props
+	const { f7route, f7router } = props
 
 	const [info, setInfo] = useState({})
-
-	// const userId = parseInt(f7route.params.id, 10)
-	// const contact = contacts.filter(({ id }) => id === userId)[0]
-
-	// console.log('contact', contact)
 
 	const pageRef = useRef(null)
 	const profileAvatarRef = useRef(null)
 
+	// 页面安装时将页面滚动到头像大小的一半
 	useEffect(() => {
-		// 页面安装时将页面滚动到头像大小的一半
 		const profileAvatarHeight = profileAvatarRef.current.offsetHeight
 		pageRef.current.el.querySelector('.page-content').scrollTop = profileAvatarHeight / 2
 	}, [])
@@ -33,12 +32,31 @@ export default function Profile(props) {
 	useEffect(() => {
 		const getUserInfo = async () => {
 			const res = await getUserInfoApi({ user_id: f7route.params.id, type: 1 })
-			console.log('res', res)
+			console.log('获取用户信息', res)
 			if (res.code !== 200) return
-			setInfo(res.data?.user_info)
+			setInfo(res.data)
 		}
 		getUserInfo()
 	}, [])
+
+	const text = {
+		tips: $t('您确定要删除好友吗？'),
+		btn_agree: $t('同意'),
+		btn_refuse: $t('拒绝')
+	}
+
+	const deleteFriend = () => {
+		// 确认提示
+		f7.dialog.confirm(text.tips, async () => {
+			const res = await deleteFriendApi({ user_id: f7route.params.id })
+			if (res.code !== 200) return
+			// 删除本地存储
+			await WebDB.contacts.where('user_id').equals(f7route.params.id).delete()
+			f7.dialog.alert('删除成功', () => {
+				f7router.back()
+			})
+		})
+	}
 
 	return (
 		<Page ref={pageRef} className="profile-page" noToolbar>
@@ -48,14 +66,14 @@ export default function Profile(props) {
 			</div>
 			<div className="profile-content">
 				<List strong outline dividers mediaList className="no-margin-top">
-					<ListItem title={info?.name} text="+1 222 333-44-55">
+					<ListItem title={info?.name} text={info?.nick_name}>
 						<div slot="after" className="profile-actions-links">
 							<Link iconF7="chat_bubble_fill" />
-							<Link iconF7="camera_fill" />
-							<Link iconF7="phone_fill" />
+							{/* <Link iconF7="camera_fill" /> */}
+							{/* <Link iconF7="phone_fill" /> */}
 						</div>
 					</ListItem>
-					<ListItem subtitle={info?.status} text="27 Jun 2021" />
+					<ListItem subtitle={info?.status} text={info?.email} />
 				</List>
 				{/* <List strong outline dividers>
 					<ListItem link title={$t('媒体、链接和文档')} after="1 758">
@@ -110,10 +128,16 @@ export default function Profile(props) {
 					<ListButton color="red">Report Contact</ListButton>
 				</List> */}
 
-				<List strong outline dividers>
+				{/* <List strong outline dividers>
 					<ListButton>Share Contact</ListButton>
 					<ListButton>Export Chat</ListButton>
 					<ListButton color="red">Clear Chat</ListButton>
+				</List> */}
+				<List strong outline dividers>
+					<ListButton onClick={deleteFriend}>添加到黑名单</ListButton>
+					<ListButton color="red" onClick={deleteFriend}>
+						{$t('删除好友')}
+					</ListButton>
 				</List>
 			</div>
 		</Page>
