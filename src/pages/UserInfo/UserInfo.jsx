@@ -14,7 +14,6 @@ export default function Userinfo({ f7router }) {
 	const [user, setUser] = useState(userStore.user)
 	useEffect(() => {
 		setUser(userStore.user)
-		console.log('更新', user)
 	}, [userStore.user])
 
 	const logout = () => {
