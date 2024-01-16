@@ -9,6 +9,7 @@ import { loginApi } from '@/api/user'
 import { validEmail } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
+
 // import PGP from '@/utils/PGP'
 // import { SignalDirectory } from '@/utils/signal-directory'
 import Signal from '@/utils/signal/signal-protocol'
@@ -41,7 +42,10 @@ export default function Login({ disabled }) {
 		serverError: $t('服务器错误，请稍后重试！')
 	}
 
-	const [signal] = useState(new Signal())
+	// todo： 这里确认自己的名字和设备id
+	const deviceName = Math.random().toString(36).slice(-8)
+	const deviceId = Math.floor(10000 * Math.random())
+	const [signal] = useState(new Signal(deviceName,deviceId))
 
 	// signal 目录
 	// const signalDirectory = new SignalDirectory()
@@ -95,11 +99,25 @@ export default function Login({ disabled }) {
 			if (decryptedData.data.token) userStore.updateToken(decryptedData.data.token)
 			if (decryptedData.data.user_info) userStore.updateUser(decryptedData.data.user_info)
 
-			const deviceId = Math.floor(10000 * Math.random())
-			// const info = await createIdentity(fromData.nickname, decryptedData.data.user_id, deviceId, signalDirectory)
-			const info = signal.ceeateIdentity()
+			// 生成信令
+			const info = await signal.ceeateIdentity(signal.deviceName)
 
+			// 更新信令
 			userStore.updateIdentity({ ...info })
+			userStore.updateSignal(signal)
+
+			// const directory = signal.directory.getPreKeyBundle(deviceName)
+			// const obj = {
+			// 	...directory,
+			// 	deviceName: deviceName,
+			// 	deviceId: deviceId
+			// }
+			// const data = JSON.stringify(toBase64(obj))
+			// console.log("userStore",JSON.stringify(toBase64(obj)))
+
+			// // 交换信令
+			// switchE2EKeyApi({public_key:data, user_id:userStore.user.user_id})
+			// return 
 
 			userStore.updateLogin(true)
 			setLoading(false)

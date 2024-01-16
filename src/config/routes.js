@@ -11,6 +11,7 @@ import ChatTest from '@/pages/ChatTest'
 import MessageTest from '@/pages/MessageTest'
 import UserInfo from '@/pages/UserInfo/Userinfo'
 import UpdateUserInfo from '@/pages/UpdateUserInfo/UpdateUserInfo'
+import NewContact from '@/pages/NewContact/NewContact'
 
 var routes = [
 	{
@@ -36,6 +37,10 @@ var routes = [
 	{
 		path: '/chat_test/',
 		component: ChatTest
+	},
+	{
+		path: '/new_contact/',
+		component: NewContact
 	},
 	{
 		path: '/chats_test/:id/',

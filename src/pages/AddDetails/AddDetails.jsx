@@ -1,13 +1,16 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { List, ListItem, Navbar, Link, Page, ListButton,f7 } from 'framework7-react'
+import { List, ListItem, Navbar, Page, ListButton, f7 } from 'framework7-react'
 // import './Profile.less'
-import ListColorIcon from '@/components/ListColorIcon'
-import { contacts } from '@/data'
+// import ListColorIcon from '@/components/ListColorIcon'
+// import { contacts } from '@/data'
 import { $t } from '@/i18n'
 import { getUserInfoApi } from '@/api/user'
 import PropTypes from 'prop-types'
 import { addFriendApi } from '@/api/relation'
 import { useUserStore } from '@/stores/user'
+
+// import { switchE2EKeyApi } from '@/api/relation'
+import { toBase64 } from '@/utils/signal/signal-protocol'
 
 AddDetails.propTypes = {
 	f7route: PropTypes.object
@@ -18,7 +21,7 @@ export default function AddDetails(props) {
 
 	const [info, setInfo] = useState({})
 
-	const userStore = useUserStore()
+	const { signal } = useUserStore()
 
 	// const userId = parseInt(f7route.params.id, 10)
 	// const contact = contacts.filter(({ id }) => id === userId)[0]
@@ -45,9 +48,23 @@ export default function AddDetails(props) {
 	}, [])
 
 	const addFriend = async () => {
-		const res = await addFriendApi({ user_id: f7route.params.id, p2public_key: '', msg: ''})
-		if(res.code !== 200) return f7.dialog.alert(res.msg)
-		f7.dialog.alert('添加好友成功')
+		try {
+			// console.log("signal",signal.directory._data[signal.deviceName])
+			const directory = signal.directory._data[signal.deviceName]
+			const obj = {
+				...directory,
+				deviceName: signal.deviceName,
+				deviceId: signal.deviceId
+			}
+			// console.log('obj', obj)
+			const data = JSON.stringify(toBase64(obj))
+			// console.log('userStore', data)
+			const res = await addFriendApi({ user_id: f7route.params.id, e2e_public_key: data, msg: '' })
+			if (res.code !== 200) return f7.dialog.alert(res.msg)
+			f7.dialog.alert('发送成功，等待对方同意')
+		} catch (error) {
+			console.log('公钥交换失败', error)
+		}
 	}
 
 	return (
@@ -65,7 +82,7 @@ export default function AddDetails(props) {
 							<Link iconF7="phone_fill" />
 						</div> */}
 					</ListItem>
-					<ListItem subtitle={info?.status}  />
+					<ListItem subtitle={info?.status} />
 				</List>
 				{/* <List strong outline dividers>
 					<ListItem link title={$t('媒体、链接和文档')} after="1 758">
@@ -121,7 +138,7 @@ export default function AddDetails(props) {
 				</List> */}
 
 				<List strong outline dividers>
-					<ListButton onClick={addFriend}>{ $t('添加好友')}</ListButton>
+					<ListButton onClick={addFriend}>{$t('添加好友')}</ListButton>
 					{/* <ListButton>Export Chat</ListButton> */}
 					{/* <ListButton color="red">Clear Chat</ListButton> */}
 				</List>
