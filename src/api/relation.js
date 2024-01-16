@@ -34,8 +34,9 @@ export function addBlackListApi(data) {
 /**
  * 添加好友
  * @param {Object} data
- * @param {String} data.user_id         用户id
- * @param {String} data.friend_id       好友id
+ * @param {String} data.user_id         添加对面的用户 id
+ * @param {String} data.msg       		添加消息
+ * @param {String} data.e2e_public_key  公钥
  * @returns {Promise<Object>}
  */
 export function addFriendApi(data) {
@@ -64,7 +65,7 @@ export function blackListApi(params) {
  * 确认添加好友
  * @param {Object} data
  * @param {String} data.user_id         用户id
- * @param {String} data.friend_id       好友id
+ * @param {String} data.e2e_public_key      
  * @returns {Promise<Object>}
  */
 export function confirmAddFriendApi(data) {
@@ -102,5 +103,32 @@ export function deleteFriendApi(data) {
 		url: `${baseApi}/delete_friend`,
 		method: 'post',
 		data
+	})
+}
+
+/**
+ * 交换端对端公钥
+ * @param {Object} data
+ * @param {String} data.public_key      公钥
+ * @param {String} data.user_id         用户id
+ * @returns {Promise<Object>}
+ */
+export function switchE2EKeyApi(data) {
+	return request({
+		url: `${baseApi}/switch/e2e/key`,
+		method: 'POST',
+		data
+	})
+}
+
+/**
+ * 好友申请列表
+ * @param {Object} params
+ */
+export function friendApplyListApi(params) {
+	return request({
+		url: `${baseApi}/request_list`,
+		method: 'get',
+		params
 	})
 }

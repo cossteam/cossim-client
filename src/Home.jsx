@@ -15,6 +15,9 @@ import WebSocketClient from '@/utils/WebSocketClient'
 import WebDB from '@/db'
 // import { useLiveQuery } from 'dexie-react-hooks'
 
+// import { switchE2EKeyApi } from '@/api/relation'
+// import { toBase64 } from '@/utils/signal/signal-protocol'
+
 /**
  * 这里主要做一些全局配置之类的事情
  * @returns
@@ -100,7 +103,24 @@ const Home = () => {
 				// 更新会话列表数据
 				chat && WebDB.chats.update(chat.id, { last_message: message.content, msg_id: msgId })
 			}
+			console.log('msg', msg)
 		})
+
+		// try {
+		// 	// console.log("signal",signal.directory._data[signal.deviceName])
+		// 	const directory = signal.directory._data[signal.deviceName]
+		// 	const obj = {
+		// 		...directory,
+		// 		deviceName: signal.deviceName,
+		// 		deviceId: signal.deviceId
+		// 	}
+		// 	const data = JSON.stringify(toBase64(obj))
+		// 	console.log("userStore",JSON.stringify(toBase64(obj)))
+		// 	// 交换信令
+		// 	switchE2EKeyApi({public_key:data, user_id:"787bb5d3-7e63-43d0-ad4f-4c3e5f31a71c"})
+		// } catch (error) {
+		// 	console.log("交换密钥失败",error)
+		// }
 	}, [isLogin])
 
 	return (

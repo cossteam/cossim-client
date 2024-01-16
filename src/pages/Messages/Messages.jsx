@@ -13,7 +13,7 @@ import { sendToUser } from '@/api/msg'
 
 // TODO: 添加好友时交换双方密钥（地址）
 // import Signal from '@/utils/signal/signal-protocol.ts'
-// import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
+import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -24,7 +24,7 @@ export default function MessagesPage({ f7route }) {
 	const dialogId = f7route.query.dialog_id
 
 	// 用户信息
-	const { user } = useUserStore()
+	const { user, signal } = useUserStore()
 	const UserId = user?.UserId
 
 	// 好友信息
@@ -42,53 +42,18 @@ export default function MessagesPage({ f7route }) {
 	// const DESKTOP1 = UserId
 	// const DESKTOP2 = ReceiverId
 
-	// // 创建实例
-	// const [signal1] = useState(new Signal())
-	// const [signal2] = useState(new Signal())
-
-	// // 身份信息
-	// const [desktop1, setDesktop1] = useState({})
-	// const [desktop2, setDesktop2] = useState({})
-
-	// // 地址
-	// const [address1] = useState(new SignalProtocolAddress(DESKTOP1, 1))
-	// const [address2] = useState(new SignalProtocolAddress(DESKTOP2, 2))
-
-	// // 会话 session
-	// const [sessionCipher1] = useState(new SessionCipher(signal1.store, address2))
-	// const [sessionCipher2] = useState(new SessionCipher(signal2.store, address2))
-
-	// // 消息
-	// const [msg1, setMsg1] = useState('')
-	// const [msg2, setMsg2] = useState('')
-
-	// 加密的消息
-	// const [message, setMessage] = useState([])
-	// 解密后的消息
-	// const [chats, setChats] = useState([])
+	// 地址
+	// const [address] = useState(new SignalProtocolAddress())
+	// 会话 session
+	// const [sessionCipher] = useState(new SessionCipher(signal.store, address))
 
 	// 初始化
 	async function init() {
-		// const desktop1 = await signal1.ceeateIdentity(DESKTOP1)
-		// const desktop2 = await signal2.ceeateIdentity(DESKTOP2)
-		// setDesktop1(desktop1)
-		// setDesktop2(desktop2)
-
-		// console.log('%c第一步:', 'color:#f36;font-size:24px;')
-		// console.info('为客户端1生成身份：', desktop1)
-		// console.info('为客户端2生成身份：', desktop2)
-
 		//* 生成个人信息后，把 bundle 暴露出
-		// const bundle1Buffer = signal1.directory.getPreKeyBundle(DESKTOP1)
-		// const bundle2Buffer = signal2.directory.getPreKeyBundle(DESKTOP2)
+		// const bundle = signal2.directory.getPreKeyBundle(DESKTOP2)
 
 		// *建立会话
-		// await signal1.cretaeSession(signal1.store, address2, bundle2Buffer)
-		// await signal2.cretaeSession(signal2.store, address1, bundle1Buffer)
-
-		// console.log('%c第二步:', 'color:#f36;font-size:24px;')
-		// console.info('与客户端2建立会话')
-		// console.info('与客户端1建立会话')
+		// await signal.cretaeSession(signal.store, address, bundle)
 	}
 	useEffect(() => {
 		// ;(async () => {
@@ -96,6 +61,7 @@ export default function MessagesPage({ f7route }) {
 		// 	console.log(desktop1, desktop2)
 		// 	console.log(sessionCipher1, sessionCipher2)
 		// })()
+		init()
 	}, [])
 
 	// 聊天记录

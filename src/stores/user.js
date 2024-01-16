@@ -26,6 +26,7 @@ const userStore = (set) => ({
 	serviceKey: '',
 	clientKeys: {},
 	identity: {},
+	signal: {},
 	updateLogin: (isLogin) => set({ isLogin }),
 	updateUser: (user) =>
 		set((state) => ({
@@ -50,7 +51,8 @@ const userStore = (set) => ({
 				...state.identity,
 				...identity
 			}
-		}))
+		})),
+	updateSignal: (signal) => set({ signal }),
 })
 
 const ProStroeName = 'COSS_USER_STRORAGE'

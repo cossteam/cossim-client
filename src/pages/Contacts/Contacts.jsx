@@ -1,7 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { List, ListGroup, ListItem, Navbar, Page, Searchbar, Subnavbar, ListIndex, Icon, f7 } from 'framework7-react'
 import React from 'react'
-import { friendListApi } from '@/api/relation'
+import { friendListApi, friendApplyListApi } from '@/api/relation'
 import { $t } from '@/i18n'
 import './Contacts.less'
 import WebDB from '@/db'
@@ -9,6 +9,9 @@ import { useLiveQuery } from 'dexie-react-hooks'
 
 export default function Contacts(props) {
 	// const { f7router } = props
+
+	// 申请好友列表
+	const [users, setUsers] = useState([])
 
 	function groupsToArray(obj) {
 		obj = typeof obj !== 'object' ? {} : obj
@@ -59,10 +62,18 @@ export default function Contacts(props) {
 			}
 		})()
 	}, [])
+	
+	useEffect(() => {
+		;(async ()=>{
+			const res = await friendApplyListApi()
+			if (res.code !== 200) return
+			console.log("res",res);
+		})()
+	})
 
 	// 选择用户
 	const handleUserSelect = (user) => {
-		console.log(user, props)
+		console.log(user, props,groups)
 		f7.dialog.alert('TODO:个人列表')
 	}
 
@@ -84,24 +95,26 @@ export default function Contacts(props) {
 						{$t('群组')}
 					</span>
 				</ListItem>
-				<ListItem link>
+				<ListItem link="/new_contact/">
 					<Icon className="contacts-list-icon" f7="person_badge_plus_fill" slot="media" color="primary" />
 					<span slot="title" className="text-color-primary">
 						{$t('新联系人')}
 					</span>
 				</ListItem>
+
 				{Object.keys(groups).map((groupKey) => (
 					<ListGroup key={groupKey}>
 						<ListItem groupTitle title={groupKey} />
 						{groups[groupKey].map((contact) => (
 							<ListItem
 								key={contact.nick_name}
-								// link={`/profile/${contact.user_id}/`}
-								link
+								link={`/profile/${contact.user_id}/`}
+								// link
 								title={contact.nick_name}
 								footer={contact.signature}
 								popupClose
 								onClick={() => handleUserSelect(contact)}
+								data-test={contact.email}
 							>
 								<img slot="media" src={contact.avatar} alt="" />
 							</ListItem>

@@ -9,7 +9,14 @@ export default class Signal {
 	// todo: 后续仓库可能需要修改，在添加时可以添加到 indexDB 中, 或者初始化的时候读取数据到仓库中
 	store = new SignalProtocolStore()
 
+	// 地址
 	address = null
+
+	// 设备名
+	deviceName = ''
+
+	// 设备 ID
+	deviceId = 0
 
 	/**
 	 * 实例化
@@ -17,6 +24,8 @@ export default class Signal {
 	 * @param {*} deviceId 		设备id
 	 */
 	constructor(name,deviceId) {
+		this.deviceName = name
+		this.deviceId = deviceId
 		this.address = new SignalProtocolAddress(name,deviceId)
 	}
 
@@ -66,12 +75,14 @@ export default class Signal {
 		// 存储签名密钥
 		this.store.storeSignedPreKey(`${signedPreKeyId}`, signedPreKey.keyPair)
 
-		this.directory.storeKeyBundle(name, {
+		this.directory.storeKeyBundle(name, toBase64({
 			registrationId,
 			identityPubKey: identityKeyPair.pubKey,
 			signedPreKey: publicSignedPreKey,
 			oneTimePreKeys: [publicPreKey]
-		})
+		}))
+
+		this.store._store = toBase64(this.store._store)
 
 		const buffer = {
 			registrationId,
