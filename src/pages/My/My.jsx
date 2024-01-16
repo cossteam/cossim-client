@@ -13,8 +13,8 @@ export default function My() {
 			<Navbar title={user.nick_name} large transparent />
 			<List strong dividers outline mediaList className="settings-profile-list">
 				<ListItem link={`/userinfo/${user.id}}/`} noChevron title={user.email} text={user.signature}>
-					<img slot="media" src="/avatars/vladimir-kharlampidi.jpg" alt="" />
-					{/* <img slot="media" src={user.avatar} alt="" /> */}
+					{/* <img slot="media" src="/avatars/vladimir-kharlampidi.jpg" alt="" /> */}
+					<img slot="media" src={user.avatar} alt="" />
 					<Link
 						slot="root"
 						style={{

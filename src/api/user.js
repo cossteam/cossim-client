@@ -89,3 +89,19 @@ export function updateUserInfoApi(data) {
 		data
 	})
 }
+
+/**
+ * 修改密码
+ * @param {*} data
+ * @param {*} data.old_password
+ * @param {*} data.password
+ * @param {*} data.confirm_password
+ * @returns
+ */
+export function updatePassWordApi(data) {
+	return request({
+		url: `${baseApi}/password/modify`,
+		method: 'POST',
+		data
+	})
+}
