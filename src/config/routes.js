@@ -8,7 +8,6 @@ import AddFriend from '@/pages/AddFriend/AddFriend'
 import AddDetails from '@/pages/AddDetails/AddDetails'
 import Auth from '@/pages/Auth/Auth'
 import ChatTest from '@/pages/ChatTest'
-import MessageTest from '@/pages/MessageTest'
 import UserInfo from '@/pages/UserInfo/Userinfo'
 import UpdateUserInfo from '@/pages/UpdateUserInfo/UpdateUserInfo'
 import NewContact from '@/pages/NewContact/NewContact'
@@ -41,10 +40,6 @@ var routes = [
 	{
 		path: '/new_contact/',
 		component: NewContact
-	},
-	{
-		path: '/chats_test/:id/',
-		component: MessageTest
 	},
 	{
 		path: '/add_details/:id/',
