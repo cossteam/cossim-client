@@ -10,12 +10,12 @@ import { useUserStore } from '@/stores/user'
 import WebDB from '@/db'
 import _ from 'lodash-es'
 import { sendToUser } from '@/api/msg'
-import { switchE2EKeyApi } from '@/api/relation'
+// import { switchE2EKeyApi } from '@/api/relation'
 
 import WebSocketClient from '@/utils/WebSocketClient'
 
 // TODO: 添加好友时交换双方密钥（地址）
-import Signal, { toArrayBuffer, cretaeSession, decrypt, encrypt, toBase64 } from '@/utils/signal/signal-protocol'
+import { toArrayBuffer, decrypt, encrypt } from '@/utils/signal/signal-protocol'
 import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 import { SignalProtocolStore } from '@/utils/signal/storage-type'
 
@@ -26,20 +26,15 @@ MessagesPage.propTypes = {
 export default function MessagesPage({ f7route }) {
 	// 会话信息
 	const dialogId = f7route.query.dialog_id
-
-	const [newSignal, setNewSignal] = useState(new Signal())
-
 	// 用户信息
-	const { user, signal, directory } = useUserStore()
+	const { user } = useUserStore()
+	// 用户 id
 	const UserId = user?.UserId
-
-	// 地址
-	// const [address, setAddress] = useState()
 	// 会话 session
 	const [sessionCipher, setSessionCipher] = useState()
-
+	// 好友id/群聊id
+	const ReceiverId = f7route.params.id
 	// 好友信息
-	const ReceiverId = f7route.params.id // 好友id/群聊id
 	const [contact, setContact] = useState({})
 
 	useEffect(() => {
@@ -60,56 +55,21 @@ export default function MessagesPage({ f7route }) {
 
 			console.log('查找到用户信息', data, ReceiverId)
 
-			// // todo: 如果找不到用户公钥信息，就从服务器上获取
-			// const res = await switchE2EKeyApi({ user_id: ReceiverId, public_key: JSON.stringify(directory) })
-			// if (res.code !== 200) return f7.dialog.alert(res.msg)
-
+			// 对方的仓库
 			const store = new SignalProtocolStore(toArrayBuffer(data.store))
-			// 初始化地址
-			const addr = new SignalProtocolAddress(data.deviceName, data.deviceId)
+			// 初始化对方地址
+			const addr = new SignalProtocolAddress(data.directory.deviceName, data.directory.deviceId)
 			// 初始化会话
 			const cipher = new SessionCipher(store, addr)
 
-			// const record = new SessionRecord(data.deviceId)
-			// setAddress(addr)
 			setSessionCipher(cipher)
-
-			console.log("store",store,cipher)
-
-			// delete data.deviceName
-			// delete data.user_id
-			// delete data.deviceId
-
-			// const sessionData = await WebDB.session.where('user_id').equals(ReceiverId).first()
-			// console.log('查找到会话信息', sessionData,cipher)
-
-			// if (!sessionData) {
-			// 	// 创建会话
-			// 	const session = await cretaeSession(store, addr, toArrayBuffer(data))
-
-			// 	const sessionBase64 = toBase64(session)
-
-			// 	// 保存会话
-			// 	const res = await WebDB.session.add({ ...sessionBase64, user_id: ReceiverId })
-
-			// 	if (!res) { 
-			// 		// todo: 这里可以做异常上报处理
-			// 		return
-			// 	}
-			// 	console.log('创建会话成功', sessionBase64)
-
-			// 	return
-			// }
-
-			// 如果已经有会话了
-			// delete sessionData.user_id
-			// const sessionBuffer = toArrayBuffer(sessionData)
 		} catch (error) {
 			console.log('消息初始化失败', error)
 		}
 	}
 	useEffect(() => {
 		init()
+		setMessages(allMsg)
 	}, [])
 
 	// 聊天记录
@@ -122,24 +82,29 @@ export default function MessagesPage({ f7route }) {
 
 	useEffect(() => {
 		setMessages(allMsg)
-		// 解密
 		// ;(async () => {
-		// 	console.log("触发解密",allMsg)
-		// 	if (!sessionCipher || allMsg.length === 0) return
-		// 	const arr =  await allMsg.map(async (v) => {
+		// 	if (!sessionCipher) return
+		// 	console.log('开始解密消息', allMsg)
+		// 	for (let i = 0; i < allMsg.length; i++) {
+		// 		let msg = ''
 		// 		try {
-		// 			return {
-		// 				...v,
-		// 				content: await decrypt(JSON.parse(v.content), sessionCipher)
+		// 			if (allMsg[i].type === 'sent') {
+		// 				// 解密自己的消息
+		// 				// msg = await decrypt(JSON.parse(allMsg[i].content), selfCipher)
+		// 				msg = '我自己的消息'
+		// 			} else {
+		// 				// 解密对方的消息
+		// 				msg = await decrypt(JSON.parse(allMsg[i].content), sessionCipher)
 		// 			}
-		// 		} catch(error) {
-		// 			console.log("解密失败",error);
-		// 			return v
+		// 			allMsg[i].content = msg ? msg : allMsg[i].content
+		// 		} catch (error) {
+		// 			console.log('解密失败', error)
+		// 			allMsg[i].content = msg ? msg : allMsg[i].content
 		// 		}
-		// 	})
-		// 	setMessages(arr)
+		// 	}
+		// 	setMessages(allMsg)
 		// })()
-	}, [allMsg])
+	}, [allMsg, sessionCipher])
 
 	// 倒序分页查询
 	// async function reversePageQuery(pageSize, pageIndex) {
@@ -214,20 +179,10 @@ export default function MessagesPage({ f7route }) {
 	// 	const handler = async (message) => {
 	// 		if (sessionCipher) {
 	// 			console.log('message', message)
-	// 			const emd = await newSignal.decrypt(JSON.parse(message.data.content), sessionCipher)
-	// 			console.log('解密', emd)
-	// 			// const arr = await allMsg.map(async (v) => {
-	// 			// 	try {
-	// 			// 		return {
-	// 			// 			...v,
-	// 			// 			content: await decrypt(JSON.parse(v.content), sessionCipher)
-	// 			// 		}
-	// 			// 	} catch (error) {
-	// 			// 		console.log('解密失败', error)
-	// 			// 		return v
-	// 			// 	}
-	// 			// })
-	// 			// console.log("arr", arr)
+	// 			const content = await decrypt(JSON.parse(message.data.content), sessionCipher)
+	// 			console.log('解密', content)
+	// 			const lastMsg = messages.at(-1)
+	// 			lastMsg.content = content
 	// 		}
 	// 	}
 
@@ -293,23 +248,24 @@ export default function MessagesPage({ f7route }) {
 	}
 	const sendMessage = async (type, content) => {
 		try {
-			console.log("sessionCipher",sessionCipher)
+			console.log('sessionCipher', sessionCipher)
 			const encrypted = await encrypt(content, sessionCipher)
 			console.log('发送消息', encrypted)
-			
+
 			let send_state = 'sending'
 			const dbMsg = {
 				sender_id: UserId,
 				receiver_id: ReceiverId,
 				type: 'sent', // 发送方
-				content: content, //JSON.stringify(encrypted),
+				content: JSON.stringify(encrypted),
 				content_type: type, // 1: 文本, 2: 语音, 3: 图片
 				date: new Date(),
 				send_state,
 				is_read: true
 			}
 
-			const msgId = await WebDB.messages.add(dbMsg)
+			// TODO: 现在是明文存储，后续希望可以使用密文
+			const msgId = await WebDB.messages.add({ ...dbMsg, content })
 			const { code } = await sendToUser(dbMsgToReqMsg(dbMsg))
 
 			send_state = code === 200 ? 'ok' : 'error'

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getDevice } from 'framework7/lite-bundle'
 // import './i18n'
 // import '@/config'
@@ -17,8 +17,8 @@ import WebDB from '@/db'
 
 // import { switchE2EKeyApi } from '@/api/relation'
 // import { toBase64 } from '@/utils/signal/signal-protocol'
-import { toArrayBuffer, cretaeSession, toBase64 } from '@/utils/signal/signal-protocol'
-import { SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
+import { toArrayBuffer, cretaeSession, toBase64, decrypt } from '@/utils/signal/signal-protocol'
+import { SignalProtocolAddress, SessionCipher } from '@privacyresearch/libsignal-protocol-typescript'
 import { SignalProtocolStore } from '@/utils/signal/storage-type'
 
 /**
@@ -26,9 +26,35 @@ import { SignalProtocolStore } from '@/utils/signal/storage-type'
  * @returns
  */
 const Home = () => {
-	const { isLogin, user, signal } = useUserStore()
+	const { isLogin, signal, user } = useUserStore()
 	// const { chats, updateChats } = useChatsStore()
 	const device = getDevice()
+
+	// 会话
+	const [sessionCipher, setSessionCipher] = useState()
+
+	async function init(user_id) {
+		try {
+			// 获取对方信息
+			const data = await WebDB.session.where('user_id').equals(user_id).first()
+
+			console.log('查找到用户信息', data, user_id)
+
+			// 对方的仓库
+			const store = new SignalProtocolStore(toArrayBuffer(data.store))
+			// 初始化对方地址
+			const addr = new SignalProtocolAddress(data.directory.deviceName, data.directory.deviceId)
+			// 初始化会话
+			const cipher = new SessionCipher(store, addr)
+
+			setSessionCipher(cipher)
+
+			return cipher
+		} catch (error) {
+			console.log('消息初始化失败', error)
+			return null
+		}
+	}
 
 	// Framework7 Parameters
 	const f7params = {
@@ -77,7 +103,7 @@ const Home = () => {
 				console.log('添加被拒绝处理')
 				return
 			} else {
-				console.log("出来");
+				console.log('出来')
 				// 对方的公钥
 				const directory = JSON.parse(msg.data?.e2e_public_key || '{}')
 
@@ -87,33 +113,38 @@ const Home = () => {
 					.equals(msg.data?.user_id || '')
 					.first()
 
-				const newObj = { ...directory, user_id: msg.data?.user_id, directory  }
+				const newObj = { ...directory, user_id: msg.data?.user_id }
 
 				if (directoryId) {
-					WebDB.keypairs.update(directoryId.id, newObj)
+					await WebDB.keypairs.update(directoryId.id, newObj)
 				} else {
-					WebDB.keypairs.add(newObj)
+					await WebDB.keypairs.add(newObj)
 				}
 
 				// 查找是否已经有会话了
-				const user = await WebDB.session
+				const session = await WebDB.session
 					.where('user_id')
 					.equals(msg.data?.user_id || '')
 					.first()
 
-				if (user) return
+				console.log('是否已经有session', session)
+
+				if (session) return
 
 				// 对方的地址
 				const address = new SignalProtocolAddress(directory.deviceName, directory.deviceId)
 				// 自己的仓库
 				const store = new SignalProtocolStore(toArrayBuffer(signal.store))
+				// 创建会话
+				// const cipher = new SessionCipher(store, address)
 				// 初始化会话
-				await cretaeSession(store, address, toArrayBuffer(directory))
-				
-				console.log("toBase64(store)",toBase64(store));
-				WebDB.session.add({
+				const sess = await cretaeSession(store, address, toArrayBuffer(directory))
+				console.log('sess', sess)
+				console.log('toBase64(store)', toBase64(store))
+				await WebDB.session.add({
 					store: toBase64(store),
-					user_id: msg.data?.user_id
+					user_id: msg.data?.user_id,
+					directory
 				})
 			}
 		} catch (error) {
@@ -121,15 +152,10 @@ const Home = () => {
 		}
 	}
 
-	// const switchE2EKey = async (msg) => {
-	// 	// const res = await switchE2EKeyApi({ public_key: JSON.stringify(directory), user_id: msg.data.user_id })
-	// 	// console.log('交换公钥', res)
-	// }
-
 	// 连接ws并监听消息推送
 	useEffect(() => {
 		if (!isLogin) return
-		// console.log(user.nick_name, user.user_id)
+
 		WebSocketClient.closeConnection()
 		WebSocketClient.connect()
 
@@ -145,21 +171,20 @@ const Home = () => {
 				console.log('好友管理', data.data)
 				// WebSocketClient.triggerEvent('onManager', data)
 				updateKey(data, data.event)
-
-				// if (data.event === 8) {
-				// 	switchE2EKey(data)
-				// }
 			}
 		})
 
 		WebSocketClient.addListener('onMessage', async (msg) => {
 			if (msg.event === 3) {
-				// console.log(msg)
+				// console.log("msg",msg);
+				// 重连会话
+				const cipher = await init(msg.data.sender_id)
+				console.log('解密后消息', msg.data.content)
 				const message = {
 					// id: '', // msg_id: '', // 消息id
 					sender_id: '', // 发送者id
 					receiver_id: msg.uid, // 接收者id
-					content: msg.data.content,
+					content: await decrypt(JSON.parse(msg.data.content), cipher),
 					content_type: msg.data.msgType, // 消息类型 => 1: 文本消息
 					type: 'received', // 接收方
 					reply_id: msg.data.reply_id, // 所回复消息的id
@@ -168,7 +193,7 @@ const Home = () => {
 					dialog_id: msg.data.dialog_id, // 会话id
 					send_state: 'ok' // 发送成功/接收成功
 				}
-				// console.log(message)
+				console.log('解密后消息', message.content)
 				// 消息持久化
 				const msgId = await WebDB.messages.add(message)
 				console.log(msgId)
@@ -180,39 +205,6 @@ const Home = () => {
 				chat && WebDB.chats.update(chat.id, { last_message: message.content, msg_id: msgId })
 			}
 		})
-		;(async () => {
-			const test = await WebDB.users
-				.where('user_id')
-				.equals(user.user_id || '')
-				.first()
-
-			console.log('user', test)
-			// const newSignal = stringToClass(test.signal)
-
-			// console.log("newSignal",newSignal);
-		})()
-
-		// WebSocketClient.addListener('onManager', async (msg) => {
-		// 	// 发自己的公钥给对面
-		// 	// const res = await switchE2EKeyApi({ public_key: JSON.stringify(directory), user_id: msg.data.user_id })/
-		// 	// console.log('交换公钥', res)
-		// })
-
-		// try {
-		// 	// console.log("signal",signal.directory._data[signal.deviceName])
-		// 	const directory = signal.directory._data[signal.deviceName]
-		// 	const obj = {
-		// 		...directory,
-		// 		deviceName: signal.deviceName,
-		// 		deviceId: signal.deviceId
-		// 	}
-		// 	const data = JSON.stringify(toBase64(obj))
-		// 	console.log("userStore",JSON.stringify(toBase64(obj)))
-		// 	// 交换信令
-		// 	switchE2EKeyApi({public_key:data, user_id:"787bb5d3-7e63-43d0-ad4f-4c3e5f31a71c"})
-		// } catch (error) {
-		// 	console.log("交换密钥失败",error)
-		// }
 	}, [isLogin])
 
 	return (
