@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { getDevice } from 'framework7/lite-bundle'
 // import './i18n'
 // import '@/config'
@@ -26,12 +26,12 @@ import { SignalProtocolStore } from '@/utils/signal/storage-type'
  * @returns
  */
 const Home = () => {
-	const { isLogin, signal, user } = useUserStore()
+	const { isLogin, signal } = useUserStore()
 	// const { chats, updateChats } = useChatsStore()
 	const device = getDevice()
 
 	// 会话
-	const [sessionCipher, setSessionCipher] = useState()
+	// const [sessionCipher, setSessionCipher] = useState()
 
 	async function init(user_id) {
 		try {
@@ -47,7 +47,7 @@ const Home = () => {
 			// 初始化会话
 			const cipher = new SessionCipher(store, addr)
 
-			setSessionCipher(cipher)
+			// setSessionCipher(cipher)
 
 			return cipher
 		} catch (error) {

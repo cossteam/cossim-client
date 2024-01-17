@@ -12,10 +12,10 @@ import _ from 'lodash-es'
 import { sendToUser } from '@/api/msg'
 // import { switchE2EKeyApi } from '@/api/relation'
 
-import WebSocketClient from '@/utils/WebSocketClient'
+// import WebSocketClient from '@/utils/WebSocketClient'
 
 // TODO: 添加好友时交换双方密钥（地址）
-import { toArrayBuffer, decrypt, encrypt } from '@/utils/signal/signal-protocol'
+import { toArrayBuffer, encrypt } from '@/utils/signal/signal-protocol'
 import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 import { SignalProtocolStore } from '@/utils/signal/storage-type'
 
