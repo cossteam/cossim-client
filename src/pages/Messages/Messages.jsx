@@ -15,7 +15,7 @@ import { switchE2EKeyApi } from '@/api/relation'
 import WebSocketClient from '@/utils/WebSocketClient'
 
 // TODO: 添加好友时交换双方密钥（地址）
-import Signal, { toArrayBuffer } from '@/utils/signal/signal-protocol'
+import Signal, { toArrayBuffer, cretaeSession, decrypt, encrypt } from '@/utils/signal/signal-protocol'
 import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 
 MessagesPage.propTypes = {
@@ -42,7 +42,7 @@ export default function MessagesPage({ f7route }) {
 	const [contact, setContact] = useState({})
 
 	useEffect(() => {
-		console.log('接收人', ReceiverId)
+		// console.log('接收人', ReceiverId)
 		if (!ReceiverId) return
 		;async () => {
 			const contact = await WebDB.contacts.where('user_id').equals(ReceiverId).first()
@@ -50,44 +50,36 @@ export default function MessagesPage({ f7route }) {
 		}
 	}, [ReceiverId])
 
-	// const DESKTOP1 = UserId
-	// const DESKTOP2 = ReceiverId
-
-	// 地址
-	// const [address] = useState(new SignalProtocolAddress())
-	// 会话 session
-	// const [sessionCipher] = useState(new SessionCipher(signal.store, address))
-
 	// 初始化
 	async function init() {
 		try {
-			newSignal.store._store = toArrayBuffer(signal.store._store)
+			// newSignal.store._store = toArrayBuffer(signal.store._store)
+
+			const store = toArrayBuffer(signal.store._store)
 
 			// 获取对方信息
 			const data = await WebDB.keypairs.where('user_id').equals(ReceiverId).first()
 
-			// 如果找不到用户，就交换公钥
-			const res = await switchE2EKeyApi({ user_id: ReceiverId, public_key: JSON.stringify(directory) })
-			if (res.code !== 200) return f7.dialog.alert(res.msg)
+			// todo: 如果找不到用户公钥信息，就从服务器上获取
+			// const res = await switchE2EKeyApi({ user_id: ReceiverId, public_key: JSON.stringify(directory) })
+			// if (res.code !== 200) return f7.dialog.alert(res.msg)
 
 			// 初始化地址
 			const addr = new SignalProtocolAddress(data.deviceName, data.deviceId)
 			// 初始化会话
-			const cipher = new SessionCipher(newSignal.store, addr)
+			const cipher = new SessionCipher(store, addr)
 
 			setAddress(addr)
 			setSessionCipher(cipher)
 
-			delete data.deviceName
-			delete data.user_id
-			delete data.deviceId
+			// delete data.deviceName
+			// delete data.user_id
+			// delete data.deviceId
 
-			setNewSignal(newSignal)
-
-			console.log('获取用户信息', data)
+			// setNewSignal(newSignal)
 
 			// 创建会话
-			await newSignal.cretaeSession(newSignal.store, addr, toArrayBuffer(data))
+			await cretaeSession(store, addr, toArrayBuffer(data))
 		} catch (error) {
 			console.log('消息初始化失败', error)
 		}
@@ -107,20 +99,26 @@ export default function MessagesPage({ f7route }) {
 	// const [isActive, setIsActive] = useState(true)
 
 	useEffect(() => {
-		// ;(async() => {
-		// 	if (allMsg.length > 0 && sessionCipher) {
-		// 		// console.log(await newSignal.decrypt(JSON.parse(allMsg[0].content), sessionCipher))
-		// 		console.log(allMsg);
-		// 		console.log(allMsg.map(m => {
-		// 			return newSignal.decrypt(JSON.parse(m.content), sessionCipher).then(e => {
-		// 				console.log(e);
-		// 				return e
-		// 			})
-		// 		}))
-		// 	}
-		// })()
 		setMessages(allMsg)
-	}, [allMsg, sessionCipher])
+		// 解密
+		;(async () => {
+			console.log("触发解密",sessionCipher)
+			if (!sessionCipher) return
+			const arr =  await allMsg.map(async (v) => {
+				try {
+					return {
+						...v,
+						content: await decrypt(JSON.parse(v.content), sessionCipher)
+					}
+				} catch(error) {
+					console.log("解密失败",error);
+					return v
+				}
+			})
+			console.log("arr",arr);
+			setMessages(arr)
+		})()
+	}, [sessionCipher])
 
 	// 倒序分页查询
 	// async function reversePageQuery(pageSize, pageIndex) {
@@ -191,13 +189,13 @@ export default function MessagesPage({ f7route }) {
 	// 	}
 	// }
 
-	WebSocketClient.addListener('onMessage', async (message) => {
-		if (sessionCipher) {
-			console.log('message', message.data.content)
-			const emd = await newSignal.decrypt(JSON.parse(message.data.content), sessionCipher)
-			console.log('解密', emd)
-		}
-	})
+	// WebSocketClient.addListener('onMessage', async (message) => {
+	// 	if (sessionCipher) {
+	// 		console.log('message', message.data.content)
+	// 		const emd = await newSignal.decrypt(JSON.parse(message.data.content), sessionCipher)
+	// 		console.log('解密', emd)
+	// 	}
+	// })
 
 	// 初始化后执行
 	useEffect(() => {
@@ -254,7 +252,7 @@ export default function MessagesPage({ f7route }) {
 	}
 	const sendMessage = async (type, content) => {
 		try {
-			const encrypted = await newSignal.encrypt(content, sessionCipher)
+			const encrypted = await encrypt(content, sessionCipher)
 			console.log('发送消息', encrypted)
 			let send_state = 'sending'
 			const dbMsg = {

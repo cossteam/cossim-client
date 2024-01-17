@@ -22,12 +22,13 @@ export default function NewContact() {
 			if (res.code !== 200) return
 			let newUsers = res.data
 			if (!res.data) {
-                newUsers = []
+				newUsers = []
 			} else {
 				newUsers = newUsers?.map((user) => {
 					return {
 						...user,
-						isActive: false
+						// 0 初始状态 1 已同意 2 已拒绝
+						status: 0
 					}
 				})
 			}
@@ -40,11 +41,12 @@ export default function NewContact() {
 		tips: $t('对方没有留言'),
 		btn_agree: $t('同意'),
 		btn_refuse: $t('拒绝'),
-        agree: $t('已同意'),
+		agree: $t('已同意'),
+		refuse: $t('已拒绝')
 	}
 
 	// 同意或拒绝添加好友
-	const confirm = async (id,status) => {
+	const confirm = async (id, status) => {
 		const res = await confirmAddFriendApi({ user_id: id, e2e_public_key: directory, status })
 		if (res.code !== 200) return
 
@@ -52,14 +54,15 @@ export default function NewContact() {
 			if (user.user_id === id) {
 				return {
 					...user,
-					isActive: true
+					// 0 初始状态 1 已同意 2 已拒绝
+					status: status === 0 ? 2 : 1
 				}
 			}
 			return user
 		})
 
-        // todo: 添加好友到本地
-        // WebDB.contacts.add({  })
+		// todo: 添加好友到本地
+		// WebDB.contacts.add({  })
 
 		setUsers(newUsers)
 	}
@@ -86,8 +89,14 @@ export default function NewContact() {
 							{chat?.msg || text.tips}
 						</span>
 
-						{chat.isActive ? (
-							<span className="text-gray-500 text-sm whitespace-nowrap pr-2" slot="content">{text.agree}</span>
+						{chat.status === 1 ? (
+							<span className="text-gray-500 text-sm whitespace-nowrap pr-2" slot="content">
+								{text.agree}
+							</span>
+						) : chat.status === 2 ? (
+							<span className="text-gray-500 text-sm whitespace-nowrap pr-2" slot="content">
+								{text.refuse}
+							</span>
 						) : (
 							<div slot="content" className="pr-2 flex">
 								<Button className="text-sm text-red-500" onClick={() => confirm(chat?.user_id, 0)}>

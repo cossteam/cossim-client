@@ -18,16 +18,15 @@ export default class Signal {
 	// 设备 ID
 	deviceId = 0
 
-
 	/**
 	 * 实例化
 	 * @param {*} name 			名称
 	 * @param {*} deviceId 		设备id
 	 */
-	constructor(name,deviceId) {
+	constructor(name, deviceId) {
 		this.deviceName = name
 		this.deviceId = deviceId
-		this.address = new SignalProtocolAddress(name,deviceId)
+		this.address = new SignalProtocolAddress(name, deviceId)
 	}
 
 	/**
@@ -76,12 +75,15 @@ export default class Signal {
 		// 存储签名密钥
 		this.store.storeSignedPreKey(`${signedPreKeyId}`, signedPreKey.keyPair)
 
-		this.directory.storeKeyBundle(name, toBase64({
-			registrationId,
-			identityPubKey: identityKeyPair.pubKey,
-			signedPreKey: publicSignedPreKey,
-			oneTimePreKeys: [publicPreKey]
-		}))
+		this.directory.storeKeyBundle(
+			name,
+			toBase64({
+				registrationId,
+				identityPubKey: identityKeyPair.pubKey,
+				signedPreKey: publicSignedPreKey,
+				oneTimePreKeys: [publicPreKey]
+			})
+		)
 
 		this.store._store = toBase64(this.store._store)
 
@@ -141,13 +143,65 @@ export default class Signal {
 
 		if (msg.type === 3) {
 			plaintext = await cipher.decryptPreKeyWhisperMessage(base64ToString(msg.body), 'binary')
+			// await cipher.decryptPreKeyWhisperMessage(base64ToString(msg.body), 'binary')
 		} else if (msg.type === 1) {
 			plaintext = await cipher.decryptWhisperMessage(base64ToString(msg.body), 'binary')
+			// await cipher.decryptWhisperMessage(base64ToString(msg.body), 'binary')
 		}
 		const stringPlaintext = new TextDecoder().decode(new Uint8Array(plaintext))
 
 		return stringPlaintext
 	}
+}
+
+/**
+ * 创建会话
+ * @returns {Promise<IdentityType>}
+ */
+export async function cretaeSession(userStore, recipientAddress, bundle) {
+	const sessionBuilder = new SessionBuilder(userStore, recipientAddress)
+	await sessionBuilder.processPreKey(bundle)
+}
+
+/**
+ * 加密消息
+ * @param {string} msg  要加密的消息
+ * @param {SessionCipher} cipher
+ * @returns
+ */
+export async function encrypt(msg, cipher) {
+	// 把消息转为 ArrayBuffer
+	const buffer = new TextEncoder().encode(msg).buffer
+
+	// 加密
+	const ciphertext = await cipher.encrypt(buffer)
+
+	const result = {
+		...ciphertext,
+		// 把消息转为 base64
+		body: stringToBase64(ciphertext.body)
+	}
+
+	return result
+}
+
+/**
+ * 解密消息
+ * @param {MessageType} msg  要解密的消息
+ * @param {SessionCipher} cipher
+ * @returns {SessionCipher}
+ */
+export async function decrypt(msg, cipher) {
+	let plaintext = new Uint8Array().buffer
+
+	if (msg.type === 3) {
+		plaintext = await cipher.decryptPreKeyWhisperMessage(base64ToString(msg.body), 'binary')
+	} else if (msg.type === 1) {
+		plaintext = await cipher.decryptWhisperMessage(base64ToString(msg.body), 'binary')
+	}
+	const stringPlaintext = new TextDecoder().decode(new Uint8Array(plaintext))
+
+	return stringPlaintext
 }
 
 /**

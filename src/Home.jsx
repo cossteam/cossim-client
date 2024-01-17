@@ -109,9 +109,14 @@ const Home = () => {
 
 			// event: 6 => 收到好友请求 event: 7 => 收到好友确认 event: 8 => 公钥交换
 			if (data.event === 6 || data.event === 7 || data.event === 8) {
-				// console.log('好友管理', data)
+				console.log('好友管理', data.data)
 				// WebSocketClient.triggerEvent('onManager', data)
-				updateKey(data)
+
+				// 同意添加好友
+				if (data.status && data.status === 1) {
+					updateKey(data)
+				}
+				
 
 				// if (data.event === 8) {
 				// 	switchE2EKey(data)
@@ -148,11 +153,11 @@ const Home = () => {
 			}
 		})
 
-		WebSocketClient.addListener('onManager', async (msg) => {
-			// 发自己的公钥给对面
-			// const res = await switchE2EKeyApi({ public_key: JSON.stringify(directory), user_id: msg.data.user_id })/
-			// console.log('交换公钥', res)
-		})
+		// WebSocketClient.addListener('onManager', async (msg) => {
+		// 	// 发自己的公钥给对面
+		// 	// const res = await switchE2EKeyApi({ public_key: JSON.stringify(directory), user_id: msg.data.user_id })/
+		// 	// console.log('交换公钥', res)
+		// })
 
 		// try {
 		// 	// console.log("signal",signal.directory._data[signal.deviceName])
