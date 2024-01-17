@@ -1,4 +1,6 @@
 import { KeyHelper, SessionBuilder, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
+import {  } from '@privacyresearch/libsignal-protocol-typescript'
+
 import { SignalProtocolStore } from './storage-type'
 import { cloneDeep } from 'lodash-es'
 import { SignalDirectory } from './signal-directory'
@@ -152,6 +154,17 @@ export default class Signal {
 
 		return stringPlaintext
 	}
+
+	/**
+	 * 恢复会话
+	 * @param {IdentityType} identity
+	 * @returns
+	 */
+	async restoreSession(identity) {
+		const bundle = await this.directory.getKeyBundle(identity.name)
+		const sessionBuilder = new SessionBuilder(this.store, identity.address)
+		await sessionBuilder.processPreKey(bundle)
+	}
 }
 
 /**
@@ -160,7 +173,7 @@ export default class Signal {
  */
 export async function cretaeSession(userStore, recipientAddress, bundle) {
 	const sessionBuilder = new SessionBuilder(userStore, recipientAddress)
-	await sessionBuilder.processPreKey(bundle)
+	return await sessionBuilder.processPreKey(bundle)
 }
 
 /**
@@ -227,6 +240,11 @@ export function arrayBufferToBase64(arr) {
  * @returns
  */
 export function base64ArrayBuffer(str) {
+	// console.log("base64 转 ArrayBuffer", str)
+	// 如果不是 base64 字符串，则转换为 base64
+	if (str.length % 4 !== 0) {
+		str += '='.repeat(4 - (str.length % 4))
+	}
 	// 使用atob将Base64字符串转换为二进制字符串
 	const binaryString = atob(str)
 
@@ -269,7 +287,7 @@ export function toArrayBuffer(obj, isClone = true) {
 	const clone = isClone ? cloneDeep(obj) : obj
 	Object.keys(clone).forEach(async (key) => {
 		// 判断是否是 base64 字符
-		if (typeof clone[key] === 'string') {
+		if (typeof clone[key] === 'string' && isBase64(clone[key])) {
 			clone[key] = base64ArrayBuffer(clone[key])
 		}
 
@@ -295,4 +313,11 @@ export function stringToBase64(str) {
  */
 export function base64ToString(str) {
 	return new TextDecoder().decode(base64ArrayBuffer(str))
+}
+
+
+function isBase64(str) {
+	// 使用正则表达式检查字符串是否符合Base64编码格式
+	const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/
+	return base64Regex.test(str)
 }

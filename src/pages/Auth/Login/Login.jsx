@@ -10,6 +10,11 @@ import { validEmail } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
 
+// import WebDB from '@/db'
+// import { classToString } from '@/utils/utils'
+
+// import { useSignalStore } from '@/stores/signal'
+
 // import PGP from '@/utils/PGP'
 // import { SignalDirectory } from '@/utils/signal-directory'
 import Signal, { toBase64 } from '@/utils/signal/signal-protocol'
@@ -32,6 +37,9 @@ export default function Login({ disabled }) {
 
 	// 用户信息
 	const userStore = useUserStore()
+
+	// signal
+	// const signalStore = useSignalStore()
 
 	// 错误信息列表
 	const errorList = {
@@ -102,10 +110,6 @@ export default function Login({ disabled }) {
 			// 生成信令
 			const info = await signal.ceeateIdentity(signal.deviceName)
 
-			// 更新信令
-			userStore.updateIdentity({ ...info })
-			userStore.updateSignal(signal)
-
 			const directory = signal.directory?.getPreKeyBundle(signal.deviceName) || {}
 			const obj = {
 				...directory,
@@ -114,22 +118,34 @@ export default function Login({ disabled }) {
 			}
 			const data = JSON.stringify(toBase64(obj))
 
+			// 更新信令
+			userStore.updateIdentity({ ...info })
+			userStore.updateSignal(signal)
 			userStore.updateDirectory(data)
 
-			window.signal = signal
-			// const directory = signal.directory.getPreKeyBundle(deviceName)
-			// const obj = {
-			// 	...directory,
-			// 	deviceName: deviceName,
-			// 	deviceId: deviceId
-			// }
-			// const data = JSON.stringify(toBase64(obj))
-			// console.log("userStore",JSON.stringify(toBase64(obj)))
+			// 存储类
+			// signalStore.updateSignal(signal)
+			// signalStore.updateState({ info, directory: data })
 
-			// // 交换信令
-			// switchE2EKeyApi({public_key:data, user_id:userStore.user.user_id})
-			// return
+			// window.signal = signal
 
+			// 查找本地数据库中是否存在有该用户
+			// const user = await WebDB.users.where('user_id').equals(decryptedData?.data.user_info?.user_id).first()
+
+			// if (!user) {
+			// 	// 添加用户
+			// 	await WebDB.users.add({
+			// 		signal: classToString(signal),
+			// 		state: {
+			// 			directory: toBase64(directory),
+			// 			identity: info.base64
+			// 		},
+			// 		user_id: decryptedData?.data.user_info?.user_id
+			// 	})
+			// } 
+
+			// window.signal = signal
+	
 			userStore.updateLogin(true)
 			setLoading(false)
 			window.location.href = '/'

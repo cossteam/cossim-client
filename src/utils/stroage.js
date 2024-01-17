@@ -13,3 +13,4 @@ export function getStorage(name = storageName) {
 		return null
 	}
 }
+
