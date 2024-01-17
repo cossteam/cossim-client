@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Page, Navbar, List, ListItem, SwipeoutActions, SwipeoutButton, Button } from 'framework7-react'
+import { f7, Page, Navbar, List, ListItem, SwipeoutActions, SwipeoutButton, Button } from 'framework7-react'
 // import PropTypes from 'prop-types'
 import { friendApplyListApi, confirmAddFriendApi } from '@/api/relation'
+import { groupRequestListApi } from '@/api/group'
 import { useUserStore } from '@/stores/user'
 
 import { $t } from '@/i18n'
@@ -12,15 +13,26 @@ import { $t } from '@/i18n'
 // }
 
 export default function NewContact() {
-	const [users, setUsers] = useState([])
-
 	const { directory } = useUserStore()
 
+	const [users, setUsers] = useState([])
 	useEffect(() => {
 		;(async () => {
+			groupRequestListApi()
+				.then(({ code, data }) => {
+					if (code !== 200) {
+						return
+					}
+					// TODO: 展示群请求列表
+					console.log(data)
+				})
+				.catch((err) => {
+					console.log(err)
+				})
 			const res = await friendApplyListApi()
 			if (res.code !== 200) return
 			let newUsers = res.data
+			console.log(newUsers)
 			if (!res.data) {
 				newUsers = []
 			} else {
@@ -33,7 +45,6 @@ export default function NewContact() {
 				})
 			}
 			setUsers(newUsers)
-			// console.log('users', newUsers)
 		})()
 	}, [])
 
@@ -69,7 +80,7 @@ export default function NewContact() {
 
 	return (
 		<Page noToolbar className="new-contact">
-			<Navbar title={$t('新朋友')} backLink="Back" backLinkShowText="" />
+			<Navbar title={$t('新请求')} backLink="Back" backLinkShowText="" />
 			<List noChevron dividers mediaList className="my-0">
 				{users.map((chat) => (
 					<ListItem

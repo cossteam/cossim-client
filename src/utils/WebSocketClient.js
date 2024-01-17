@@ -25,7 +25,7 @@ class WebSocketClient {
 
 			this.socket.addEventListener('message', (event) => {
 				this.triggerEvent('onWsMessage', event)
-				console.log('收到消息:', event.data)
+				// console.log('收到消息:', event.data)
 				// 在这里处理收到的消息，更新UI或执行其他操作
 			})
 
@@ -71,7 +71,7 @@ class WebSocketClient {
 			this.listeners[eventType] = this.listeners[eventType].filter((cb) => cb !== callback)
 		}
 	}
-	
+
 	// 触发监听器
 	triggerEvent(eventType, event) {
 		if (this.listeners[eventType]) {

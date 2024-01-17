@@ -11,6 +11,7 @@ import ChatTest from '@/pages/ChatTest'
 import UserInfo from '@/pages/UserInfo/Userinfo'
 import UpdateUserInfo from '@/pages/UpdateUserInfo/UpdateUserInfo'
 import NewContact from '@/pages/NewContact/NewContact'
+import GroupList from '@/pages/Group/GroupList/GroupList'
 
 var routes = [
 	{
@@ -60,6 +61,10 @@ var routes = [
 	{
 		path: '/updateuserinfo/:key/',
 		component: UpdateUserInfo
+	},
+	{
+		path: '/groups/',
+		component: GroupList
 	},
 	{
 		path: '(.*)',
