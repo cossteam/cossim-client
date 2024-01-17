@@ -15,15 +15,18 @@ import WebSocketClient from '@/utils/WebSocketClient'
 import WebDB from '@/db'
 // import { useLiveQuery } from 'dexie-react-hooks'
 
-import { switchE2EKeyApi } from '@/api/relation'
+// import { switchE2EKeyApi } from '@/api/relation'
 // import { toBase64 } from '@/utils/signal/signal-protocol'
+import { toArrayBuffer, cretaeSession, toBase64 } from '@/utils/signal/signal-protocol'
+import { SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
+import { SignalProtocolStore } from '@/utils/signal/storage-type'
 
 /**
  * 这里主要做一些全局配置之类的事情
  * @returns
  */
 const Home = () => {
-	const { isLogin, user } = useUserStore()
+	const { isLogin, user, signal } = useUserStore()
 	// const { chats, updateChats } = useChatsStore()
 	const device = getDevice()
 
@@ -63,40 +66,70 @@ const Home = () => {
 		}
 	})
 
-	const { directory } = useUserStore()
+	// const { directory } = useUserStore()
 
 	const updateKey = async (msg) => {
 		try {
-			const directory = JSON.parse(msg.data?.e2e_public_key || '')
-			// 先查找数据库中有无这个用户，如果有就修改，如果无就添加
-			const directoryId = await WebDB.keypairs
-				.where('user_id')
-				.equals(msg.data?.user_id || '')
-				.first()
-			const newObj = {
-				...directory,
-				user_id: msg.data?.user_id
-			}
-			console.log('directoryId', directoryId)
-			if (directoryId) {
-				WebDB.keypairs.update(directoryId.id, newObj)
+			console.log('msg.data.status', msg.data.status, msg)
+			// debugger
+			if (msg.data?.status === 0) {
+				// todo: 添加被拒绝处理
+				console.log('添加被拒绝处理')
 				return
+			} else {
+				console.log("出来");
+				// 对方的公钥
+				const directory = JSON.parse(msg.data?.e2e_public_key || '{}')
+
+				// 先查找数据库中有无这个用户，如果有就修改，如果无就添加
+				const directoryId = await WebDB.keypairs
+					.where('user_id')
+					.equals(msg.data?.user_id || '')
+					.first()
+
+				const newObj = { ...directory, user_id: msg.data?.user_id, directory  }
+
+				if (directoryId) {
+					WebDB.keypairs.update(directoryId.id, newObj)
+				} else {
+					WebDB.keypairs.add(newObj)
+				}
+
+				// 查找是否已经有会话了
+				const user = await WebDB.session
+					.where('user_id')
+					.equals(msg.data?.user_id || '')
+					.first()
+
+				if (user) return
+
+				// 对方的地址
+				const address = new SignalProtocolAddress(directory.deviceName, directory.deviceId)
+				// 自己的仓库
+				const store = new SignalProtocolStore(toArrayBuffer(signal.store))
+				// 初始化会话
+				await cretaeSession(store, address, toArrayBuffer(directory))
+				
+				console.log("toBase64(store)",toBase64(store));
+				WebDB.session.add({
+					store: toBase64(store),
+					user_id: msg.data?.user_id
+				})
 			}
-			WebDB.keypairs.add(newObj)
 		} catch (error) {
 			console.log('error', error)
 		}
 	}
 
-	const switchE2EKey = async (msg) => {
-		// const res = await switchE2EKeyApi({ public_key: JSON.stringify(directory), user_id: msg.data.user_id })
-		// console.log('交换公钥', res)
-	}
+	// const switchE2EKey = async (msg) => {
+	// 	// const res = await switchE2EKeyApi({ public_key: JSON.stringify(directory), user_id: msg.data.user_id })
+	// 	// console.log('交换公钥', res)
+	// }
 
 	// 连接ws并监听消息推送
 	useEffect(() => {
 		if (!isLogin) return
-		console.log(user.nick_name, user.user_id)
+		// console.log(user.nick_name, user.user_id)
 		WebSocketClient.closeConnection()
 		WebSocketClient.connect()
 
@@ -108,15 +141,10 @@ const Home = () => {
 			}
 
 			// event: 6 => 收到好友请求 event: 7 => 收到好友确认 event: 8 => 公钥交换
-			if (data.event === 6 || data.event === 7 || data.event === 8) {
+			if (data.event === 6 || data.event === 7) {
 				console.log('好友管理', data.data)
 				// WebSocketClient.triggerEvent('onManager', data)
-
-				// 同意添加好友
-				if (data.status && data.status === 1) {
-					updateKey(data)
-				}
-				
+				updateKey(data, data.event)
 
 				// if (data.event === 8) {
 				// 	switchE2EKey(data)
@@ -152,6 +180,17 @@ const Home = () => {
 				chat && WebDB.chats.update(chat.id, { last_message: message.content, msg_id: msgId })
 			}
 		})
+		;(async () => {
+			const test = await WebDB.users
+				.where('user_id')
+				.equals(user.user_id || '')
+				.first()
+
+			console.log('user', test)
+			// const newSignal = stringToClass(test.signal)
+
+			// console.log("newSignal",newSignal);
+		})()
 
 		// WebSocketClient.addListener('onManager', async (msg) => {
 		// 	// 发自己的公钥给对面

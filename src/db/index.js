@@ -65,6 +65,18 @@ WebDB.version(WEBDB_VERSION).stores({
 		registrationId,
 		signedPreKey,
 		user_id
+	`,
+	session: `
+		++id,
+		store,
+		directory,
+		user_id
+	`,
+	users: `
+		++id,
+		signal,
+		state,
+		user_id
 	`
 })
 
