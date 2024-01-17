@@ -149,7 +149,7 @@ export default function MessagesPage({ f7route }) {
 			for (let i = 0; i < respData.length; i++) {
 				const item = respData[i]
 				const oldItem = oldData.find((oldItem) => oldItem.id === item.id)
-				oldItem ? await WebDB.messages.update(oldItem.id, item) : await WebDB.messages.put(item)
+				oldItem ? await WebDB.messages.update(oldItem.id, item) : await WebDB.messages.add(item)
 			}
 		} catch (error) {
 			console.log(error)

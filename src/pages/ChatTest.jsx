@@ -74,7 +74,7 @@ export default function Chats() {
 			for (let i = 0; i < respData.length; i++) {
 				const item = respData[i]
 				const oldItem = oldData.find((oldItem) => oldItem.dialog_id === item.dialog_id)
-				oldItem ? await WebDB.chats.update(oldItem.dialog_id, item) : await WebDB.chats.put(item)
+				oldItem ? await WebDB.chats.update(oldItem.dialog_id, item) : await WebDB.chats.add(item)
 			}
 		})()
 	}, [])

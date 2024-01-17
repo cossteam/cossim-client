@@ -58,7 +58,7 @@ export default function Contacts() {
 			for (let i = 0; i < respData.length; i++) {
 				const item = respData[i]
 				const oldItem = oldData.find((oldItem) => oldItem.user_id === item.user_id)
-				oldItem ? await WebDB.contacts.update(oldItem.id, item) : await WebDB.contacts.put(item)
+				oldItem ? await WebDB.contacts.update(oldItem.id, item) : await WebDB.contacts.add(item)
 			}
 		})()
 	}, [])

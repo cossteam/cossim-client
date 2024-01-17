@@ -70,11 +70,14 @@ export default function Chats() {
 					)
 				}) || []
 			const oldData = (await WebDB.chats.toArray()) || []
+			console.log('oldData', oldData)
 			// 校验新数据和旧数据 => 更新数据 or 插入数据库
 			for (let i = 0; i < respData.length; i++) {
 				const item = respData[i]
 				const oldItem = oldData.find((oldItem) => oldItem.dialog_id === item.dialog_id)
-				oldItem ? await WebDB.chats.update(oldItem.dialog_id, item) : await WebDB.chats.put(item)
+				console.log('oldItem', oldItem)
+				console.log('item', item)
+				oldItem ? await WebDB.chats.update(oldItem.dialog_id, item) : await WebDB.chats.add(item)
 			}
 		})()
 	}, [])
