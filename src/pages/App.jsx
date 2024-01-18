@@ -34,21 +34,21 @@ export default function AppComponent() {
 						tabLink="#view-chats"
 						iconF7="chat_bubble_2"
 						text="聊天"
+						tabLinkActive
 						onClick={() => onTabLinkClick('chats')}
 					/>
 					<Link
 						tabLink="#view-contacts"
 						iconF7="phone"
 						text="联系人"
-						tabLinkActive
 						onClick={() => onTabLinkClick('contacts')}
 					/>
 					<Link tabLink="#view-my" iconF7="person" text="我的" onClick={() => onTabLinkClick('my')} />
 				</Toolbar>
 			</>
 
-			<View id="view-chats" onTabShow={() => setActiveTab('chats')} tab url="/chats/" main />
-			<View id="view-contacts" onTabShow={() => setActiveTab('contacts')} tabActive tab url="/contacts/" />
+			<View id="view-chats" onTabShow={() => setActiveTab('chats')} tabActive tab url="/chats/" main />
+			<View id="view-contacts" onTabShow={() => setActiveTab('contacts')} tab url="/contacts/" />
 			<View id="view-my" onTabShow={() => setActiveTab('my')} name="my" tab url="/my/" />
 		</Views>
 	)

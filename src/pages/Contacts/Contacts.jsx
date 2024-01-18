@@ -7,7 +7,7 @@ import { $t } from '@/i18n'
 import './Contacts.less'
 import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useState } from 'react'
+import { useRelationRequestStore } from '@/stores/relationRequest'
 
 export default function Contacts() {
 	/**
@@ -68,27 +68,26 @@ export default function Contacts() {
 		})()
 	}, [])
 
-	// // 获取申请列表
-	// const [requestList, setRequestList] = useState({})
-	// useEffect(() => {
-	// 	;(async () => {
-	// 		try {
-	// 			const res = await Promise.allSettled([
-	// 				friendApplyListApi().then((res) => res.data),
-	// 				groupRequestListApi().then((res) => res.data)
-	// 			])
-	// 			console.log(res)
-	// 			console.log(res.map((i) => i.value))
-	// 			// setRequestList({
-	// 			//     requestList,
-	// 			//     ...item.value
-	// 			// })
-	// 			console.log(requestList)
-	// 		} catch (error) {
-	// 			console.log(error)
-	// 		}
-	// 	})()
-	// }, [])
+	// 获取申请列表
+	const { updateFriendResquest, updateGroupResquest } = useRelationRequestStore()
+	useEffect(() => {
+		console.log(123)
+		friendApplyListApi().then(({ data }) => {
+			updateFriendResquest(
+				data?.map((i) => ({
+					...i,
+					// 0 初始状态 1 已同意 2 已拒绝
+					status: 0
+				})) || []
+			)
+		})
+		groupRequestListApi().then(({ data }) => {
+			updateGroupResquest(
+				// 群聊申请列表 status 申请状态 (0=申请中, 1=已加入, 2=被拒绝, 3=被封禁)
+				data?.map((i) => i) || []
+			)
+		})
+	}, [])
 
 	return (
 		<Page className="contacts-page">

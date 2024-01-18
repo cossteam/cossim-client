@@ -105,7 +105,9 @@ export default function Chats() {
 				{chats.map((chat) => (
 					<ListItem
 						key={chat.dialog_id}
-						link={`/chats/${chat.user_id}/?dialog_id=${chat?.dialog_id || ''}`}
+						link={`/${chat.dialog_type === 1 ? 'groups' : 'chats'}/${chat.user_id}/?dialog_id=${
+							chat?.dialog_id || ''
+						}`}
 						title={chat.dialog_name}
 						after={chatsTimeFormat(chat.send_time)}
 						swipeout
