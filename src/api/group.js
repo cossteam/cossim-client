@@ -28,3 +28,16 @@ export function confirmAddGroupApi(data) {
 		data
 	})
 }
+
+/**
+ * 获取群聊列表
+ * @param {*} param
+ * @returns
+ */
+export function groupListApi(param) {
+	return request({
+		url: relationGroup + '/list',
+		method: 'GET',
+		params: param
+	})
+}

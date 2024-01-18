@@ -12,6 +12,7 @@ import UserInfo from '@/pages/UserInfo/Userinfo'
 import UpdateUserInfo from '@/pages/UpdateUserInfo/UpdateUserInfo'
 import NewContact from '@/pages/NewContact/NewContact'
 import GroupList from '@/pages/Group/GroupList/GroupList'
+import GroupChat from '@/pages/Group/GroupChat'
 
 var routes = [
 	{
@@ -65,6 +66,10 @@ var routes = [
 	{
 		path: '/groups/',
 		component: GroupList
+	},
+	{
+		path: '/groups/:id/',
+		component: GroupChat
 	},
 	{
 		path: '(.*)',
