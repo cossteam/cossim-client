@@ -1,71 +1,93 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getDevice } from 'framework7/lite-bundle'
-// import './i18n'
-// import '@/config'
-// import f7params from '@/config'
 import cordovaApp from '@/config/cordova-app'
-
-import AppComponent from './pages/App'
+import AppComponent from '@/pages/App'
 import { f7, App, f7ready, Views, View } from 'framework7-react'
-
 import routes from '@/config/routes'
 import { useUserStore } from '@/stores/user'
-// import { useChatsStore } from '@/stores/chats'
 import WebSocketClient from '@/utils/WebSocketClient'
-import WebDB from '@/db'
-// import { useLiveQuery } from 'dexie-react-hooks'
+import { dbService } from '@/db'
 
-// import { switchE2EKeyApi } from '@/api/relation'
-// import { toBase64 } from '@/utils/signal/signal-protocol'
-import { toArrayBuffer, cretaeSession, toBase64, decrypt } from '@/utils/signal/signal-protocol'
-import { SignalProtocolAddress, SessionCipher } from '@privacyresearch/libsignal-protocol-typescript'
+import { toArrayBuffer, cretaeSession, toBase64 } from '@/utils/signal/signal-protocol'
+import { SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 import { SignalProtocolStore } from '@/utils/signal/storage-type'
+// import { reconnectSession } from '@/utils/utils'
+
+/**
+ * 异步处理消息。
+ *
+ * @param {Object} msg -要处理的消息。
+ */
+const handlerMessage = async (msg) => {
+	// 重连会话
+	// const cipher = await reconnectSession(msg.data.sender_id)
+
+	// console.log('接收回来的东西', msg.data.content)
+	// let content = ''
+	// try {
+	// 	content = await decrypt(JSON.parse(msg.data.content), cipher)
+	// 	console.log('解密后消息', content)
+	// } catch (error) {
+	// 	console.log('解密失败', error)
+	// 	// 解密失败就返回原消息
+	// 	content = msg.data.content
+	// }
+
+	// content = await pgpEncrypt(content)
+
+	// console.log('pgpEncrypt后的消息', content)
+
+	const message = {
+		// 发送者id
+		sender_id: '',
+		// 接收者id
+		receiver_id: msg.uid,
+		// 消息内容
+		content: msg.data.content,
+		// 消息类型 => 1: 文本消息
+		content_type: msg.data.msgType,
+		// 接收方
+		type: 'received',
+		// 所回复消息的id
+		reply_id: msg.data.reply_id,
+		// 接收时间/读取时间
+		read_at: null,
+		// 发送时间
+		created_at: msg.data.send_at,
+		// 会话id
+		dialog_id: msg.data.dialog_id,
+		// 发送成功/接收成功
+		send_state: 'ok'
+	}
+
+	// 查找本地消息记录
+	const result = await dbService.findOneById(dbService.TABLES.MSGS, msg.data?.sender_id)
+
+	// 如果有记录就更新，没有就添加到表中
+	result
+		? dbService.update(dbService.TABLES.MSGS, msg.data?.sender_id, {
+				user_id: msg.data?.sender_id,
+				data: [...result.data, message]
+			})
+		: dbService.add(dbService.TABLES.MSGS, { user_id: msg.data?.sender_id, data: [message] })
+}
 
 /**
  * 这里主要做一些全局配置之类的事情
  * @returns
  */
 const Home = () => {
-	const { isLogin, signal } = useUserStore()
-	// const { chats, updateChats } = useChatsStore()
+	const { isLogin, user, signal, identity, directory } = useUserStore()
 	const device = getDevice()
 
-	// 会话
-	// const [sessionCipher, setSessionCipher] = useState()
-
-	async function init(user_id) {
-		try {
-			// 获取对方信息
-			const data = await WebDB.session.where('user_id').equals(user_id).first()
-
-			console.log('查找到用户信息', data, user_id)
-
-			// 对方的仓库
-			const store = new SignalProtocolStore(toArrayBuffer(data.store))
-			// 初始化对方地址
-			const addr = new SignalProtocolAddress(data.directory.deviceName, data.directory.deviceId)
-			// 初始化会话
-			const cipher = new SessionCipher(store, addr)
-
-			// setSessionCipher(cipher)
-
-			return cipher
-		} catch (error) {
-			console.log('消息初始化失败', error)
-			return null
-		}
-	}
-
 	// Framework7 Parameters
-	const f7params = {
+	const [f7params] = useState({
 		name: '', // App name
 		theme: 'auto', // Automatic theme detection
-
 		// App store
 		store: [],
 		// App routes
 		routes: routes,
-
 		// Input settings
 		input: {
 			scrollIntoViewOnFocus: device.cordova,
@@ -76,135 +98,131 @@ const Home = () => {
 			iosOverlaysWebView: true,
 			androidOverlaysWebView: false
 		},
-
 		colors: {
 			primary: '#33a854'
 		}
-	}
+	})
 
 	// TODO: 国际化
 	// i18next.changeLanguage('zh-CN')
 
-	f7ready(() => {
-		// 注册 cordova API
-		if (f7.device.cordova) {
-			cordovaApp.init(f7)
-		}
-	})
+	// 注册 cordova API
+	f7ready(() => f7.device.cordova && cordovaApp.init(f7))
 
-	// const { directory } = useUserStore()
-
-	const updateKey = async (msg) => {
+	/**
+	 * 好友管理
+	 * @param {*} msg
+	 * @returns
+	 */
+	const handlerManger = async (msg) => {
 		try {
-			console.log('msg.data.status', msg.data.status, msg)
-			// debugger
 			if (msg.data?.status === 0) {
-				// todo: 添加被拒绝处理
+				// TODO: 添加被拒绝处理
 				console.log('添加被拒绝处理')
 				return
 			} else {
-				console.log('出来')
 				// 对方的公钥
 				const directory = JSON.parse(msg.data?.e2e_public_key || '{}')
 
-				// 先查找数据库中有无这个用户，如果有就修改，如果无就添加
-				const directoryId = await WebDB.keypairs
-					.where('user_id')
-					.equals(msg.data?.user_id || '')
-					.first()
+				// 查找自己的信息
+				const reslut = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
 
-				const newObj = { ...directory, user_id: msg.data?.user_id }
+				if (!reslut) return
 
-				if (directoryId) {
-					await WebDB.keypairs.update(directoryId.id, newObj)
-				} else {
-					await WebDB.keypairs.add(newObj)
-				}
+				console.log('获取自己的个人信息：', reslut)
 
-				// 查找是否已经有会话了
-				const session = await WebDB.session
-					.where('user_id')
-					.equals(msg.data?.user_id || '')
-					.first()
-
-				console.log('是否已经有session', session)
-
+				// 查找是否和好友已经有会话了, 如果有了就不需要再创建了
+				const session = await dbService.findOneById(dbService.TABLES.SESSION, msg.data?.user_id)
 				if (session) return
 
+				// 自己的仓库
+				const store = new SignalProtocolStore(toArrayBuffer(reslut.data.signal.store))
 				// 对方的地址
 				const address = new SignalProtocolAddress(directory.deviceName, directory.deviceId)
-				// 自己的仓库
-				const store = new SignalProtocolStore(toArrayBuffer(signal.store))
-				// 创建会话
-				// const cipher = new SessionCipher(store, address)
 				// 初始化会话
-				const sess = await cretaeSession(store, address, toArrayBuffer(directory))
-				console.log('sess', sess)
-				console.log('toBase64(store)', toBase64(store))
-				await WebDB.session.add({
-					store: toBase64(store),
+				await cretaeSession(store, address, toArrayBuffer(directory))
+
+				// 对方的仓库
+				// const selfStore = new SignalProtocolStore(toArrayBuffer(reslut.data.signal.store))
+				
+				// 持久化会话到数据库
+				await dbService.add(dbService.TABLES.SESSION, {
 					user_id: msg.data?.user_id,
-					directory
+					data: {
+						store: toBase64(store),
+						directory
+						// selfStore:
+					}
 				})
 			}
 		} catch (error) {
+			// TODO: 这里可以统一上报
 			console.log('error', error)
 		}
+	}
+
+	// 初始化用户
+	const initUsers = async () => {
+		// 如果已经有了用户信息，就不需要添加
+		const result = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
+
+		if (result) return
+
+		// 添加用户
+		const success = await dbService.add(dbService.TABLES.USERS, {
+			user_id: user?.user_id,
+			data: {
+				signal,
+				info: user,
+				identity,
+				directory
+			}
+		})
+
+		// TODO: 这里可以统一上报
+		if (!success) console.log('添加用户失败')
+
+		console.log('indexDB 添加用户成功', success)
 	}
 
 	// 连接ws并监听消息推送
 	useEffect(() => {
 		if (!isLogin) return
 
-		WebSocketClient.closeConnection()
+		// 初始化 users 表
+		initUsers()
+
+		// 初始化 websocket
 		WebSocketClient.connect()
 
-		WebSocketClient.addListener('onWsMessage', (e) => {
+		/**
+		 * 初始化
+		 *
+		 * @param {*} e
+		 */
+		const handlerInit = (e) => {
 			const data = JSON.parse(e.data)
-			// event: 1 => 用户上线，2 => 用户下线，3 => 用户发送消息，4 => 群聊发送消息，5 => 系统推送消息
-			if (data.event === 3 || data.event === 4 || data.event === 5) {
-				WebSocketClient.triggerEvent('onMessage', data)
-			}
 
-			// event: 6 => 收到好友请求 event: 7 => 收到好友确认 event: 8 => 公钥交换
-			if (data.event === 6 || data.event === 7) {
-				console.log('好友管理', data.data)
-				// WebSocketClient.triggerEvent('onManager', data)
-				updateKey(data, data.event)
+			switch (data.event) {
+				// event: 1 => 用户上线，2 => 用户下线，3 => 用户发送消息，4 => 群聊发送消息，5 => 系统推送消息
+				case 3:
+					handlerMessage(data)
+					break
+				// event: 6 => 收到好友请求 event: 7 => 收到好友确认 event: 8 => 公钥交换
+				case 6:
+				case 7:
+					handlerManger(data)
+					break
 			}
-		})
+		}
 
-		WebSocketClient.addListener('onMessage', async (msg) => {
-			if (msg.event === 3) {
-				// console.log("msg",msg);
-				// 重连会话
-				const cipher = await init(msg.data.sender_id)
-				console.log('解密后消息', msg.data.content)
-				const message = {
-					// id: '', // msg_id: '', // 消息id
-					sender_id: '', // 发送者id
-					receiver_id: msg.uid, // 接收者id
-					content: await decrypt(JSON.parse(msg.data.content), cipher),
-					content_type: msg.data.msgType, // 消息类型 => 1: 文本消息
-					type: 'received', // 接收方
-					reply_id: msg.data.reply_id, // 所回复消息的id
-					read_at: null, // 接收时间/读取时间
-					created_at: msg.data.send_at, // 发送时间
-					dialog_id: msg.data.dialog_id, // 会话id
-					send_state: 'ok' // 发送成功/接收成功
-				}
-				console.log('解密后消息', message.content)
-				// 消息持久化
-				const msgId = await WebDB.messages.add(message)
-				console.log(msgId)
-				// TODO：检查当前会话是否存在 => 新建会话数据 or 更新会话列表数据
-				// const chats = useLiveQuery(() => WebDB.chats.toArray()) || []
-				// 检查当前会话是否存在 ? WebDB.chats.add({}) : WebDB.chats.update(msg.data.msg_id, {})
-				const chat = await WebDB.chats.where('dialog_id').equals(msg?.data?.dialog_id).first()
-				// 更新会话列表数据
-				chat && WebDB.chats.update(chat.id, { last_message: message.content, msg_id: msgId })
-			}
-		})
+		WebSocketClient.addListener('onWsMessage', handlerInit)
+		// WebSocketClient.addListener('onMessage', handlerMessage)
+
+		return () => {
+			WebSocketClient.removeListener('onWsMessage', handlerInit)
+			// WebSocketClient.removeListener('onMessage', handlerMessage)
+		}
 	}, [isLogin])
 
 	return (

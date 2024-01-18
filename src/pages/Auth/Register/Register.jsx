@@ -15,10 +15,11 @@ import { SignalDirectory } from '@/utils/signal-directory'
 import { createIdentity } from '@/utils/protocol'
 
 Login.propTypes = {
-	disabled: PropTypes.bool.isRequired
+	disabled: PropTypes.bool.isRequired,
+	handlerRegister: PropTypes.func
 }
 
-export default function Login({ disabled }) {
+export default function Login({ disabled, handlerRegister }) {
 	// 表单数据
 	const [fromData, setFromData] = useState({
 		nickname: '123',
@@ -37,8 +38,6 @@ export default function Login({ disabled }) {
 	// 登录loading
 	const [loading, setLoading] = useState(false)
 
-	// 表单触焦图标的颜色
-
 	// 用户信息
 	const userStore = useUserStore()
 
@@ -53,7 +52,8 @@ export default function Login({ disabled }) {
 		passwordFormat: $t('密码必须由数字+字母组成且6位以上'),
 		confirmPasswordEmpty: $t('确认密码不能为空'),
 		passwordConfirm: $t('两次密码不一致'),
-		usernameEmpty: $t('用户名不能为空')
+		usernameEmpty: $t('用户名不能为空'),
+		registerSuccess: $t('注册成功')
 	}
 
 	// 登录
@@ -120,20 +120,18 @@ export default function Login({ disabled }) {
 
 		userStore.updateIdentity({ ...info, directory: signalDirectory })
 
-		f7.dialog.alert(`注册成功! TODO: 跳转到登录页面或跳转到首页（待定）`)
-		// if (decryptedData.data.token) userStore.updateToken(decryptedData.data.token)
-		// if (decryptedData.data.user_info) userStore.updateUser(decryptedData.data.user_info)
-
-		// userStore.updateLogin(true)
-		// window.location.href = '/'
+		f7.dialog.alert(errorList.registerSuccess, () => {
+			handlerRegister()
+		})
 	}
 
 	// 返回时需要操作
 	useEffect(() => {
 		if (disabled) {
-			setFromData({ email: '', password: '' })
+			setFromData({ email: '', password: '', confirm_password: '', nick_name: '' })
 			setEmailError('')
 			setPasswordError('')
+			setConfirmPasswordError('')
 			setLoading(false)
 		}
 	}, [disabled])

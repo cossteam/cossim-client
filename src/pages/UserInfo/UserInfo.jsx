@@ -5,6 +5,7 @@ import './UserInfo.less'
 import { useUserStore } from '@/stores/user'
 import { useState } from 'react'
 import { useEffect } from 'react'
+import { logoutApi } from '@/api/user'
 
 Userinfo.propTypes = {
 	f7router: PropType.object.isRequired
@@ -17,7 +18,8 @@ export default function Userinfo({ f7router }) {
 	}, [userStore.user])
 
 	const logout = () => {
-		f7.dialog.confirm('退出登录', '确定要退出登录吗？', () => {
+		f7.dialog.confirm('退出登录', '确定要退出登录吗？', async () => {
+			await logoutApi()
 			userStore.removeUser()
 			f7router.navigate('/auth/')
 		})
