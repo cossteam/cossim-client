@@ -60,6 +60,8 @@ const handlerMessage = async (msg) => {
 		send_state: 'ok'
 	}
 
+	console.log("接收到消息",message);
+
 	// 查找本地消息记录
 	const result = await dbService.findOneById(dbService.TABLES.MSGS, msg.data?.sender_id)
 
@@ -144,7 +146,7 @@ const Home = () => {
 
 				// 对方的仓库
 				// const selfStore = new SignalProtocolStore(toArrayBuffer(reslut.data.signal.store))
-				
+
 				// 持久化会话到数据库
 				await dbService.add(dbService.TABLES.SESSION, {
 					user_id: msg.data?.user_id,

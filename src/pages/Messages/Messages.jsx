@@ -57,74 +57,57 @@ export default function MessagesPage({ f7route }) {
 	// 	})()
 	// }, [ReceiverId])
 
-	// 初始化
-	async function init() {
-		try {
-			console.log('ReceiverId', ReceiverId, user?.user_id)
-			// 重连会话
-			const cipher = await reconnectSession(ReceiverId, user?.user_id)
-			setSessionCipher(cipher)
-
-			const selfCipher = await reconnectSession(ReceiverId, user?.user_id, true)
-			setSessionSlefCipher(selfCipher)
-		} catch (error) {
-			console.log('消息初始化失败', error)
-		}
-	}
-	useEffect(() => {
-		init()
-	}, [])
-
 	useEffect(() => {
 		;(async () => {
-			const allMsg = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
-			if (!allMsg) return
+			try {
+				console.log('ReceiverId', ReceiverId, user?.user_id)
+				// 重连会话
+				const cipher = await reconnectSession(ReceiverId, user?.user_id)
+				setSessionCipher(cipher)
 
-			console.log('有消息')
+				const selfCipher = await reconnectSession(ReceiverId, user?.user_id, true)
+				setSessionSlefCipher(selfCipher)
 
-			let cipher = sessionCipher
-			let slefCipher = slefSessionCipher
+				if (isActive) setIsActive(false)
 
-			if (!cipher) cipher = await reconnectSession(ReceiverId, user?.user_id)
-			console.log('sessionCipher', cipher)
+				const allMsg = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
+				if (!allMsg) return
 
-			if (!slefCipher) slefCipher = await reconnectSession(ReceiverId, user?.user_id, true)
-			console.log('slefCipher', slefCipher)
-
-			let arr = allMsg.data || []
-			for (let i = 0; i < arr.length; i++) {
-				const item = arr[i]
-				try {
-					if (['sent', 'sending'].includes(item.type)) {
-						item.content = await decrypt(JSON.parse(item.content), slefCipher)
-					} else {
-						item.content = await decrypt(JSON.parse(item.content), cipher)
+				let arr = allMsg.data || []
+				for (let i = 0; i < arr.length; i++) {
+					const item = arr[i]
+					try {
+						if (['sent', 'sending'].includes(item.type)) {
+							// item.content = await decrypt(JSON.parse(item.content), selfCipher)
+						} else {
+							item.content = await decrypt(JSON.parse(item.content), cipher)
+						}
+					} catch (error) {
+						console.error('解密失败', error)
+						continue
 					}
-				} catch (error) {
-					console.error('解密失败', error)
-					continue
 				}
+
+				setMessages(arr)
+
+				const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
+				// 滚动到顶部加载更多
+				messagesContent?.addEventListener(
+					'scroll',
+					_.throttle(async () => {
+						if (messagesContent.scrollTop === 0) {
+							console.log('触顶')
+						}
+					}, 1000)
+				)
+
+				return () => {
+					messagesContent?.removeEventListener('scroll', () => {})
+				}
+			} catch (error) {
+				console.log('消息初始化失败', error)
 			}
-
-			setMessages(arr)
 		})()
-	}, [])
-
-	// 初始化后执行
-	useEffect(() => {
-		const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
-		// 滚动到顶部加载更多
-		messagesContent?.addEventListener(
-			'scroll',
-			_.throttle(async () => {
-				if (messagesContent.scrollTop === 0) {
-					console.log('触顶')
-				}
-			}, 1000)
-		)
-		return () => {
-			messagesContent?.removeEventListener('scroll', () => {})
-		}
 	}, [])
 
 	// 消息渲染处理
@@ -160,21 +143,21 @@ export default function MessagesPage({ f7route }) {
 		}
 	}
 
-	// useEffect(() => {
-	// 	;(async () => {
-	// 		if(isActive) return
-	// 		const lastMsg = allMsg[0]?.data?.at(-1)
+	useEffect(() => {
+		;(async () => {
+			if (isActive) return
+			const lastMsg = allMsg[0]?.data?.at(-1)
 
-	// 		if (!lastMsg) return
+			if (!lastMsg) return
 
-	// 		// 解密
-	// 		// lastMsg.content = await pgpDecrypt(lastMsg.content)
+			// 解密
+			// lastMsg.content = await pgpDecrypt(lastMsg.content)
+			// messages.pop()
+			messages.push(lastMsg)
 
-	// 		messages.push(lastMsg)
-
-	// 		setMessages([...messages])
-	// 	})()
-	// }, [allMsg])
+			setMessages([...messages])
+		})()
+	}, [allMsg])
 
 	const sendMessage = async (type, content) => {
 		try {
@@ -230,7 +213,7 @@ export default function MessagesPage({ f7route }) {
 						data: [{ ...dbMsg, content: text }]
 					})
 
-			setMessages([...messages, { ...dbMsg, content }])
+			// setMessages([...messages, { ...dbMsg, content }])
 		} catch (error) {
 			console.error('发送消息失败：', error)
 			// throw error

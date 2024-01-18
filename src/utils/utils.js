@@ -48,18 +48,16 @@ export async function reconnectSession(friend_id, user_id, self = false) {
 
 		if (self) {
 			// 如果是自己
-			const store = new SignalProtocolStore()
-			const address = new SignalProtocolAddress(reslut.data?.directory.deviceName, reslut.data?.directory.deviceId)
+			// const store = new SignalProtocolStore(toArrayBuffer(reslut.data?.store))
+			// const address = new SignalProtocolAddress(reslut.data?.directory.deviceName, reslut.data?.directory.deviceId)
 
-			const cipher = new SessionCipher(store, address)
+			// const cipher = new SessionCipher(store, address)
 
-			
-			const ression = await cretaeSession(store, address)
+			// const ression = await cretaeSession(store, address)
 
-			console.log("ression",ression);
-			
-
-			return cipher
+			// console.log("ression",ression);
+		
+			// return cipher
 
 		}
 
