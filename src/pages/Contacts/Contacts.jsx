@@ -71,7 +71,6 @@ export default function Contacts() {
 	// 获取申请列表
 	const { updateFriendResquest, updateGroupResquest } = useRelationRequestStore()
 	useEffect(() => {
-		console.log(123)
 		friendApplyListApi().then(({ data }) => {
 			updateFriendResquest(
 				data?.map((i) => ({

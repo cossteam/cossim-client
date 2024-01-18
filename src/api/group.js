@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// const baseApi = '/group'
+const group = '/group'
 const relationGroup = '/relation/group'
 
 /**
@@ -37,6 +37,32 @@ export function confirmAddGroupApi(data) {
 export function groupListApi(param) {
 	return request({
 		url: relationGroup + '/list',
+		method: 'GET',
+		params: param
+	})
+}
+
+/**
+ * 获取群聊信息
+ * @param {*} param
+ * @returns
+ */
+export function groupInfoApi(param) {
+	return request({
+		url: group + '/info',
+		method: 'GET',
+		params: param
+	})
+}
+
+/**
+ * 获取群成员列表
+ * @param {*} param
+ * @returns
+ */
+export function groupMemberApi(param) {
+	return request({
+		url: relationGroup + '/member',
 		method: 'GET',
 		params: param
 	})

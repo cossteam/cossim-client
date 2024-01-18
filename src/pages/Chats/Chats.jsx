@@ -102,12 +102,16 @@ export default function Chats() {
 			</Navbar>
 
 			<List noChevron dividers mediaList className="chats-list">
-				{chats.map((chat) => (
+				{chats.map((chat, index) => (
 					<ListItem
 						key={chat.dialog_id}
-						link={`/${chat.dialog_type === 1 ? 'groups' : 'chats'}/${chat.user_id}/?dialog_id=${
-							chat?.dialog_id || ''
-						}`}
+						data-index={index}
+						data-id={chat.group_id}
+						link={
+							chat.dialog_type === 1
+								? `/groups/${chat.group_id}/?dialog_id=${chat?.dialog_id || ''}`
+								: `/chats/${chat.user_id}/?dialog_id=${chat?.dialog_id || ''}`
+						}
 						title={chat.dialog_name}
 						after={chatsTimeFormat(chat.send_time)}
 						swipeout

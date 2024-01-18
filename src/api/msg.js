@@ -54,7 +54,7 @@ export function sendToUser(data) {
  * @param {*} data.type             消息类型
  * @returns
  */
-export function sentToGroup(data) {
+export function sendToGroup(data) {
 	return request({
 		url: baseApi + '/send/group',
 		method: 'POST',
