@@ -22,7 +22,7 @@ export default function AddDetails(props) {
 
 	const [info, setInfo] = useState({})
 
-	// const { directory } = useUserStore()
+	const { user } = useUserStore()
 
 	// const userId = parseInt(f7route.params.id, 10)
 	// const contact = contacts.filter(({ id }) => id === userId)[0]
@@ -50,16 +50,20 @@ export default function AddDetails(props) {
 
 	const addFriend = async () => {
 		try {
-			const user = await dbService.findOneById(dbService.TABLES.USERS, f7route.params.id)
-			if(!user) return f7.dialog.alert('系统内部错误')
+			console.log('f7route.params.id', f7route.params.id)
+			const users = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
+			if (!users) return f7.dialog.alert('系统内部错误')
 
 			const directory = {
-				...JSON.parse(user?.data?.directory),
-				store: user?.data?.signal?.store
+				...JSON.parse(users?.data?.directory),
+				store: users?.data?.signal?.store
 			}
 
-
-			const res = await addFriendApi({ user_id: f7route.params.id, e2e_public_key: JSON.stringify(directory), msg: '' })
+			const res = await addFriendApi({
+				user_id: f7route.params.id,
+				e2e_public_key: JSON.stringify(directory),
+				msg: ''
+			})
 			if (res.code !== 200) return f7.dialog.alert(res.msg)
 
 			f7.dialog.alert('发送成功，等待对方同意')
