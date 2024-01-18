@@ -57,6 +57,7 @@ request.interceptors.request.use(
 			public_key: publicKey
 		}
 		// 加密数据 AES256
+		// TODO： 移动到环境变量
 		const passwords = ['coss'] // 密钥
 		const encryptedData = await PGP.encryptAES256(JSON.stringify(requestData), passwords[0])
 		// 使用服务端公钥加密 AES256 密钥

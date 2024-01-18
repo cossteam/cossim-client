@@ -8,6 +8,7 @@ import { getUserInfoApi } from '@/api/user'
 import PropTypes from 'prop-types'
 import { addFriendApi } from '@/api/relation'
 import { useUserStore } from '@/stores/user'
+import { dbService } from '@/db'
 
 // import { switchE2EKeyApi } from '@/api/relation'
 // import { toBase64 } from '@/utils/signal/signal-protocol'
@@ -49,8 +50,12 @@ export default function AddDetails(props) {
 
 	const addFriend = async () => {
 		try {
-			const res = await addFriendApi({ user_id: f7route.params.id, e2e_public_key: directory, msg: '' })
+			const user = await dbService.findOneById(dbService.TABLES.USERS, f7route.params.id)
+			if(!user) return f7.dialog.alert('系统内部错误')
+
+			const res = await addFriendApi({ user_id: f7route.params.id, e2e_public_key: user?.data?.directory, msg: '' })
 			if (res.code !== 200) return f7.dialog.alert(res.msg)
+
 			f7.dialog.alert('发送成功，等待对方同意')
 		} catch (error) {
 			console.log('公钥交换失败', error)

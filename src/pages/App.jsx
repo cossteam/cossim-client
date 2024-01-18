@@ -1,20 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import $ from 'dom7'
-import { f7, f7ready, Views, View, Toolbar, Link } from 'framework7-react'
-import cordovaApp from '@/config/cordova-app'
-// import { useUserStore } from '@/stores/user'
-// import PropTypes from 'prop-types'
-
-// AppComponent.propTypes = {
-// 	isLogin: PropTypes.bool
-// }
+import { f7, Views, View, Toolbar, Link } from 'framework7-react'
 
 export default function AppComponent() {
-	// console.log("AppComponent",isLogin);
-	// if(!isLogin) {
-	// 	return <View id="view-auth" name="auth" url="/auth/" />
-	// }
-
 	const [activeTab, setActiveTab] = useState('chats')
 	const previousTab = useRef('chats')
 
@@ -38,30 +26,8 @@ export default function AppComponent() {
 		previousTab.current = tab
 	}
 
-	// WebDB.keypairs.put({
-	// 	sender_id:,
-	// 	sender_name,
-	// 	sender_device_id,
-	// 	signed_pre_key,
-	// 	sender_identity_key,
-	// 	sender_pre_key_id,
-	// 	sender_public_key,
-	// 	sender_registration_id,
-	// 	sender_signed_pre_key,
-	// 	sender_signature
-	// })
-
-	f7ready(() => {
-		// Init cordova APIs (see cordova-app.js)
-		if (f7.device.cordova) {
-			cordovaApp.init(f7)
-		}
-		// Call F7 APIs here
-	})
-
 	return (
 		<Views tabs className="safe-areas">
-			{/* {isLogin && ( */}
 			<>
 				<Toolbar tabbar icons bottom>
 					<Link
@@ -80,13 +46,10 @@ export default function AppComponent() {
 					<Link tabLink="#view-my" iconF7="person" text="我的" onClick={() => onTabLinkClick('my')} />
 				</Toolbar>
 			</>
-			{/* )} */}
 
 			<View id="view-chats" onTabShow={() => setActiveTab('chats')} tabActive tab url="/chats/" main />
 			<View id="view-contacts" onTabShow={() => setActiveTab('contacts')} tab url="/contacts/" />
 			<View id="view-my" onTabShow={() => setActiveTab('my')} name="my" tab url="/my/" />
-
-			{/* <View id="view-auth" name="auth" tab url="/auth/" /> */}
 		</Views>
 	)
 }

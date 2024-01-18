@@ -1,31 +1,115 @@
-/**
- * 将类实例转换为字符串表示形式。
- *
- * @param {any} instance -要转换的类的实例。
- * @return {Object} 类实例的字符串表示形式，包括构造函数和属性。
- */
-export function classToString(instance) {
-	// 把函数转换成字符串
-	const constructor = instance.constructor.toString()
-	// 把对象转换成字符串
-	const properties = JSON.stringify({ name: instance.name })
+import PGP from './PGP'
+import { toArrayBuffer, cretaeSession } from './signal/signal-protocol'
+import { SignalProtocolAddress, SessionCipher } from '@privacyresearch/libsignal-protocol-typescript'
+import { SignalProtocolStore } from './signal/storage-type'
+import { dbService } from '@/db'
 
-	return { constructor, properties }
+const KEY = 'COSS'
+
+/**
+ * 加密
+ * @param {string} content
+ * @return {string}
+ */
+export async function pgpEncrypt(content) {
+	return await PGP.encryptAES256(content, KEY)
 }
 
 /**
- * 将类实例的字符串表示形式转换为实际的类实例。
- *
- * @param {object} instance -类实例的字符串表示形式。
- * @return {object|null} 转换后的类实例，如果转换失败则返回 null。
+ * 解密
+ * @param {string} content
+ * @return {string}
  */
-export function stringToClass(instance) {
-	const { constructor, properties } = instance
-	if (constructor && properties) {
-		const constructorFunc = new Function(`return ${constructor}`)()
-		const properties = JSON.parse(properties)
-		const newClass = new constructorFunc(properties.name)
-		return newClass
+export async function pgpDecrypt(content) {
+	return await PGP.decryptAES256(content, KEY)
+}
+
+/**
+ * 重连会话
+ *
+ * @param {type} user_id -用户 ID
+ * @return {type} 会话
+ */
+export async function reconnectSession(friend_id, user_id, self = false) {
+	try {
+		// 获取对方信息
+		const reslut = await dbService.findOneById(dbService.TABLES.SESSION, friend_id)
+		// 查找自己信息
+		const user = await dbService.findOneById(dbService.TABLES.USERS, user_id)
+
+		console.log('查找对方会话信息', reslut, user)
+
+		// 如果没有找到对方会话
+		if (!reslut) {
+			// TODO: 通知对方发送公钥
+			console.error('TODO:没有找到对方的会话信息，通知对方发送公钥')
+			return
+		}
+
+		if (self) {
+			// 如果是自己
+			const store = new SignalProtocolStore()
+			const address = new SignalProtocolAddress(reslut.data?.directory.deviceName, reslut.data?.directory.deviceId)
+
+			const cipher = new SessionCipher(store, address)
+
+			
+			const ression = await cretaeSession(store, address)
+
+			console.log("ression",ression);
+			
+
+			return cipher
+
+		}
+
+		// 自己仓库
+		const store = new SignalProtocolStore(toArrayBuffer(reslut.data?.store))
+		// 初始化对方地址
+		const addr = new SignalProtocolAddress(reslut.data?.directory.deviceName, reslut.data?.directory.deviceId)
+		// 初始化会话
+		const cipher = new SessionCipher(store, addr)
+
+		console.log('重连会话成功', cipher)
+
+		// 返回会话
+		return cipher
+	} catch (error) {
+		console.log('重连会话失败', error)
+		return null
 	}
-	return null
 }
+
+/**
+ * 连接自己的会话
+ * @param {type} store -自己的仓库
+ */
+// export async function createSession(user_id, friend_id) {
+// 	try {
+// 		const reslut = await dbService.findOneById(dbService.TABLES.SESSION, friend_id)
+
+// 		// 如果没有找到对方会话
+// 		if (!reslut) {
+// 			// TODO: 通知对方发送公钥
+// 			console.error('TODO:没有找到对方的会话信息，通知对方发送公钥')
+// 			return
+// 		}
+
+// 		const user = await dbService.findOneById(dbService.TABLES.USERS, user_id)
+
+// 		// 对方的仓库
+// 		const store = new SignalProtocolStore(toArrayBuffer(reslut.data.store))
+// 		// // 初始化对方地址
+// 		// const addr = new SignalProtocolAddress(
+// 		// 	info.data.signal?.address?.deviceName,
+// 		// 	info.data.signal?.address?.deviceId
+// 		// )
+// 		// // 初始自己的化会话
+// 		// const cipher = new SessionCipher(store, addr)
+
+// 		// return cipher
+// 	} catch (error) {
+// 		console.error('消息初始化失败', error)
+// 		return null
+// 	}
+// }

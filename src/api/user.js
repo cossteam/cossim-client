@@ -105,3 +105,14 @@ export function updatePassWordApi(data) {
 		data
 	})
 }
+
+/**
+ * 退出登录
+ * @returns
+ */
+export function logoutApi() {
+	return request({
+		url: `${baseApi}/logout`,
+		method: 'POST'
+	})
+}

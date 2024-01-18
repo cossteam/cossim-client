@@ -10,13 +10,6 @@ import { validEmail } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
 
-// import WebDB from '@/db'
-// import { classToString } from '@/utils/utils'
-
-// import { useSignalStore } from '@/stores/signal'
-
-// import PGP from '@/utils/PGP'
-// import { SignalDirectory } from '@/utils/signal-directory'
 import Signal, { toBase64 } from '@/utils/signal/signal-protocol'
 // import WebDB from '@/db'
 
@@ -26,7 +19,7 @@ Login.propTypes = {
 
 export default function Login({ disabled }) {
 	// 表单数据
-	const [fromData, setFromData] = useState({ email: '1005@qq.com', password: '123456qq', public_key: '1' })
+	const [fromData, setFromData] = useState({ email: '1@qq.com', password: '123456qq', public_key: '1' })
 
 	// 错误提示
 	const [emailError, setEmailError] = useState('')
@@ -37,9 +30,6 @@ export default function Login({ disabled }) {
 
 	// 用户信息
 	const userStore = useUserStore()
-
-	// signal
-	// const signalStore = useSignalStore()
 
 	// 错误信息列表
 	const errorList = {
@@ -54,9 +44,6 @@ export default function Login({ disabled }) {
 	const deviceName = Math.random().toString(36).slice(-8)
 	const deviceId = Math.floor(10000 * Math.random())
 	const [signal] = useState(new Signal(deviceName, deviceId))
-
-	// signal 目录
-	// const signalDirectory = new SignalDirectory()
 
 	// 登录
 	const signIn = async () => {
@@ -104,8 +91,8 @@ export default function Login({ disabled }) {
 			if (decryptedData) setLoading(false)
 
 			if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || errorList.errorMessage)
-			if (decryptedData.data.token) userStore.updateToken(decryptedData.data.token)
-			if (decryptedData.data.user_info) userStore.updateUser(decryptedData.data.user_info)
+			if (decryptedData.data.token)  userStore.updateToken(decryptedData.data.token)
+			if (decryptedData.data.user_info) await userStore.updateUser(decryptedData.data.user_info)
 
 			// 生成信令
 			const info = await signal.ceeateIdentity(signal.deviceName)
@@ -122,32 +109,10 @@ export default function Login({ disabled }) {
 			userStore.updateIdentity({ ...info })
 			userStore.updateSignal(signal)
 			userStore.updateDirectory(data)
-
-			// 存储类
-			// signalStore.updateSignal(signal)
-			// signalStore.updateState({ info, directory: data })
-
-			// window.signal = signal
-
-			// 查找本地数据库中是否存在有该用户
-			// const user = await WebDB.users.where('user_id').equals(decryptedData?.data.user_info?.user_id).first()
-
-			// if (!user) {
-			// 	// 添加用户
-			// 	await WebDB.users.add({
-			// 		signal: classToString(signal),
-			// 		state: {
-			// 			directory: toBase64(directory),
-			// 			identity: info.base64
-			// 		},
-			// 		user_id: decryptedData?.data.user_info?.user_id
-			// 	})
-			// } 
-
-			// window.signal = signal
-	
 			userStore.updateLogin(true)
+
 			setLoading(false)
+
 			window.location.href = '/'
 		} catch (err) {
 			console.log(err.message)

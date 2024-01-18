@@ -111,7 +111,8 @@ class PGP {
 			try {
 				const encrypted = await openpgp.encrypt({
 					message: await openpgp.createMessage({ text: data }),
-					passwords: key
+					passwords: key,
+					
 				})
 				resolve(encrypted)
 			} catch (error) {
