@@ -27,13 +27,13 @@ export default function NewContact() {
 			onClick: () => setActiveTabbar(0),
 			itemConfirm: async (id, status) => {
 				// 同意或拒绝添加好友
-				const { code } = await confirmAddFriendApi({ user_id: id, e2e_public_key: directory, status })
+				const { code } = await confirmAddFriendApi({ user_id: id, e2e_public_key: directory, action: status })
 				if (code !== 200) return
 
 				// 修改状态
 				const newUsers = friendResquest.map((user) => {
 					// 0 初始状态 1 已同意 2 已拒绝
-					return user.user_id === id ? { ...user, action: status === 0 ? 2 : 1 } : user
+					return user.user_id === id ? { ...user, status: status === 0 ? 2 : 1 } : user
 				})
 
 				// TODO: 添加好友到本地
