@@ -44,12 +44,16 @@ export default function AppComponent() {
 						onClick={() => onTabLinkClick('contacts')}
 					/>
 					<Link tabLink="#view-my" iconF7="person" text="我的" onClick={() => onTabLinkClick('my')} />
+
+					<Link tabLink="#view-chattest" iconF7="person" text="我的" onClick={() => onTabLinkClick('chattest')} />
 				</Toolbar>
 			</>
 
 			<View id="view-chats" onTabShow={() => setActiveTab('chats')} tabActive tab url="/chats/" main />
 			<View id="view-contacts" onTabShow={() => setActiveTab('contacts')} tab url="/contacts/" />
 			<View id="view-my" onTabShow={() => setActiveTab('my')} name="my" tab url="/my/" />
+
+			<View id="view-chattest" onTabShow={() => setActiveTab('chattest')} name="chattest" tab url="/chat_test/" />
 		</Views>
 	)
 }

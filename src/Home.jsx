@@ -131,7 +131,7 @@ const Home = () => {
 
 				if (!reslut) return
 
-				console.log('获取自己的个人信息：', reslut)
+				console.log('收到添加或同意信息', directory)
 
 				// 查找是否和好友已经有会话了, 如果有了就不需要再创建了
 				const session = await dbService.findOneById(dbService.TABLES.SESSION, msg.data?.user_id)
@@ -145,6 +145,13 @@ const Home = () => {
 				await cretaeSession(store, address, toArrayBuffer(directory))
 
 				// 对方的仓库
+				// const store2 = new SignalProtocolStore(toArrayBuffer(directory?.store))
+				// 自己的地址
+				// const address2 = new SignalProtocolAddress(reslut?.data?.signal?.address?._name, reslut?.data?.signal?.address?._deviceId)
+				// 初始化会话
+				// await cretaeSession(store2, address2,toArrayBuffer(reslut.data?.directory))
+
+				// 对方的仓库
 				// const selfStore = new SignalProtocolStore(toArrayBuffer(reslut.data.signal.store))
 
 				// 持久化会话到数据库
@@ -152,8 +159,7 @@ const Home = () => {
 					user_id: msg.data?.user_id,
 					data: {
 						store: toBase64(store),
-						directory
-						// selfStore:
+						directory,
 					}
 				})
 			}

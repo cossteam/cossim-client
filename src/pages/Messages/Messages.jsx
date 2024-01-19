@@ -10,16 +10,16 @@ import { useUserStore } from '@/stores/user'
 import { dbService } from '@/db'
 import _ from 'lodash-es'
 import { sendToUser } from '@/api/msg'
-// import { pgpDecrypt, pgpEncrypt } from '@/utils/utils'
 
+// import { pgpDecrypt, pgpEncrypt } from '@/utils/utils'
 // import { switchE2EKeyApi } from '@/api/relation'
 // import WebSocketClient from '@/utils/WebSocketClient'
 
 // TODO: 添加好友时交换双方密钥（地址）
-import { toArrayBuffer, encrypt, decrypt } from '@/utils/signal/signal-protocol'
+import { toArrayBuffer, encrypt, decrypt, reconnectSession } from '@/utils/signal/signal-protocol'
 import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 import { SignalProtocolStore } from '@/utils/signal/storage-type'
-import { reconnectSession } from '@/utils/utils'
+// import { reconnectSession } from '@/utils/signal/signal-protocol.js'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -65,8 +65,8 @@ export default function MessagesPage({ f7route }) {
 				const cipher = await reconnectSession(ReceiverId, user?.user_id)
 				setSessionCipher(cipher)
 
-				const selfCipher = await reconnectSession(ReceiverId, user?.user_id, true)
-				setSessionSlefCipher(selfCipher)
+				// const selfCipher = await reconnectSession(ReceiverId, user?.user_id, true)
+				// setSessionSlefCipher(selfCipher)
 
 				if (isActive) setIsActive(false)
 
@@ -77,6 +77,7 @@ export default function MessagesPage({ f7route }) {
 				for (let i = 0; i < arr.length; i++) {
 					const item = arr[i]
 					try {
+						// 解自己的消息
 						if (['sent', 'sending'].includes(item.type)) {
 							// item.content = await decrypt(JSON.parse(item.content), selfCipher)
 						} else {

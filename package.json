@@ -29,6 +29,7 @@
         "last 5 Firefox versions"
     ],
     "dependencies": {
+        "@aomao/engine": "^2.10.25",
         "@privacyresearch/libsignal-protocol-typescript": "^0.0.16",
         "@signalapp/libsignal-client": "^0.38.0",
         "axios": "^1.6.3",

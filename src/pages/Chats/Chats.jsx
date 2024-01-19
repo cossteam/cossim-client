@@ -22,6 +22,8 @@ import { useEffect } from 'react'
 import _ from 'lodash-es'
 import { useLiveQuery } from 'dexie-react-hooks'
 
+import ChatBox from '@/components/ChatBox/ChatBox'
+
 export default function Chats() {
 	// const { f7router } = props
 
@@ -117,26 +119,10 @@ export default function Chats() {
 						swipeout
 					>
 						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
-						{/* <img
-							slot="media"
-							src="../../assets/avatars/elena-k.jpg"
-							loading="lazy"
-							alt={chat.dialog_name}
-						/> */}
 						<span slot="text">
 							{chat.send_time === 'sent' && <DoubleTickIcon />}
 							{chat.last_message}
 						</span>
-						{/* <SwipeoutActions left>
-							<SwipeoutButton close overswipe color="blue" onClick={swipeoutUnread}>
-								<Icon f7="chat_bubble_fill" />
-								<span>Unread</span>
-							</SwipeoutButton>
-							<SwipeoutButton close color="gray" onClick={swipeoutPin}>
-								<Icon f7="pin_fill" />
-								<span>Pin</span>
-							</SwipeoutButton>
-						</SwipeoutActions> */}
 						<SwipeoutActions right>
 							<SwipeoutButton close overswipe color="blue" onClick={swipeoutUnread}>
 								<Icon f7="chat_bubble_fill" />
@@ -168,8 +154,6 @@ export default function Chats() {
 					</ListItem>
 				</List>
 			</Popover>
-
-			{/* <SearchComponent title={$t('添加朋友')} placeholder={$t('邮箱')} className="z-[13000]" /> */}
 		</Page>
 	)
 }

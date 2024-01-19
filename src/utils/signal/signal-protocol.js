@@ -1,9 +1,8 @@
-import { KeyHelper, SessionBuilder, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
-import {  } from '@privacyresearch/libsignal-protocol-typescript'
-
+import { KeyHelper, SessionBuilder, SignalProtocolAddress, SessionCipher } from '@privacyresearch/libsignal-protocol-typescript'
 import { SignalProtocolStore } from './storage-type'
 import { cloneDeep } from 'lodash-es'
 import { SignalDirectory } from './signal-directory'
+import { dbService } from '@/db'
 
 export default class Signal {
 	directory = new SignalDirectory()
@@ -315,9 +314,64 @@ export function base64ToString(str) {
 	return new TextDecoder().decode(base64ArrayBuffer(str))
 }
 
-
 function isBase64(str) {
 	// 使用正则表达式检查字符串是否符合Base64编码格式
 	const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/
 	return base64Regex.test(str)
+}
+
+/**
+ * 重连会话
+ *
+ * @param {type} user_id -用户 ID
+ * @return {type} 会话
+ */
+export async function reconnectSession(friend_id, user_id, self = false) {
+	try {
+		// 获取对方信息
+		const reslut = await dbService.findOneById(dbService.TABLES.SESSION, friend_id)
+		// 查找自己信息
+		const user = await dbService.findOneById(dbService.TABLES.USERS, user_id)
+
+		console.log('查找对方会话信息', reslut, user)
+
+		// 如果没有找到对方会话
+		if (!reslut) {
+			// TODO: 通知对方发送公钥
+			console.error('TODO:没有找到对方的会话信息，通知对方发送公钥')
+			return
+		}
+
+		if (self) {
+			// 如果是自己
+			// const store = new SignalProtocolStore(toArrayBuffer(reslut.data?.store))
+			// const address = new SignalProtocolAddress(
+			// 	user.data?.signal?.address?._name,
+			// 	user.data?.signal?.address?._deviceId
+			// )
+
+			// const cipher = new SessionCipher(store, address)
+
+			// // const seion = await cretaeSession(store, address,toArrayBuffer(reslut.data?.directory))
+
+			// // console.log('重连会话成功', cipher,address,seion)
+
+			// return cipher
+		}
+
+		// 自己仓库
+		const store = new SignalProtocolStore(toArrayBuffer(reslut.data?.store))
+		// 初始化对方地址
+		const addr = new SignalProtocolAddress(reslut.data?.directory.deviceName, reslut.data?.directory.deviceId)
+		// 初始化会话
+		const cipher = new SessionCipher(store, addr)
+
+		console.log('重连会话成功', cipher)
+
+		// 返回会话
+		return cipher
+	} catch (error) {
+		console.log('重连会话失败', error)
+		return null
+	}
 }

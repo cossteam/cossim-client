@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Page, Navbar, Button, Subnavbar, Segmented, Block } from 'framework7-react'
+import { Page, Navbar, Button, Subnavbar, Segmented, Block, f7 } from 'framework7-react'
 import { confirmAddFriendApi } from '@/api/relation'
 import { confirmAddGroupApi } from '@/api/group'
 import { useUserStore } from '@/stores/user'
@@ -7,7 +7,8 @@ import { useUserStore } from '@/stores/user'
 import { $t } from '@/i18n'
 import RequestList from './RequestList'
 import { useRelationRequestStore } from '@/stores/relationRequest'
-// import WebDB from '@/db'
+
+import { dbService } from '@/db'
 
 // import PropTypes from 'prop-types'
 // NewContact.propTypes = {
@@ -15,7 +16,7 @@ import { useRelationRequestStore } from '@/stores/relationRequest'
 // }
 
 export default function NewContact() {
-	const { directory } = useUserStore()
+	const { user } = useUserStore()
 
 	// 选项卡
 	const { friendResquest, updateFriendResquest, groupResquest, updateGroupResquest } = useRelationRequestStore() // 获取申请列表
@@ -26,8 +27,15 @@ export default function NewContact() {
 			data: friendResquest || [],
 			onClick: () => setActiveTabbar(0),
 			itemConfirm: async (id, status) => {
+				const users = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
+				if (!users) return f7.dialog.alert('系统内部错误')
+
+				const directory = {
+					...JSON.parse(users?.data?.directory),
+					store: users?.data?.signal?.store
+				}
 				// 同意或拒绝添加好友
-				const { code } = await confirmAddFriendApi({ user_id: id, e2e_public_key: directory, action: status })
+				const { code } = await confirmAddFriendApi({ user_id: id, e2e_public_key: JSON.stringify(directory), action: status })
 				if (code !== 200) return
 
 				// 修改状态
