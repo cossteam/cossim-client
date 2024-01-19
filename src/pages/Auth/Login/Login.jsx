@@ -59,7 +59,7 @@ export default function Login({ disabled }) {
 			// loading
 			setLoading(true)
 			// 登录
-			let decryptedData = await loginApi({ ...fromData, public_key: '1' })
+			let decryptedData = await loginApi(fromData)
 
 			/*
 			// 生成客户端公钥
@@ -91,7 +91,7 @@ export default function Login({ disabled }) {
 			if (decryptedData) setLoading(false)
 
 			if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || errorList.errorMessage)
-			if (decryptedData.data.token)  userStore.updateToken(decryptedData.data.token)
+			if (decryptedData.data.token) userStore.updateToken(decryptedData.data.token)
 			if (decryptedData.data.user_info) await userStore.updateUser(decryptedData.data.user_info)
 
 			// 生成信令

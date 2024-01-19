@@ -13,6 +13,7 @@ import UpdateUserInfo from '@/pages/UpdateUserInfo/UpdateUserInfo'
 import NewContact from '@/pages/NewContact/NewContact'
 import GroupList from '@/pages/Group/GroupList/GroupList'
 import GroupChat from '@/pages/Group/GroupChat'
+import NewGroup from '@/pages/Group/NewGroup'
 
 var routes = [
 	{
@@ -62,6 +63,10 @@ var routes = [
 	{
 		path: '/updateuserinfo/:key/',
 		component: UpdateUserInfo
+	},
+	{
+		path: '/new_group/',
+		component: NewGroup
 	},
 	{
 		path: '/groups/',

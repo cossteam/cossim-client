@@ -158,13 +158,13 @@ export default function Chats() {
 			{/* 标题栏右侧加号弹出层 */}
 			<Popover className="popover-menu w-[160px]" backdrop={false} arrow={false}>
 				<List className="text-white" dividersIos outlineIos strongIos>
-					<ListItem link="/dialog/" popoverClose className="el-list">
+					<ListItem link="/new_group/" popoverClose className="el-list">
 						<Person2Alt className="el-list__icon" />
 						<span className="el-text">{$t('发起群聊')}</span>
 					</ListItem>
 					<ListItem link="/add_friend/" popoverClose className="el-list">
 						<PersonBadgePlusFill className="el-list__icon" />
-						<span className="el-text">{$t('添加朋友/群')}</span>
+						<span className="el-text">{$t('添加朋友')}</span>
 					</ListItem>
 				</List>
 			</Popover>

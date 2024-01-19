@@ -81,7 +81,7 @@ export default function Login({ disabled, handlerRegister }) {
 		setLoading(true)
 
 		// 登录
-		const decryptedData = await registerApi({ ...fromData, public_key: '1' })
+		const decryptedData = await registerApi(fromData)
 
 		/*
 		// 生成客户端公钥
@@ -112,7 +112,7 @@ export default function Login({ disabled, handlerRegister }) {
 		// 无论登录成功与否都需要关闭 loading
 		if (decryptedData) setLoading(false)
 
-		if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || $t('注册失败'))
+		if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || '注册失败')
 
 		// 生成用户信息
 		const deviceId = Math.floor(10000 * Math.random())

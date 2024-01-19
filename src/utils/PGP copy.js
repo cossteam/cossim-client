@@ -7,6 +7,10 @@ class PGP {
 			return
 		}
 		this.passphrase = passphrase
+		if (!this.instance) {
+			this.instance = this
+		}
+		return this.instance
 	}
 	// 生成密钥对
 	generateKeys() {
@@ -75,17 +79,19 @@ class PGP {
 		return new Promise(async (resolve, reject) => {
 			try {
 				console.log(typeof data)
+				console.log(data)
+				console.log(this.privateKeyObj)
 				if (typeof data === 'string') {
 					data = {
 						text: data,
 						key: this.privateKeyObj
 					}
 				} else if (typeof data === 'object') {
-					console.log(data.key)
+					// console.log(data.key)
 					const inputKey = data.key || data.privateKey
-					console.log(inputKey)
+					// console.log(inputKey)
 					const key = inputKey ? await openpgp.readKey({ armoredKey: inputKey }) : null
-					console.log(key)
+					// console.log(key)
 					data = {
 						text: data.text || '',
 						key: key || this.privateKeyObj
@@ -111,8 +117,7 @@ class PGP {
 			try {
 				const encrypted = await openpgp.encrypt({
 					message: await openpgp.createMessage({ text: data }),
-					passwords: key,
-					
+					passwords: key
 				})
 				resolve(encrypted)
 			} catch (error) {

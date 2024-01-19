@@ -1,4 +1,4 @@
-import PGP from './PGP'
+import PGP from './PGPUtils'
 import { toArrayBuffer, cretaeSession } from './signal/signal-protocol'
 import { SignalProtocolAddress, SessionCipher } from '@privacyresearch/libsignal-protocol-typescript'
 import { SignalProtocolStore } from './signal/storage-type'

@@ -15,12 +15,12 @@ export const PRIMARY_KEY = 'user_id'
  * "1.1.0"      1.01
  * "1.3.4"      1.0304
  */
-const WEBDB_VERSION = 1.0 // 对表结构进行修改时需要进版本号修改
+const WEBDB_VERSION = 1.0001 // 对表结构进行修改时需要进版本号修改
 
 const BASE_KEYS = 'user_id, data'
 
 // contacts, chats, messages
-const TABLE_NAMES = ['session', 'users', 'msgs']
+const TABLE_NAMES = ['session', 'users', 'msgs', 'pgpkeys']
 
 const TABLES = {
 	// 建立唯一索引在 字段 前添加 & 符号
