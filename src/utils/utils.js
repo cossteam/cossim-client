@@ -79,37 +79,3 @@ export async function reconnectSession(friend_id, user_id, self = false) {
 		return null
 	}
 }
-
-/**
- * 连接自己的会话
- * @param {type} store -自己的仓库
- */
-// export async function createSession(user_id, friend_id) {
-// 	try {
-// 		const reslut = await dbService.findOneById(dbService.TABLES.SESSION, friend_id)
-
-// 		// 如果没有找到对方会话
-// 		if (!reslut) {
-// 			// TODO: 通知对方发送公钥
-// 			console.error('TODO:没有找到对方的会话信息，通知对方发送公钥')
-// 			return
-// 		}
-
-// 		const user = await dbService.findOneById(dbService.TABLES.USERS, user_id)
-
-// 		// 对方的仓库
-// 		const store = new SignalProtocolStore(toArrayBuffer(reslut.data.store))
-// 		// // 初始化对方地址
-// 		// const addr = new SignalProtocolAddress(
-// 		// 	info.data.signal?.address?.deviceName,
-// 		// 	info.data.signal?.address?.deviceId
-// 		// )
-// 		// // 初始自己的化会话
-// 		// const cipher = new SessionCipher(store, addr)
-
-// 		// return cipher
-// 	} catch (error) {
-// 		console.error('消息初始化失败', error)
-// 		return null
-// 	}
-// }

@@ -54,6 +54,8 @@ export default function AddDetails(props) {
 			const users = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
 			if (!users) return f7.dialog.alert('系统内部错误')
 
+			console.log("store",users?.data?.signal?.store)
+
 			const directory = {
 				...JSON.parse(users?.data?.directory),
 				store: users?.data?.signal?.store

@@ -28,15 +28,15 @@ export default function RequestList({ listData, confirm }) {
 					{listData.map((chat) => (
 						<ListItem
 							key={chat.user_id}
-							title={chat.nickname}
+							title={chat.user_name}
 							swipeout
 							// link
 						>
 							<img
 								slot="media"
-								src={chat?.avatar || chat?.group_avatar}
+								src={chat?.user_avatar || chat?.group_avatar}
 								loading="lazy"
-								alt={chat?.nickname || chat?.group_name}
+								alt={chat?.user_name || chat?.group_name}
 								className="w-10 h-10 rounded-full"
 							/>
 							<span slot="text" className="text-gray-500 text-sm">
