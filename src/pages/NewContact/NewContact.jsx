@@ -33,7 +33,7 @@ export default function NewContact() {
 				// 修改状态
 				const newUsers = friendResquest.map((user) => {
 					// 0 初始状态 1 已同意 2 已拒绝
-					return user.user_id === id ? { ...user, status: status === 0 ? 2 : 1 } : user
+					return user.user_id === id ? { ...user, action: status === 0 ? 2 : 1 } : user
 				})
 
 				// TODO: 添加好友到本地
@@ -52,7 +52,7 @@ export default function NewContact() {
 				const { code } = await confirmAddGroupApi({
 					group_id,
 					user_id: id,
-					status // 1 同意 0 拒绝
+					action: status // 1 同意 0 拒绝
 				})
 				if (code !== 200) return
 
