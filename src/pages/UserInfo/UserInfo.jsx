@@ -6,6 +6,7 @@ import { useUserStore } from '@/stores/user'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import { logoutApi } from '@/api/user'
+import WebSocketClient from '@/utils/WebSocketClient'
 
 Userinfo.propTypes = {
 	f7router: PropType.object.isRequired
@@ -19,9 +20,17 @@ export default function Userinfo({ f7router }) {
 
 	const logout = () => {
 		f7.dialog.confirm('退出登录', '确定要退出登录吗？', async () => {
-			await logoutApi()
-			userStore.removeUser()
-			f7router.navigate('/auth/')
+			f7.dialog.preloader('正在退出...')
+			try {
+				await logoutApi()
+				userStore.removeUser()
+				WebSocketClient.closeConnection()
+				f7router.navigate('/auth/')
+			} catch (error) {
+				f7.dialog.alert(error.message, '退出登录失败')
+			} finally {
+				f7.dialog.close()
+			}
 		})
 	}
 

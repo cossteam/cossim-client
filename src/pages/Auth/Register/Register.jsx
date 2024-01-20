@@ -25,8 +25,7 @@ export default function Login({ disabled, handlerRegister }) {
 		nickname: '123',
 		email: '123@qq.com',
 		password: '123456qq',
-		confirm_password: '123456qq',
-		public_key: '1'
+		confirm_password: '123456qq'
 	})
 
 	// 错误提示
@@ -79,50 +78,26 @@ export default function Login({ disabled, handlerRegister }) {
 
 		// loading
 		setLoading(true)
+		try {
+			// 注册
+			const decryptedData = await registerApi(fromData)
 
-		// 登录
-		const decryptedData = await registerApi(fromData)
+			if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || '注册失败')
 
-		/*
-		// 生成客户端公钥
-		const { privateKey, publicKey, revocationCertificate } = await PGP.generateKeys()
-		userStore.updateClientKeys({ privateKey, publicKey, revocationCertificate })
-		const newFromData = { ...fromData, public_key: publicKey }
-		setFromData(newFromData)
-		// AES256 加密表单数据
-		const passwords = ['coss']
-		const messageEncrypted = await PGP.encryptAES256(JSON.stringify(newFromData), passwords[0])
-		// 使用服务端公钥加密AES256密钥
-		const passwordsEncrypted = await PGP.encrypt({
-			text: passwords[0],
-			key: userStore.serviceKey
-		})
+			// 生成用户信息
+			const deviceId = Math.floor(10000 * Math.random())
+			const info = await createIdentity(fromData.nickname, decryptedData.data.user_id, deviceId, signalDirectory)
 
-		// 登录
-		const res = await registerApi({
-			message: messageEncrypted,
-			secret: passwordsEncrypted
-		})
-		// AES256解密
-		const decrypted = await PGP.decryptAES256(res.message, await PGP.decrypt(res.secret))
-		const decryptedData = JSON.parse(decrypted)
-		console.log('res', decryptedData)
-        */
+			userStore.updateIdentity({ ...info, directory: signalDirectory })
 
-		// 无论登录成功与否都需要关闭 loading
-		if (decryptedData) setLoading(false)
-
-		if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || '注册失败')
-
-		// 生成用户信息
-		const deviceId = Math.floor(10000 * Math.random())
-		const info = await createIdentity(fromData.nickname, decryptedData.data.user_id, deviceId, signalDirectory)
-
-		userStore.updateIdentity({ ...info, directory: signalDirectory })
-
-		f7.dialog.alert(errorList.registerSuccess, () => {
-			handlerRegister()
-		})
+			f7.dialog.alert(errorList.registerSuccess, () => {
+				handlerRegister()
+			})
+		} catch (error) {
+			console.log(error)
+		} finally {
+			setLoading(false)
+		}
 	}
 
 	// 返回时需要操作

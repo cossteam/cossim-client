@@ -80,7 +80,6 @@ class WebSocketClient {
 	}
 }
 
-// 创建全局唯一的WebSocketClient实例
 const token = getStorage()?.state?.token
 const wsClient = new WebSocketClient(`ws://43.229.28.107:8080/api/v1/msg/ws?token=${token}`)
 
