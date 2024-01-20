@@ -35,19 +35,25 @@
 
 # Git 提交规范
 
-- fix: 修复 bug
-- feat: 新功能
-- docs: 文档
-- style: 格式
-- refactor: 重构
-- perf: 性能优化
-- test: 测试
-- build: 构建
-- ci: 持续集成
-- chore: 其他修改
+-   fix: 修复 bug
+-   feat: 新功能
+-   docs: 文档
+-   style: 格式
+-   refactor: 重构
+-   perf: 性能优化
+-   test: 测试
+-   build: 构建
+-   ci: 持续集成
+-   chore: 其他修改
+
+# Git 提交规范
+
+-   主分支 main
+-   开发分支 dev
+-   预发布分支 release
+-   功能分支 feat-xxx
+-   修补bug分支fix-xxx
 
 # 国际化规范
 
-- json：一个中文 key 对应其他语言的 value
-
-
+-   json：一个中文 key 对应其他语言的 value
