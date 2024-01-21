@@ -19,7 +19,10 @@ import { sendToUser } from '@/api/msg'
 import { toArrayBuffer, encrypt, decrypt, reconnectSession } from '@/utils/signal/signal-protocol'
 import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 import { SignalProtocolStore } from '@/utils/signal/storage-type'
-// import { reconnectSession } from '@/utils/signal/signal-protocol.js'
+// import { reconnectSession } from '@/utils/signal/signal-protocol'
+import { importPublicKey, encryptMessage, decryptMessage, importKey } from '@/utils/signal/signal-crypto'
+import { getPublicKeyApi } from '@/api/user'
+import { getSession } from '@/utils/session'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -45,6 +48,100 @@ export default function MessagesPage({ f7route }) {
 	const [messages, setMessages] = useState([])
 
 	const [isActive, setIsActive] = useState(true)
+	const [isSend, setIsSend] = useState(false)
+	const [userInfo, setUserInfo] = useState({})
+	const [userSesion, setUserSession] = useState({})
+	const [preKey, setPreKey] = useState()
+
+	useEffect(() => {
+		console.log('消息初始化开始...')
+		// 基本初始化
+		const init = async () => {
+			try {
+				const userInfo = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
+				if (!userInfo) return
+
+				const userSession = await getSession(user?.user_id, ReceiverId)
+				if (!userSession) return
+
+				// 预共享密钥
+				const preKey = (await importKey(userSession?.preKey)) || null
+
+				setUserInfo(userInfo)
+				setUserSession(userSession)
+				setPreKey(preKey)
+			} catch (error) {
+				console.error('error', error)
+			}
+		}
+
+		// TODO: 初始化用户信息
+
+
+		init()
+	}, [])
+
+	useEffect(() => {
+		// 首次进来初始化消息列表,把解密的消息放入到这里
+		const initMsgs = async () => {
+			try {
+				if (!preKey) return
+				// 只截取最新的 30 条消息，从后面往前截取
+				const msgs = allMsg[0]?.data?.slice(-30) || []
+				for (let i = 0; i < msgs.length; i++) {
+					const msg = msgs[i]
+					let content = msg.content
+					try {
+						content = await decryptMessage(preKey, msg.content)
+					} catch (error) {
+						console.log('解密失败：', error)
+						content = msg.content
+					}
+					msg.content = content
+				}
+				console.log('msg', msgs)
+				setMessages(msgs)
+				setIsActive(false)
+			} catch (error) {
+				console.error('error', error)
+			}
+		}
+
+		initMsgs()
+	}, [preKey])
+
+	useEffect(() => {
+		const updateMsg = async () => {
+			try {
+				const lastMsg = allMsg[0]?.data?.at(-1) || []
+
+				// 如果是发送消息
+				if (isSend) {
+					const msg = messages.at(-1)
+					msg.send_state = lastMsg?.send_state
+					setIsSend(false)
+					setMessages(messages)
+					return
+				}
+
+				// 如果是接收消息
+				let content = ''
+				try {
+					content = await decryptMessage(preKey, lastMsg?.content)
+				} catch (error) {
+					console.log('解密失败：', error)
+					content = lastMsg.content
+				}
+				lastMsg.content = content
+
+				setMessages([...messages, lastMsg])
+			} catch (error) {
+				console.error('解析消息失败：', error)
+			}
+		}
+
+		!isActive && updateMsg()
+	}, [allMsg])
 
 	// 联系人头像信息等
 	// useEffect(() => {
@@ -57,59 +154,59 @@ export default function MessagesPage({ f7route }) {
 	// 	})()
 	// }, [ReceiverId])
 
-	useEffect(() => {
-		;(async () => {
-			try {
-				console.log('ReceiverId', ReceiverId, user?.user_id)
-				// 重连会话
-				const cipher = await reconnectSession(ReceiverId, user?.user_id)
-				setSessionCipher(cipher)
+	// useEffect(() => {
+	// 	;(async () => {
+	// 		try {
+	// 			console.log('ReceiverId', ReceiverId, user?.user_id)
+	// 			// 重连会话
+	// 			const cipher = await reconnectSession(ReceiverId, user?.user_id)
+	// 			setSessionCipher(cipher)
 
-				// const selfCipher = await reconnectSession(ReceiverId, user?.user_id, true)
-				// setSessionSlefCipher(selfCipher)
+	// 			// const selfCipher = await reconnectSession(ReceiverId, user?.user_id, true)
+	// 			// setSessionSlefCipher(selfCipher)
 
-				if (isActive) setIsActive(false)
+	// 			if (isActive) setIsActive(false)
 
-				const allMsg = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
-				if (!allMsg) return
+	// 			const allMsg = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
+	// 			if (!allMsg) return
 
-				let arr = allMsg.data || []
-				for (let i = 0; i < arr.length; i++) {
-					const item = arr[i]
-					try {
-						// 解自己的消息
-						if (['sent', 'sending'].includes(item.type)) {
-							// item.content = await decrypt(JSON.parse(item.content), selfCipher)
-						} else {
-							item.content = await decrypt(JSON.parse(item.content), cipher)
-						}
-					} catch (error) {
-						console.error('解密失败', error)
-						continue
-					}
-				}
+	// 			let arr = allMsg.data || []
+	// 			for (let i = 0; i < arr.length; i++) {
+	// 				const item = arr[i]
+	// 				try {
+	// 					// 解自己的消息
+	// 					if (['sent', 'sending'].includes(item.type)) {
+	// 						// item.content = await decrypt(JSON.parse(item.content), selfCipher)
+	// 					} else {
+	// 						item.content = await decrypt(JSON.parse(item.content), cipher)
+	// 					}
+	// 				} catch (error) {
+	// 					console.error('解密失败', error)
+	// 					continue
+	// 				}
+	// 			}
 
-				setMessages(arr)
+	// 			setMessages(arr)
 
-				const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
-				// 滚动到顶部加载更多
-				messagesContent?.addEventListener(
-					'scroll',
-					_.throttle(async () => {
-						if (messagesContent.scrollTop === 0) {
-							console.log('触顶')
-						}
-					}, 1000)
-				)
+	// 			const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
+	// 			// 滚动到顶部加载更多
+	// 			messagesContent?.addEventListener(
+	// 				'scroll',
+	// 				_.throttle(async () => {
+	// 					if (messagesContent.scrollTop === 0) {
+	// 						console.log('触顶')
+	// 					}
+	// 				}, 1000)
+	// 			)
 
-				return () => {
-					messagesContent?.removeEventListener('scroll', () => {})
-				}
-			} catch (error) {
-				console.log('消息初始化失败', error)
-			}
-		})()
-	}, [])
+	// 			return () => {
+	// 				messagesContent?.removeEventListener('scroll', () => {})
+	// 			}
+	// 		} catch (error) {
+	// 			console.log('消息初始化失败', error)
+	// 		}
+	// 	})()
+	// }, [])
 
 	// 消息渲染处理
 	const messageTime = (message) => {
@@ -144,29 +241,14 @@ export default function MessagesPage({ f7route }) {
 		}
 	}
 
-	useEffect(() => {
-		;(async () => {
-			if (isActive) return
-			const lastMsg = allMsg[0]?.data?.at(-1)
-
-			if (!lastMsg) return
-
-			// 解密
-			// lastMsg.content = await pgpDecrypt(lastMsg.content)
-			// messages.pop()
-			messages.push(lastMsg)
-
-			setMessages([...messages])
-		})()
-	}, [allMsg])
-
 	const sendMessage = async (type, content) => {
 		try {
+			// if (isActive) setIsActive(false)
 			let encrypted = ''
-
 			try {
-				encrypted = await encrypt(content, sessionCipher)
-				encrypted = JSON.stringify(encrypted)
+				// encrypted = await encrypt(content, sessionCipher)
+				// encrypted = JSON.stringify(encrypted)
+				encrypted = await encryptMessage(preKey, content)
 				console.log('发送加密消息', encrypted)
 			} catch (error) {
 				console.log('发送加密消息失败', error)
@@ -186,8 +268,9 @@ export default function MessagesPage({ f7route }) {
 				send_state,
 				is_read: true
 			}
-
-			console.log('megs', dbMsg)
+			setIsSend(true)
+			// 先假设发送是 ok 的
+			setMessages([...messages, { ...dbMsg, content, send_state: 'ok' }])
 
 			// 发送消息接口
 			try {
@@ -195,26 +278,20 @@ export default function MessagesPage({ f7route }) {
 				dbMsg.send_state = code === 200 ? 'ok' : 'error'
 			} catch (error) {
 				console.error('发送失败', error)
+				dbMsg.send_state = 'error'
 			}
 
-			// TODO: 现在是明文存储，后续希望可以使用密文
 			// 查找本地消息记录
 			const result = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
-
-			// const text = await pgpEncrypt(content)
-			const text = encrypted
-
 			result
 				? await dbService.update(dbService.TABLES.MSGS, ReceiverId, {
 						user_id: ReceiverId,
-						data: [...result.data, { ...dbMsg, content: text }]
+						data: [...result.data, { ...dbMsg, content: encrypted }]
 					})
 				: await dbService.add(dbService.TABLES.MSGS, {
 						user_id: ReceiverId,
-						data: [{ ...dbMsg, content: text }]
+						data: [{ ...dbMsg, content: encrypted }]
 					})
-
-			// setMessages([...messages, { ...dbMsg, content }])
 		} catch (error) {
 			console.error('发送消息失败：', error)
 			// throw error

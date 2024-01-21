@@ -116,3 +116,31 @@ export function logoutApi() {
 		method: 'POST'
 	})
 }
+
+
+/**
+ * 获取用户的公钥
+ * @param {*} params
+ * @param {*} params.user_id
+ */
+export function getPublicKeyApi(params) {
+	return request({
+		url: `${baseApi}/bundle/get`,
+		method: 'GET',
+		params
+	})
+}
+
+/**
+ * 修改自己的公钥
+ * @param {*} data
+ * @param {*} data.secret_bundle
+ * @returns
+ */
+export function updatePublicKeyApi(data) {
+	return request({
+		url: `${baseApi}/bundle/modify`,
+		method: 'POST',
+		data
+	})
+}

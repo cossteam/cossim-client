@@ -7,11 +7,19 @@ import routes from '@/config/routes'
 import { useUserStore } from '@/stores/user'
 import WebSocketClient from '@/utils/WebSocketClient'
 import { dbService } from '@/db'
+import { updatePublicKeyApi } from '@/api/user'
 
 import { toArrayBuffer, cretaeSession, toBase64 } from '@/utils/signal/signal-protocol'
 import { SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 import { SignalProtocolStore } from '@/utils/signal/storage-type'
-// import { reconnectSession } from '@/utils/utils'
+import {
+	generateKeyPair,
+	performKeyExchange,
+	importPublicKey,
+	exportKey,
+	exportPublicKey
+} from '@/utils/signal/signal-crypto'
+// import { getSession } from '@/utils/session'
 
 /**
  * 异步处理消息。
@@ -19,24 +27,6 @@ import { SignalProtocolStore } from '@/utils/signal/storage-type'
  * @param {Object} msg -要处理的消息。
  */
 const handlerMessage = async (msg) => {
-	// 重连会话
-	// const cipher = await reconnectSession(msg.data.sender_id)
-
-	// console.log('接收回来的东西', msg.data.content)
-	// let content = ''
-	// try {
-	// 	content = await decrypt(JSON.parse(msg.data.content), cipher)
-	// 	console.log('解密后消息', content)
-	// } catch (error) {
-	// 	console.log('解密失败', error)
-	// 	// 解密失败就返回原消息
-	// 	content = msg.data.content
-	// }
-
-	// content = await pgpEncrypt(content)
-
-	// console.log('pgpEncrypt后的消息', content)
-
 	const message = {
 		// 发送者id
 		sender_id: '',
@@ -60,7 +50,7 @@ const handlerMessage = async (msg) => {
 		send_state: 'ok'
 	}
 
-	console.log("接收到消息",message);
+	console.log('接收到消息', message)
 
 	// 查找本地消息记录
 	const result = await dbService.findOneById(dbService.TABLES.MSGS, msg.data?.sender_id)
@@ -72,6 +62,54 @@ const handlerMessage = async (msg) => {
 				data: [...result.data, message]
 			})
 		: dbService.add(dbService.TABLES.MSGS, { user_id: msg.data?.sender_id, data: [message] })
+}
+
+/**
+ * 处理会话
+ * @param {Object} directory	目录
+ * @param {String} user_id		好友 id
+ * @returns
+ */
+const handlerSession = async (directory, user_id, friend_id) => {
+	try {
+		console.log('处理会话', directory, user_id)
+		// 查找自己的信息
+		const reslut = await dbService.findOneById(dbService.TABLES.USERS, user_id)
+		if (!reslut) return
+
+		// 查找是否和好友已经有会话了, 如果有了就不需要再创建了
+		const session = await dbService.findOneById(dbService.TABLES.SESSION, friend_id)
+		if (session) return
+
+		// 得到对方公钥
+		const publicKey = await importPublicKey(directory?.publicKey)
+		// 生成预共享密钥
+		const preKey = await performKeyExchange(reslut?.data?.keyPair, publicKey)
+		// base64
+		const preKeyBase64 = await exportKey(preKey)
+
+		// 自己的仓库
+		const store = new SignalProtocolStore(toArrayBuffer(reslut.data.signal.store))
+		// 对方的地址
+		const address = new SignalProtocolAddress(directory.deviceName, directory.deviceId)
+
+		delete directory.publicKey
+
+		// 初始化会话
+		await cretaeSession(store, address, toArrayBuffer({ ...directory }))
+
+		// 持久化会话到数据库
+		await dbService.add(dbService.TABLES.SESSION, {
+			user_id: friend_id,
+			data: {
+				store: toBase64(store),
+				directory,
+				preKey: preKeyBase64
+			}
+		})
+	} catch (error) {
+		console.log('处理会话失败', error)
+	}
 }
 
 /**
@@ -123,45 +161,8 @@ const Home = () => {
 				console.log('添加被拒绝处理')
 				return
 			} else {
-				// 对方的公钥
-				const directory = JSON.parse(msg.data?.e2e_public_key || '{}')
-
-				// 查找自己的信息
-				const reslut = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
-
-				if (!reslut) return
-
-				console.log('收到添加或同意信息', directory)
-
-				// 查找是否和好友已经有会话了, 如果有了就不需要再创建了
-				const session = await dbService.findOneById(dbService.TABLES.SESSION, msg.data?.user_id)
-				if (session) return
-
-				// 自己的仓库
-				const store = new SignalProtocolStore(toArrayBuffer(reslut.data.signal.store))
-				// 对方的地址
-				const address = new SignalProtocolAddress(directory.deviceName, directory.deviceId)
-				// 初始化会话
-				await cretaeSession(store, address, toArrayBuffer(directory))
-
-				// 对方的仓库
-				// const store2 = new SignalProtocolStore(toArrayBuffer(directory?.store))
-				// 自己的地址
-				// const address2 = new SignalProtocolAddress(reslut?.data?.signal?.address?._name, reslut?.data?.signal?.address?._deviceId)
-				// 初始化会话
-				// await cretaeSession(store2, address2,toArrayBuffer(reslut.data?.directory))
-
-				// 对方的仓库
-				// const selfStore = new SignalProtocolStore(toArrayBuffer(reslut.data.signal.store))
-
-				// 持久化会话到数据库
-				await dbService.add(dbService.TABLES.SESSION, {
-					user_id: msg.data?.user_id,
-					data: {
-						store: toBase64(store),
-						directory,
-					}
-				})
+				console.log('收到添加或同意信息', msg)
+				await handlerSession(JSON.parse(msg.data?.e2e_public_key || '{}'), user?.user_id, msg.data?.user_id)
 			}
 		} catch (error) {
 			// TODO: 这里可以统一上报
@@ -169,28 +170,47 @@ const Home = () => {
 		}
 	}
 
-	// 初始化用户
+	// 初始化用户,用户首次登录时会自动创建
 	const initUsers = async () => {
-		// 如果已经有了用户信息，就不需要添加
-		const result = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
+		try {
+			// 如果已经有了用户信息，就不需要添加
+			const result = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
+			if (result) return
 
-		if (result) return
+			// 为用户生成密钥对
+			const keyPair = await generateKeyPair()
 
-		// 添加用户
-		const success = await dbService.add(dbService.TABLES.USERS, {
-			user_id: user?.user_id,
-			data: {
-				signal,
-				info: user,
-				identity,
-				directory
-			}
-		})
+			// 添加用户
+			const success = await dbService.add(dbService.TABLES.USERS, {
+				user_id: user?.user_id,
+				data: {
+					signal,
+					info: user,
+					identity,
+					directory,
+					keyPair
+				}
+			})
 
-		// TODO: 这里可以统一上报
-		if (!success) console.log('添加用户失败')
+			const secret_bundle = JSON.stringify({
+				directory,
+				publicKey: await exportPublicKey(keyPair?.publicKey)
+			})
 
-		console.log('indexDB 添加用户成功', success)
+			// 更新公钥信息到服务器
+			const res = await updatePublicKeyApi({ secret_bundle })
+
+			if (res.code !== 200) return
+
+			console.log('上传公钥成功', res)
+
+			// TODO: 这里可以统一上报
+			if (!success) console.log('添加用户失败')
+
+			console.log('indexDB 添加用户成功', success)
+		} catch (error) {
+			console.error('初始化用户消息失败:', error)
+		}
 	}
 
 	// 连接ws并监听消息推送
@@ -225,11 +245,9 @@ const Home = () => {
 		}
 
 		WebSocketClient.addListener('onWsMessage', handlerInit)
-		// WebSocketClient.addListener('onMessage', handlerMessage)
 
 		return () => {
 			WebSocketClient.removeListener('onWsMessage', handlerInit)
-			// WebSocketClient.removeListener('onMessage', handlerMessage)
 		}
 	}, [isLogin])
 

@@ -1,17 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { List, ListItem, Navbar, Page, ListButton, f7 } from 'framework7-react'
-// import './Profile.less'
-// import ListColorIcon from '@/components/ListColorIcon'
-// import { contacts } from '@/data'
 import { $t } from '@/i18n'
 import { getUserInfoApi } from '@/api/user'
 import PropTypes from 'prop-types'
 import { addFriendApi } from '@/api/relation'
 import { useUserStore } from '@/stores/user'
 import { dbService } from '@/db'
-
-// import { switchE2EKeyApi } from '@/api/relation'
-// import { toBase64 } from '@/utils/signal/signal-protocol'
+import { exportPublicKey } from '@/utils/signal/signal-crypto'
 
 AddDetails.propTypes = {
 	f7route: PropTypes.object
@@ -24,10 +19,6 @@ export default function AddDetails(props) {
 
 	const { user } = useUserStore()
 
-	// const userId = parseInt(f7route.params.id, 10)
-	// const contact = contacts.filter(({ id }) => id === userId)[0]
-
-	// console.log('contact', contact)
 
 	const pageRef = useRef(null)
 	const profileAvatarRef = useRef(null)
@@ -41,7 +32,6 @@ export default function AddDetails(props) {
 	useEffect(() => {
 		const getUserInfo = async () => {
 			const res = await getUserInfoApi({ user_id: f7route.params.id, type: 1 })
-			console.log('res', res)
 			if (res.code !== 200) return
 			setInfo(res.data)
 		}
@@ -54,11 +44,13 @@ export default function AddDetails(props) {
 			const users = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
 			if (!users) return f7.dialog.alert('系统内部错误')
 
-			console.log("store",users?.data?.signal?.store)
+			// console.log("store",users?.data?.signal?.store)
+			// const exportedPublicKey = await crypto.subtle.exportKey('spki', users?.data?.keyPair?.publicKey)
+			// const exportedKeyBase64 = fromUint8Array(new Uint8Array(exportedPublicKey))
 
 			const directory = {
 				...JSON.parse(users?.data?.directory),
-				store: users?.data?.signal?.store
+				publicKey: await exportPublicKey(users?.data?.keyPair?.publicKey)
 			}
 
 			const res = await addFriendApi({
