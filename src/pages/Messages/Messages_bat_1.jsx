@@ -23,7 +23,7 @@ import _ from 'lodash-es'
 import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useUserStore } from '@/stores/user'
-import { emojis, emojisImg } from './emojis/emojis'
+import { emojis, emojisImg } from '../../components/Emojis/emojis'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired

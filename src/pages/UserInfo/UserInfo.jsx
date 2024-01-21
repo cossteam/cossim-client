@@ -20,8 +20,8 @@ export default function Userinfo({ f7router }) {
 
 	const logout = () => {
 		f7.dialog.confirm('退出登录', '确定要退出登录吗？', async () => {
-			f7.dialog.preloader('正在退出...')
 			try {
+				f7.dialog.preloader('正在退出...')
 				await logoutApi()
 				userStore.removeUser()
 				WebSocketClient.closeConnection()

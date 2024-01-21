@@ -4,6 +4,24 @@ const group = '/group'
 const relationGroup = '/relation/group'
 
 /**
+ * 创建群聊
+ * @param {Object} data
+ * @param {String} data.avatar
+ * @param {String} data.name
+ * @param {String} data.type
+ * @param {String} data.max_members_limit
+ * @param {Array} data.member
+ * @returns
+ */
+export function groupCreateApi(data) {
+	return request({
+		url: group + '/create',
+		method: 'POST',
+		data
+	})
+}
+
+/**
  * 获取群申请列表
  * @param {*} params
  * @returns
