@@ -105,7 +105,6 @@ export default function NewGroup({ f7route }) {
 		// 	return
 		// }
 		group['type'] = parseInt(group?.type)
-		delete group?.member
 		try {
 			f7.dialog.preloader('创建中...')
 			const { code, data, msg } = await groupCreateApi(group)

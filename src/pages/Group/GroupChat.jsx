@@ -198,7 +198,7 @@ export default function GroupChat({ f7route }) {
 						name={member.get(message.sender)?.nickname}
 						avatar={member.get(message.sender)?.avatar}
 						type={message.sender === user.user_id ? 'sent' : 'received'}
-						image={message.type === 3 ? [message.content] : []}
+						image={message.type === 3 ? [message.content] : ''}
 						text={message.type === 1 ? message.content : ''}
 					>
 						<span slot="text-footer" className="text-xs text-gray-500">

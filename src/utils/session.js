@@ -14,11 +14,11 @@ export async function getSession(user_id, friend_id) {
 			// 查找用户的密钥
 			const user = await dbService.findOneById(dbService.TABLES.USERS, user_id)
 
-			const result = JSON.parse(res.data?.secret_bundle)
+			const result = JSON.parse(res.data?.secret_bundle || '{}')
 
 			const publicKey = await importPublicKey(result?.publicKey)
 
-            console.log("解析公钥",publicKey);
+			console.log('解析公钥', publicKey)
 
 			const preKey = await performKeyExchange(user?.data?.keyPair, publicKey)
 

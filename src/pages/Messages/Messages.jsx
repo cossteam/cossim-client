@@ -57,26 +57,27 @@ export default function MessagesPage({ f7route }) {
 		console.log('消息初始化开始...')
 		// 基本初始化
 		const init = async () => {
+			let userInfo = null,
+				userSession = null,
+				preKey = null
 			try {
-				const userInfo = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
+				userInfo = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
 				if (!userInfo) return
 
-				const userSession = await getSession(user?.user_id, ReceiverId)
+				userSession = await getSession(user?.user_id, ReceiverId)
 				if (!userSession) return
-
 				// 预共享密钥
-				const preKey = (await importKey(userSession?.preKey)) || null
-
-				setUserInfo(userInfo)
-				setUserSession(userSession)
-				setPreKey(preKey)
+				preKey = await importKey(userSession?.preKey)
 			} catch (error) {
 				console.error('error', error)
+			} finally {
+				setUserInfo(userInfo)
+				setUserSession(userSession)
+				setPreKey(preKey || '1')
 			}
 		}
 
 		// TODO: 初始化用户信息
-
 
 		init()
 	}, [])
@@ -88,11 +89,12 @@ export default function MessagesPage({ f7route }) {
 				if (!preKey) return
 				// 只截取最新的 30 条消息，从后面往前截取
 				const msgs = allMsg[0]?.data?.slice(-30) || []
+				console.log(allMsg[0])
 				for (let i = 0; i < msgs.length; i++) {
 					const msg = msgs[i]
 					let content = msg.content
 					try {
-						content = await decryptMessage(preKey, msg.content)
+						content = await decryptMessage(preKey, content)
 					} catch (error) {
 						console.log('解密失败：', error)
 						content = msg.content
@@ -108,7 +110,7 @@ export default function MessagesPage({ f7route }) {
 		}
 
 		initMsgs()
-	}, [preKey])
+	}, [preKey, allMsg])
 
 	useEffect(() => {
 		const updateMsg = async () => {
@@ -125,12 +127,12 @@ export default function MessagesPage({ f7route }) {
 				}
 
 				// 如果是接收消息
-				let content = ''
+				let content = lastMsg?.content
 				try {
-					content = await decryptMessage(preKey, lastMsg?.content)
+					content = await decryptMessage(preKey, content)
 				} catch (error) {
 					console.log('解密失败：', error)
-					content = lastMsg.content
+					content = lastMsg?.content
 				}
 				lastMsg.content = content
 
@@ -396,7 +398,7 @@ export default function MessagesPage({ f7route }) {
 						first={isMessageFirst(message)}
 						last={isMessageLast(message)}
 						tail={isMessageLast(message)}
-						image={message.content_type === 3 ? [message.content] : []}
+						image={message.content_type === 3 ? [message.content] : ''}
 						type={messageType(message)}
 						text={message.content_type === 3 ? '' : message.content}
 					>

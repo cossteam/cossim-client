@@ -27,7 +27,7 @@ export default function Group() {
 						{groups[groupKey].map((group) => (
 							<ListItem
 								key={group.group_id}
-								link={`/groups/${group.dialog_id}/`}
+								link={`/groups/${group.group_id}/?dialog_id=${group.dialog_id}/`}
 								title={group.name}
 								popupClose
 							>
