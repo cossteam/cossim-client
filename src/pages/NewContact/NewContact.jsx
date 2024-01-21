@@ -9,6 +9,9 @@ import RequestList from './RequestList'
 import { useRelationRequestStore } from '@/stores/relationRequest'
 
 import { dbService } from '@/db'
+// import { fromUint8Array } from 'js-base64'
+import { exportPublicKey } from '@/utils/signal/signal-crypto'
+
 
 // import PropTypes from 'prop-types'
 // NewContact.propTypes = {
@@ -30,9 +33,12 @@ export default function NewContact() {
 				const users = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
 				if (!users) return f7.dialog.alert('系统内部错误')
 
+				// const exportedPublicKey = await crypto.subtle.exportKey('spki', users?.data?.keyPair?.publicKey)
+				// const exportedKeyBase64 = fromUint8Array(new Uint8Array(exportedPublicKey))
+
 				const directory = {
 					...JSON.parse(users?.data?.directory),
-					store: users?.data?.signal?.store
+					publicKey: await exportPublicKey(users?.data?.keyPair?.publicKey)
 				}
 				// 同意或拒绝添加好友
 				const { code } = await confirmAddFriendApi({ user_id: id, e2e_public_key: JSON.stringify(directory), action: status })

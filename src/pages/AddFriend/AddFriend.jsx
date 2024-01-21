@@ -29,8 +29,6 @@ export default function AddFriend(props) {
 			const res = await getUserInfoApi({ email: keywords, type: 0 })
 			if (res.code !== 200) return f7.dialog.alert(res.msg)
 			// 跳转页面
-			const path = `/add_details/${res.data.user_id}`
-			console.log('path', path)
 			f7router.navigate(`/add_details/${res.data.user_id}/`)
 		} catch (error) {
 			// 这里可以上报异常
