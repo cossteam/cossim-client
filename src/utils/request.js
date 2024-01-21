@@ -4,11 +4,11 @@ import PGPUtils from '@/utils/PGPUtils'
 import { f7 } from 'framework7-react'
 
 export const mode = import.meta.env.MODE || 'development'
+// export const HOST = '43.229.28.107:8080' // 线上
+export const HOST = '192.168.130.230:8080' // 本地
 export const baseURL = {
-	development: 'http://43.229.28.107:8080/api/v1',
-	// development: 'http://192.168.100.145:8080/api/v1',
-	// development: 'http://localhost:8083/api/v1',
-	production: 'http://43.229.28.107:8080/api/v1'
+	development: `http://${HOST}/api/v1`,
+	production: `http://${HOST}/api/v1`
 }
 const axiosConfig = {
 	baseURL: baseURL[mode],
@@ -109,6 +109,9 @@ request.interceptors.request.use(
 		const storage = getStorage()
 		if (storage && storage.state.isLogin && storage.state.token) {
 			config.headers.Authorization = 'Bearer ' + storage.state.token
+		}
+		if (config.url === '/user/register') {
+			config.data['public_key'] = '1' // 临时使用，用于通过注册接口必填校验
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		// PGP 加密 Start
