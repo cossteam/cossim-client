@@ -22,6 +22,20 @@ export function groupCreateApi(data) {
 }
 
 /**
+ * 加入群聊
+ * @param {*} data
+ * @param {*} data.group_id
+ * @returns
+ */
+export function joinGroupApi(data) {
+	return request({
+		url: relationGroup + '/join',
+		method: 'POST',
+		data
+	})
+}
+
+/**
  * 获取群申请列表
  * @param {*} params
  * @returns

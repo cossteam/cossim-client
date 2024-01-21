@@ -22,8 +22,6 @@ import { useEffect } from 'react'
 import _ from 'lodash-es'
 import { useLiveQuery } from 'dexie-react-hooks'
 
-import ChatBox from '@/components/ChatBox/ChatBox'
-
 export default function Chats() {
 	// const { f7router } = props
 
