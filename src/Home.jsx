@@ -19,8 +19,6 @@ import {
 	exportKey,
 	exportPublicKey
 } from '@/utils/signal/signal-crypto'
-// import { getSession } from '@/utils/session'
-import { uniqueId } from 'lodash-es'
 
 /**
  * 异步处理消息。
@@ -66,35 +64,38 @@ const handlerMessage = async (msg) => {
 }
 
 const handlerGroupMessage = async (msg) => {
-	console.log('收到群消息', msg)
-	// 发送消息
-	const time = Date.now()
-	const unique_id = uniqueId(`${time}_`)
-	const message = {
-		unique_id,
-		content: msg.data.content, // 内容
-		sender: msg.data.user_id, // 发送人
-		dialog_id: msg.data.dialog_id, // 会话
-		group_id: msg.data.group_id, // 群组(私聊时为receiver_id)
-		// receiver_id: parseInt(ReceiverId), // 接收人(群聊时为group_id)
-		time, // 时间
-		type: '' // 1:文本 2:语音 3:图片
-		// send_status: 0 // 0:未发送 1:发送中 2:发送成功 3:发送失败
-	}
-	console.log(message)
+
+    console.log('msg', msg);
+    console.log('msg.data.content', JSON.parse(msg?.data?.content));
 
 	// 查找本地消息记录
-	const sender = msg.data?.group_id
+	const sender = `${msg.data?.group_id}`
 	const messages = await dbService.findOneById(dbService.TABLES.MSGS, sender)
+
+	// 收到的消息
+	const message = JSON.parse(msg?.data?.content)
+	// const message = {
+	// 	unique_id,
+	// 	content: msg.data.content, // 内容
+	// 	sender: msg.data.user_id, // 发送人
+	// 	dialog_id: msg.data.dialog_id, // 会话
+	// 	group_id: msg.data.group_id, // 群组(私聊时为receiver_id)
+	// 	// receiver_id: parseInt(ReceiverId), // 接收人(群聊时为group_id)
+	// 	time, // 时间
+	// 	type: '' // 1:文本 2:语音 3:图片
+	// 	// send_status: 0 // 0:未发送 1:发送中 2:发送成功 3:发送失败
+	// }
 
 	// 存入本地数据库
 	const newAllMsg = {
 		user_id: sender,
-		data: [...messages.data, message]
+		data: messages?.data || []
 	}
-	if (messages.length === 0) {
+	if (!messages) {
+        newAllMsg.data.push(message)
 		await dbService.add(dbService.TABLES.MSGS, newAllMsg)
-	} else {
+	} else if (!newAllMsg.data.find(obj => obj.unique_id === message.unique_id)) {
+        newAllMsg.data.push(message)
 		await dbService.update(dbService.TABLES.MSGS, sender, newAllMsg)
 	}
 }
@@ -272,7 +273,6 @@ const Home = () => {
 					handlerMessage(data)
 					break
 				case 4:
-					console.log('收到群聊消息', data)
 					handlerGroupMessage(data)
 					break
 				// event: 6 => 收到好友请求 event: 7 => 收到好友确认 event: 8 => 公钥交换
