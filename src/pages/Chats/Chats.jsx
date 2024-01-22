@@ -132,6 +132,18 @@ export default function Chats(props) {
 		// )
 	}
 
+    const lastMessageHandler = (chat) => {
+        console.log(chat)
+        let msg = chat.last_message
+        if (!chat?.group_id) return msg
+        try {
+            msg = JSON.parse(chat?.last_message).content
+        } catch (error) {
+            console.log(error);
+        }
+        return msg
+    }
+
 	return (
 		<Page className="chats-page">
 			<Navbar title="COSS" className="coss-header">
@@ -162,7 +174,7 @@ export default function Chats(props) {
 						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
 						<div slot="text" className="max-w-[60%] overflow-hidden overflow-ellipsis ">
 							{chat.send_time === 'sent' && <DoubleTickIcon />}
-							{chat.last_message}
+                            {lastMessageHandler(chat)}
 						</div>
 						<SwipeoutActions right>
 							<SwipeoutButton close overswipe color="blue" onClick={swipeoutUnread}>

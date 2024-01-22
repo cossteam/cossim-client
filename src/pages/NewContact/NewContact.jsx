@@ -61,8 +61,8 @@ export default function NewContact() {
 				// 同意或拒绝加入群聊
 				const { code } = await confirmAddGroupApi({
 					group_id,
-					user_id: id,
-					action: status // 1 同意 0 拒绝
+					action: status, // 1 同意 0 拒绝
+                    inviter_id: ''
 				})
                 getResquestList() // 更新列表
 				if (code !== 200) return

@@ -126,9 +126,11 @@ export default function NewGroup({ f7route }) {
 	return (
 		<Page className="bg-gray-50 p-4" noToolbar>
 			<Navbar className="messages-navbar" backLink>
-				<NavTitle>{$t(GroupId ? '群组设置' : '新建群组')}</NavTitle>
+				<NavTitle>
+                    <span className={GroupId && "mr-14"}>{$t(GroupId ? '群组设置' : '新建群组')}</span>
+                </NavTitle>
 				<NavRight>
-					<Link onClick={() => createGroup()}>{$t('完成')}</Link>
+                    {!GroupId && <Link onClick={() => createGroup()}>{$t('完成')}</Link>}
 				</NavRight>
 			</Navbar>
 			<Card className="m-0 py-6 mb-4" outlineMd>
@@ -140,6 +142,7 @@ export default function NewGroup({ f7route }) {
 						name="name"
 						value={group.name}
 						onChange={onInput}
+                        disabled={GroupId}
 					/>
 				</CardHeader>
 			</Card>
@@ -157,6 +160,7 @@ export default function NewGroup({ f7route }) {
 							name="type"
 							value="1"
 							onChange={(e) => updateGroup({ [e.target.name]: e.target.value })}
+                            disabled={GroupId}
 						/>
 						<ListItem
 							radio
@@ -166,6 +170,7 @@ export default function NewGroup({ f7route }) {
 							name="type"
 							value="0"
 							onChange={(e) => updateGroup({ [e.target.name]: e.target.value })}
+                            disabled={GroupId}
 						/>
 					</List>
 				</CardContent>

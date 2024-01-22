@@ -55,7 +55,7 @@ export function groupRequestListApi(params) {
  */
 export function confirmAddGroupApi(data) {
 	return request({
-		url: relationGroup + '/manage_join_group',
+		url: relationGroup + '/manage_join',
 		method: 'POST',
 		data
 	})

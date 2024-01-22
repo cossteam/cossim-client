@@ -5,7 +5,7 @@ import { f7 } from 'framework7-react'
 
 export const mode = import.meta.env.MODE || 'development'
 export const HOST = '43.229.28.107:8080' // 线上
-// export const HOST = '192.168.130.230:8080' // 本地
+// export const HOST = '192.168.100.143:8080' // 本地
 export const baseURL = {
 	development: `http://${HOST}/api/v1`,
 	production: `http://${HOST}/api/v1`

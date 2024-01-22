@@ -10,12 +10,14 @@ RequestList.propTypes = {
 export default function RequestList({ listData, confirm }) {
 
     const getUserStatusText = (status) => {
+        console.log('getUserStatusText', status);
         const user_status = {
          0: '申请中', 1: '待通过', 2: '已添加', 3: '已拒绝', 4: '已拉黑', 5: '已删除'
         }
         return user_status[status]
      }
      const getGroupStatusText = (status) => {
+        console.log('getGroupStatusText', status);
         const group_status = {
          0: '申请中', 1: '待通过', 2: '已加入', 3: '已删除', 4: '已拒绝', 5: '被封禁'
         }
@@ -46,8 +48,9 @@ export default function RequestList({ listData, confirm }) {
                             <span slot="text" className="text-gray-500 text-sm">
                                 {chat?.msg || '对方没有留言'}
                             </span>
-                            {
-                                (chat.group_status || chat.user_status) === 0 ?
+                            {(chat.group_status || chat.user_status)}
+                            {   
+                                (chat.group_status == 1 || chat.user_status == 0) ?
                                 (<div slot="content" className="pr-2 flex">
                                     <Button
                                         className="text-sm text-red-500"
