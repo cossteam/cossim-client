@@ -48,7 +48,6 @@ export default function RequestList({ listData, confirm }) {
                             <span slot="text" className="text-gray-500 text-sm">
                                 {chat?.msg || '对方没有留言'}
                             </span>
-                            {(chat.group_status || chat.user_status)}
                             {   
                                 (chat.group_status == 1 || chat.user_status == 0) ?
                                 (<div slot="content" className="pr-2 flex">
