@@ -23,12 +23,12 @@ export default function Userinfo({ f7router }) {
 			try {
 				f7.dialog.preloader('正在退出...')
 				await logoutApi()
-				userStore.removeUser()
-				WebSocketClient.closeConnection()
-				f7router.navigate('/auth/')
 			} catch (error) {
 				f7.dialog.alert(error.message, '退出登录失败')
 			} finally {
+				userStore.removeUser()
+				WebSocketClient.closeConnection()
+				f7router.navigate('/auth/')
 				f7.dialog.close()
 			}
 		})
