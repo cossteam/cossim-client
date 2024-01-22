@@ -103,7 +103,7 @@ export default function Login({ disabled, handlerRegister }) {
 	// 返回时需要操作
 	useEffect(() => {
 		if (disabled) {
-			setFromData({ email: '', password: '', confirm_password: '', nick_name: '' })
+			setFromData({ email: '', password: '', confirm_password: '', nickname: '' })
 			setEmailError('')
 			setPasswordError('')
 			setConfirmPasswordError('')
