@@ -49,9 +49,12 @@ const handlerMessage = async (msg) => {
 		send_state: 'ok'
 	}
 
+	console.log('收到消息！！！', msg)
+
 	// 查找本地消息记录
 	const result = await dbService.findOneById(dbService.TABLES.MSGS, msg.data?.sender_id)
 	// 如果有记录就更新，没有就添加到表中
+	console.log("result",result);
 	result
 		? dbService.update(dbService.TABLES.MSGS, msg.data?.sender_id, {
 				user_id: msg.data?.sender_id,
@@ -62,7 +65,7 @@ const handlerMessage = async (msg) => {
 	// 会话列表
 	const chats = await dbService.findOneById(dbService.TABLES.CHATS, msg.data?.dialog_id, 'dialog_id')
 	chats
-		? dbService.update(dbService.TABLES.CHATS, chats.id, { ...message, last_message:msg.data.content  })
+		? dbService.update(dbService.TABLES.CHATS, chats.id, { ...message, last_message: msg.data.content })
 		: dbService.add(dbService.TABLES.CHATS, msg.data)
 }
 

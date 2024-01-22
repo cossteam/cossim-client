@@ -20,7 +20,7 @@ import { getUserInfoApi } from '@/api/user'
 // import { SignalProtocolStore } from '@/utils/signal/storage-type'
 // import { reconnectSession } from '@/utils/signal/signal-protocol'
 import { encryptMessage, decryptMessage, importKey } from '@/utils/signal/signal-crypto'
-import { getSession } from '@/utils/session'
+import { getSession, updateSession } from '@/utils/session'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -62,6 +62,7 @@ export default function MessagesPage({ f7route }) {
 				if (!userInfo) return
 
 				userSession = await getSession(user?.user_id, ReceiverId)
+				console.log('userSession', userSession)
 				if (!userSession) return
 				// 预共享密钥
 				preKey = await importKey(userSession?.preKey)
@@ -104,7 +105,7 @@ export default function MessagesPage({ f7route }) {
 			try {
 				if (!preKey) return
 				// 只截取最新的 30 条消息，从后面往前截取
-				const msgs = allMsg[0]?.data?.slice(-30) || []
+				const msgs = allMsg?.find((item) => item.user_id === ReceiverId)?.data?.slice(-30) || []
 				for (let i = 0; i < msgs.length; i++) {
 					const msg = msgs[i]
 					let content = msg.content
@@ -142,6 +143,9 @@ export default function MessagesPage({ f7route }) {
 				} catch {
 					// console.log('解密失败：', error)
 					content = lastMsg?.content
+					// const session = await updateSession(user?.user_id, ReceiverId)
+					// const preKey = await importKey(session?.preKey)
+					// setPreKey(preKey || '1')
 				}
 				lastMsg.content = content
 
@@ -154,11 +158,11 @@ export default function MessagesPage({ f7route }) {
 		const initContact = async () => {
 			if (contact) return
 			const user = await dbService.findOneById(dbService.TABLES.CONTACTS, ReceiverId)
-			console.log('contact', user)
-			if (!user) {
-				const res = await getUserInfoApi({ user_id: ReceiverId })
-				console.log('查询用户信息', res)
-			}
+			// console.log('contact', user)
+			// if (!user) {
+			// 	const res = await getUserInfoApi({ user_id: ReceiverId })
+			// 	console.log('查询用户信息', res)
+			// }
 			setContact(user)
 		}
 
