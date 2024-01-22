@@ -5,10 +5,10 @@ import './Profile.less'
 // import { contacts } from '@/data'
 import { $t } from '@/i18n'
 import { getUserInfoApi } from '@/api/user'
-import { deleteFriendApi } from '@/api/relation'
+import { deleteFriendApi, addBlackListApi } from '@/api/relation'
 import PropTypes from 'prop-types'
 
-import WebDB from '@/db'
+import { dbService } from '@/db'
 
 Profile.propTypes = {
 	f7route: PropTypes.object,
@@ -25,11 +25,6 @@ export default function Profile(props) {
 
 	// 页面安装时将页面滚动到头像大小的一半
 	useEffect(() => {
-		const profileAvatarHeight = profileAvatarRef.current.offsetHeight
-		pageRef.current.el.querySelector('.page-content').scrollTop = profileAvatarHeight / 2
-	}, [])
-
-	useEffect(() => {
 		const getUserInfo = async () => {
 			const res = await getUserInfoApi({ user_id: f7route.params.id, type: 1 })
 			console.log('获取用户信息', res)
@@ -37,12 +32,18 @@ export default function Profile(props) {
 			setInfo(res.data)
 		}
 		getUserInfo()
+
+		const profileAvatarHeight = profileAvatarRef.current.offsetHeight
+		pageRef.current.el.querySelector('.page-content').scrollTop = profileAvatarHeight / 2
 	}, [])
 
 	const text = {
 		tips: $t('您确定要删除好友吗？'),
 		btn_agree: $t('同意'),
-		btn_refuse: $t('拒绝')
+		btn_refuse: $t('拒绝'),
+		backTips: $t('加入黑名单后，你将不再收到对方的消息'),
+		delSuccess: $t('删除成功'),
+		blackSuccess: $t('添加黑名单成功')
 	}
 
 	const deleteFriend = () => {
@@ -51,8 +52,21 @@ export default function Profile(props) {
 			const res = await deleteFriendApi({ user_id: f7route.params.id })
 			if (res.code !== 200) return
 			// 删除本地存储
-			await WebDB.contacts.where('user_id').equals(f7route.params.id).delete()
-			f7.dialog.alert('删除成功', () => {
+			// await WebDB.contacts.where('user_id').equals(f7route.params.id).delete()
+			await dbService.delete(dbService.TABLES.CONTACTS, f7route.params.id)
+			f7.dialog.alert(text.delSuccess, () => {
+				f7router.back()
+			})
+		})
+	}
+
+	const addBlackList = () => {
+		f7.dialog.confirm(text.backTips, async () => {
+			const res = await addBlackListApi({ user_id: f7route.params.id })
+			if (res.code !== 200) return
+			console.log(res)
+			// await dbService.delete(dbService.TABLES.CONTACTS, f7route.params.id)
+			f7.dialog.alert(text.blackSuccess, () => {
 				f7router.back()
 			})
 		})
@@ -134,7 +148,7 @@ export default function Profile(props) {
 					<ListButton color="red">Clear Chat</ListButton>
 				</List> */}
 				<List strong outline dividers>
-					<ListButton onClick={deleteFriend}>添加到黑名单</ListButton>
+					<ListButton onClick={addBlackList}>{$t('添加到黑名单')}</ListButton>
 					<ListButton color="red" onClick={deleteFriend}>
 						{$t('删除好友')}
 					</ListButton>

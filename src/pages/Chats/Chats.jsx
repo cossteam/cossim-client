@@ -16,12 +16,12 @@ import DoubleTickIcon from '@/components/DoubleTickIcon'
 import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
 // import SearchComponent from '@/components/Search/Search'
-import WebDB, { dbService } from '@/db'
+import { dbService } from '@/db'
 import { getChatList } from '@/api/msg'
 import _ from 'lodash-es'
 import { useLiveQuery } from 'dexie-react-hooks'
 
-import { preKeyGlobal } from '@/state/state'
+// import { preKeyGlobal } from '@/state/state'
 import { getSession } from '@/utils/session'
 import { useUserStore } from '@/stores/user'
 import { decryptMessage, importKey } from '@/utils/signal/signal-crypto'
@@ -81,13 +81,11 @@ export default function Chats(props) {
 					)
 				}) || []
 
-			console.log(respData)
-
 			for (let i = 0; i < respData.length; i++) {
 				const item = respData[i]
-				const chatsList = await dbService.findOneById(dbService.TABLES.CHATS, item?.dialog_id, 'dialog_id')
-				chatList
-					? await dbService.update(dbService.TABLES.CHATS, chatsList.id, item)
+				const chatsData = await dbService.findOneById(dbService.TABLES.CHATS, item?.dialog_id, 'dialog_id')
+				chatsData
+					? await dbService.update(dbService.TABLES.CHATS, item?.dialog_id, item, 'dialog_id')
 					: await dbService.add(dbService.TABLES.CHATS, item)
 			}
 		}
@@ -99,6 +97,7 @@ export default function Chats(props) {
 	useEffect(() => {
 		const decrypt = async () => {
 			const chatList = chats
+			console.log("chats",chats)
 			if (chatList.length === 0) return
 
 			for (let i = 0; i < chats.length; i++) {
@@ -115,7 +114,7 @@ export default function Chats(props) {
 				}
 			}
 
-			// console.log('chatList', chatList)
+			console.log('chatList', chatList)
 			setChatList(chatList)
 		}
 		decrypt()

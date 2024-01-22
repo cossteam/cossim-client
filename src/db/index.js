@@ -112,8 +112,9 @@ export class dbService {
 	 * @param {object} data -用于更新记录的数据。
 	 * @return {Promise} 解析为更新记录的 Promise。
 	 */
-	static async update(table, id, data) {
-		return WebDB[table] && (await WebDB[table].update(id, data))
+	static async update(table, id, data, key) {
+		// return WebDB[table] && (await WebDB[table].update(id, data))
+		return WebDB[table] && (await WebDB[table].where(key || PRIMARY_KEY).equals(id).modify(data))
 	}
 
 	/**
@@ -123,8 +124,8 @@ export class dbService {
 	 * @param {number} id -要删除的记录的 id。
 	 * @return {Promise} 成功删除记录时解析的承诺。
 	 */
-	static async delete(table, id) {
-		return WebDB[table] && (await WebDB[table].delete(id))
+	static async delete(table, id, key) {
+		return WebDB[table] &&  WebDB.contacts.where(key || PRIMARY_KEY).equals(id).delete()
 	}
 
 	/**
