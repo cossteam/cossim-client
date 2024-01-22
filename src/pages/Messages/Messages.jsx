@@ -110,7 +110,7 @@ export default function MessagesPage({ f7route }) {
 		}
 
 		initMsgs()
-	}, [preKey, allMsg])
+	}, [preKey])
 
 	useEffect(() => {
 		const updateMsg = async () => {
