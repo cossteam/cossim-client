@@ -1,16 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Page, Navbar, Button, Subnavbar, Segmented, Block, f7 } from 'framework7-react'
+import RequestList from './RequestList'
+import { $t } from '@/i18n'
+import { useUserStore } from '@/stores/user'
+import { useRelationRequestStore } from '@/stores/relationRequest'
+import { dbService } from '@/db'
+import { exportPublicKey } from '@/utils/signal/signal-crypto'
+import { friendApplyListApi } from '@/api/relation'
+import { groupRequestListApi } from '@/api/group'
 import { confirmAddFriendApi } from '@/api/relation'
 import { confirmAddGroupApi } from '@/api/group'
-import { useUserStore } from '@/stores/user'
-
-import { $t } from '@/i18n'
-import RequestList from './RequestList'
-import { useRelationRequestStore } from '@/stores/relationRequest'
-
-import { dbService } from '@/db'
-// import { fromUint8Array } from 'js-base64'
-import { exportPublicKey } from '@/utils/signal/signal-crypto'
 
 
 // import PropTypes from 'prop-types'
@@ -42,6 +41,7 @@ export default function NewContact() {
 				}
 				// 同意或拒绝添加好友
 				const { code } = await confirmAddFriendApi({ user_id: id, e2e_public_key: JSON.stringify(directory), action: status })
+                getResquestList() // 更新列表
 				if (code !== 200) return
 
 				// 修改状态
@@ -49,10 +49,6 @@ export default function NewContact() {
 					// 0 初始状态 1 已同意 2 已拒绝
 					return user.user_id === id ? { ...user, status: status === 0 ? 2 : 1 } : user
 				})
-
-				// TODO: 添加好友到本地
-				// WebDB.contacts.add({  })
-
 				updateFriendResquest(newUsers)
 			}
 		},
@@ -68,6 +64,7 @@ export default function NewContact() {
 					user_id: id,
 					action: status // 1 同意 0 拒绝
 				})
+                getResquestList() // 更新列表
 				if (code !== 200) return
 
 				// 修改状态
@@ -75,15 +72,23 @@ export default function NewContact() {
 					// 0 初始状态 1 已同意 2 已拒绝
 					return group.user_id === id ? { ...group, status: status === 0 ? 2 : 1 } : group
 				})
-
-				// TODO: 添加好友到本地
-				// WebDB.contacts.add({  })
-
 				updateGroupResquest(newGroups)
 			}
 		}
 	]
 	const [activeTabbar, setActiveTabbar] = useState(0)
+    // 获取申请列表
+    const getResquestList = () => {
+		friendApplyListApi().then(({ data }) => {
+			updateFriendResquest(data || [])
+		})
+		groupRequestListApi().then(({ data }) => {
+			updateGroupResquest(data || [])
+		})
+    }
+    useEffect(() => {
+        getResquestList()
+    }, [activeTabbar])
 
 	return (
 		<Page noToolbar className="new-contact">

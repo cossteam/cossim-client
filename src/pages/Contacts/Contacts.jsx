@@ -1,15 +1,14 @@
 import { useEffect } from 'react'
 import { List, ListGroup, ListItem, Navbar, Page, Searchbar, Subnavbar, Icon } from 'framework7-react'
 import React from 'react'
-import { friendListApi, friendApplyListApi } from '@/api/relation'
-import { groupRequestListApi } from '@/api/group'
+import { friendListApi } from '@/api/relation'
 import { $t } from '@/i18n'
 import './Contacts.less'
 import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useRelationRequestStore } from '@/stores/relationRequest'
 
-export default function Contacts() {
+export default function Contacts(props) {
 	/**
 	 * 将联系人分组转成数组结构
 	 * @param {*} obj
@@ -66,27 +65,13 @@ export default function Contacts() {
 				oldItem ? await WebDB.contacts.update(oldItem.id, item) : await WebDB.contacts.add(item)
 			}
 		})()
-	}, [])
+	}, [props])
 
-	// 获取申请列表
-	const { updateFriendResquest, updateGroupResquest } = useRelationRequestStore()
-	useEffect(() => {
-		friendApplyListApi().then(({ data }) => {
-			updateFriendResquest(
-				data?.map((i) => ({
-					...i,
-					// 0 初始状态 1 已同意 2 已拒绝
-					status: 0
-				})) || []
-			)
-		})
-		groupRequestListApi().then(({ data }) => {
-			updateGroupResquest(
-				// 群聊申请列表 status 申请状态 (0=申请中, 1=已加入, 2=被拒绝, 3=被封禁)
-				data?.map((i) => i) || []
-			)
-		})
-	}, [])
+	const { friendResquest, groupResquest } = useRelationRequestStore() // 获取申请列表
+    useEffect(() => {
+        // TODO: 显示未处理请求数
+        // console.log(friendResquest, groupResquest);
+    }, [friendResquest, groupResquest])
 
 	return (
 		<Page className="contacts-page">
