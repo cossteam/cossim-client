@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
 	f7,
 	List,
@@ -16,14 +16,21 @@ import DoubleTickIcon from '@/components/DoubleTickIcon'
 import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
 // import SearchComponent from '@/components/Search/Search'
-import WebDB from '@/db'
+import WebDB, { dbService } from '@/db'
 import { getChatList } from '@/api/msg'
-import { useEffect } from 'react'
 import _ from 'lodash-es'
 import { useLiveQuery } from 'dexie-react-hooks'
 
-export default function Chats() {
+import { preKeyGlobal } from '@/state/state'
+import { getSession } from '@/utils/session'
+import { useUserStore } from '@/stores/user'
+import { decryptMessage, importKey } from '@/utils/signal/signal-crypto'
+import { format } from 'timeago.js'
+
+export default function Chats(props) {
 	// const { f7router } = props
+
+	const { user } = useUserStore()
 
 	const swipeoutUnread = () => {
 		f7.dialog.alert('Unread')
@@ -50,13 +57,17 @@ export default function Chats() {
 	 * 2、拉取服务端数据
 	 * 3、校验新数据和旧数据 => 更新数据 or 插入数据库
 	 */
-	const chats = useLiveQuery(() => WebDB.chats.toArray()) || []
+	const chats = useLiveQuery(() => dbService.findAll(dbService.TABLES.CHATS)) || []
+	const [chatList, setChatList] = useState([])
+
 	useEffect(() => {
-		;(async () => {
-			const { data } = await getChatList()
-			// 响应数据格式化
+		const initChats = async () => {
+			const res = await getChatList()
+			if (res.code !== 200) return
+			const list = res?.data || []
+
 			const respData =
-				data?.map((item) => {
+				list?.map((item) => {
 					// 将 last_message 字段数据提取出来
 					return _.mapKeys(
 						{
@@ -69,25 +80,57 @@ export default function Chats() {
 						}
 					)
 				}) || []
-			const oldData = (await WebDB.chats.toArray()) || []
-			// 校验新数据和旧数据 => 更新数据 or 插入数据库
+
+			console.log(respData)
+
 			for (let i = 0; i < respData.length; i++) {
 				const item = respData[i]
-				const oldItem = oldData.find((oldItem) => oldItem.dialog_id === item.dialog_id)
-				oldItem ? await WebDB.chats.update(oldItem.dialog_id, item) : await WebDB.chats.add(item)
+				const chatsList = await dbService.findOneById(dbService.TABLES.CHATS, item?.dialog_id, 'dialog_id')
+				chatList
+					? await dbService.update(dbService.TABLES.CHATS, chatsList.id, item)
+					: await dbService.add(dbService.TABLES.CHATS, item)
 			}
-		})()
-	}, [])
+		}
+
+		initChats()
+	}, [props])
+
+	// 解密消息
+	useEffect(() => {
+		const decrypt = async () => {
+			const chatList = chats
+			if (chatList.length === 0) return
+
+			for (let i = 0; i < chats.length; i++) {
+				const item = chatList[i]
+				let userSession = null,
+					preKey = null
+				try {
+					if (!item.last_message) continue
+					userSession = await getSession(user?.user_id, item.user_id)
+					preKey = await importKey(userSession?.preKey)
+					item.last_message = await decryptMessage(preKey, item.last_message)
+				} catch {
+					continue
+				}
+			}
+
+			// console.log('chatList', chatList)
+			setChatList(chatList)
+		}
+		decrypt()
+	}, [chats])
 
 	// 会话时间格式化
 	const chatsTimeFormat = (date) => {
-		return (
-			Intl.DateTimeFormat('en', {
-				month: 'short',
-				year: 'numeric',
-				day: 'numeric'
-			}).format(new Date(date)) || '-'
-		)
+		return format(date,'zh_CN')
+		// return (
+		// 	Intl.DateTimeFormat('zh', {
+		// 		month: 'short',
+		// 		year: 'numeric',
+		// 		day: 'numeric'
+		// 	}).format(new Date(date)) || '-'
+		// )
 	}
 
 	return (
@@ -102,7 +145,7 @@ export default function Chats() {
 			</Navbar>
 
 			<List noChevron dividers mediaList className="chats-list">
-				{chats.map((chat, index) => (
+				{chatList.map((chat, index) => (
 					<ListItem
 						key={chat.dialog_id}
 						data-index={index}
@@ -113,14 +156,15 @@ export default function Chats() {
 								: `/chats/${chat.user_id}/?dialog_id=${chat?.dialog_id || ''}`
 						}
 						title={chat.dialog_name}
+						// badge={chat.dialog_unread_count}
 						after={chatsTimeFormat(chat.send_time)}
 						swipeout
 					>
 						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
-						<span slot="text">
+						<div slot="text" className="max-w-[60%] overflow-hidden overflow-ellipsis ">
 							{chat.send_time === 'sent' && <DoubleTickIcon />}
 							{chat.last_message}
-						</span>
+						</div>
 						<SwipeoutActions right>
 							<SwipeoutButton close overswipe color="blue" onClick={swipeoutUnread}>
 								<Icon f7="chat_bubble_fill" />

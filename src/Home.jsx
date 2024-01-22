@@ -49,11 +49,8 @@ const handlerMessage = async (msg) => {
 		send_state: 'ok'
 	}
 
-	console.log('接收到消息', message)
-
 	// 查找本地消息记录
 	const result = await dbService.findOneById(dbService.TABLES.MSGS, msg.data?.sender_id)
-
 	// 如果有记录就更新，没有就添加到表中
 	result
 		? dbService.update(dbService.TABLES.MSGS, msg.data?.sender_id, {
@@ -61,12 +58,17 @@ const handlerMessage = async (msg) => {
 				data: [...result.data, message]
 			})
 		: dbService.add(dbService.TABLES.MSGS, { user_id: msg.data?.sender_id, data: [message] })
+
+	// 会话列表
+	const chats = await dbService.findOneById(dbService.TABLES.CHATS, msg.data?.dialog_id, 'dialog_id')
+	chats
+		? dbService.update(dbService.TABLES.CHATS, chats.id, { ...message, last_message:msg.data.content  })
+		: dbService.add(dbService.TABLES.CHATS, msg.data)
 }
 
 const handlerGroupMessage = async (msg) => {
-
-    console.log('msg', msg);
-    console.log('msg.data.content', JSON.parse(msg?.data?.content));
+	console.log('msg', msg)
+	console.log('msg.data.content', JSON.parse(msg?.data?.content))
 
 	// 查找本地消息记录
 	const sender = `${msg.data?.group_id}`
@@ -92,10 +94,10 @@ const handlerGroupMessage = async (msg) => {
 		data: messages?.data || []
 	}
 	if (!messages) {
-        newAllMsg.data.push(message)
+		newAllMsg.data.push(message)
 		await dbService.add(dbService.TABLES.MSGS, newAllMsg)
-	} else if (!newAllMsg.data.find(obj => obj.unique_id === message.unique_id)) {
-        newAllMsg.data.push(message)
+	} else if (!newAllMsg.data.find((obj) => obj.unique_id === message.unique_id)) {
+		newAllMsg.data.push(message)
 		await dbService.update(dbService.TABLES.MSGS, sender, newAllMsg)
 	}
 }
@@ -209,6 +211,7 @@ const Home = () => {
 	// 初始化用户,用户首次登录时会自动创建
 	const initUsers = async () => {
 		try {
+			// if(!user.user_id) return
 			// 如果已经有了用户信息，就不需要添加
 			const result = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
 			if (result) return
@@ -270,6 +273,7 @@ const Home = () => {
 			switch (data.event) {
 				// event: 1 => 用户上线，2 => 用户下线，3 => 用户发送消息，4 => 群聊发送消息，5 => 系统推送消息
 				case 3:
+					console.log('接收消息', e.data)
 					handlerMessage(data)
 					break
 				case 4:

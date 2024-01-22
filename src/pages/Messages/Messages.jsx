@@ -10,18 +10,16 @@ import { useUserStore } from '@/stores/user'
 import { dbService } from '@/db'
 import _ from 'lodash-es'
 import { sendToUser } from '@/api/msg'
+import { getUserInfoApi } from '@/api/user'
 
 // import { pgpDecrypt, pgpEncrypt } from '@/utils/utils'
 // import { switchE2EKeyApi } from '@/api/relation'
 // import WebSocketClient from '@/utils/WebSocketClient'
-
-// TODO: 添加好友时交换双方密钥（地址）
-import { toArrayBuffer, encrypt, decrypt, reconnectSession } from '@/utils/signal/signal-protocol'
-import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
-import { SignalProtocolStore } from '@/utils/signal/storage-type'
+// import { toArrayBuffer, encrypt, decrypt, reconnectSession } from '@/utils/signal/signal-protocol'
+// import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
+// import { SignalProtocolStore } from '@/utils/signal/storage-type'
 // import { reconnectSession } from '@/utils/signal/signal-protocol'
-import { importPublicKey, encryptMessage, decryptMessage, importKey } from '@/utils/signal/signal-crypto'
-import { getPublicKeyApi } from '@/api/user'
+import { encryptMessage, decryptMessage, importKey } from '@/utils/signal/signal-crypto'
 import { getSession } from '@/utils/session'
 
 MessagesPage.propTypes = {
@@ -33,11 +31,10 @@ export default function MessagesPage({ f7route }) {
 	const dialogId = f7route.query.dialog_id
 	// 用户信息
 	const { user } = useUserStore()
-	// 用户 id
-	// const UserId = user?.UserId
+
 	// 会话 session
-	const [sessionCipher, setSessionCipher] = useState()
-	const [slefSessionCipher, setSessionSlefCipher] = useState()
+	// const [sessionCipher, setSessionCipher] = useState()
+	// const [slefSessionCipher, setSessionSlefCipher] = useState()
 
 	// 好友id/群聊id
 	const ReceiverId = f7route.params.id
@@ -49,17 +46,17 @@ export default function MessagesPage({ f7route }) {
 
 	const [isActive, setIsActive] = useState(true)
 	const [isSend, setIsSend] = useState(false)
-	const [userInfo, setUserInfo] = useState({})
-	const [userSesion, setUserSession] = useState({})
-	const [preKey, setPreKey] = useState()
+	// const [userInfo, setUserInfo] = useState({})
+	// const [userSesion, setUserSession] = useState({})
+	const [preKey, setPreKey] = useState(null)
 
 	useEffect(() => {
-		console.log('消息初始化开始...')
 		// 基本初始化
 		const init = async () => {
 			let userInfo = null,
 				userSession = null,
 				preKey = null
+
 			try {
 				userInfo = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
 				if (!userInfo) return
@@ -68,17 +65,36 @@ export default function MessagesPage({ f7route }) {
 				if (!userSession) return
 				// 预共享密钥
 				preKey = await importKey(userSession?.preKey)
-			} catch (error) {
-				console.error('error', error)
 			} finally {
-				setUserInfo(userInfo)
-				setUserSession(userSession)
+				// setUserInfo(userInfo)
+				// setUserSession(userSession)
 				setPreKey(preKey || '1')
 			}
+
+			// 设置户消息
+			let userContact = await dbService.findOneById(dbService.TABLES.CONTACTS, ReceiverId)
+			if (!userContact) {
+				const res = await getUserInfoApi({ user_id: ReceiverId })
+				console.log('查询用户信息', res)
+			}
+			setContact(userContact)
+
+			// // 触顶加载
+			// const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
+			// // 滚动到顶部加载更多
+			// messagesContent?.addEventListener(
+			// 	'scroll',
+			// 	_.throttle(async () => {
+			// 		if (messagesContent.scrollTop === 0) {
+			// 			console.log('触顶')
+			// 		}
+			// 	}, 1000)
+			// )
+
+			// return () => {
+			// 	messagesContent?.removeEventListener('scroll', () => {})
+			// }
 		}
-
-		// TODO: 初始化用户信息
-
 		init()
 	}, [])
 
@@ -87,34 +103,25 @@ export default function MessagesPage({ f7route }) {
 		const initMsgs = async () => {
 			try {
 				if (!preKey) return
-				if (!isActive) return
-
 				// 只截取最新的 30 条消息，从后面往前截取
 				const msgs = allMsg[0]?.data?.slice(-30) || []
-				console.log(allMsg[0])
 				for (let i = 0; i < msgs.length; i++) {
 					const msg = msgs[i]
 					let content = msg.content
 					try {
 						content = await decryptMessage(preKey, content)
-					} catch (error) {
-						console.log('解密失败：', error)
+					} catch {
 						content = msg.content
 					}
 					msg.content = content
 				}
-				console.log('msg', msgs)
 				setMessages(msgs)
-				setTimeout(()=> setIsActive(false), 1000)
+				setTimeout(() => setIsActive(false), 1000)
 			} catch (error) {
 				console.error('error', error)
 			}
 		}
 
-		initMsgs()
-	}, [preKey, allMsg])
-
-	useEffect(() => {
 		const updateMsg = async () => {
 			try {
 				const lastMsg = allMsg[0]?.data?.at(-1) || []
@@ -132,20 +139,36 @@ export default function MessagesPage({ f7route }) {
 				let content = lastMsg?.content
 				try {
 					content = await decryptMessage(preKey, content)
-				} catch (error) {
-					console.log('解密失败：', error)
+				} catch {
+					// console.log('解密失败：', error)
 					content = lastMsg?.content
 				}
 				lastMsg.content = content
 
 				setMessages([...messages, lastMsg])
 			} catch (error) {
-				console.error('解析消息失败：', error)
+				console.error('解析消息失败：', error.message)
 			}
 		}
 
-		!isActive && updateMsg()
-	}, [allMsg])
+		const initContact = async () => {
+			if (contact) return
+			const user = await dbService.findOneById(dbService.TABLES.CONTACTS, ReceiverId)
+			console.log('contact', user)
+			if (!user) {
+				const res = await getUserInfoApi({ user_id: ReceiverId })
+				console.log('查询用户信息', res)
+			}
+			setContact(user)
+		}
+
+		if (isActive) {
+			initContact()
+			initMsgs()
+			return
+		}
+		updateMsg()
+	}, [preKey, allMsg])
 
 	// 联系人头像信息等
 	// useEffect(() => {
@@ -158,59 +181,45 @@ export default function MessagesPage({ f7route }) {
 	// 	})()
 	// }, [ReceiverId])
 
-	// useEffect(() => {
-	// 	;(async () => {
-	// 		try {
-	// 			console.log('ReceiverId', ReceiverId, user?.user_id)
-	// 			// 重连会话
-	// 			const cipher = await reconnectSession(ReceiverId, user?.user_id)
-	// 			setSessionCipher(cipher)
+	useEffect(() => {
+		;(async () => {
+			try {
+				// console.log('ReceiverId', ReceiverId, user?.user_id)
+				// // 重连会话
+				// const cipher = await reconnectSession(ReceiverId, user?.user_id)
+				// setSessionCipher(cipher)
+				// // const selfCipher = await reconnectSession(ReceiverId, user?.user_id, true)
+				// // setSessionSlefCipher(selfCipher)
 
-	// 			// const selfCipher = await reconnectSession(ReceiverId, user?.user_id, true)
-	// 			// setSessionSlefCipher(selfCipher)
+				// if (isActive) setIsActive(false)
+				if (contact) return
+				const user = await dbService.findOneById(dbService.TABLES.CONTACTS, ReceiverId)
+				console.log('contact', user)
+				if (!user) {
+					const res = await getUserInfoApi({ user_id: ReceiverId })
+					console.log('查询用户信息', res)
+				}
+				setContact(user)
 
-	// 			if (isActive) setIsActive(false)
+				const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
+				// 滚动到顶部加载更多
+				messagesContent?.addEventListener(
+					'scroll',
+					_.throttle(async () => {
+						if (messagesContent.scrollTop === 0) {
+							console.log('触顶')
+						}
+					}, 1000)
+				)
 
-	// 			const allMsg = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
-	// 			if (!allMsg) return
-
-	// 			let arr = allMsg.data || []
-	// 			for (let i = 0; i < arr.length; i++) {
-	// 				const item = arr[i]
-	// 				try {
-	// 					// 解自己的消息
-	// 					if (['sent', 'sending'].includes(item.type)) {
-	// 						// item.content = await decrypt(JSON.parse(item.content), selfCipher)
-	// 					} else {
-	// 						item.content = await decrypt(JSON.parse(item.content), cipher)
-	// 					}
-	// 				} catch (error) {
-	// 					console.error('解密失败', error)
-	// 					continue
-	// 				}
-	// 			}
-
-	// 			setMessages(arr)
-
-	// 			const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
-	// 			// 滚动到顶部加载更多
-	// 			messagesContent?.addEventListener(
-	// 				'scroll',
-	// 				_.throttle(async () => {
-	// 					if (messagesContent.scrollTop === 0) {
-	// 						console.log('触顶')
-	// 					}
-	// 				}, 1000)
-	// 			)
-
-	// 			return () => {
-	// 				messagesContent?.removeEventListener('scroll', () => {})
-	// 			}
-	// 		} catch (error) {
-	// 			console.log('消息初始化失败', error)
-	// 		}
-	// 	})()
-	// }, [])
+				return () => {
+					messagesContent?.removeEventListener('scroll', () => {})
+				}
+			} catch (error) {
+				console.log('消息初始化失败', error)
+			}
+		})()
+	}, [])
 
 	// 消息渲染处理
 	const messageTime = (message) => {

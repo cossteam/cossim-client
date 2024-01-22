@@ -19,7 +19,7 @@ Login.propTypes = {
 
 export default function Login({ disabled }) {
 	// 表单数据
-	const [fromData, setFromData] = useState({ email: '1@qq.com', password: '123456qq', public_key: '1' })
+	const [fromData, setFromData] = useState({ email: '1@qq.com', password: '123456qq'})
 
 	// 错误提示
 	const [emailError, setEmailError] = useState('')
