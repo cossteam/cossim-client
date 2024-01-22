@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { f7 } from 'framework7-react'
 import PropType from 'prop-types'
 import { friendListApi } from '@/api/relation'
-import { groupInfoApi, groupCreateApi } from '@/api/group'
+import { groupInfoApi, groupCreateApi, groupMemberApi } from '@/api/group'
 
 NewGroup.propTypes = {
 	f7route: PropType.object.isRequired
@@ -76,21 +76,32 @@ export default function NewGroup({ f7route }) {
 	const [friends, setFriends] = useState([])
 	useEffect(() => {
 		;(async () => {
-			const { code, data: groups } = await friendListApi()
-			if (code !== 200) return
-			const friends = []
-			for (const group in groups) {
-				if (Object.hasOwnProperty.call(groups, group)) {
-					const groupItem = groups[group] || []
-					for (const friend of groupItem) {
-						friends.push({
-							...friend,
-							group
-						})
-					}
-				}
-			}
-			setFriends(friends)
+            if (GroupId) {
+                // 获取成员信息
+                groupMemberApi({ group_id: GroupId }).then(({ code, data }) => {
+                    if (code === 200) {
+                        setFriends(data)
+                        console.log(data);
+                    }
+                })
+            } else {
+                const { code, data: groups } = await friendListApi()
+                if (code !== 200) return
+                const friends = []
+                for (const group in groups) {
+                    if (Object.hasOwnProperty.call(groups, group)) {
+                        const groupItem = groups[group] || []
+                        for (const friend of groupItem) {
+                            friends.push({
+                                ...friend,
+                                group
+                            })
+                        }
+                    }
+                }
+                setFriends(friends)
+                console.log(friends);
+            }
 		})()
 	}, [])
 
@@ -184,13 +195,14 @@ export default function NewGroup({ f7route }) {
 						{friends.map((friend) => (
 							<ListItem
 								key={friend.user_id}
-								checkbox
+								checkbox={!GroupId}
 								checkboxIcon="end"
 								onChange={(e) => groupMemberChange(e, friend.user_id)}
+                                // disabled={GroupId}
 							>
 								<img slot="media" className="w-12 h-12 rounded-full" src={friend.avatar} alt="" />
 								<span slot="title" className="text-xl">
-									{friend.nick_name}
+									{friend.nick_name || friend.nickname}
 								</span>
 								<span slot="footer" className="text-base">
 									{friend.email}
