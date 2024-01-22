@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {
+    Icon,
 	Link,
 	Message,
 	Messagebar,
@@ -10,6 +11,7 @@ import {
 	Navbar,
 	Page
 } from 'framework7-react'
+import DoubleTickIcon from '@/components/DoubleTickIcon'
 import Emojis from '@/components/Emojis/Emojis.jsx'
 import PropType from 'prop-types'
 import { $t } from '@/i18n'
@@ -210,8 +212,23 @@ export default function GroupChat({ f7route }) {
 						text={message.type === 1 ? message.content : ''}
 					>
 						<span slot="text-footer" className="text-xs text-gray-500">
-							<div className="flex flex-row justify-between">
-								<span>{sendStatusToText(message?.send_status)}</span>
+							<div className="flex flex-row justify-between items-center">
+								<span>
+                                    {message?.send_status ? (
+                                        message.send_status == 2 ? (
+                                            <span className="mb-2 mr-2 text-xs">
+                                                <DoubleTickIcon />
+                                            </span>
+                                        ) : (
+                                            // message.send_state
+                                            <Icon
+                                                className="mb-2 mr-2 text-xs"
+                                                f7={message.send_status == 1 ? 'slowmo' : 'wifi_slash'}
+                                                color="primary"
+                                            />
+                                        )
+                                    ) : sendStatusToText(message?.send_status)}
+                                </span>
 								<span>{messageTime(message)}</span>
 							</div>
 						</span>
