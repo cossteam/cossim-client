@@ -87,6 +87,8 @@ export default function MessagesPage({ f7route }) {
 		const initMsgs = async () => {
 			try {
 				if (!preKey) return
+				if (!isActive) return
+
 				// 只截取最新的 30 条消息，从后面往前截取
 				const msgs = allMsg[0]?.data?.slice(-30) || []
 				console.log(allMsg[0])
@@ -103,7 +105,7 @@ export default function MessagesPage({ f7route }) {
 				}
 				console.log('msg', msgs)
 				setMessages(msgs)
-				setIsActive(false)
+				setTimeout(()=> setIsActive(false), 1000)
 			} catch (error) {
 				console.error('error', error)
 			}
@@ -245,7 +247,7 @@ export default function MessagesPage({ f7route }) {
 
 	const sendMessage = async (type, content) => {
 		try {
-			// if (isActive) setIsActive(false)
+			if (isActive) setIsActive(false)
 			let encrypted = ''
 			try {
 				// encrypted = await encrypt(content, sessionCipher)
