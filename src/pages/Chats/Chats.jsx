@@ -26,6 +26,7 @@ import { getSession } from '@/utils/session'
 import { useUserStore } from '@/stores/user'
 import { decryptMessage, importKey } from '@/utils/signal/signal-crypto'
 import { format } from 'timeago.js'
+import WebSocketClient from '@/utils/WebSocketClient'
 
 export default function Chats(props) {
 	// const { f7router } = props
@@ -95,34 +96,59 @@ export default function Chats(props) {
 
 	// 解密消息
 	useEffect(() => {
-		const decrypt = async () => {
-			const chatList = chats
-			console.log("chats",chats)
+		const decrypt = async (data) => {
+			let chatList = (await dbService.findAll(dbService.TABLES.CHATS)) || []
+			console.log('chatList', chatList, data)
 			if (chatList.length === 0) return
 
-			for (let i = 0; i < chats.length; i++) {
-				const item = chatList[i]
-				let userSession = null,
-					preKey = null
+			let userSession = null,
+				preKey = null
+
+			if (!data) {
+				for (let i = 0; i < chats.length; i++) {
+					const item = chatList[i]
+
+					try {
+						if (!item.last_message) continue
+						userSession = await getSession(user?.user_id, item.user_id)
+						preKey = await importKey(userSession?.preKey)
+						item.last_message = await decryptMessage(preKey, item.last_message)
+					} catch {
+						continue
+					}
+				}
+			} else {
+				let last_message = ''
 				try {
-					if (!item.last_message) continue
-					userSession = await getSession(user?.user_id, item.user_id)
+					userSession = await getSession(user?.user_id, data?.receiver_id)
 					preKey = await importKey(userSession?.preKey)
-					item.last_message = await decryptMessage(preKey, item.last_message)
+					last_message = await decryptMessage(preKey, data?.last_message)
 				} catch {
-					continue
+					last_message = data?.last_message
+				}
+				const index = chatList.findIndex((v) => v.user_id === data?.receiver_id)
+				console.log('index', index)
+				if (index !== -1) {
+					chatList[index] = {
+						...chatList,
+						last_message
+					}
 				}
 			}
-
 			console.log('chatList', chatList)
 			setChatList(chatList)
 		}
 		decrypt()
-	}, [chats])
+		WebSocketClient.addListener('onChats', decrypt)
+
+		return () => {
+			WebSocketClient.removeListener('onChats', decrypt)
+		}
+	}, [])
 
 	// 会话时间格式化
 	const chatsTimeFormat = (date) => {
-		return format(date,'zh_CN')
+		return format(date, 'zh_CN')
 		// return (
 		// 	Intl.DateTimeFormat('zh', {
 		// 		month: 'short',
@@ -132,17 +158,17 @@ export default function Chats(props) {
 		// )
 	}
 
-    const lastMessageHandler = (chat) => {
-        console.log(chat)
-        let msg = chat.last_message
-        if (!chat?.group_id) return msg
-        try {
-            msg = JSON.parse(chat?.last_message).content
-        } catch (error) {
-            console.log(error);
-        }
-        return msg
-    }
+	const lastMessageHandler = (chat) => {
+		console.log(chat)
+		let msg = chat.last_message
+		if (!chat?.group_id) return msg
+		try {
+			msg = JSON.parse(chat?.last_message).content
+		} catch (error) {
+			console.log(error)
+		}
+		return msg
+	}
 
 	return (
 		<Page className="chats-page">
@@ -174,7 +200,7 @@ export default function Chats(props) {
 						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
 						<div slot="text" className="max-w-[60%] overflow-hidden overflow-ellipsis ">
 							{chat.send_time === 'sent' && <DoubleTickIcon />}
-                            {lastMessageHandler(chat)}
+							{lastMessageHandler(chat)}
 						</div>
 						<SwipeoutActions right>
 							<SwipeoutButton close overswipe color="blue" onClick={swipeoutUnread}>

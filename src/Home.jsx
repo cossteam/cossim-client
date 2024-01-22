@@ -67,6 +67,8 @@ const handlerMessage = async (msg) => {
 	chats
 		? dbService.update(dbService.TABLES.CHATS, chats.id, { ...message, last_message: msg.data.content })
 		: dbService.add(dbService.TABLES.CHATS, msg.data)
+	
+	WebSocketClient.triggerEvent('onChats', { ...message, last_message: msg.data.content })
 }
 
 const handlerGroupMessage = async (msg) => {
