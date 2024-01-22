@@ -2,7 +2,7 @@ import Dexie from 'dexie'
 import { getStorage } from '@/utils/stroage'
 
 // COSSIM 客户端数据库
-const user_id = getStorage()?.state?.user?.user_id
+const user_id = getStorage()?.state?.user?.user_id || 'DB'
 const WebDB = new Dexie(`COSSIM_${user_id}`)
 
 export const PRIMARY_KEY = 'user_id'
@@ -76,10 +76,11 @@ export class dbService {
 	 *
 	 * @param {string} table -要搜索的表的名称。
 	 * @param {any} id -要查找的记录的 ID。
+	 * @param {string} key -要查找的字段的名称。
 	 * @return {Promise<any>} 一个用找到的记录解析的承诺。
 	 */
-	static async findOneById(table, id) {
-		return WebDB[table] && (await WebDB[table].where(PRIMARY_KEY).equals(id).first())
+	static async findOneById(table, id, key) {
+		return WebDB[table] && (await WebDB[table].where(key || PRIMARY_KEY).equals(id).first())
 	}
 
 	/**

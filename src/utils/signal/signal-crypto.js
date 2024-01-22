@@ -27,7 +27,7 @@ export async function performKeyExchange(myKeyPair, theirPublicKey) {
 
 		return sharedSecret
 	} catch (error) {
-		console.error('执行密钥交换时出错:', error)
+		console.error('执行密钥交换时出错:', error.message)
 		throw error
 	}
 }
