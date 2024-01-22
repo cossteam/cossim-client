@@ -17,7 +17,7 @@ export default function RequestList({ listData, confirm }) {
      }
      const getGroupStatusText = (status) => {
         const group_status = {
-         0: '申请中', 1: '已加入', 2: '已删除', 3: '被拒绝', 4: '被封禁'
+         0: '申请中', 1: '待通过', 2: '已加入', 3: '已删除', 4: '已拒绝', 5: '被封禁'
         }
         return group_status[status]
      }
