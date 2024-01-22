@@ -16,7 +16,7 @@ import { $t } from '@/i18n'
 import { useUserStore } from '@/stores/user'
 import { dbService } from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { pick, uniqueId } from 'lodash-es'
+import { uniqueId } from 'lodash-es'
 import { groupInfoApi, groupMemberApi } from '@/api/group'
 import { sendToGroup } from '@/api/msg'
 
@@ -29,9 +29,17 @@ export default function GroupChat({ f7route }) {
 	const DialogId = f7route.query.dialog_id // 会话 ID
 	const [chatInfo, setGroupInfo] = useState({}) // 群聊信息
 	const [member, setMember] = useState(new Map()) // 成员信息
+
+    // 消息处理（加密、解密）
+    const msgHendler = (message) => {
+        return message
+	}
 	// 消息列表
 	const messages = useLiveQuery(
-		async () => (await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId))?.data || []
+		async () => {
+            const allMsg = (await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId))?.data || []
+            return allMsg.map(msgItem => msgHendler(msgItem))
+        }
 	)
 	useEffect(() => {
 		// 获取群聊信息
@@ -51,10 +59,6 @@ export default function GroupChat({ f7route }) {
 			}
 		})
 	}, [])
-	useEffect(() => {
-		console.log('member', member)
-		console.log('messages', messages)
-	}, [member, messages])
 
 	// 发送消息
 	const messagebarRef = useRef(null)
@@ -105,6 +109,7 @@ export default function GroupChat({ f7route }) {
 			type, // 1:文本 2:语音 3:图片
 			send_status: 0 // 0:未发送 1:发送中 2:发送成功 3:发送失败
 		}
+        console.log('发送消息', message);
 		const newAllMsg = {
 			user_id: ReceiverId,
 			data: [...messages, message]
@@ -124,8 +129,12 @@ export default function GroupChat({ f7route }) {
 		try {
 			// message['send_status'] = 1
 			// dbService.update(dbService.TABLES.MSGS, ReceiverId, newAllMsg)
-			const { code, data } = await sendToGroup(pick(message, ['content', 'dialog_id', 'group_id', 'type']))
-			console.log(code, data)
+			const { code } = await sendToGroup({
+                content: JSON.stringify(message),
+                dialog_id: message.dialog_id,
+                group_id: message.group_id,
+                type: message.type
+            })
 			message['send_status'] = code === 200 ? 2 : 3
 		} catch (error) {
 			console.log(error)
@@ -138,7 +147,6 @@ export default function GroupChat({ f7route }) {
 	// 图片表情
 	const [sheetVisible, setSheetVisible] = useState(false)
 	const onEmojiSelect = ({ type, emoji }) => {
-		// console.log(type, emoji)
 		type === 'emoji' && setMsgText(`${msgText}${emoji}`)
 		type === 'img' && sendMessage(emoji, 3)
 	}
