@@ -22,10 +22,10 @@ Login.propTypes = {
 export default function Login({ disabled, handlerRegister }) {
 	// 表单数据
 	const [fromData, setFromData] = useState({
-		nickname: '123',
-		email: '123@qq.com',
-		password: '123456qq',
-		confirm_password: '123456qq'
+		nickname: '',
+		email: '',
+		password: '',
+		confirm_password: ''
 	})
 
 	// 错误提示

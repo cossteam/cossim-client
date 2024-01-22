@@ -20,7 +20,7 @@ import { getUserInfoApi } from '@/api/user'
 // import { SignalProtocolStore } from '@/utils/signal/storage-type'
 // import { reconnectSession } from '@/utils/signal/signal-protocol'
 import { encryptMessage, decryptMessage, importKey } from '@/utils/signal/signal-crypto'
-import { getSession, updateSession } from '@/utils/session'
+import { getSession } from '@/utils/session'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -49,6 +49,7 @@ export default function MessagesPage({ f7route }) {
 	// const [userInfo, setUserInfo] = useState({})
 	// const [userSesion, setUserSession] = useState({})
 	const [preKey, setPreKey] = useState(null)
+
 
 	useEffect(() => {
 		// 基本初始化
@@ -125,7 +126,7 @@ export default function MessagesPage({ f7route }) {
 
 		const updateMsg = async () => {
 			try {
-				const lastMsg = allMsg[0]?.data?.at(-1) || []
+				const lastMsg = allMsg?.find((item) => item.user_id === ReceiverId)?.data?.at(-1) || []
 
 				// 如果是发送消息
 				if (isSend) {
@@ -148,7 +149,7 @@ export default function MessagesPage({ f7route }) {
 					// setPreKey(preKey || '1')
 				}
 				lastMsg.content = content
-
+				console.log("lastMsg",lastMsg,messages);
 				setMessages([...messages, lastMsg])
 			} catch (error) {
 				console.error('解析消息失败：', error.message)
