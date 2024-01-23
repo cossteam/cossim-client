@@ -11,7 +11,6 @@ import { groupRequestListApi } from '@/api/group'
 import { confirmAddFriendApi } from '@/api/relation'
 import { confirmAddGroupApi } from '@/api/group'
 
-
 // import PropTypes from 'prop-types'
 // NewContact.propTypes = {
 // 	f7route: PropTypes.object
@@ -40,8 +39,12 @@ export default function NewContact() {
 					publicKey: await exportPublicKey(users?.data?.keyPair?.publicKey)
 				}
 				// 同意或拒绝添加好友
-				const { code } = await confirmAddFriendApi({ user_id: id, e2e_public_key: JSON.stringify(directory), action: status })
-                getResquestList() // 更新列表
+				const { code } = await confirmAddFriendApi({
+					user_id: id,
+					e2e_public_key: JSON.stringify(directory),
+					action: status
+				})
+				getResquestList() // 更新列表
 				if (code !== 200) return
 
 				// 修改状态
@@ -62,9 +65,9 @@ export default function NewContact() {
 				const { code } = await confirmAddGroupApi({
 					group_id,
 					action: status, // 1 同意 0 拒绝
-                    inviter_id: ''
+					inviter_id: ''
 				})
-                getResquestList() // 更新列表
+				getResquestList() // 更新列表
 				if (code !== 200) return
 
 				// 修改状态
@@ -77,18 +80,18 @@ export default function NewContact() {
 		}
 	]
 	const [activeTabbar, setActiveTabbar] = useState(0)
-    // 获取申请列表
-    const getResquestList = () => {
+	// 获取申请列表
+	const getResquestList = () => {
 		friendApplyListApi().then(({ data }) => {
 			updateFriendResquest(data || [])
 		})
 		groupRequestListApi().then(({ data }) => {
 			updateGroupResquest(data || [])
 		})
-    }
-    useEffect(() => {
-        getResquestList()
-    }, [activeTabbar])
+	}
+	useEffect(() => {
+		getResquestList()
+	}, [activeTabbar])
 
 	return (
 		<Page noToolbar className="new-contact">

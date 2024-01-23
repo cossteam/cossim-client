@@ -135,7 +135,6 @@ export default function Chats(props) {
 					}
 				}
 			}
-			console.log('chatList', chatList)
 			setChatList(chatList)
 		}
 		decrypt()
@@ -159,7 +158,6 @@ export default function Chats(props) {
 	}
 
 	const lastMessageHandler = (chat) => {
-		console.log(chat)
 		let msg = chat.last_message
 		if (!chat?.group_id) return msg
 		try {
@@ -195,6 +193,7 @@ export default function Chats(props) {
 						title={chat.dialog_name}
 						// badge={chat.dialog_unread_count}
 						after={chatsTimeFormat(chat.send_time)}
+						// after={chat.send_time}
 						swipeout
 					>
 						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />

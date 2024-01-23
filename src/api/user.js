@@ -58,6 +58,20 @@ export function registerApi(data) {
 }
 
 /**
+ * 搜索用户
+ * @param {*} params
+ * @param {*} params.email
+ * @returns
+ */
+export function searchUserApi(params) {
+	return request({
+		url: `${baseApi}/search`,
+		method: 'GET',
+		params
+	})
+}
+
+/**
  * 查询用户信息
  * @param {*} params
  * @param {string} params.user_id     	用户 邮箱 | id
@@ -116,7 +130,6 @@ export function logoutApi() {
 		method: 'POST'
 	})
 }
-
 
 /**
  * 获取用户的公钥
