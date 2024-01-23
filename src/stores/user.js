@@ -28,6 +28,7 @@ const userStore = (set) => ({
 	identity: {},
 	signal: {},
 	directory: {},
+	dbName: '',
 	updateLogin: (isLogin) => set({ isLogin }),
 	updateUser: (user) =>
 		set((state) => ({
@@ -54,7 +55,8 @@ const userStore = (set) => ({
 			}
 		})),
 	updateSignal: (signal) => set({ signal }),
-	updateDirectory: (directory) => set({ directory })
+	updateDirectory: (directory) => set({ directory }),
+	updateDBName: (dbName) => set({ dbName })
 })
 
 const ProStroeName = 'COSS_USER_STRORAGE'

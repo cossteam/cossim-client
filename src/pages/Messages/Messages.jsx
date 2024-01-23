@@ -21,6 +21,7 @@ import { getUserInfoApi } from '@/api/user'
 // import { reconnectSession } from '@/utils/signal/signal-protocol'
 import { encryptMessage, decryptMessage, importKey } from '@/utils/signal/signal-crypto'
 import { getSession } from '@/utils/session'
+import MessageBox from '@/components/Message/Message'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -49,7 +50,6 @@ export default function MessagesPage({ f7route }) {
 	// const [userInfo, setUserInfo] = useState({})
 	// const [userSesion, setUserSession] = useState({})
 	const [preKey, setPreKey] = useState(null)
-
 
 	useEffect(() => {
 		// 基本初始化
@@ -149,7 +149,7 @@ export default function MessagesPage({ f7route }) {
 					// setPreKey(preKey || '1')
 				}
 				lastMsg.content = content
-				console.log("lastMsg",lastMsg,messages);
+				console.log('lastMsg', lastMsg, messages)
 				setMessages([...messages, lastMsg])
 			} catch (error) {
 				console.error('解析消息失败：', error.message)
@@ -405,7 +405,9 @@ export default function MessagesPage({ f7route }) {
 				</MessagebarSheet>
 			</Messagebar>
 
-			<Messages>
+			<MessageBox messages={messages} />
+
+			{/* <Messages>
 				{messages.map((message, index) => (
 					<Message
 						key={index}
@@ -420,12 +422,10 @@ export default function MessagesPage({ f7route }) {
 					>
 						<span slot="text-footer">
 							{messageTime(message)}
-							{/* 发送状态 */}
 							{message?.send_state && message.type === 'sent' ? (
 								message.send_state === 'ok' ? (
 									<DoubleTickIcon />
 								) : (
-									// message.send_state
 									<Icon
 										className="text-base"
 										f7={message.send_state === 'sending' ? 'slowmo' : 'wifi_slash'}
@@ -438,7 +438,7 @@ export default function MessagesPage({ f7route }) {
 						</span>
 					</Message>
 				))}
-			</Messages>
+			</Messages> */}
 		</Page>
 	)
 }

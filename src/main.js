@@ -16,6 +16,8 @@ import './styles/app.less'
 // Import App Component
 import Home from './Home.jsx'
 
+import 'animate.css'
+
 // import * as serviceWorker from './utils//serviceWorker'
 
 // Init F7 React Plugin

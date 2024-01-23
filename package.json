@@ -32,6 +32,7 @@
         "@aomao/engine": "^2.10.25",
         "@privacyresearch/libsignal-protocol-typescript": "^0.0.16",
         "@signalapp/libsignal-client": "^0.38.0",
+        "animate.css": "^4.1.1",
         "axios": "^1.6.3",
         "clsx": "^2.1.0",
         "dexie": "^3.2.4",
@@ -56,6 +57,7 @@
         "skeleton-elements": "^4.0.1",
         "swiper": "^11.0.5",
         "timeago.js": "4.0.0-beta.3",
+        "tippy.js": "^6.3.7",
         "vue-auto-translate": "^1.1.12",
         "zustand": "^4.4.7"
     },

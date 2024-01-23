@@ -1,8 +1,12 @@
 import Dexie from 'dexie'
 import { getStorage } from '@/utils/stroage'
 
+const state = getStorage()?.state?.user
+
+console.log("state",state);
+
 // COSSIM 客户端数据库
-const user_id = getStorage()?.state?.user?.user_id || 'DB'
+const user_id =  state?.user_id || state?.dbName ||  'DB'
 const WebDB = new Dexie(`COSSIM_${user_id}`)
 
 export const PRIMARY_KEY = 'user_id'

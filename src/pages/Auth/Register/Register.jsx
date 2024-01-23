@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { f7, ListInput, List, LoginScreenTitle, Button, theme, Preloader } from 'framework7-react'
 import { $t } from '@/i18n'
-import { useUserStore } from '@/stores/user'
+// import { useUserStore } from '@/stores/user'
 import { Lock, At } from 'framework7-icons/react'
 import { useEffect } from 'react'
 import PropTypes from 'prop-types'
@@ -11,13 +11,11 @@ import '../Auth.less'
 import { clsx } from 'clsx'
 // import PGP from '@/utils/PGP'
 // import DB from '@/db'
-import { SignalDirectory } from '@/utils/signal-directory'
-import { createIdentity } from '@/utils/protocol'
+// import { SignalDirectory } from '@/utils/signal-directory'
+// import { createIdentity } from '@/utils/protocol'
 
-Login.propTypes = {
-	disabled: PropTypes.bool.isRequired,
-	handlerRegister: PropTypes.func
-}
+// import Signal, { toBase64 } from '@/utils/signal/signal-protocol'
+// import { useHistoryStore } from '@/stores/history'
 
 export default function Login({ disabled, handlerRegister }) {
 	// 表单数据
@@ -38,10 +36,14 @@ export default function Login({ disabled, handlerRegister }) {
 	const [loading, setLoading] = useState(false)
 
 	// 用户信息
-	const userStore = useUserStore()
+	// const userStore = useUserStore()
+	// const historyStore = useHistoryStore()
 
 	// signal 目录
-	const signalDirectory = new SignalDirectory()
+	// const signalDirectory = new SignalDirectory()
+	// const deviceName = Math.random().toString(36).slice(-8)
+	// const deviceId = Math.floor(10000 * Math.random())
+	// const [signal] = useState(new Signal(deviceName, deviceId))
 
 	// 错误信息列表
 	const errorList = {
@@ -85,11 +87,21 @@ export default function Login({ disabled, handlerRegister }) {
 			if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || '注册失败')
 
 			// 生成用户信息
-			const deviceId = Math.floor(10000 * Math.random())
-			const info = await createIdentity(fromData.nickname, decryptedData.data.user_id, deviceId, signalDirectory)
+			// const info = await signal.ceeateIdentity(signal.deviceName)
+			// const directory = signal.directory?.getPreKeyBundle(signal.deviceName) || {}
+			// const obj = {
+			// 	...directory,
+			// 	deviceName: signal.deviceName,
+			// 	deviceId: signal.deviceId
+			// }
+			// const data = JSON.stringify(toBase64(obj))
+			// const historyInfo = {
+			// 	user_id: decryptedData.data?.user_id,
+			// 	device_id: signal.deviceId,
+			// 	device_name: signal.deviceName
+			// }
 
-			userStore.updateIdentity({ ...info, directory: signalDirectory })
-
+			// 注册成功
 			f7.dialog.alert(errorList.registerSuccess, () => {
 				handlerRegister()
 			})
@@ -191,4 +203,9 @@ export default function Login({ disabled, handlerRegister }) {
 			</List>
 		</>
 	)
+}
+
+Login.propTypes = {
+	disabled: PropTypes.bool.isRequired,
+	handlerRegister: PropTypes.func
 }

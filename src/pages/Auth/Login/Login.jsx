@@ -13,9 +13,6 @@ import { clsx } from 'clsx'
 import Signal, { toBase64 } from '@/utils/signal/signal-protocol'
 // import WebDB from '@/db'
 
-Login.propTypes = {
-	disabled: PropTypes.bool.isRequired
-}
 
 export default function Login({ disabled }) {
 	// 表单数据
@@ -60,32 +57,6 @@ export default function Login({ disabled }) {
 			setLoading(true)
 			// 登录
 			let decryptedData = await loginApi(fromData)
-
-			/*
-			// 生成客户端公钥
-			const { privateKey, publicKey, revocationCertificate } = await PGP.generateKeys()
-			userStore.updateClientKeys({ privateKey, publicKey, revocationCertificate })
-			const newFromData = { ...fromData, public_key: publicKey }
-			setFromData(newFromData)
-			// AES256 加密表单数据
-			const passwords = ['coss']
-			const messageEncrypted = await PGP.encryptAES256(JSON.stringify(newFromData), passwords[0])
-			// 使用服务端公钥加密AES256密钥
-			const passwordsEncrypted = await PGP.encrypt({
-				text: passwords[0],
-				key: userStore.serviceKey
-			})
-
-			// 登录
-			const res = await loginApi({
-				message: messageEncrypted,
-				secret: passwordsEncrypted
-			})
-			 */
-			// AES256解密
-			// const decrypted = await PGP.decryptAES256(decryptedData.message, await PGP.decrypt(decryptedData.secret))
-			// decryptedData = JSON.parse(decrypted)
-			// console.log('res', decryptedData)
 
 			// 无论登录成功与否都需要关闭 loading
 			if (decryptedData) setLoading(false)
@@ -185,4 +156,8 @@ export default function Login({ disabled }) {
 			</List>
 		</>
 	)
+}
+
+Login.propTypes = {
+	disabled: PropTypes.bool.isRequired
 }

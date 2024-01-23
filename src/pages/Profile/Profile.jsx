@@ -1,11 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { List, ListItem, Navbar, Link, Page, ListButton, f7 } from 'framework7-react'
+import { List, ListItem, Navbar, Link, Page, f7, Toggle } from 'framework7-react'
 import './Profile.less'
 // import ListColorIcon from '@/components/ListColorIcon'
 // import { contacts } from '@/data'
 import { $t } from '@/i18n'
 import { getUserInfoApi } from '@/api/user'
-import { deleteFriendApi, addBlackListApi } from '@/api/relation'
+import { deleteFriendApi, addBlackListApi, deleteBlackListApi } from '@/api/relation'
 import PropTypes from 'prop-types'
 
 import { dbService } from '@/db'
@@ -23,11 +23,26 @@ export default function Profile(props) {
 	const pageRef = useRef(null)
 	const profileAvatarRef = useRef(null)
 
+	const [isBlackList, setIsBlackList] = useState(false)
+
+	const text = {
+		tips: $t('您确定要删除好友吗？'),
+		btn_agree: $t('同意'),
+		btn_refuse: $t('拒绝'),
+		backTips: $t('加入黑名单后，你将不再收到对方的消息'),
+		delSuccess: $t('删除成功'),
+		blackSuccess: $t('添加黑名单成功'),
+		blackFail: $t('添加黑名单失败'),
+		romoveBlackTips: $t('您确定要移除黑名单吗？'),
+		romoveBlackSuccess: $t('移除黑名单成功'),
+		romoveBlackFail: $t('移除黑名单失败')
+	}
+
 	// 页面安装时将页面滚动到头像大小的一半
 	useEffect(() => {
 		const getUserInfo = async () => {
 			const res = await getUserInfoApi({ user_id: f7route.params.id, type: 1 })
-			console.log('获取用户信息', res)
+			// console.log('获取用户信息', res)
 			if (res.code !== 200) return
 			setInfo(res.data)
 		}
@@ -37,22 +52,12 @@ export default function Profile(props) {
 		pageRef.current.el.querySelector('.page-content').scrollTop = profileAvatarHeight / 2
 	}, [])
 
-	const text = {
-		tips: $t('您确定要删除好友吗？'),
-		btn_agree: $t('同意'),
-		btn_refuse: $t('拒绝'),
-		backTips: $t('加入黑名单后，你将不再收到对方的消息'),
-		delSuccess: $t('删除成功'),
-		blackSuccess: $t('添加黑名单成功')
-	}
-
 	const deleteFriend = () => {
 		// 确认提示
 		f7.dialog.confirm(text.tips, async () => {
 			const res = await deleteFriendApi({ user_id: f7route.params.id })
 			if (res.code !== 200) return
 			// 删除本地存储
-			// await WebDB.contacts.where('user_id').equals(f7route.params.id).delete()
 			await dbService.delete(dbService.TABLES.CONTACTS, f7route.params.id)
 			f7.dialog.alert(text.delSuccess, () => {
 				f7router.back()
@@ -61,14 +66,48 @@ export default function Profile(props) {
 	}
 
 	const addBlackList = () => {
-		f7.dialog.confirm(text.backTips, async () => {
-			const res = await addBlackListApi({ user_id: f7route.params.id })
-			if (res.code !== 200) return
-			console.log(res)
-			// await dbService.delete(dbService.TABLES.CONTACTS, f7route.params.id)
-			f7.dialog.alert(text.blackSuccess, () => {
-				f7router.back()
-			})
+		f7.dialog.confirm(
+			text.backTips,
+			async () => {
+				try {
+					const res = await addBlackListApi({ user_id: f7route.params.id })
+					if (res.code !== 200) {
+						f7.dialog.alert(res?.msg || text.blackFail)
+						setIsBlackList(false)
+						return
+					}
+				} catch {
+					f7.dialog.alert(text.blackFail)
+				}
+			},
+			() => setIsBlackList(false)
+		)
+	}
+
+	const deleteBlackList = async () => {
+		f7.dialog.confirm(
+			text.romoveBlackTips,
+			async () => {
+				try {
+					const res = await deleteBlackListApi({ user_id: f7route.params.id })
+					if (res.code !== 200) {
+						f7.dialog.alert(res?.msg)
+						setIsBlackList(true)
+						return
+					}
+				} catch {
+					f7.dialog.alert(text.romoveBlackFail)
+				}
+			},
+			() => setIsBlackList(true)
+		)
+	}
+
+	const onToggleChange = () => {
+		setIsBlackList(() => {
+			const isblack = !isBlackList
+			isblack ? addBlackList() : deleteBlackList()
+			return isblack
 		})
 	}
 
@@ -80,7 +119,7 @@ export default function Profile(props) {
 			</div>
 			<div className="profile-content">
 				<List strong outline dividers mediaList className="no-margin-top">
-					<ListItem title={info?.name} text={info?.nick_name}>
+					<ListItem title={info?.name} text={info?.nick_name || info?.nickname}>
 						<div slot="after" className="profile-actions-links">
 							<Link iconF7="chat_bubble_fill" />
 							{/* <Link iconF7="camera_fill" /> */}
@@ -89,6 +128,7 @@ export default function Profile(props) {
 					</ListItem>
 					<ListItem subtitle={info?.status} text={info?.email} />
 				</List>
+
 				{/* <List strong outline dividers>
 					<ListItem link title={$t('媒体、链接和文档')} after="1 758">
 						<ListColorIcon color="#007BFD" icon="photo" slot="media" />
@@ -147,11 +187,24 @@ export default function Profile(props) {
 					<ListButton>Export Chat</ListButton>
 					<ListButton color="red">Clear Chat</ListButton>
 				</List> */}
-				<List strong outline dividers>
-					<ListButton onClick={addBlackList}>{$t('添加到黑名单')}</ListButton>
-					<ListButton color="red" onClick={deleteFriend}>
+
+				{/* <ListButton color="red" onClick={deleteFriend}>
 						{$t('删除好友')}
-					</ListButton>
+					</ListButton> */}
+
+				<List strong outline dividers>
+					<ListItem>
+						<span onClick={deleteFriend} slot="title">
+							{$t('添加到黑名单')}
+						</span>
+						<Toggle slot="after" onToggleChange={onToggleChange} checked={isBlackList} />
+					</ListItem>
+
+					<ListItem onClick={deleteFriend}>
+						<span slot="title" className="text-red-500">
+							{$t('删除好友')}
+						</span>
+					</ListItem>
 				</List>
 			</div>
 		</Page>
