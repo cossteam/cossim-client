@@ -26,6 +26,7 @@ import { getSession } from '@/utils/session'
 import { useUserStore } from '@/stores/user'
 import { decryptMessage, importKey } from '@/utils/signal/signal-crypto'
 import { format } from 'timeago.js'
+import WebSocketClient from '@/utils/WebSocketClient'
 
 export default function Chats(props) {
 	// const { f7router } = props
@@ -95,27 +96,54 @@ export default function Chats(props) {
 
 	// 解密消息
 	useEffect(() => {
-		const decrypt = async () => {
-			const chatList = chats
+		const decrypt = async (data) => {
+			let chatList = (await dbService.findAll(dbService.TABLES.CHATS)) || []
+			console.log('chatList', chatList, data)
 			if (chatList.length === 0) return
 
-			for (let i = 0; i < chats.length; i++) {
-				const item = chatList[i]
-				let userSession = null,
-					preKey = null
+			let userSession = null,
+				preKey = null
+
+			if (!data) {
+				for (let i = 0; i < chats.length; i++) {
+					const item = chatList[i]
+
+					try {
+						if (!item.last_message) continue
+						userSession = await getSession(user?.user_id, item.user_id)
+						preKey = await importKey(userSession?.preKey)
+						item.last_message = await decryptMessage(preKey, item.last_message)
+					} catch {
+						continue
+					}
+				}
+			} else {
+				let last_message = ''
 				try {
-					if (!item.last_message) continue
-					userSession = await getSession(user?.user_id, item.user_id)
+					userSession = await getSession(user?.user_id, data?.receiver_id)
 					preKey = await importKey(userSession?.preKey)
-					item.last_message = await decryptMessage(preKey, item.last_message)
+					last_message = await decryptMessage(preKey, data?.last_message)
 				} catch {
-					continue
+					last_message = data?.last_message
+				}
+				const index = chatList.findIndex((v) => v.user_id === data?.receiver_id)
+				console.log('index', index)
+				if (index !== -1) {
+					chatList[index] = {
+						...chatList,
+						last_message
+					}
 				}
 			}
 			setChatList(chatList)
 		}
 		decrypt()
-	}, [chats])
+		WebSocketClient.addListener('onChats', decrypt)
+
+		return () => {
+			WebSocketClient.removeListener('onChats', decrypt)
+		}
+	}, [])
 
 	// 会话时间格式化
 	const chatsTimeFormat = (date) => {
