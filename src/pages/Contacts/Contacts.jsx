@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { List, ListGroup, ListItem, Navbar, Page, Searchbar, Subnavbar, Icon } from 'framework7-react'
 import React from 'react'
 import { friendListApi } from '@/api/relation'
@@ -7,6 +7,8 @@ import './Contacts.less'
 import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useRelationRequestStore } from '@/stores/relationRequest'
+import { friendApplyListApi } from '@/api/relation'
+import { groupRequestListApi } from '@/api/group'
 
 export default function Contacts(props) {
 	/**
@@ -67,11 +69,37 @@ export default function Contacts(props) {
 		})()
 	}, [props])
 
-	const { friendResquest, groupResquest } = useRelationRequestStore() // 获取申请列表
-    useEffect(() => {
-        // TODO: 显示未处理请求数
-        // console.log(friendResquest, groupResquest);
-    }, [friendResquest, groupResquest])
+	const { updateFriendResquest, updateGroupResquest } = useRelationRequestStore() // 获取申请列表
+	const [requestNumber, setRequestNumber] = useState(0) // 待处理请求数量
+	// 获取申请列表
+	const getResquestList = () => {
+		return Promise.allSettled([friendApplyListApi(), groupRequestListApi()]).then(
+			([
+				{
+					value: { data: friendResquest }
+				},
+				{
+					value: { data: groupResquest }
+				}
+			]) => {
+				let count = 0
+				friendResquest &&
+					friendResquest.forEach((item) => {
+						if (item.user_status === 0) count++
+					})
+				groupResquest &&
+					groupResquest.forEach((item) => {
+						if (item.group_status === 1) count++
+					})
+				setRequestNumber(count)
+				updateFriendResquest(friendResquest || [])
+				updateGroupResquest(groupResquest || [])
+			}
+		)
+	}
+	useEffect(() => {
+		getResquestList()
+	}, [props])
 
 	return (
 		<Page className="contacts-page">
@@ -81,7 +109,7 @@ export default function Contacts(props) {
 				</Subnavbar>
 			</Navbar>
 			<List contactsList noChevron dividers>
-				<ListItem link="/new_contact/">
+				<ListItem link="/new_contact/" badge={requestNumber} badgeColor="red">
 					<Icon className="contacts-list-icon" f7="person_badge_plus_fill" slot="media" color="primary" />
 					<span slot="title" className="text-color-primary">
 						{$t('新请求')}
@@ -101,7 +129,7 @@ export default function Contacts(props) {
 							<ListItem
 								key={contact.nick_name}
 								link={`/profile/${contact.user_id}/`}
-								title={contact.nick_name}
+								title={contact.nickname}
 								footer={contact.signature}
 								popupClose
 								data-test={contact.email}

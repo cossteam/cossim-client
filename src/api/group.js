@@ -36,6 +36,21 @@ export function joinGroupApi(data) {
 }
 
 /**
+ * 邀请加入群聊
+ * @param {*} data
+ * @param {String} data.group_id
+ * @param {Array} data.member
+ * @returns
+ */
+export function groupInviteMemberApi(data) {
+	return request({
+		url: relationGroup + '/invite',
+		method: 'POST',
+		data
+	})
+}
+
+/**
  * 获取群申请列表
  * @param {*} params
  * @returns

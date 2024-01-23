@@ -54,7 +54,7 @@ const handlerMessage = async (msg) => {
 	// 查找本地消息记录
 	const result = await dbService.findOneById(dbService.TABLES.MSGS, msg.data?.sender_id)
 	// 如果有记录就更新，没有就添加到表中
-	console.log("result",result);
+	console.log('result', result)
 	result
 		? dbService.update(dbService.TABLES.MSGS, msg.data?.sender_id, {
 				user_id: msg.data?.sender_id,
@@ -164,7 +164,7 @@ const Home = () => {
 	// Framework7 Parameters
 	const [f7params] = useState({
 		name: '', // App name
-		theme: 'auto', // Automatic theme detection
+		theme: 'ios', // Automatic theme detection
 		// App store
 		store: [],
 		// App routes
@@ -176,8 +176,10 @@ const Home = () => {
 		},
 		// Cordova Statusbar settings
 		statusbar: {
-			iosOverlaysWebView: true,
-			androidOverlaysWebView: false
+			iosOverlaysWebView: true, // 在iOS上叠加在WebView上,
+			androidOverlaysWebView: false,
+			androidBackgroundColor: '#ffffff', // 设置Android状态栏的背景色
+			iosBackgroundColor: '#ffffff' // 设置iOS状态栏的背景色
 		},
 		colors: {
 			primary: '#33a854'

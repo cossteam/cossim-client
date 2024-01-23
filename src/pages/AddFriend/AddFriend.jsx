@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
-import { Navbar, Page, Block, Subnavbar, Searchbar, f7 } from 'framework7-react'
-import { Search as SearchIcon } from 'framework7-icons/react'
+import React, { useState, useEffect } from 'react'
+import { Navbar, Page, Searchbar, f7, List, ListItem } from 'framework7-react'
 import { $t } from '@/i18n'
-import { getUserInfoApi } from '@/api/user'
+import { searchUserApi, getUserInfoApi } from '@/api/user'
 import useLoading from '@/shared/useLoading'
 import PropTypes from 'prop-types'
 
@@ -14,19 +13,23 @@ export default function AddFriend(props) {
 	const { f7router } = props
 	const { show, hide } = useLoading()
 
-	// useEffect(() => {
-	// 	console.log('f7router', f7router)
-	// 	console.log('$(f7router.selector)[0]', $(f7router.selector))
-	// }, [])
+	const [keywords, setKeywords] = useState('')
+	const [userList, setUserList] = useState([])
+	const searchUser = async () => {
+		const { data } = await searchUserApi({
+			email: keywords
+		})
+		setUserList(data ? [data] : [])
+	}
+	useEffect(() => {
+		if (keywords === '') return
+		searchUser()
+	}, [keywords])
 
-	const [keywords, setKeywords] = useState('123@qq.com')
-
-	const tips = $t('搜索')
-
-	const search = async () => {
+	const getUserInfo = async (user_id) => {
 		try {
 			show()
-			const res = await getUserInfoApi({ email: keywords, type: 0 })
+			const res = await getUserInfoApi({ user_id })
 			if (res.code !== 200) return f7.dialog.alert(res.msg)
 			// 跳转页面
 			f7router.navigate(`/add_details/${res.data.user_id}/`)
@@ -48,25 +51,30 @@ export default function AddFriend(props) {
 				</NavLeft> */}
 				{/* <NavTitle>{$t('添加朋友')}</NavTitle> */}
 			</Navbar>
-
-			<Subnavbar>
-				<Searchbar
-					placeholder={$t('邮箱')}
-					disableButtonText={$t('取消')}
-					onInput={(e) => setKeywords(e.target.value)}
-					onCancel={() => setKeywords('')}
-				/>
-			</Subnavbar>
-
-			<Block className="my-5">
-				{keywords && (
-					<div className="flex items-center text-[1rem]" onClick={search}>
-						<SearchIcon className="w-5 h-5 text-icon-cc" />
-						<span className="ml-2">{tips}：</span>
-						<span className="text-primary">{keywords}</span>
-					</div>
-				)}
-			</Block>
+			<Searchbar
+				searchContainer=".contacts-list"
+				placeholder={$t('请输入完整邮箱')}
+				disableButtonText={$t('取消')}
+				onInput={(e) => setKeywords(e.target.value)}
+				onCancel={() => setKeywords('')}
+			/>
+			{keywords && (
+				<div className="flex items-center text-[1rem]">
+					<List contactsList noChevron dividers>
+						{userList.map((user, index) => (
+							<ListItem
+								key={index}
+								title={user?.nickname || ''}
+								footer={user?.signature || ''}
+								popupClose
+								onClick={() => getUserInfo(user?.user_id)}
+							>
+								<img slot="media" src={user?.avatar} alt="" />
+							</ListItem>
+						))}
+					</List>
+				</div>
+			)}
 		</Page>
 	)
 }
