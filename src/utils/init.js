@@ -1,44 +1,40 @@
-import { dbService } from '@/db'
-import { generateKeyPair, exportPublicKey, updatePublicKeyApi } from '@/utils/signal/signal-crypto'
+// import { dbService } from '@/db'
+// import { exportPublicKey, importPublicKey } from '@/utils/signal/signal-crypto'
+import commonService from '@/db/common'
+import { updatePublicKeyApi } from '@/api/user'
+import { exportKey } from '@/utils/tweetnacl'
 
-// 初始化用户,用户首次登录时会自动创建
-export const initUsers = async (user, signal, identity, directory) => {
+/**
+ * 初始化用户,用户首次登录时会自动创建
+ * TODO: 如果是新设备登录需要做一些额外操作，例如：同步数据，传递私钥
+ * @param {*} user
+ * @returns
+ */
+export const useInitUser = async (user) => {
 	try {
+		const id = user?.user_id
+
 		// 如果已经有了用户信息，就不需要添加
-		const result = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
-		if (result) return
+		const result = await commonService.findOneById(commonService.TABLES.HISTORY, id)
 
-		// 为用户生成密钥对
-		const keyPair = await generateKeyPair()
+		// 首次注册后登录需要上传公钥到服务端
+		if (result && result.data?.isFirst) {
+			// 上传公钥
+			const secret_bundle = JSON.stringify({
+				publicKey: exportKey(result?.data.keyPair?.publicKey)
+			})
+			const res = await updatePublicKeyApi({ secret_bundle })
 
-		// 添加用户
-		const success = await dbService.add(dbService.TABLES.USERS, {
-			user_id: user?.user_id,
-			data: {
-				signal,
-				info: user,
-				identity,
-				directory,
-				keyPair
-			}
-		})
+			if (res.code !== 200) return console.error('上传公钥失败', res)
 
-		const secret_bundle = JSON.stringify({
-			directory,
-			publicKey: await exportPublicKey(keyPair?.publicKey)
-		})
-
-		// 更新公钥信息到服务器
-		const res = await updatePublicKeyApi({ secret_bundle })
-
-		if (res.code !== 200) return
-
-		console.log('上传公钥成功', res)
-
-		// TODO: 这里可以统一上报
-		if (!success) console.log('添加用户失败')
-
-		console.log('indexDB 添加用户成功', success)
+			// 更新用户信息
+			await commonService.update(commonService.TABLES.HISTORY, id, {
+				data: {
+					...result.data,
+					isFirst: false
+				}
+			})
+		}
 	} catch (error) {
 		console.error('初始化用户消息失败:', error)
 	}

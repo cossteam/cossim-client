@@ -21,7 +21,7 @@ import { getUserInfoApi } from '@/api/user'
 // import { reconnectSession } from '@/utils/signal/signal-protocol'
 import { encryptMessage, decryptMessage, importKey } from '@/utils/signal/signal-crypto'
 import { getSession } from '@/utils/session'
-import MessageBox from '@/components/Message/Message'
+import MessageBox from '@/components/Message/Msg'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -50,6 +50,8 @@ export default function MessagesPage({ f7route }) {
 	// const [userInfo, setUserInfo] = useState({})
 	// const [userSesion, setUserSession] = useState({})
 	const [preKey, setPreKey] = useState(null)
+
+	const [height, setHeight] = useState('100vh')
 
 	useEffect(() => {
 		// 基本初始化
@@ -336,6 +338,7 @@ export default function MessagesPage({ f7route }) {
 	// Fix for iOS web app scroll body when
 	const resizeTimeout = useRef(null)
 	const onViewportResize = () => {
+		setHeight(visualViewport.height - 88 + 'px')
 		$('html, body').css('height', `${visualViewport.height}px`)
 		$('html, body').scrollTop(0)
 	}
@@ -405,9 +408,9 @@ export default function MessagesPage({ f7route }) {
 				</MessagebarSheet>
 			</Messagebar>
 
-			<MessageBox messages={messages} />
+			{/* <MessageBox messages={messages} height={height} /> */}
 
-			{/* <Messages>
+			<Messages>
 				{messages.map((message, index) => (
 					<Message
 						key={index}
@@ -438,7 +441,7 @@ export default function MessagesPage({ f7route }) {
 						</span>
 					</Message>
 				))}
-			</Messages> */}
+			</Messages>
 		</Page>
 	)
 }

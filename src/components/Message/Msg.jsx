@@ -2,7 +2,7 @@ import React from 'react'
 import PropType from 'prop-types'
 import { Messages, Message, Icon, Popover, List, ListItem, Link } from 'framework7-react'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { $t } from '@/i18n'
 // import tippy from 'tippy.js'
 // import 'tippy.js/dist/tippy.css'
@@ -25,6 +25,7 @@ export default function MessageBox(props) {
 
 	const [timeOutEvent, setTimeOutEvent] = useState(0)
 	const [opened, setOpened] = useState('')
+	const popoverRef = useRef(null)
 
 	const isMessageFirst = (message) => {
 		const messageIndex = messages.indexOf(message)
@@ -41,24 +42,64 @@ export default function MessageBox(props) {
 		console.log('message', messages)
 	}, [messages])
 
-	let root = null
+	useEffect(() => {
+		const removeRoot = () => setOpened(false)
+
+		document.body.addEventListener('click', removeRoot)
+
+		return () => {
+			document.body.removeEventListener('click', removeRoot)
+		}
+	}, [])
+
+	useEffect(() => {
+		if (popoverRef.current && opened) {
+			popoverRef.current.style.display = 'block'
+		}
+
+		if (popoverRef.current && !opened) {
+			popoverRef.current.style.display = 'none'
+		}
+	}, [opened])
 
 	const handlerTouch = (e) => {
-		const id = e.target?.querySelector('.select')?.id
-		console.log("e.target?.querySelector('select')", e.target?.querySelector('.select'))
-		if (!id) return
-		root = createRoot(document.getElementById(id))
-		root.render(<Select />)
+		console.log('e', e.targetTouches)
+
+		const clientX = e.targetTouches[0].clientX
+		const clientY = e.targetTouches[0].clientY
+
+		console.log('popoverRef', popoverRef.current)
+
+		if (popoverRef.current) {
+			// 确保元素在可视区域
+			const rect = popoverRef.current.getBoundingClientRect()
+			console.log('rect', rect)
+
+			popoverRef.current.style.top = `${clientY}px`
+			popoverRef.current.style.left = `${clientX}px`
+
+			// 确保元素位置在可视区域，且不被遮挡，才显示
+			// const rect = popoverRef.current.getBoundingClientRect()
+			// console.log("rect", rect)
+
+			// if (rect.top < 0 || rect.left < 0 || rect.bottom > window.innerHeight || rect.right > window.innerWidth) {
+			// 	return
+			// }
+
+			if (opened) setOpened(false)
+
+			setOpened(true)
+		}
 	}
 
 	return (
 		<>
-			<Popover
+			{/* <Popover
 				className="popover-select w-[160px]"
 				arrow={false}
 				backdrop={false}
 				opened={opened}
-				targetEl="popover-select-btn"
+				// targetEl="popover-select-btn"
 				// containerEl="popover-select-btn"
 			>
 				<List className="text-white" dividersIos outlineIos strongIos>
@@ -69,12 +110,17 @@ export default function MessageBox(props) {
 						<span className="el-text">{$t('添加朋友')}</span>
 					</ListItem>
 				</List>
-			</Popover>
+			</Popover> */}
+			{/* {opened && ( */}
+			<div className="fixed z-[999] w-[300px] h-[150px] bg-black hidden" ref={popoverRef}>
+				111
+			</div>
+			{/* )} */}
 			<Messages>
 				{messages.map((message, index) => (
 					<Message
 						key={index}
-						className="message-appear-from-bottom relative"
+						className="popover-select-btn message-appear-from-bottom relative"
 						data-key={index}
 						first={isMessageFirst(message)}
 						last={isMessageLast(message)}
@@ -100,10 +146,17 @@ export default function MessageBox(props) {
 							onSelect={(e) => e.preventDefault()}
 						>
 							{message.content_type === 3 ? '' : message.content}
-							<div
+							{/* <div
 								id={'data-' + Math.random().toString(36).slice(-6)}
 								className="select w-auto h-auto fixed bottom-[120%]left-1/2 -translate-x-1/2 bg-black text-white"
-							></div>
+							></div> */}
+							{/* <Link
+								popoverOpen=".popover-select-btn"
+								id={'data-' + Math.random().toString(36).slice(-6)}
+								className="opover-link"
+							>
+								343435454
+							</Link> */}
 						</div>
 
 						<span slot="text-footer">
@@ -131,5 +184,6 @@ export default function MessageBox(props) {
 
 MessageBox.propTypes = {
 	messages: PropType.array.isRequired,
-	avatar: PropType.node
+	avatar: PropType.node,
+	height: PropType.string
 }

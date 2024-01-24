@@ -19,6 +19,8 @@ import {
 	exportKey,
 	exportPublicKey
 } from '@/utils/signal/signal-crypto'
+// import {}
+import { useInitUser } from '@/utils/init'
 
 /**
  * 异步处理消息。
@@ -68,7 +70,7 @@ const handlerMessage = async (msg) => {
 		? dbService.update(dbService.TABLES.CHATS, chats.id, { ...message, last_message: msg.data.content })
 		: dbService.add(dbService.TABLES.CHATS, msg.data)
 	
-	WebSocketClient.triggerEvent('onChats', { ...message, last_message: msg.data.content })
+	// WebSocketClient.triggerEvent('onChats', { ...message, last_message: msg.data.content })
 }
 
 const handlerGroupMessage = async (msg) => {
@@ -216,55 +218,56 @@ const Home = () => {
 	}
 
 	// 初始化用户,用户首次登录时会自动创建
-	const initUsers = async () => {
-		try {
-			// if(!user.user_id) return
-			// 如果已经有了用户信息，就不需要添加
-			const result = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
-			if (result) return
+	// const initUsers = async () => {
+	// 	try {
+	// 		// if(!user.user_id) return
+	// 		// 如果已经有了用户信息，就不需要添加
+	// 		const result = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
+	// 		if (result) return
 
-			// 为用户生成密钥对
-			const keyPair = await generateKeyPair()
+	// 		// 为用户生成密钥对
+	// 		const keyPair = await generateKeyPair()
 
-			// 添加用户
-			const success = await dbService.add(dbService.TABLES.USERS, {
-				user_id: user?.user_id,
-				data: {
-					signal,
-					info: user,
-					identity,
-					directory,
-					keyPair
-				}
-			})
+	// 		// 添加用户
+	// 		const success = await dbService.add(dbService.TABLES.USERS, {
+	// 			user_id: user?.user_id,
+	// 			data: {
+	// 				signal,
+	// 				info: user,
+	// 				identity,
+	// 				directory,
+	// 				keyPair
+	// 			}
+	// 		})
 
-			const secret_bundle = JSON.stringify({
-				directory,
-				publicKey: await exportPublicKey(keyPair?.publicKey)
-			})
+	// 		const secret_bundle = JSON.stringify({
+	// 			directory,
+	// 			publicKey: await exportPublicKey(keyPair?.publicKey)
+	// 		})
 
-			// 更新公钥信息到服务器
-			const res = await updatePublicKeyApi({ secret_bundle })
+	// 		// 更新公钥信息到服务器
+	// 		const res = await updatePublicKeyApi({ secret_bundle })
 
-			if (res.code !== 200) return
+	// 		if (res.code !== 200) return
 
-			console.log('上传公钥成功', res)
+	// 		console.log('上传公钥成功', res)
 
-			// TODO: 这里可以统一上报
-			if (!success) console.log('添加用户失败')
+	// 		// TODO: 这里可以统一上报
+	// 		if (!success) console.log('添加用户失败')
 
-			console.log('indexDB 添加用户成功', success)
-		} catch (error) {
-			console.error('初始化用户消息失败:', error)
-		}
-	}
+	// 		console.log('indexDB 添加用户成功', success)
+	// 	} catch (error) {
+	// 		console.error('初始化用户消息失败:', error)
+	// 	}
+	// }
 
 	// 连接ws并监听消息推送
 	useEffect(() => {
 		if (!isLogin) return
 
 		// 初始化 users 表
-		initUsers()
+		// initUsers()
+		useInitUser(user)
 
 		// 初始化 websocket
 		WebSocketClient.connect()

@@ -5,8 +5,10 @@ import { getUserInfoApi } from '@/api/user'
 import PropTypes from 'prop-types'
 import { addFriendApi } from '@/api/relation'
 import { useUserStore } from '@/stores/user'
-import { dbService } from '@/db'
-import { exportPublicKey } from '@/utils/signal/signal-crypto'
+// import { dbService } from '@/db'
+// import { exportPublicKey } from '@/utils/signal/signal-crypto'
+import commonService from '@/db/common'
+import { exportKey } from '@/utils/tweetnacl'
 
 AddDetails.propTypes = {
 	f7route: PropTypes.object
@@ -18,8 +20,6 @@ export default function AddDetails(props) {
 	const [info, setInfo] = useState({})
 
 	const { user } = useUserStore()
-
-
 	const pageRef = useRef(null)
 	const profileAvatarRef = useRef(null)
 
@@ -40,17 +40,12 @@ export default function AddDetails(props) {
 
 	const addFriend = async () => {
 		try {
-			console.log('f7route.params.id', f7route.params.id)
-			const users = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
-			if (!users) return f7.dialog.alert('系统内部错误')
-
-			// console.log("store",users?.data?.signal?.store)
-			// const exportedPublicKey = await crypto.subtle.exportKey('spki', users?.data?.keyPair?.publicKey)
-			// const exportedKeyBase64 = fromUint8Array(new Uint8Array(exportedPublicKey))
+			// console.log('f7route.params.id', f7route.params.id)
+			const result = await commonService.findOneById(commonService.TABLES.HISTORY, user?.user_id)
+			if (!result) f7.dialog.alert('本地数据库中没有该用户！请重新登录后重试')
 
 			const directory = {
-				...JSON.parse(users?.data?.directory),
-				publicKey: await exportPublicKey(users?.data?.keyPair?.publicKey)
+				publicKey: exportKey(result?.data?.keyPair?.publicKey)
 			}
 
 			const res = await addFriendApi({
