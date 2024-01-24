@@ -8,7 +8,7 @@ const useLongPress = (callback, duration = 500) => {
 		const handleTouchStart = (e) => {
 			e.preventDefault()
 			timerRef.current = setTimeout(() => {
-				callback()
+				callback(e)
 			}, duration)
 		}
 

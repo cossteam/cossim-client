@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Page, LoginScreen, Block, Button } from 'framework7-react'
+import { Page, LoginScreen, Block, Button, Popover, List, ListItem } from 'framework7-react'
 import { $t } from '@/i18n'
 import Login from './Login/Login'
 import Register from './Register/Register'
 import Fingerprint2 from 'fingerprintjs2'
+import LongPressWrap from '../Group/LongPressWrap'
+import { Link } from 'framework7-icons/react'
 
 export default function Auth() {
 	const [loginScreenOpened, setLoginScreenOpened] = useState('')
@@ -13,7 +15,7 @@ export default function Auth() {
 	// 指纹
 	const [fingerprint, setFingerprint] = useState('')
 	// 用户信息
-	const [data,setData] = useState(null)
+	const [data, setData] = useState(null)
 
 	const handleClick = (isLogin) => {
 		setLogin(isLogin)
@@ -44,11 +46,34 @@ export default function Auth() {
 		setTimeout(() => createFingerprintGenerator(), 500)
 	}, [])
 
+	// 消息操作菜单
+	const [msgEl, setMsgEL] = useState(null)
+	const [msgMenuOpened, setMsgMenuOpened] = useState(false)
+	const onMsgLongPress = (e, msg) => {
+		console.log('longPress', e, msg)
+		// console.log(e.target.offsetParent.offsetParent.offsetTop)
+		// setMsgEL(e.target.offsetParent.offsetParent)
+		// setMsgEL(e.srcElement)
+		setMsgMenuOpened(true)
+	}
+
+	useEffect(() => {
+		const handler = () => {
+			setMsgMenuOpened(false)
+			console.log('click')
+		}
+		document.body.addEventListener('click', handler)
+		return () => {
+			document.body.removeEventListener('click', handler)
+		}
+	}, [])
+
 	return (
 		<Page>
 			<Block className="flex justify-center h-3/5 pt-10">
 				<h1 className="text-3xl font-semibold">COSS</h1>
 			</Block>
+
 			<Block>
 				<Button
 					large
@@ -59,8 +84,21 @@ export default function Auth() {
 					className="mb-5"
 					round
 				>
-					{$t('登录')}
+					<Link popoverOpen=".popover-menu">
+						<LongPressWrap onLongPress={(e) => onMsgLongPress(e, '这是一个消息')}>
+							{$t('登录')}
+						</LongPressWrap>
+					</Link>
 				</Button>
+				<Popover
+					className="popover-menu"
+					// opened={msgMenuOpened}
+					// targetEl={msgEl}
+					// backdrop={false}
+					// arrow={false}
+				>
+					<span>菜单</span>
+				</Popover>
 				<Button
 					large
 					tonal
@@ -90,7 +128,7 @@ export default function Auth() {
 						<i className="icon-back"></i>
 					</Button>
 					{login ? (
-						<Login disabled={disabled} fingerprint={fingerprint}  defaultData={data}/>
+						<Login disabled={disabled} fingerprint={fingerprint} defaultData={data} />
 					) : (
 						<Register disabled={disabled} handlerRegister={handlerRegister} fingerprint={fingerprint} />
 					)}

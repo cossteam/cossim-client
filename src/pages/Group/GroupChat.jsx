@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import {
 	Icon,
 	Link,
+	List,
+	ListItem,
 	Message,
 	Messagebar,
 	MessagebarSheet,
@@ -9,7 +11,8 @@ import {
 	NavRight,
 	NavTitle,
 	Navbar,
-	Page
+	Page,
+	Popover
 } from 'framework7-react'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import Emojis from '@/components/Emojis/Emojis.jsx'
@@ -22,7 +25,7 @@ import { uniqueId } from 'lodash-es'
 import { groupInfoApi, groupMemberApi } from '@/api/group'
 import { sendToGroup } from '@/api/msg'
 import clsx from 'clsx'
-import useLongPress from '@/shared/useLongPress'
+import LongPressWrap from './LongPressWrap'
 
 GroupChat.propTypes = {
 	f7route: PropType.object.isRequired
@@ -173,10 +176,14 @@ export default function GroupChat({ f7route }) {
 		type === 'img' && sendMessage(emoji, 3)
 	}
 
-	const mseRef = useRef(null)
-	const msgLongPress = useLongPress(() => {
-		console.log('longPress')
-	})
+	// 消息操作菜单
+	const [msgEl, setMsgEL] = useState(null)
+	const [msgMenuOpened, setMsgMenuOpened] = useState(false)
+	const onMsgLongPress = (e, msg) => {
+		console.log('longPress', e, msg)
+		setMsgEL(e.target)
+		setMsgMenuOpened(true)
+	}
 
 	return (
 		<Page className="chat-group-page messages-page" noToolbar messagesContent>
@@ -241,8 +248,10 @@ export default function GroupChat({ f7route }) {
 								type={message.sender === user.user_id ? 'sent' : 'received'}
 								image={message.type === 3 ? [message.content] : ''}
 							>
-								<span slot="text" ref={mseRef} {...msgLongPress}>
-									{message.type === 1 ? message.content : ''}
+								<span slot="text">
+									<LongPressWrap onLongPress={(e) => onMsgLongPress(e, message)}>
+										{message.type === 1 ? message.content : ''}
+									</LongPressWrap>
 								</span>
 							</Message>
 							{/* 时间、状态 */}
@@ -259,6 +268,16 @@ export default function GroupChat({ f7route }) {
 					)
 				})}
 			</Messages>
+
+			<Popover opened={msgMenuOpened} containerEl={msgEl}>
+				<List>
+					<ListItem link="/dialog/" popoverClose title="Dialog" />
+					<ListItem link="/tabs/" popoverClose title="Tabs" />
+					<ListItem link="/panel/" popoverClose title="Side Panels" />
+					<ListItem link="/list/" popoverClose title="List View" />
+					<ListItem link="/inputs/" popoverClose title="Form Inputs" />
+				</List>
+			</Popover>
 		</Page>
 	)
 }
