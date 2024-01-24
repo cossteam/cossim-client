@@ -41,7 +41,6 @@ export default function RequestList({ listData, confirm }) {
 					{listData.map((chat, index) => (
 						<ListItem
 							key={index}
-							title={chat.user_name}
 							swipeout
 							// link
 						>
@@ -52,6 +51,17 @@ export default function RequestList({ listData, confirm }) {
 								alt={chat?.user_name || chat?.group_name}
 								className="w-10 h-10 rounded-full"
 							/>
+							<span slot="title">
+								{chat.user_name}
+								{chat?.group_name ? (
+									<>
+										<span className=" text-xs text-gray-500">邀请你加入</span>
+										<span>{chat?.group_name}</span>
+									</>
+								) : (
+									''
+								)}
+							</span>
 							<span slot="text" className="text-gray-500 text-sm">
 								{chat?.msg || '对方没有留言'}
 							</span>

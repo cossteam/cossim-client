@@ -18,7 +18,7 @@ export default function Emojis({ onEmojiSelect }) {
 	}
 
 	return (
-		<div onClick={(e) => e.stopPropagation()}>
+		<div className="emojis bg-gray-100" onClick={(e) => e.stopPropagation()}>
 			<SwitchIcon fill={showImgEmojis} onClick={() => setShowImgEmojis(!showImgEmojis)} />
 			{!showImgEmojis ? (
 				// emojis

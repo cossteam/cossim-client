@@ -98,7 +98,6 @@ export default function Chats(props) {
 	useEffect(() => {
 		const decrypt = async (data) => {
 			let chatList = (await dbService.findAll(dbService.TABLES.CHATS)) || []
-			console.log('chatList', chatList, data)
 			if (chatList.length === 0) return
 
 			let userSession = null,
@@ -151,7 +150,7 @@ export default function Chats(props) {
 		try {
 			msg = JSON.parse(chat?.last_message).content
 		} catch (error) {
-			console.log(error)
+			// console.log(error)
 		}
 		return msg
 	}
