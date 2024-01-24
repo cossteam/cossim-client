@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {
-    Icon,
+	Icon,
 	Link,
 	Message,
 	Messagebar,
@@ -32,17 +32,15 @@ export default function GroupChat({ f7route }) {
 	const [chatInfo, setGroupInfo] = useState({}) // 群聊信息
 	const [member, setMember] = useState(new Map()) // 成员信息
 
-    // 消息处理（加密、解密）
-    const msgHendler = (message) => {
-        return message
+	// 消息处理（加密、解密）
+	const msgHendler = (message) => {
+		return message
 	}
 	// 消息列表
-	const messages = useLiveQuery(
-		async () => {
-            const allMsg = (await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId))?.data || []
-            return allMsg.map(msgItem => msgHendler(msgItem))
-        }
-	)
+	const messages = useLiveQuery(async () => {
+		const allMsg = (await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId))?.data || []
+		return allMsg.map((msgItem) => msgHendler(msgItem))
+	})
 	useEffect(() => {
 		// 获取群聊信息
 		groupInfoApi({ gid: ReceiverId }).then(({ code, data }) => {
@@ -89,6 +87,26 @@ export default function GroupChat({ f7route }) {
 		}
 		return status[code] ? status[code] : '未知状态'
 	}
+	// 发送状态图标
+	const sendStatusIcon = (message) => {
+		if (message?.send_status === undefined) return sendStatusToText(message?.send_status)
+		switch (message.send_status) {
+			case 2:
+				return (
+					<span className="mb-2 mr-2 text-xs">
+						<DoubleTickIcon />
+					</span>
+				)
+			default:
+				return (
+					<Icon
+						className="mb-2 mr-2 text-sm"
+						f7={message.send_status == 1 ? 'slowmo' : 'wifi_slash'}
+						color="primary"
+					/>
+				)
+		}
+	}
 	/**
 	 * 发送消息
 	 * @param {*} sandText 内容
@@ -111,7 +129,7 @@ export default function GroupChat({ f7route }) {
 			type, // 1:文本 2:语音 3:图片
 			send_status: 0 // 0:未发送 1:发送中 2:发送成功 3:发送失败
 		}
-        console.log('发送消息', message);
+		console.log('发送消息', message)
 		const newAllMsg = {
 			user_id: ReceiverId,
 			data: [...messages, message]
@@ -129,14 +147,14 @@ export default function GroupChat({ f7route }) {
 		})
 		// 发送
 		try {
-			// message['send_status'] = 1
-			// dbService.update(dbService.TABLES.MSGS, ReceiverId, newAllMsg)
+			message['send_status'] = 1
+			dbService.update(dbService.TABLES.MSGS, ReceiverId, newAllMsg)
 			const { code } = await sendToGroup({
-                content: JSON.stringify(message),
-                dialog_id: message.dialog_id,
-                group_id: message.group_id,
-                type: message.type
-            })
+				content: JSON.stringify(message),
+				dialog_id: message.dialog_id,
+				group_id: message.group_id,
+				type: message.type
+			})
 			message['send_status'] = code === 200 ? 2 : 3
 		} catch (error) {
 			console.log(error)
@@ -200,39 +218,26 @@ export default function GroupChat({ f7route }) {
 			</Messagebar>
 			<Messages>
 				{messages?.map((message, index) => (
-					<Message
-						key={index}
-						first={isMessageFirst(message)}
-						last={isMessageLast(message)}
-						tail={isMessageLast(message)}
-						name={member.get(message.sender)?.nickname}
-						avatar={member.get(message.sender)?.avatar}
-						type={message.sender === user.user_id ? 'sent' : 'received'}
-						image={message.type === 3 ? [message.content] : ''}
-						text={message.type === 1 ? message.content : ''}
-					>
-						<span slot="text-footer" className="text-xs text-gray-500">
-							<div className="flex flex-row justify-between items-center">
-								<span>
-                                    {message?.send_status ? (
-                                        message.send_status == 2 ? (
-                                            <span className="mb-2 mr-2 text-xs">
-                                                <DoubleTickIcon />
-                                            </span>
-                                        ) : (
-                                            // message.send_state
-                                            <Icon
-                                                className="mb-2 mr-2 text-xs"
-                                                f7={message.send_status == 1 ? 'slowmo' : 'wifi_slash'}
-                                                color="primary"
-                                            />
-                                        )
-                                    ) : sendStatusToText(message?.send_status)}
-                                </span>
-								<span>{messageTime(message)}</span>
+					<>
+						<Message
+							key={index}
+							first={isMessageFirst(message)}
+							last={isMessageLast(message)}
+							tail={isMessageLast(message)}
+							name={member.get(message.sender)?.nickname}
+							avatar={member.get(message.sender)?.avatar}
+							type={message.sender === user.user_id ? 'sent' : 'received'}
+							image={message.type === 3 ? [message.content] : ''}
+							text={message.type === 1 ? message.content : ''}
+						></Message>
+						<div className="message-sent message-last message-tail flex flex-row text-xs text-gray-500">
+							<div className="mt-1 flex flex-row justify-between items-center">
+								{<span className="mr-2">{messageTime(message)}</span>}
+								<span>{sendStatusIcon(message)}</span>
 							</div>
-						</span>
-					</Message>
+							<div className="w-10"></div>
+						</div>
+					</>
 				))}
 			</Messages>
 		</Page>
