@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { f7, ListInput, List, LoginScreenTitle, Button, theme, Preloader } from 'framework7-react'
 import { $t } from '@/i18n'
-// import { useUserStore } from '@/stores/user'
 import { Lock, At } from 'framework7-icons/react'
 import { useEffect } from 'react'
 import PropTypes from 'prop-types'
@@ -9,15 +8,46 @@ import { registerApi } from '@/api/user'
 import { validEmail, validPassword } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
-// import PGP from '@/utils/PGP'
-// import DB from '@/db'
-// import { SignalDirectory } from '@/utils/signal-directory'
-// import { createIdentity } from '@/utils/protocol'
 
-// import Signal, { toBase64 } from '@/utils/signal/signal-protocol'
-// import { useHistoryStore } from '@/stores/history'
+import commonService from '@/db/common'
+// import { generateKeyPair } from '@/utils/signal/signal-crypto'
+import { generateKeyPair } from '@/utils/tweetnacl'
 
-export default function Login({ disabled, handlerRegister }) {
+/**
+ * 生成用户 id
+ * @param {string} id 用户 id
+ */
+async function createInfo(options) {
+	try {
+		// 生成用户信息
+		const keyPair = await generateKeyPair()
+		// 存储到本地数据库
+		await commonService.add(commonService.TABLES.HISTORY, {
+			id: options.id,
+			data: {
+				keyPair,
+				account: options.account,
+				createTime: Date.now(),
+				updateTime: Date.now(),
+				// 指纹信息
+				fingerprint: options.fingerprint,
+				// 用于判断是否是第一次注册
+				isFirst: true,
+				// 设备信息
+				// platform: options.platform
+				// 上一次登录时间
+				lastLoginTime: 0
+			}
+		})
+		// TODO: 生成 signal 身份
+	} catch (error) {
+		console.error('生成用户信息失败', error)
+	}
+}
+
+export default function Register({ disabled, handlerRegister, fingerprint }) {
+	console.log("fingerprint",fingerprint);
+
 	// 表单数据
 	const [fromData, setFromData] = useState({
 		nickname: '',
@@ -35,16 +65,6 @@ export default function Login({ disabled, handlerRegister }) {
 	// 登录loading
 	const [loading, setLoading] = useState(false)
 
-	// 用户信息
-	// const userStore = useUserStore()
-	// const historyStore = useHistoryStore()
-
-	// signal 目录
-	// const signalDirectory = new SignalDirectory()
-	// const deviceName = Math.random().toString(36).slice(-8)
-	// const deviceId = Math.floor(10000 * Math.random())
-	// const [signal] = useState(new Signal(deviceName, deviceId))
-
 	// 错误信息列表
 	const errorList = {
 		emailEmpty: $t('邮箱不能为空'),
@@ -59,52 +79,39 @@ export default function Login({ disabled, handlerRegister }) {
 
 	// 登录
 	const signIn = async () => {
-		// 判断是否正在登录
-		if (loading) return
-
-		// 初步校验
-		// if (!fromData.nickname.trim()) return setNicknameError(errorList.usernameEmpty)
-
-		// 校验邮箱
-		if (!fromData.email.trim()) return setEmailError(errorList.emailEmpty)
-		if (!validEmail(fromData.email.trim())) return setEmailError(errorList.emailFormat)
-
-		// 校验密码
-		if (!fromData.password.trim()) return setPasswordError(errorList.passwordEmpty)
-		if (!validPassword(fromData.password.trim())) return setPasswordError(errorList.passwordFormat)
-
-		// 校验确认密码
-		if (!fromData.confirm_password.trim()) return setConfirmPasswordError(errorList.confirmPasswordEmpty)
-		if (fromData.password.trim() !== fromData.confirm_password.trim())
-			return setConfirmPasswordError(errorList.passwordConfirm)
-
-		// loading
-		setLoading(true)
 		try {
+			// 判断是否正在登录
+			if (loading) return
+
+			// 校验邮箱
+			if (!fromData.email.trim()) return setEmailError(errorList.emailEmpty)
+			if (!validEmail(fromData.email.trim())) return setEmailError(errorList.emailFormat)
+
+			// 校验密码
+			if (!fromData.password.trim()) return setPasswordError(errorList.passwordEmpty)
+			if (!validPassword(fromData.password.trim())) return setPasswordError(errorList.passwordFormat)
+
+			// 校验确认密码
+			if (!fromData.confirm_password.trim()) return setConfirmPasswordError(errorList.confirmPasswordEmpty)
+			if (fromData.password.trim() !== fromData.confirm_password.trim())
+				return setConfirmPasswordError(errorList.passwordConfirm)
+
+			// loading
+			setLoading(true)
+
 			// 注册
 			const decryptedData = await registerApi(fromData)
-
 			if (decryptedData.code !== 200) return f7.dialog.alert(decryptedData.msg || '注册失败')
 
 			// 生成用户信息
-			// const info = await signal.ceeateIdentity(signal.deviceName)
-			// const directory = signal.directory?.getPreKeyBundle(signal.deviceName) || {}
-			// const obj = {
-			// 	...directory,
-			// 	deviceName: signal.deviceName,
-			// 	deviceId: signal.deviceId
-			// }
-			// const data = JSON.stringify(toBase64(obj))
-			// const historyInfo = {
-			// 	user_id: decryptedData.data?.user_id,
-			// 	device_id: signal.deviceId,
-			// 	device_name: signal.deviceName
-			// }
+			await createInfo({
+				id: decryptedData.data?.user_id,
+				account: fromData.email.trim(),
+				fingerprint
+			})
 
 			// 注册成功
-			f7.dialog.alert(errorList.registerSuccess, () => {
-				handlerRegister()
-			})
+			f7.dialog.alert(errorList.registerSuccess, () => handlerRegister(fromData))
 		} catch (error) {
 			console.log(error)
 		} finally {
@@ -205,7 +212,8 @@ export default function Login({ disabled, handlerRegister }) {
 	)
 }
 
-Login.propTypes = {
+Register.propTypes = {
 	disabled: PropTypes.bool.isRequired,
-	handlerRegister: PropTypes.func
+	handlerRegister: PropTypes.func,
+	fingerprint: PropTypes.string
 }

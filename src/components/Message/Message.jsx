@@ -18,7 +18,7 @@ const Select = () => {
 let root = null
 
 export default function MessageBox(props) {
-	const { messages } = props
+	const { messages, height } = props
 
 	const msgRef = useRef(null)
 
@@ -63,7 +63,7 @@ export default function MessageBox(props) {
 	}, [visualViewport.height])
 
 	return (
-		<div className="py-4 overflow-auto" ref={msgRef} style={{ height: visualViewport.height - 88 + 'px' }}>
+		<div className="py-4 overflow-auto" ref={msgRef} style={{ height }}>
 			{messages.map((message, index) => (
 				<div key={index}>
 					{/* <div className="text-center my-2 text-gray-500 max-w-[75%] text-[12px] mx-auto">昨天 下午4:54</div> */}
@@ -125,5 +125,6 @@ export default function MessageBox(props) {
 
 MessageBox.propTypes = {
 	messages: PropType.array.isRequired,
-	avatar: PropType.node
+	avatar: PropType.node,
+	height: PropType.string
 }

@@ -1,65 +1,42 @@
 import { fromUint8Array, toUint8Array } from 'js-base64'
+import * as openpgp from 'openpgp'
+
 /**
  * 生成密钥对，用于密钥交换
  * @returns
  */
-export async function generateKeyPair() {
-	return crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey'])
-}
-
-/**
- * 执行密钥交换，得到共享的对称密钥
- * @param {CryptoKeyPair} myKeyPair 		自己的密钥对
- * @param {CryptoKey} theirPublicKey 		对方的公钥
- * @returns Promise<CryptoKey>
- */
-export async function performKeyExchange(myKeyPair, theirPublicKey) {
+export async function generateKeyPair(user, passphrase) {
 	try {
-		// 使用对方的公钥和自己的私钥进行 Diffie-Hellman 密钥交换
-		const sharedSecret = await crypto.subtle.deriveKey(
-			{ name: 'ECDH', public: theirPublicKey },
-			myKeyPair.privateKey,
-			{ name: 'AES-GCM', length: 256 },
-			true,
-			['encrypt', 'decrypt']
-		)
-
-		return sharedSecret
+		if (!user) return
+		const keyPair = await openpgp.generateKey({
+			passphrase,
+			rsaBits: 2048,
+			curve: 'curve25519',
+			userIDs: [user],
+			format: 'armored'
+		})
+		console.log('生成公私钥', keyPair)
+		return keyPair
 	} catch (error) {
-		console.error('执行密钥交换时出错:', error.message)
-		throw error
+		console.log('生成公私钥错误:', error)
+		return null
 	}
 }
 
 /**
  * 加密消息
- * @param {CryptoKey} actualKey 		共享密钥
+ * @param {CryptoKey} publicKeyArmored 		共享密钥
  * @param {string} plaintext 			要加密的消息
  * @returns
  */
-export async function encryptMessage(actualKey, plaintext) {
+export async function encryptMessage(publicKeyArmored, plaintext) {
 	try {
-		const encodedText = new TextEncoder().encode(plaintext)
-
-		// 随机生成一个 IV
-		const iv = crypto.getRandomValues(new Uint8Array(12))
-
-		// 使用 AES-GCM 进行加密
-		const ciphertext = await crypto.subtle.encrypt(
-			{
-				name: 'AES-GCM',
-				iv: iv
-			},
-			actualKey,
-			encodedText
-		)
-
-		// 将 IV 附加到加密的消息中，用于解密
-		const result = new Uint8Array(ciphertext.byteLength + iv.byteLength)
-		result.set(new Uint8Array(ciphertext), 0)
-		result.set(iv, ciphertext.byteLength)
-
-		return fromUint8Array(new Uint8Array(result.buffer))
+		const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored })
+		const encrypted = await openpgp.encrypt({
+			message: await openpgp.createMessage({ text: plaintext }),
+			publicKeys: publicKey
+		})
+		return encrypted
 	} catch (error) {
 		console.error('Error encrypting message:', error)
 		throw error

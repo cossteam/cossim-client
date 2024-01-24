@@ -38,6 +38,7 @@
         "dexie": "^3.2.4",
         "dexie-react-hooks": "^1.1.7",
         "dom7": "^4.0.6",
+        "fingerprintjs2": "^2.1.4",
         "framework7": "^8.3.0",
         "framework7-icons": "^5.0.5",
         "framework7-react": "^8.3.0",
@@ -58,6 +59,7 @@
         "swiper": "^11.0.5",
         "timeago.js": "4.0.0-beta.3",
         "tippy.js": "^6.3.7",
+        "tweetnacl": "^1.0.3",
         "vue-auto-translate": "^1.1.12",
         "zustand": "^4.4.7"
     },

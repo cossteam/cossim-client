@@ -44,6 +44,8 @@ export default function Profile(props) {
 			const res = await getUserInfoApi({ user_id: f7route.params.id, type: 1 })
 			// console.log('获取用户信息', res)
 			if (res.code !== 200) return
+			const status = res.data?.relation_status || 1
+			setIsBlackList(status === 2)
 			setInfo(res.data)
 		}
 		getUserInfo()

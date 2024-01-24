@@ -18,6 +18,8 @@ import Home from './Home.jsx'
 
 import 'animate.css'
 
+// import { test } from '@/utils/pgp/test'
+// test()
 // import * as serviceWorker from './utils//serviceWorker'
 
 // Init F7 React Plugin
@@ -26,6 +28,8 @@ Framework7.use(Framework7React)
 // Mount React App
 const root = createRoot(document.getElementById('app'))
 root.render(React.createElement(Home))
+
+// generateKeyPair({name:'111'})
 
 // 如果您希望您的应用程序能够离线工作并更快加载，您可以更改
 // 下面的 unregister() 到 register() 。请注意，这会带来一些陷阱。

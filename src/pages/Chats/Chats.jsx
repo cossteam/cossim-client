@@ -144,18 +144,6 @@ export default function Chats(props) {
 		}
 	}, [])
 
-	// 会话时间格式化
-	const chatsTimeFormat = (date) => {
-		return format(date, 'zh_CN')
-		// return (
-		// 	Intl.DateTimeFormat('zh', {
-		// 		month: 'short',
-		// 		year: 'numeric',
-		// 		day: 'numeric'
-		// 	}).format(new Date(date)) || '-'
-		// )
-	}
-
 	const lastMessageHandler = (chat) => {
 		let msg = chat.last_message
 		if (!chat?.group_id) return msg
@@ -191,7 +179,7 @@ export default function Chats(props) {
 						}
 						title={chat.dialog_name}
 						// badge={chat.dialog_unread_count}
-						after={chatsTimeFormat(chat.send_time)}
+						after={format(chat.send_time, 'zh_CN')}
 						// after={chat.send_time}
 						swipeout
 					>

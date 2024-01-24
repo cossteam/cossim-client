@@ -1,12 +1,20 @@
+import { Dexie } from 'dexie'
+
 export class dbService {
+	static db
+
 	constructor(options) {
-		const { db, tables, primary_key } = options
+		const { tables, primary_key, name, version } = options
 
 		if (typeof tables !== 'object') throw new Error('tables should be an object')
 		if (typeof primary_key !== 'string') throw new Error('primary_key should be a string')
 
+		this.db = options.db
+
 		this.TABLES = Object.assign({}, ...Object.keys(tables).map((key) => ({ [key.toLocaleUpperCase()]: key })))
-		this.DB = db
+
+		this.DB = new Dexie(name)
+		this.DB.version(version).stores(tables)
 		this.PRIMARY_KEY = primary_key
 	}
 

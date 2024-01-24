@@ -10,13 +10,28 @@ import { validEmail } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
 
-import Signal, { toBase64 } from '@/utils/signal/signal-protocol'
-// import WebDB from '@/db'
+// import Signal, { toBase64 } from '@/utils/signal/signal-protocol'
+import commonService from '@/db/common'
 
+/**
+ * 验证用户是否在新设备上登录
+ * @param {*} data
+ */
+async function validDeviceInfo(data) {
+	try {
+		const users = await commonService.findAll(commonService.TABLES.HISTORY)
+		const user = users.find((item) => item.data.account === data.email)
+		if (!user) return true
+		return false
+	} catch (error) {
+		console.error('验证用户是否在新设备上登录失败', error)
+		return false
+	}
+}
 
-export default function Login({ disabled }) {
+export default function Login({ disabled, defaultData }) {
 	// 表单数据
-	const [fromData, setFromData] = useState({ email: '', password: ''})
+	const [fromData, setFromData] = useState({ email: '', password: '' })
 
 	// 错误提示
 	const [emailError, setEmailError] = useState('')
@@ -34,13 +49,20 @@ export default function Login({ disabled }) {
 		emailFormat: $t('邮箱格式不正确'),
 		passwordEmpty: $t('密码不能为空'),
 		errorMessage: $t('登录失败，请稍后重试！'),
-		serverError: $t('服务器错误，请稍后重试！')
+		serverError: $t('服务器错误，请稍后重试！'),
+		deviceError: $t('该设备为新设备，请扫码登录或者输入唯一密码！请等待开发人员新增验证功能！')
 	}
 
 	// todo： 这里确认自己的名字和设备id
-	const deviceName = Math.random().toString(36).slice(-8)
-	const deviceId = Math.floor(10000 * Math.random())
-	const [signal] = useState(new Signal(deviceName, deviceId))
+	// const deviceName = Math.random().toString(36).slice(-8)
+	// const deviceId = Math.floor(10000 * Math.random())
+	// const [signal] = useState(new Signal(deviceName, deviceId))
+
+	useEffect(() => {
+		if (defaultData && defaultData.email && defaultData.password) {
+			setFromData({ email: defaultData.email, password: defaultData.password })
+		}
+	}, [defaultData])
 
 	// 登录
 	const signIn = async () => {
@@ -52,6 +74,10 @@ export default function Login({ disabled }) {
 			if (!fromData.email.trim()) return setEmailError(errorList.emailEmpty)
 			if (!validEmail(fromData.email.trim())) return setEmailError(errorList.emailFormat)
 			if (!fromData.password.trim()) return setPasswordError(errorList.passwordEmpty)
+
+			// 判断是否是新设备
+			const valid = await validDeviceInfo(fromData)
+			if (valid) return f7.dialog.alert(errorList.deviceError)
 
 			// loading
 			setLoading(true)
@@ -65,21 +91,30 @@ export default function Login({ disabled }) {
 			if (decryptedData.data.token) userStore.updateToken(decryptedData.data.token)
 			if (decryptedData.data.user_info) await userStore.updateUser(decryptedData.data.user_info)
 
-			// 生成信令
-			const info = await signal.ceeateIdentity(signal.deviceName)
+			const id = decryptedData.data.user_info?.user_id
 
-			const directory = signal.directory?.getPreKeyBundle(signal.deviceName) || {}
-			const obj = {
-				...directory,
-				deviceName: signal.deviceName,
-				deviceId: signal.deviceId
+			const user = await commonService.findOneById(commonService.TABLES.HISTORY, id)
+			if (user) {
+				await commonService.update(commonService.TABLES.HISTORY, id, {
+					data: { ...user.data, lastLoginTime: Date.now() }
+				})
 			}
-			const data = JSON.stringify(toBase64(obj))
+
+			// 生成信令
+			// const info = await signal.ceeateIdentity(signal.deviceName)
+
+			// const directory = signal.directory?.getPreKeyBundle(signal.deviceName) || {}
+			// const obj = {
+			// 	...directory,
+			// 	deviceName: signal.deviceName,
+			// 	deviceId: signal.deviceId
+			// }
+			// const data = JSON.stringify(toBase64(obj))
 
 			// 更新信令
-			userStore.updateIdentity({ ...info })
-			userStore.updateSignal(signal)
-			userStore.updateDirectory(data)
+			// userStore.updateIdentity({ ...info })
+			// userStore.updateSignal(signal)
+			// userStore.updateDirectory(data)
 			userStore.updateLogin(true)
 
 			setLoading(false)
@@ -159,5 +194,6 @@ export default function Login({ disabled }) {
 }
 
 Login.propTypes = {
-	disabled: PropTypes.bool.isRequired
+	disabled: PropTypes.bool.isRequired,
+	defaultData: PropTypes.object
 }
