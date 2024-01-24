@@ -22,6 +22,7 @@ import { uniqueId } from 'lodash-es'
 import { groupInfoApi, groupMemberApi } from '@/api/group'
 import { sendToGroup } from '@/api/msg'
 import clsx from 'clsx'
+import useLongPress from '@/shared/useLongPress'
 
 GroupChat.propTypes = {
 	f7route: PropType.object.isRequired
@@ -172,11 +173,10 @@ export default function GroupChat({ f7route }) {
 		type === 'img' && sendMessage(emoji, 3)
 	}
 
-	const handleContextMenu = (event) => {
-		// 在这里处理右键菜单事件
-		event.preventDefault() // 阻止默认的右键菜单行为
-		console.log('Right-clicked!')
-	}
+	const mseRef = useRef(null)
+	const msgLongPress = useLongPress(() => {
+		console.log('longPress')
+	})
 
 	return (
 		<Page className="chat-group-page messages-page" noToolbar messagesContent>
@@ -230,7 +230,7 @@ export default function GroupChat({ f7route }) {
 					const tail = isMessageLast(message)
 					const isSender = message.sender === user.user_id
 					return (
-						<div key={index} className="messages" onContextMenu={handleContextMenu}>
+						<div key={index} className="messages">
 							{/* 消息 */}
 							<Message
 								first={first}
@@ -240,8 +240,11 @@ export default function GroupChat({ f7route }) {
 								avatar={member.get(message.sender)?.avatar}
 								type={message.sender === user.user_id ? 'sent' : 'received'}
 								image={message.type === 3 ? [message.content] : ''}
-								text={message.type === 1 ? message.content : ''}
-							></Message>
+							>
+								<span slot="text" ref={mseRef} {...msgLongPress}>
+									{message.type === 1 ? message.content : ''}
+								</span>
+							</Message>
 							{/* 时间、状态 */}
 							<div
 								className={clsx(
