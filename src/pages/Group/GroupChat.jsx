@@ -21,6 +21,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { uniqueId } from 'lodash-es'
 import { groupInfoApi, groupMemberApi } from '@/api/group'
 import { sendToGroup } from '@/api/msg'
+import clsx from 'clsx'
 
 GroupChat.propTypes = {
 	f7route: PropType.object.isRequired
@@ -171,6 +172,12 @@ export default function GroupChat({ f7route }) {
 		type === 'img' && sendMessage(emoji, 3)
 	}
 
+	const handleContextMenu = (event) => {
+		// 在这里处理右键菜单事件
+		event.preventDefault() // 阻止默认的右键菜单行为
+		console.log('Right-clicked!')
+	}
+
 	return (
 		<Page className="chat-group-page messages-page" noToolbar messagesContent>
 			<Navbar className="messages-navbar" backLink>
@@ -217,28 +224,37 @@ export default function GroupChat({ f7route }) {
 				</MessagebarSheet>
 			</Messagebar>
 			<Messages>
-				{messages?.map((message, index) => (
-					<>
-						<Message
-							key={index}
-							first={isMessageFirst(message)}
-							last={isMessageLast(message)}
-							tail={isMessageLast(message)}
-							name={member.get(message.sender)?.nickname}
-							avatar={member.get(message.sender)?.avatar}
-							type={message.sender === user.user_id ? 'sent' : 'received'}
-							image={message.type === 3 ? [message.content] : ''}
-							text={message.type === 1 ? message.content : ''}
-						></Message>
-						<div className="message-sent message-last message-tail flex flex-row text-xs text-gray-500">
-							<div className="mt-1 flex flex-row justify-between items-center">
-								{<span className="mr-2">{messageTime(message)}</span>}
-								<span>{sendStatusIcon(message)}</span>
+				{messages?.map((message, index) => {
+					const first = isMessageFirst(message)
+					const last = isMessageLast(message)
+					const tail = isMessageLast(message)
+					const isSender = message.sender === user.user_id
+					return (
+						<div key={index} className="messages" onContextMenu={handleContextMenu}>
+							{/* 消息 */}
+							<Message
+								first={first}
+								last={last}
+								tail={tail}
+								name={member.get(message.sender)?.nickname}
+								avatar={member.get(message.sender)?.avatar}
+								type={message.sender === user.user_id ? 'sent' : 'received'}
+								image={message.type === 3 ? [message.content] : ''}
+								text={message.type === 1 ? message.content : ''}
+							></Message>
+							{/* 时间、状态 */}
+							<div
+								className={clsx(
+									'mt-1 pl-14 pr-8 flex flex-row justify-between items-center text-xs text-gray-500',
+									isSender && 'message-sent'
+								)}
+							>
+								{<span className={clsx(isSender && 'mr-2')}>{messageTime(message)}</span>}
+								{isSender && <span>{sendStatusIcon(message)}</span>}
 							</div>
-							<div className="w-10"></div>
 						</div>
-					</>
-				))}
+					)
+				})}
 			</Messages>
 		</Page>
 	)

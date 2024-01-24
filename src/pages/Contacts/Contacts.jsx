@@ -125,9 +125,9 @@ export default function Contacts(props) {
 				{Object.keys(contacts).map((groupKey) => (
 					<ListGroup key={groupKey}>
 						<ListItem groupTitle title={groupKey} />
-						{contacts[groupKey].map((contact) => (
+						{contacts[groupKey].map((contact, index) => (
 							<ListItem
-								key={contact.nick_name}
+								key={index}
 								link={`/profile/${contact.user_id}/`}
 								title={contact.nickname}
 								footer={contact.signature}
