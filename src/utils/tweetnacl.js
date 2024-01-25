@@ -29,7 +29,7 @@ export function performKeyExchange(myPrivateKey, theirPublicKey) {
  */
 export function encryptMessage(message, nonce, sharedKey) {
 	// 将消息转为 Uint8Array
-	return fromUint8Array(nacl.box.after(new TextEncoder().encode(message), nonce, sharedKey))
+	return fromUint8Array(nacl.box.after(new TextEncoder().encode(message), toUint8Array(nonce), sharedKey))
 }
 
 /**
@@ -41,7 +41,7 @@ export function encryptMessage(message, nonce, sharedKey) {
  */
 export function decryptMessage(encryptedMessage, nonce, sharedKey) {
 	encryptedMessage = toUint8Array(encryptedMessage)
-	const decryptedMessage = nacl.box.open.after(encryptedMessage, nonce, sharedKey)
+	const decryptedMessage = nacl.box.open.after(encryptedMessage, toUint8Array(nonce), sharedKey)
 	return new TextDecoder().decode(decryptedMessage)
 }
 

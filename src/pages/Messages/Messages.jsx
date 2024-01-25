@@ -7,21 +7,9 @@ import DoubleTickIcon from '@/components/DoubleTickIcon'
 import Emojis from '@/components/Emojis/Emojis.jsx'
 import './Messages.less'
 import { useUserStore } from '@/stores/user'
-// import { userService } from '@/db'
 import _ from 'lodash-es'
-import { sendToUser } from '@/api/msg'
+import { sendToUser, getMsgByUser } from '@/api/msg'
 import { getUserInfoApi } from '@/api/user'
-
-// import { pgpDecrypt, pgpEncrypt } from '@/utils/utils'
-// import { switchE2EKeyApi } from '@/api/relation'
-// import WebSocketClient from '@/utils/WebSocketClient'
-// import { toArrayBuffer, encrypt, decrypt, reconnectSession } from '@/utils/signal/signal-protocol'
-// import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
-// import { SignalProtocolStore } from '@/utils/signal/storage-type'
-// import { reconnectSession } from '@/utils/signal/signal-protocol'
-// import { encryptMessage, decryptMessage, importKey } from '@/utils/signal/signal-crypto'
-// import { getSession } from '@/utils/session'
-// import MessageBox from '@/components/Message/Msg'
 import { encryptMessage, decryptMessage, cretateNonce } from '@/utils/tweetnacl'
 import userService from '@/db'
 
@@ -29,35 +17,36 @@ MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
 }
 
+async function getMsg(page, limit, user_id) {
+	const res = await getMsgByUser({ page_num: page, page_size: limit, user_id })
+	console.log('res', res)
+}
+
 export default function MessagesPage({ f7route }) {
 	// 会话信息
 	const dialogId = f7route.query.dialog_id
 	// 用户信息
 	const { user } = useUserStore()
-
-	// 会话 session
-	// const [sessionCipher, setSessionCipher] = useState()
-	// const [slefSessionCipher, setSessionSlefCipher] = useState()
-
 	// 好友id/群聊id
 	const ReceiverId = f7route.params.id
 	// 好友信息
 	const [contact, setContact] = useState({})
-	// 消息
+	// 数据库所有消息
 	const allMsg = useLiveQuery(() => userService.findAll(userService.TABLES.USERS)) || []
+	// 页面显示消息列表
 	const [messages, setMessages] = useState([])
-
+	// 是否首次进入
 	const [isActive, setIsActive] = useState(true)
+	// 是否是发送方
 	const [isSend, setIsSend] = useState(false)
-	// const [userInfo, setUserInfo] = useState({})
-	// const [userSesion, setUserSession] = useState({})
+	// 预共享密钥
 	const [preKey, setPreKey] = useState(null)
-
-	// const [height, setHeight] = useState('100vh')
 
 	const [nonce] = useState(cretateNonce())
 
 	useEffect(() => {
+		getMsg(1, 100, ReceiverId)
+
 		// 基本初始化
 		const init = async () => {
 			// let userInfo = null,
@@ -68,8 +57,7 @@ export default function MessagesPage({ f7route }) {
 				const reslut = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
 				// userInfo = await userService.findOneById(userService.TABLES.USERS, user?.user_id)
 				if (!reslut) return
-
-				console.log('reslut', reslut)
+				// console.log('reslut', reslut)
 				setPreKey(reslut?.data?.shareKey)
 				// userSession = await getSession(user?.user_id, ReceiverId)
 				// console.log('userSession', userSession)
@@ -83,12 +71,13 @@ export default function MessagesPage({ f7route }) {
 			}
 
 			// 设置户消息
-			// let userContact = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
-			// if (!userContact) {
-			// 	const res = await getUserInfoApi({ user_id: ReceiverId })
-			// 	console.log('查询用户信息', res)
-			// }
-			// setContact(userContact)
+			let userContact = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
+			if (!userContact) {
+				const res = await getUserInfoApi({ user_id: ReceiverId })
+				if (res.code !== 200) return
+				setContact(res.data)
+			}
+			setContact(userContact)
 
 			// // 触顶加载
 			// const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
@@ -122,7 +111,6 @@ export default function MessagesPage({ f7route }) {
 					try {
 						const msg = JSON.parse(content)
 						content = decryptMessage(msg.msg, msg.nonce, preKey)
-						console.log('解密消息', content, msg)
 					} catch {
 						content = '该消息解密失败'
 					}
@@ -155,48 +143,27 @@ export default function MessagesPage({ f7route }) {
 					content = decryptMessage(msg.msg, msg.nonce, preKey)
 				} catch {
 					// console.log('解密失败：', error)
-					content = lastMsg?.content
+					content = '该消息解密失败'
 					// const session = await updateSession(user?.user_id, ReceiverId)
 					// const preKey = await importKey(session?.preKey)
 					// setPreKey(preKey || '1')
 				}
 				lastMsg.content = content
-				console.log('lastMsg', lastMsg, messages)
+				// console.log('lastMsg', lastMsg, messages)
 				setMessages([...messages, lastMsg])
 			} catch (error) {
 				console.error('解析消息失败：', error.message)
 			}
 		}
 
-		const initContact = async () => {
-			if (contact) return
-			const user = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
-			// console.log('contact', user)
-			// if (!user) {
-			// 	const res = await getUserInfoApi({ user_id: ReceiverId })
-			// 	console.log('查询用户信息', res)
-			// }
-			setContact(user)
-		}
-
 		if (isActive) {
-			initContact()
+			// initContact()
 			initMsgs()
 			return
 		}
 		updateMsg()
 	}, [preKey, allMsg])
 
-	// 联系人头像信息等
-	// useEffect(() => {
-	// 	if (!ReceiverId) return
-	// 	;(async () => {
-	// 		const contact = await WebDB.contacts.where('user_id').equals(ReceiverId).first()
-
-	// 		console.log('contact', contact)
-	// 		setContact(contact || {})
-	// 	})()
-	// }, [ReceiverId])
 
 	useEffect(() => {
 		;(async () => {
@@ -319,18 +286,17 @@ export default function MessagesPage({ f7route }) {
 
 			// 查找本地消息记录
 			const result = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
-			// result
-			// 	?
-			await userService.update(userService.TABLES.USERS, ReceiverId, {
-				user_id: ReceiverId,
-				// data: [...result.data, { ...dbMsg, content: encrypted }]
-				data: { ...result.data, msgs: [...result.data.msgs, { ...dbMsg, content: encrypted }] }
-			})
-			// : await userService.add(userService.TABLES.USERS, {
-			// 		user_id: ReceiverId,
-			// 		// data: [{ ...dbMsg, content: encrypted }]
-			// 		data: {  }
-			// 	})
+			result
+				? await userService.update(userService.TABLES.USERS, ReceiverId, {
+						user_id: ReceiverId,
+						// data: [...result.data, { ...dbMsg, content: encrypted }]
+						data: { ...result.data, msgs: [...result.data.msgs, { ...dbMsg, content: encrypted }] }
+					})
+				: await userService.add(userService.TABLES.USERS, {
+						user_id: ReceiverId,
+						// data: [{ ...dbMsg, content: encrypted }]
+						data: {}
+					})
 		} catch (error) {
 			console.error('发送消息失败：', error)
 			// throw error

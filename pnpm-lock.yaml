@@ -11,6 +11,9 @@ dependencies:
   '@privacyresearch/libsignal-protocol-typescript':
     specifier: ^0.0.16
     version: 0.0.16
+  '@reactuses/core':
+    specifier: ^4.0.13
+    version: 4.0.13(react@18.2.0)
   '@signalapp/libsignal-client':
     specifier: ^0.38.0
     version: 0.38.0
@@ -71,6 +74,9 @@ dependencies:
   protobufjs:
     specifier: ^7.2.5
     version: 7.2.6
+  qrcodejs:
+    specifier: ^1.0.0
+    version: 1.0.0
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -1329,6 +1335,18 @@ packages:
 
   /@protobufjs/utf8@1.1.0:
     resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==}
+    dev: false
+
+  /@reactuses/core@4.0.13(react@18.2.0):
+    resolution: {integrity: sha512-80F8GKO8q5+43WK9du0BrmBd1AVWA3m9hsFlWoeUWxaUazxF4zVJy52LOu1OeU2KMo+JrvTKQTEHFuhBWHjv6A==}
+    peerDependencies:
+      react: ^16.8.0  || ^17.0.0 || ^18.0.0
+    dependencies:
+      js-cookie: 3.0.5
+      lodash-es: 4.17.21
+      react: 18.2.0
+      screenfull: 5.2.0
+      use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
   /@rollup/plugin-inject@5.0.5(rollup@4.9.6):
@@ -4482,6 +4500,11 @@ packages:
     resolution: {integrity: sha512-NPrWuHFxFUknr1KqJRDgUQPexQF0uIJWjeT+2KjEePhitQxQEx5EJBG1lVn5/hc8aLycTpXrDOgPQ6Zq+EDiTA==}
     dev: false
 
+  /js-cookie@3.0.5:
+    resolution: {integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==}
+    engines: {node: '>=14'}
+    dev: false
+
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -5921,6 +5944,10 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
+  /qrcodejs@1.0.0:
+    resolution: {integrity: sha512-67rj3mMBhSBepaD57qENnltO+r8rSYlqM7HGThks/BiyDAkc86sLvkKqjkqPS5v13f7tvnt6dbEf3qt7zq+BCg==}
+    dev: false
+
   /qs@6.11.2:
     resolution: {integrity: sha512-tDNIz22aBzCDxLtVH++VnTfzxlfeK5CbqohpSqpJgj1Wg/cQbStNAz3NuqCs5vV+pjBsK4x4pN9HlVh7rcYRiA==}
     engines: {node: '>=0.6'}
@@ -6241,6 +6268,11 @@ packages:
     resolution: {integrity: sha512-CtuThmgHNg7zIZWAXi3AsyIzA3n4xx7aNyjwC2VJldO2LMVDhFK+63xGqq6CsJH4rTAt6/M+N4GhZiDYPx9eUw==}
     dependencies:
       loose-envify: 1.4.0
+    dev: false
+
+  /screenfull@5.2.0:
+    resolution: {integrity: sha512-9BakfsO2aUQN2K9Fdbj87RJIEZ82Q9IGim7FqM5OsebfoFC6ZHXgDq/KvniuLTPdeM8wY2o6Dj3WQ7KeQCj3cA==}
+    engines: {node: '>=0.10.0'}
     dev: false
 
   /semver-compare@1.0.0:

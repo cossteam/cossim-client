@@ -66,7 +66,6 @@ export class dbService {
 	 * @return {Promise} 解析为更新记录的 Promise。
 	 */
 	async update(table, id, data, key) {
-		// return this.DB[table] && (await this.DB[table].update(id, data))
 		return (
 			this.DB[table] &&
 			(await this.DB[table]

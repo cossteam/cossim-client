@@ -8,7 +8,7 @@
     "license": "UNLICENSED",
     "scripts": {
         "start": "npm run dev",
-        "dev": "cross-env NODE_ENV=development vite",
+        "dev": "cross-env NODE_ENV=development vite --host",
         "build": "cross-env NODE_ENV=production vite build",
         "build-cordova": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && cd cordova && cordova build",
         "build-cordova-ios": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && cd cordova && cordova build ios",
@@ -31,6 +31,7 @@
     "dependencies": {
         "@aomao/engine": "^2.10.25",
         "@privacyresearch/libsignal-protocol-typescript": "^0.0.16",
+        "@reactuses/core": "^4.0.13",
         "@signalapp/libsignal-client": "^0.38.0",
         "animate.css": "^4.1.1",
         "axios": "^1.6.3",
@@ -51,6 +52,7 @@
         "openpgp": "^5.11.0",
         "prop-types": "^15.8.1",
         "protobufjs": "^7.2.5",
+        "qrcodejs": "^1.0.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-i18next": "^14.0.0",

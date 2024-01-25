@@ -7,17 +7,6 @@ import routes from '@/config/routes'
 import { useUserStore } from '@/stores/user'
 import WebSocketClient from '@/utils/WebSocketClient'
 import userService from '@/db'
-// import { updatePublicKeyApi } from '@/api/user'
-// import { toArrayBuffer, cretaeSession, toBase64 } from '@/utils/signal/signal-protocol'
-// import { SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
-// import { SignalProtocolStore } from '@/utils/signal/storage-type'
-// import {
-// 	generateKeyPair,
-// 	performKeyExchange,
-// 	importPublicKey,
-// 	exportKey,
-// 	exportPublicKey
-// } from '@/utils/signal/signal-crypto'
 import { useInitUser, useInitFriend } from '@/helpers/handler'
 
 /**
@@ -54,25 +43,54 @@ const handlerMessage = async (msg) => {
 	// 查找本地消息记录
 	const result = await userService.findOneById(userService.TABLES.USERS, msg.data?.sender_id)
 	// 如果有记录就更新，没有就添加到表中
-	console.log('result', result)
-	// result
+	// console.log('result', result)
+
+	if (!result) {
+		// TODO: 做一些额外操作
+	}
+
 	await userService.update(userService.TABLES.USERS, msg.data?.sender_id, {
 		user_id: msg.data?.sender_id,
-		// data: [...result.data, message]
 		data: {
 			...result.data,
-			data: [...result.data.msgs, message]
+			msgs: [...result.data.msgs, message]
 		}
 	})
-	// : userService.add(userService.TABLES.USERS, { user_id: msg.data?.sender_id, data: [message] })
 
 	// 会话列表
 	const chats = await userService.findOneById(userService.TABLES.CHATS, msg.data?.dialog_id, 'dialog_id')
-	chats
-		? userService.update(userService.TABLES.CHATS, chats.id, { ...message, last_message: msg.data.content })
-		: userService.add(userService.TABLES.CHATS, msg.data)
+	// &dialog_id,
+	// 	user_id,
+	// 	dialog_type,
+	// 	dialog_name,
+	// 	dialog_avatar,
+	// 	dialog_unread_count,
+	// 	msg_type,
+	// 	last_message,
+	// 	sender_id,
+	// 	send_time,
+	// 	msg_id`,
+	// const chatMsg = {
+	// 	user_id: msg.data?.sender_id,
+	// 	dialog_id: msg.data?.dialog_id,
+	// 	dialog_type: msg.data?.dialog_type,
+	// 	dialog_name: msg.data?.dialog_name,
+	// 	dialog_avatar: msg.data?.dialog_avatar,
+	// 	dialog_unread_count: msg.data?.dialog_unread_count,
+	// 	msg_type: msg.data?.msgType,
+	// 	last_message: msg.data?.content,
+	// 	sender_id: msg.data?.sender_id,
+	// 	send_time: msg.data?.send_at,
+	// 	msg_id: msg.data?.msg_id
+	// }
+	// chats
+	// 	? await userService.update(userService.TABLES.CHATS, chats.id, chatMsg)
+	// 	: await userService.add(userService.TABLES.CHA
+	if (!result) return
+	await userService.update(userService.TABLES.CHATS, chats.id, { ...chats, last_message: msg.data?.content }, 'id')
 
-	// WebSocketClient.triggerEvent('onChats', { ...message, last_message: msg.data.content })
+	// console.log('chats', chats)
+	// WebSocketClient.triggerEvent('onChats', { ...chats, last_message: msg.data.content })
 }
 
 const handlerGroupMessage = async (msg) => {
@@ -110,54 +128,6 @@ const handlerGroupMessage = async (msg) => {
 		await userService.update(userService.TABLES.MSGS, sender, newAllMsg)
 	}
 }
-
-// /**
-//  * 处理会话
-//  * @param {Object} directory	目录
-//  * @param {String} user_id		好友 id
-//  * @returns
-//  */
-// const handlerSession = async (directory, user_id, friend_id) => {
-// 	try {
-// 		console.log('处理会话', directory, user_id)
-// 		// 查找自己的信息
-// 		const reslut = await userService.findOneById(userService.TABLES.USERS, user_id)
-// 		if (!reslut) return
-
-// 		// 查找是否和好友已经有会话了, 如果有了就不需要再创建了
-// 		const session = await userService.findOneById(userService.TABLES.SESSION, friend_id)
-// 		if (session) return
-
-// 		// 得到对方公钥
-// 		const publicKey = await importPublicKey(directory?.publicKey)
-// 		// 生成预共享密钥
-// 		const preKey = await performKeyExchange(reslut?.data?.keyPair, publicKey)
-// 		// base64
-// 		const preKeyBase64 = await exportKey(preKey)
-
-// 		// 自己的仓库
-// 		const store = new SignalProtocolStore(toArrayBuffer(reslut.data.signal.store))
-// 		// 对方的地址
-// 		const address = new SignalProtocolAddress(directory.deviceName, directory.deviceId)
-
-// 		delete directory.publicKey
-
-// 		// 初始化会话
-// 		await cretaeSession(store, address, toArrayBuffer({ ...directory }))
-
-// 		// 持久化会话到数据库
-// 		await userService.add(userService.TABLES.SESSION, {
-// 			user_id: friend_id,
-// 			data: {
-// 				store: toBase64(store),
-// 				directory,
-// 				preKey: preKeyBase64
-// 			}
-// 		})
-// 	} catch (error) {
-// 		console.log('处理会话失败', error)
-// 	}
-// }
 
 /**
  * 这里主要做一些全局配置之类的事情

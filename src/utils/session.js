@@ -1,48 +1,39 @@
 import { getPublicKeyApi } from '@/api/user'
 import { dbService } from '@/db'
 import commonService from '@/db/common'
-import { performKeyExchange, exportKey, importPublicKey } from '@/utils/signal/signal-crypto'
-import { importKey } from '@/utils/tweetnacl'
+// import { performKeyExchange, exportKey, importPublicKey } from '@/utils/signal/signal-crypto'
+import { importKey,performKeyExchange } from '@/utils/tweetnacl'
 
 export async function getSession(user_id, friend_id) {
 	try {
 		const userSession = await dbService.findOneById(dbService.TABLES.USERS, friend_id)
 		const userInfo = await commonService.findOneById(commonService.TABLES.HISTORY, user_id)
 
+		console.log("userSession",userSession,userInfo);
+
 		if (!userSession) {
-			// const res = await getPublicKeyApi({ user_id: friend_id })
+			// 获取公钥
+			const res = await getPublicKeyApi({ user_id: friend_id })
+			if(res.code !== 200) return null
 
-			// if (res.code !== 200) throw new Error(res.msg)
+			const json = JSON.parse(res?.data?.secret_bundle)
 
-			// // 查找用户的密钥
-			// const user = await dbService.findOneById(dbService.TABLES.USERS, user_id)
-
-			// const result = JSON.parse(res.data?.secret_bundle || '{}')
-
-			// const publicKey = await importPublicKey(result?.publicKey)
-
-			// console.log('解析公钥', publicKey)
-
-			// const preKey = await performKeyExchange(user?.data?.keyPair, publicKey)
-
-			// const data = {
-			// 	...result,
-			// 	preKey: await exportKey(preKey)
-			// }
-			const data = await getPublicKey(user_id, friend_id)
-			const publicKey = importKey(data?.data?.secret_bundle)
+			const publicKey = importKey(json.publicKey)
+			
+			const sharedKey = performKeyExchange(userInfo?.data?.keyPair?.privateKey, publicKey)
+			console.log(sharedKey);
 			await dbService.add(dbService.TABLES.USERS, {
 				user_id: friend_id,
 				data: {
 					publicKey: publicKey,
-					shareKey: performKeyExchange(userInfo?.data?.keyPair?.privateKey, publicKey),
+					shareKey: sharedKey,
 					msgs:[]
 				}
 			})
 
-			return data
+			return sharedKey
 		} else {
-			return userSession.data
+			return userSession.data?.shareKey
 		}
 	} catch (error) {
 		console.error('获取 Session 失败', error)

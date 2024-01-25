@@ -16,18 +16,18 @@ import DoubleTickIcon from '@/components/DoubleTickIcon'
 import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
 // import SearchComponent from '@/components/Search/Search'
-import { dbService } from '@/db'
+import userService, { dbService } from '@/db'
 import { getChatList } from '@/api/msg'
-import _ from 'lodash-es'
+import { mapKeys, omit } from 'lodash-es'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 // import { preKeyGlobal } from '@/state/state'
-import { getSession } from '@/utils/session'
+// import { getSession } from '@/utils/session'
 import { useUserStore } from '@/stores/user'
 // import { decryptMessage, importKey } from '@/utils/signal/signal-crypto'
 import { format } from 'timeago.js'
-import WebSocketClient from '@/utils/WebSocketClient'
-import {  decryptMessage } from '@/utils/tweetnacl'
+// import WebSocketClient from '@/utils/WebSocketClient'
+import { decryptMessage, importKey } from '@/utils/tweetnacl'
 
 export default function Chats(props) {
 	// const { f7router } = props
@@ -63,95 +63,69 @@ export default function Chats(props) {
 	const [chatList, setChatList] = useState([])
 
 	useEffect(() => {
-		const initChats = async () => {
-			const res = await getChatList()
-			if (res.code !== 200) return
-			const list = res?.data || []
+		try {
+			const initChats = async () => {
+				const res = await getChatList()
+				if (res.code !== 200) return
+				const list = res?.data || []
 
-			const respData =
-				list?.map((item) => {
-					// 将 last_message 字段数据提取出来
-					return _.mapKeys(
-						{
-							..._.omit(item, ['last_message']), // 排除 last_message
-							...item.last_message // 提取 last_message 数据
-						},
-						(value, key) => {
-							if (key === 'content') return 'last_message' // 将 content 改为 last_message
-							return key
-						}
-					)
-				}) || []
+				const respData =
+					list?.map((item) => {
+						// 将 last_message 字段数据提取出来
+						return mapKeys(
+							{
+								...omit(item, ['last_message']), // 排除 last_message
+								...item.last_message // 提取 last_message 数据
+							},
+							(value, key) => {
+								if (key === 'content') return 'last_message' // 将 content 改为 last_message
+								return key
+							}
+						)
+					}) || []
 
-			for (let i = 0; i < respData.length; i++) {
-				const item = respData[i]
-				const chatsData = await dbService.findOneById(dbService.TABLES.CHATS, item?.dialog_id, 'dialog_id')
-				chatsData
-					? await dbService.update(dbService.TABLES.CHATS, item?.dialog_id, item, 'dialog_id')
-					: await dbService.add(dbService.TABLES.CHATS, item)
+				for (let i = 0; i < respData.length; i++) {
+					const item = respData[i]
+					const chatsData = await dbService.findOneById(dbService.TABLES.CHATS, item?.dialog_id, 'dialog_id')
+					chatsData
+						? await dbService.update(dbService.TABLES.CHATS, item?.dialog_id, item, 'dialog_id')
+						: await dbService.add(dbService.TABLES.CHATS, item)
+				}
 			}
-		}
 
-		initChats()
+			initChats()
+		} catch (error) {
+			console.error(error)
+		}
 	}, [props])
 
 	// 解密消息
 	useEffect(() => {
-		const decrypt = async (data) => {
+		const decrypt = async () => {
 			let chatList = (await dbService.findAll(dbService.TABLES.CHATS)) || []
 			if (chatList.length === 0) return
-
-			let userSession = null,
-				preKey = null
-
-			if (!data) {
-				// for (let i = 0; i < chats.length; i++) {
-				// 	const item = chatList[i]
-
-				// 	try {
-				// 		if (!item.last_message) continue
-				// 		userSession = await getSession(user?.user_id, item.user_id)
-				// 		// preKey = await importKey(userSession?.preKey)
-				// 		const msgJSON = JSON.parse(item.last_message)
-				// 		item.last_message = await decryptMessage(preKey, item.last_message)
-				// 	} catch {
-				// 		continue
-				// 	}
-				// }
-			} else {
-				// let last_message = ''
-				// try {
-				// 	userSession = await getSession(user?.user_id, data?.receiver_id)
-				// 	preKey = await importKey(userSession?.preKey)
-				// 	last_message = await decryptMessage(preKey, data?.last_message)
-				// } catch {
-				// 	last_message = data?.last_message
-				// }
-				// const index = chatList.findIndex((v) => v.user_id === data?.receiver_id)
-				// console.log('index', index)
-				// if (index !== -1) {
-				// 	chatList[index] = {
-				// 		...chatList,
-				// 		last_message
-				// 	}
-				// }
+			for (let i = 0; i < chats.length; i++) {
+				const item = chatList[i]
+				try {
+					if (!item.last_message) continue
+					const session = await userService.findOneById(userService.TABLES.USERS, item.user_id)
+					const msgJSON = JSON.parse(item.last_message)
+					item.last_message = decryptMessage(msgJSON.msg, msgJSON.nonce, session?.data?.shareKey)
+				} catch {
+					continue
+				}
 			}
 			setChatList(chatList)
 		}
 		decrypt()
-		WebSocketClient.addListener('onChats', decrypt)
-
-		return () => {
-			WebSocketClient.removeListener('onChats', decrypt)
-		}
-	}, [])
+	}, [chats])
 
 	const lastMessageHandler = (chat) => {
 		let msg = chat.last_message
 		if (!chat?.group_id) return msg
 		try {
 			msg = JSON.parse(chat?.last_message).content
-		} catch  {
+		} catch {
 			// console.log(error)
 		}
 		return msg

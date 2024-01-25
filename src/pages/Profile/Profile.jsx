@@ -128,7 +128,7 @@ export default function Profile(props) {
 							{/* <Link iconF7="phone_fill" /> */}
 						</div>
 					</ListItem>
-					<ListItem subtitle={info?.status} text={info?.email} />
+					<ListItem subtitle={info?.signature} text={info?.email} />
 				</List>
 
 				{/* <List strong outline dividers>
