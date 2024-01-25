@@ -137,6 +137,8 @@ const Home = () => {
 	const { isLogin, user } = useUserStore()
 	const device = getDevice()
 
+	// const visibility = useDocumentVisibility('visible')
+
 	// Framework7 Parameters
 	const [f7params] = useState({
 		name: '', // App name
@@ -168,6 +170,10 @@ const Home = () => {
 	// 注册 cordova API
 	f7ready(() => f7.device.cordova && cordovaApp.init(f7))
 
+	// useEffect(() => {
+	// 	console.log('visibility', visibility)
+	// }, [visibility])
+
 	/**
 	 * 好友管理
 	 * @param {*} msg
@@ -181,7 +187,6 @@ const Home = () => {
 				return
 			} else {
 				console.log('收到添加或同意信息', msg)
-				// await handlerSession(JSON.parse(msg.data?.e2e_public_key || '{}'), user?.user_id, msg.data?.user_id)
 				await useInitFriend({
 					user_id: user?.user_id,
 					friend_id: msg.data?.user_id,

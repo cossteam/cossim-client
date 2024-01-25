@@ -15,25 +15,15 @@ import './Chats.less'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
-// import SearchComponent from '@/components/Search/Search'
 import userService, { dbService } from '@/db'
 import { getChatList } from '@/api/msg'
 import { mapKeys, omit } from 'lodash-es'
 import { useLiveQuery } from 'dexie-react-hooks'
-
-// import { preKeyGlobal } from '@/state/state'
-// import { getSession } from '@/utils/session'
-import { useUserStore } from '@/stores/user'
-// import { decryptMessage, importKey } from '@/utils/signal/signal-crypto'
 import { format } from 'timeago.js'
-// import WebSocketClient from '@/utils/WebSocketClient'
-import { decryptMessage, importKey } from '@/utils/tweetnacl'
+import { decryptMessage } from '@/utils/tweetnacl'
+import { useHistoryStore } from '@/stores/history'
 
 export default function Chats(props) {
-	// const { f7router } = props
-
-	const { user } = useUserStore()
-
 	const swipeoutUnread = () => {
 		f7.dialog.alert('Unread')
 	}
@@ -43,15 +33,9 @@ export default function Chats(props) {
 	const swipeoutMore = () => {
 		f7.dialog.alert('More')
 	}
-	// const swipeoutArchive = () => {
-	// 	f7.dialog.alert('Archive')
-	// }
-	// const onUserSelect = (user) => {
-	// 	console.log('start new chat with', user)
-	// 	setTimeout(() => {
-	// 		f7router.navigate(`/chats/${user.id}/`)
-	// 	}, 300)
-	// }
+
+	const historyStore = useHistoryStore()
+
 
 	/**
 	 * 页面初始化时加载会话列表
@@ -61,6 +45,8 @@ export default function Chats(props) {
 	 */
 	const chats = useLiveQuery(() => dbService.findAll(dbService.TABLES.CHATS)) || []
 	const [chatList, setChatList] = useState([])
+	// 是否是首次进入
+	const [isFirstIn, setIsFirstIn] = useState(true)
 
 	useEffect(() => {
 		try {
@@ -77,7 +63,7 @@ export default function Chats(props) {
 								...omit(item, ['last_message']), // 排除 last_message
 								...item.last_message // 提取 last_message 数据
 							},
-							(value, key) => {
+							(_, key) => {
 								if (key === 'content') return 'last_message' // 将 content 改为 last_message
 								return key
 							}
@@ -87,10 +73,19 @@ export default function Chats(props) {
 				for (let i = 0; i < respData.length; i++) {
 					const item = respData[i]
 					const chatsData = await dbService.findOneById(dbService.TABLES.CHATS, item?.dialog_id, 'dialog_id')
+
+					if (isFirstIn && item.send_time === chatsData.send_time) {
+						// setUpdateIds([...updateIds, item.user_id])
+						historyStore.updateIds(item.user_id)
+						
+					}
+
 					chatsData
 						? await dbService.update(dbService.TABLES.CHATS, item?.dialog_id, item, 'dialog_id')
 						: await dbService.add(dbService.TABLES.CHATS, item)
 				}
+
+				setIsFirstIn(false)
 			}
 
 			initChats()
@@ -126,6 +121,7 @@ export default function Chats(props) {
 		try {
 			msg = JSON.parse(chat?.last_message).content
 		} catch {
+			msg = '该消息解密失败'
 			// console.log(error)
 		}
 		return msg
