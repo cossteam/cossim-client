@@ -18,8 +18,8 @@ import Home from './Home.jsx'
 
 import 'animate.css'
 
-import { test } from '@/utils/tweetnacl'
-test()
+// import { test } from '@/utils/tweetnacl'
+// test()
 // import * as serviceWorker from './utils//serviceWorker'
 
 // Init F7 React Plugin
