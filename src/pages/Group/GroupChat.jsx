@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import {
 	Icon,
 	Link,
-	List,
-	ListItem,
 	Message,
 	Messagebar,
 	MessagebarSheet,
@@ -11,8 +9,7 @@ import {
 	NavRight,
 	NavTitle,
 	Navbar,
-	Page,
-	Popover
+	Page
 } from 'framework7-react'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import Emojis from '@/components/Emojis/Emojis.jsx'
@@ -26,6 +23,7 @@ import { groupInfoApi, groupMemberApi } from '@/api/group'
 import { sendToGroup } from '@/api/msg'
 import clsx from 'clsx'
 import LongPressWrap from './LongPressWrap'
+import { useClickOutside } from '@reactuses/core'
 
 GroupChat.propTypes = {
 	f7route: PropType.object.isRequired
@@ -55,7 +53,7 @@ export default function GroupChat({ f7route }) {
 		groupMemberApi({ group_id: ReceiverId }).then(({ code, data }) => {
 			if (code === 200) {
 				const obj = new Map()
-				for (const dataItem of data) {
+				for (const dataItem of Array.isArray(data) ? data : []) {
 					if (dataItem.user_id) {
 						obj.set(dataItem.user_id, dataItem)
 					}
@@ -112,6 +110,14 @@ export default function GroupChat({ f7route }) {
 				)
 		}
 	}
+
+	const send = () => {
+		sendMessage(msgText, 1)
+		// 恢复输入框状态
+		setMsgText('')
+		messagebarRef.current.f7Messagebar().focus()
+	}
+
 	/**
 	 * 发送消息
 	 * @param {*} sandText 内容
@@ -145,11 +151,6 @@ export default function GroupChat({ f7route }) {
 		} else {
 			await dbService.update(dbService.TABLES.MSGS, ReceiverId, newAllMsg)
 		}
-		// 恢复输入框状态
-		setMsgText('')
-		setTimeout(() => {
-			messagebarRef.current.f7Messagebar().focus()
-		})
 		// 发送
 		try {
 			message['send_status'] = 1
@@ -177,13 +178,55 @@ export default function GroupChat({ f7route }) {
 	}
 
 	// 消息操作菜单
-	const [msgEl, setMsgEL] = useState(null)
-	const [msgMenuOpened, setMsgMenuOpened] = useState(false)
+	const messagesRef = useRef(null)
+	const [msgMenuData, setMsgMenuData] = useState({})
+	const msgMenuRef = useRef(null)
+	const [msgMenuStyle, setMsgMenuStyle] = useState({
+		top: '44px',
+		left: '9999px'
+	})
 	const onMsgLongPress = (e, msg) => {
-		console.log('longPress', e, msg)
-		setMsgEL(e.target)
-		setMsgMenuOpened(true)
+		const isSender = msg.sender === user.user_id
+		console.log(msg)
+		console.dir(e.changedTouches[0].target.parentElement.getBoundingClientRect())
+		// const clientWidth = msgMenuRef?.current?.clientWidth || 0
+		// const clientHeight = msgMenuRef?.current?.clientHeight || 0
+		// console.log(clientWidth, clientHeight)
+		// const { offsetWidth, offsetHeight } = messagesRef.current.el.offsetParent
+		// const maxWidth = offsetWidth
+		// const maxHeight = offsetHeight - 88
+		// console.log(maxWidth, maxHeight)
+		// const { clientX, clientY } = e.changedTouches[0]
+		// console.log(clientX, clientY)
+		// let x = Math.floor(clientX)
+		// let y = Math.floor(clientY)
+		// let translateX = '0'
+		// let translateY = '-50%'
+		// // 菜单超出屏幕宽度
+		// if (clientX + clientWidth >= maxWidth) {
+		// 	x = Math.floor(clientX - clientWidth)
+		// }
+		// // 菜单超出屏幕高度
+		// if (clientY + clientHeight >= maxHeight) {
+		// 	y = Math.floor(clientY - clientHeight)
+		// }
+		const { top, left, bottom, right, width, height } =
+			e.changedTouches[0].target.parentElement.getBoundingClientRect()
+
+		setMsgMenuData(msg)
+		// 开启消息菜单操作
+		setMsgMenuStyle({
+			left: isSender ? left + width : left,
+			top: top
+			// transform: `translate(${translateX}, ${translateY})`
+		})
 	}
+	useClickOutside(msgMenuRef, () => {
+		// 关闭消息菜单操作
+		setMsgMenuStyle({
+			left: '99999px'
+		})
+	})
 
 	return (
 		<Page className="chat-group-page messages-page" noToolbar messagesContent>
@@ -213,12 +256,7 @@ export default function GroupChat({ f7route }) {
 					}}
 				/>
 				{msgText !== '' ? (
-					<Link
-						slot="inner-end"
-						className="messagebar-send-link"
-						iconF7="paperplane_fill"
-						onClick={() => sendMessage()}
-					/>
+					<Link slot="inner-end" className="messagebar-send-link" iconF7="paperplane_fill" onClick={send} />
 				) : (
 					<>
 						<Link slot="inner-end" href="/camera/" iconF7="camera" />
@@ -230,10 +268,10 @@ export default function GroupChat({ f7route }) {
 					<Emojis onEmojiSelect={onEmojiSelect} />
 				</MessagebarSheet>
 			</Messagebar>
-			<Messages>
+			<Messages ref={messagesRef}>
 				{messages?.map((message, index) => {
 					const first = isMessageFirst(message)
-					const last = isMessageLast(message)
+					// const last = isMessageLast(message)
 					const tail = isMessageLast(message)
 					const isSender = message.sender === user.user_id
 					return (
@@ -241,18 +279,19 @@ export default function GroupChat({ f7route }) {
 							{/* 消息 */}
 							<Message
 								first={first}
-								last={last}
-								tail={tail}
+								last={true}
+								tail={false}
 								name={member.get(message.sender)?.nickname}
 								avatar={member.get(message.sender)?.avatar}
 								type={message.sender === user.user_id ? 'sent' : 'received'}
-								image={message.type === 3 ? [message.content] : ''}
 							>
-								<span slot="text">
-									<LongPressWrap onLongPress={(e) => onMsgLongPress(e, message)}>
-										{message.type === 1 ? message.content : ''}
-									</LongPressWrap>
-								</span>
+								<LongPressWrap
+									className={clsx(message.type === 3 && 'message-image')}
+									onLongPress={(e) => onMsgLongPress(e, message)}
+								>
+									{message.type === 3 ? <img slot="image" src={message.content} /> : ''}
+									{message.type === 1 ? <span slot="text">{message.content}</span> : ''}
+								</LongPressWrap>
 							</Message>
 							{/* 时间、状态 */}
 							<div
@@ -261,23 +300,20 @@ export default function GroupChat({ f7route }) {
 									isSender && 'message-sent'
 								)}
 							>
-								{<span className={clsx(isSender && 'mr-2')}>{messageTime(message)}</span>}
+								{tail && <span className={clsx(isSender && 'mr-2')}>{messageTime(message)}</span>}
 								{isSender && <span>{sendStatusIcon(message)}</span>}
 							</div>
 						</div>
 					)
 				})}
 			</Messages>
-
-			<Popover opened={msgMenuOpened} containerEl={msgEl}>
-				<List>
-					<ListItem link="/dialog/" popoverClose title="Dialog" />
-					<ListItem link="/tabs/" popoverClose title="Tabs" />
-					<ListItem link="/panel/" popoverClose title="Side Panels" />
-					<ListItem link="/list/" popoverClose title="List View" />
-					<ListItem link="/inputs/" popoverClose title="Form Inputs" />
-				</List>
-			</Popover>
+			<div
+				ref={msgMenuRef}
+				className=" w-44 h-28 fixed z-[999] bg-white p-2 rounded-md shadow-md"
+				style={msgMenuStyle}
+			>
+				{msgMenuData.content}
+			</div>
 		</Page>
 	)
 }
