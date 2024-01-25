@@ -1,9 +1,7 @@
-// import { dbService } from '@/db'
-// import { exportPublicKey, importPublicKey } from '@/utils/signal/signal-crypto'
 import commonService from '@/db/common'
 import userService from '@/db'
 import { updatePublicKeyApi, getPublicKeyApi } from '@/api/user'
-import { exportKey, importKey } from '@/utils/tweetnacl'
+import { exportKey, importKey, performKeyExchange } from '@/utils/tweetnacl'
 
 /**
  * 初始化用户,用户首次登录时会自动创建
@@ -40,29 +38,36 @@ export const useInitUser = async (user) => {
 		console.error('初始化用户消息失败:', error)
 	}
 }
-
 /**
  * 收到好友申请是处理
+ * @param {*} options
+ * @returns
  */
 export async function useInitFriend(options) {
 	try {
-		let result = { publicKey: null, msgs: [] }
+		console.log('收到好友申请是处理', options)
+		let result = { publicKey: null, shareKey: null, msgs: [] }
 
-		const { data, friend_id } = options
+		const { data, friend_id, user_id } = options
 
 		// 如果没有公钥就获取公钥
 		if (!data) {
 			const res = await getPublicKeyApi({ user_id: friend_id })
-			if (res.code !== 200) return
-			const secret_bundle = JSON.parse(res.data?.secret_bundle || '{}')
-			result.publicKey = importKey(secret_bundle)
+			if (res.code !== 200) throw new Error(res.msg)
+			result.publicKey = importKey(JSON.parse(res.data?.secret_bundle || '{}'))
+		} else {
+			result.publicKey = importKey(data?.publicKey)
 		}
+
+		const userInfo = await commonService.findOneById(commonService.TABLES.HISTORY, user_id)
+
+		result.shareKey = performKeyExchange(userInfo?.data?.keyPair?.privateKey, result?.publicKey)
 
 		// 更新用户信息
 		const user = await userService.findOneById(userService.TABLES.USERS, friend_id)
 		user
 			? await userService.update(userService.TABLES.USERS, friend_id, { data: result })
-			: await userService.add(userService.TABLES.USERS, { user_id: friend_id, data: { ...data } })
+			: await userService.add(userService.TABLES.USERS, { user_id: friend_id, data: result })
 	} catch (error) {
 		console.error('收到好友申请处理时错误：', error)
 	}

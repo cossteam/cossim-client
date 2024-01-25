@@ -7,7 +7,7 @@ import DoubleTickIcon from '@/components/DoubleTickIcon'
 import Emojis from '@/components/Emojis/Emojis.jsx'
 import './Messages.less'
 import { useUserStore } from '@/stores/user'
-import { dbService } from '@/db'
+// import { userService } from '@/db'
 import _ from 'lodash-es'
 import { sendToUser } from '@/api/msg'
 import { getUserInfoApi } from '@/api/user'
@@ -19,9 +19,11 @@ import { getUserInfoApi } from '@/api/user'
 // import { SessionCipher, SignalProtocolAddress } from '@privacyresearch/libsignal-protocol-typescript'
 // import { SignalProtocolStore } from '@/utils/signal/storage-type'
 // import { reconnectSession } from '@/utils/signal/signal-protocol'
-import { encryptMessage, decryptMessage, importKey } from '@/utils/signal/signal-crypto'
-import { getSession } from '@/utils/session'
-import MessageBox from '@/components/Message/Msg'
+// import { encryptMessage, decryptMessage, importKey } from '@/utils/signal/signal-crypto'
+// import { getSession } from '@/utils/session'
+// import MessageBox from '@/components/Message/Msg'
+import { encryptMessage, decryptMessage, cretateNonce } from '@/utils/tweetnacl'
+import userService from '@/db'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -42,7 +44,7 @@ export default function MessagesPage({ f7route }) {
 	// 好友信息
 	const [contact, setContact] = useState({})
 	// 消息
-	const allMsg = useLiveQuery(() => dbService.findAll(dbService.TABLES.MSGS)) || []
+	const allMsg = useLiveQuery(() => userService.findAll(userService.TABLES.USERS)) || []
 	const [messages, setMessages] = useState([])
 
 	const [isActive, setIsActive] = useState(true)
@@ -51,37 +53,42 @@ export default function MessagesPage({ f7route }) {
 	// const [userSesion, setUserSession] = useState({})
 	const [preKey, setPreKey] = useState(null)
 
-	const [height, setHeight] = useState('100vh')
+	// const [height, setHeight] = useState('100vh')
+
+	const [nonce] = useState(cretateNonce())
 
 	useEffect(() => {
 		// 基本初始化
 		const init = async () => {
-			let userInfo = null,
-				userSession = null,
-				preKey = null
+			// let userInfo = null,
+			// 	userSession = null,
+			// 	preKey = null
 
 			try {
-				userInfo = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
-				if (!userInfo) return
+				const reslut = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
+				// userInfo = await userService.findOneById(userService.TABLES.USERS, user?.user_id)
+				if (!reslut) return
 
-				userSession = await getSession(user?.user_id, ReceiverId)
-				console.log('userSession', userSession)
-				if (!userSession) return
+				console.log('reslut', reslut)
+				setPreKey(reslut?.data?.shareKey)
+				// userSession = await getSession(user?.user_id, ReceiverId)
+				// console.log('userSession', userSession)
+				// if (!userSession) return
 				// 预共享密钥
-				preKey = await importKey(userSession?.preKey)
+				// preKey = await importKey(userSession?.preKey)
 			} finally {
 				// setUserInfo(userInfo)
 				// setUserSession(userSession)
-				setPreKey(preKey || '1')
+				// setPreKey(preKey || '1')
 			}
 
 			// 设置户消息
-			let userContact = await dbService.findOneById(dbService.TABLES.CONTACTS, ReceiverId)
-			if (!userContact) {
-				const res = await getUserInfoApi({ user_id: ReceiverId })
-				console.log('查询用户信息', res)
-			}
-			setContact(userContact)
+			// let userContact = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
+			// if (!userContact) {
+			// 	const res = await getUserInfoApi({ user_id: ReceiverId })
+			// 	console.log('查询用户信息', res)
+			// }
+			// setContact(userContact)
 
 			// // 触顶加载
 			// const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
@@ -108,14 +115,16 @@ export default function MessagesPage({ f7route }) {
 			try {
 				if (!preKey) return
 				// 只截取最新的 30 条消息，从后面往前截取
-				const msgs = allMsg?.find((item) => item.user_id === ReceiverId)?.data?.slice(-30) || []
+				const msgs = allMsg?.find((item) => item.user_id === ReceiverId)?.data?.msgs?.slice(-30) || []
 				for (let i = 0; i < msgs.length; i++) {
 					const msg = msgs[i]
 					let content = msg.content
 					try {
-						content = await decryptMessage(preKey, content)
+						const msg = JSON.parse(content)
+						content = decryptMessage(msg.msg, msg.nonce, preKey)
+						console.log('解密消息', content, msg)
 					} catch {
-						content = msg.content
+						content = '该消息解密失败'
 					}
 					msg.content = content
 				}
@@ -128,7 +137,7 @@ export default function MessagesPage({ f7route }) {
 
 		const updateMsg = async () => {
 			try {
-				const lastMsg = allMsg?.find((item) => item.user_id === ReceiverId)?.data?.at(-1) || []
+				const lastMsg = allMsg?.find((item) => item.user_id === ReceiverId)?.data?.msgs?.at(-1) || []
 
 				// 如果是发送消息
 				if (isSend) {
@@ -142,7 +151,8 @@ export default function MessagesPage({ f7route }) {
 				// 如果是接收消息
 				let content = lastMsg?.content
 				try {
-					content = await decryptMessage(preKey, content)
+					const msg = JSON.parse(content)
+					content = decryptMessage(msg.msg, msg.nonce, preKey)
 				} catch {
 					// console.log('解密失败：', error)
 					content = lastMsg?.content
@@ -160,7 +170,7 @@ export default function MessagesPage({ f7route }) {
 
 		const initContact = async () => {
 			if (contact) return
-			const user = await dbService.findOneById(dbService.TABLES.CONTACTS, ReceiverId)
+			const user = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
 			// console.log('contact', user)
 			// if (!user) {
 			// 	const res = await getUserInfoApi({ user_id: ReceiverId })
@@ -200,7 +210,7 @@ export default function MessagesPage({ f7route }) {
 
 				// if (isActive) setIsActive(false)
 				if (contact) return
-				const user = await dbService.findOneById(dbService.TABLES.CONTACTS, ReceiverId)
+				const user = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
 				console.log('contact', user)
 				if (!user) {
 					const res = await getUserInfoApi({ user_id: ReceiverId })
@@ -268,12 +278,18 @@ export default function MessagesPage({ f7route }) {
 			try {
 				// encrypted = await encrypt(content, sessionCipher)
 				// encrypted = JSON.stringify(encrypted)
-				encrypted = await encryptMessage(preKey, content)
+				encrypted = encryptMessage(content, nonce, preKey)
 				console.log('发送加密消息', encrypted)
 			} catch (error) {
 				console.log('发送加密消息失败', error)
 				encrypted = content
 			}
+			const msg = { msg: encrypted, nonce }
+
+			encrypted = JSON.stringify(msg)
+
+			// const fe = decryptMessage(encrypted, nonce, preKey)
+			// console.log('加密消息', encrypted, fe)
 
 			let send_state = 'sending'
 			const dbMsg = {
@@ -302,16 +318,19 @@ export default function MessagesPage({ f7route }) {
 			}
 
 			// 查找本地消息记录
-			const result = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
-			result
-				? await dbService.update(dbService.TABLES.MSGS, ReceiverId, {
-						user_id: ReceiverId,
-						data: [...result.data, { ...dbMsg, content: encrypted }]
-					})
-				: await dbService.add(dbService.TABLES.MSGS, {
-						user_id: ReceiverId,
-						data: [{ ...dbMsg, content: encrypted }]
-					})
+			const result = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
+			// result
+			// 	?
+			await userService.update(userService.TABLES.USERS, ReceiverId, {
+				user_id: ReceiverId,
+				// data: [...result.data, { ...dbMsg, content: encrypted }]
+				data: { ...result.data, msgs: [...result.data.msgs, { ...dbMsg, content: encrypted }] }
+			})
+			// : await userService.add(userService.TABLES.USERS, {
+			// 		user_id: ReceiverId,
+			// 		// data: [{ ...dbMsg, content: encrypted }]
+			// 		data: {  }
+			// 	})
 		} catch (error) {
 			console.error('发送消息失败：', error)
 			// throw error
@@ -338,7 +357,7 @@ export default function MessagesPage({ f7route }) {
 	// Fix for iOS web app scroll body when
 	const resizeTimeout = useRef(null)
 	const onViewportResize = () => {
-		setHeight(visualViewport.height - 88 + 'px')
+		// setHeight(visualViewport.height - 88 + 'px')
 		$('html, body').css('height', `${visualViewport.height}px`)
 		$('html, body').scrollTop(0)
 	}

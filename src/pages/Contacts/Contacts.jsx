@@ -4,7 +4,7 @@ import React from 'react'
 import { friendListApi } from '@/api/relation'
 import { $t } from '@/i18n'
 import './Contacts.less'
-import WebDB from '@/db'
+import userService from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useRelationRequestStore } from '@/stores/relationRequest'
 import { friendApplyListApi } from '@/api/relation'
@@ -41,7 +41,7 @@ export default function Contacts(props) {
 		}, {})
 	}
 	// 获取好友列表
-	const contacts = arrayToGroups(useLiveQuery(() => WebDB.contacts.toArray()) || [])
+	const contacts = arrayToGroups(useLiveQuery(() => userService.findAll(userService.TABLES.CONTACTS)) || [])
 	useEffect(() => {
 		;(async () => {
 			const { code, data } = await friendListApi()
@@ -59,12 +59,14 @@ export default function Contacts(props) {
 				}
 			}
 			respData = groupsToArray(respData) // 转换为目标数据结构
-			const oldData = (await WebDB.contacts.toArray()) || []
+			const oldData = (await userService.findAll(userService.TABLES.CONTACTS)) || []
 			// 校验新数据和旧数据 => 更新数据 or 插入数据库
 			for (let i = 0; i < respData.length; i++) {
 				const item = respData[i]
 				const oldItem = oldData.find((oldItem) => oldItem.user_id === item.user_id)
-				oldItem ? await WebDB.contacts.update(oldItem.id, item) : await WebDB.contacts.add(item)
+				oldItem
+					? await userService.update(userService.TABLES.CONTACTS, oldItem.id, item)
+					: await userService.add(userService.TABLES.CONTACTS, item)
 			}
 		})()
 	}, [props])

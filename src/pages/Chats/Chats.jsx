@@ -24,9 +24,10 @@ import { useLiveQuery } from 'dexie-react-hooks'
 // import { preKeyGlobal } from '@/state/state'
 import { getSession } from '@/utils/session'
 import { useUserStore } from '@/stores/user'
-import { decryptMessage, importKey } from '@/utils/signal/signal-crypto'
+// import { decryptMessage, importKey } from '@/utils/signal/signal-crypto'
 import { format } from 'timeago.js'
 import WebSocketClient from '@/utils/WebSocketClient'
+import {  decryptMessage } from '@/utils/tweetnacl'
 
 export default function Chats(props) {
 	// const { f7router } = props
@@ -104,35 +105,36 @@ export default function Chats(props) {
 				preKey = null
 
 			if (!data) {
-				for (let i = 0; i < chats.length; i++) {
-					const item = chatList[i]
+				// for (let i = 0; i < chats.length; i++) {
+				// 	const item = chatList[i]
 
-					try {
-						if (!item.last_message) continue
-						userSession = await getSession(user?.user_id, item.user_id)
-						preKey = await importKey(userSession?.preKey)
-						item.last_message = await decryptMessage(preKey, item.last_message)
-					} catch {
-						continue
-					}
-				}
+				// 	try {
+				// 		if (!item.last_message) continue
+				// 		userSession = await getSession(user?.user_id, item.user_id)
+				// 		// preKey = await importKey(userSession?.preKey)
+				// 		const msgJSON = JSON.parse(item.last_message)
+				// 		item.last_message = await decryptMessage(preKey, item.last_message)
+				// 	} catch {
+				// 		continue
+				// 	}
+				// }
 			} else {
-				let last_message = ''
-				try {
-					userSession = await getSession(user?.user_id, data?.receiver_id)
-					preKey = await importKey(userSession?.preKey)
-					last_message = await decryptMessage(preKey, data?.last_message)
-				} catch {
-					last_message = data?.last_message
-				}
-				const index = chatList.findIndex((v) => v.user_id === data?.receiver_id)
-				console.log('index', index)
-				if (index !== -1) {
-					chatList[index] = {
-						...chatList,
-						last_message
-					}
-				}
+				// let last_message = ''
+				// try {
+				// 	userSession = await getSession(user?.user_id, data?.receiver_id)
+				// 	preKey = await importKey(userSession?.preKey)
+				// 	last_message = await decryptMessage(preKey, data?.last_message)
+				// } catch {
+				// 	last_message = data?.last_message
+				// }
+				// const index = chatList.findIndex((v) => v.user_id === data?.receiver_id)
+				// console.log('index', index)
+				// if (index !== -1) {
+				// 	chatList[index] = {
+				// 		...chatList,
+				// 		last_message
+				// 	}
+				// }
 			}
 			setChatList(chatList)
 		}
@@ -149,7 +151,7 @@ export default function Chats(props) {
 		if (!chat?.group_id) return msg
 		try {
 			msg = JSON.parse(chat?.last_message).content
-		} catch (error) {
+		} catch  {
 			// console.log(error)
 		}
 		return msg

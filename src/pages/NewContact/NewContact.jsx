@@ -4,12 +4,14 @@ import RequestList from './RequestList'
 import { $t } from '@/i18n'
 import { useUserStore } from '@/stores/user'
 import { useRelationRequestStore } from '@/stores/relationRequest'
-import { dbService } from '@/db'
-import { exportPublicKey } from '@/utils/signal/signal-crypto'
+// import { dbService } from '@/db'
+// import { exportPublicKey } from '@/utils/signal/signal-crypto'
 import { friendApplyListApi } from '@/api/relation'
 import { groupRequestListApi } from '@/api/group'
 import { confirmAddFriendApi } from '@/api/relation'
 import { confirmAddGroupApi } from '@/api/group'
+import commonService from '@/db/common'
+import { exportKey } from '@/utils/tweetnacl'
 
 // import PropTypes from 'prop-types'
 // NewContact.propTypes = {
@@ -28,16 +30,21 @@ export default function NewContact() {
 			data: friendResquest || [],
 			onClick: () => setActiveTabbar(0),
 			itemConfirm: async (id, status) => {
-				const users = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
-				if (!users) return f7.dialog.alert('系统内部错误')
-
-				// const exportedPublicKey = await crypto.subtle.exportKey('spki', users?.data?.keyPair?.publicKey)
-				// const exportedKeyBase64 = fromUint8Array(new Uint8Array(exportedPublicKey))
+				// const users = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
+				// if (!users) return f7.dialog.alert('系统内部错误')
+				const result = await commonService.findOneById(commonService.TABLES.HISTORY, user?.user_id)
+				
+				if (!result) f7.dialog.alert('本地数据库中没有该用户！请重新登录后重试')
 
 				const directory = {
-					...JSON.parse(users?.data?.directory),
-					publicKey: await exportPublicKey(users?.data?.keyPair?.publicKey)
+					publicKey: exportKey(result?.data?.keyPair?.publicKey)
 				}
+				// const exportedPublicKey = await crypto.subtle.exportKey('spki', users?.data?.keyPair?.publicKey)
+				// const exportedKeyBase64 = fromUint8Array(new Uint8Array(exportedPublicKey))
+				// const directory = {
+				// 	...JSON.parse(users?.data?.directory),
+				// 	publicKey: await exportPublicKey(users?.data?.keyPair?.publicKey)
+				// }
 				// 同意或拒绝添加好友
 				const { code } = await confirmAddFriendApi({
 					user_id: id,

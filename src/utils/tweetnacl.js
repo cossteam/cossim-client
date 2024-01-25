@@ -22,30 +22,27 @@ export function performKeyExchange(myPrivateKey, theirPublicKey) {
 
 /**
  * 使用公钥加密消息
- * @param {Uint8Array} message 待加密的消息
+ * @param {string} message 待加密的消息
  * @param {Uint8Array} nonce 随机的一次性数字
  * @param {sharedKey} theirPublicKey 共享密钥
  * @returns {Uint8Array} 加密后的消息
  */
 export function encryptMessage(message, nonce, sharedKey) {
-	return nacl.box.after(new TextEncoder().encode(message), nonce, sharedKey)
+	// 将消息转为 Uint8Array
+	return fromUint8Array(nacl.box.after(new TextEncoder().encode(message), nonce, sharedKey))
 }
 
 /**
  * 使用私钥解密消息
- * @param {Uint8Array} encryptedMessage 加密的消息
- * @param {Uint8Array} nonce 随机的一次性数字
+ * @param {string} encryptedMessage 加密的消息
+ * @param {string} nonce 随机的一次性数字
  * @param {sharedKey} theirPublicKey 共享密钥
  * @returns {string} 解密后的消息
  */
 export function decryptMessage(encryptedMessage, nonce, sharedKey) {
+	encryptedMessage = toUint8Array(encryptedMessage)
 	const decryptedMessage = nacl.box.open.after(encryptedMessage, nonce, sharedKey)
-	const decoder = new TextDecoder()
-		.decode(decryptedMessage)
-		.split(',')
-		.map((v) => Number(v))
-	const uint8Array = new Uint8Array(decoder)
-	return new TextDecoder().decode(uint8Array)
+	return new TextDecoder().decode(decryptedMessage)
 }
 
 /**
@@ -64,3 +61,37 @@ export function importKey(key) {
 	return toUint8Array(key)
 }
 
+export function cretateNonce() {
+	const randomBytes = nacl.randomBytes(24)
+	// console.log('nacl.randomBytes(24)', randomBytes,fromUint8Array(randomBytes),toUint8Array(fromUint8Array(randomBytes)))
+	return fromUint8Array(randomBytes)
+}
+
+export function test() {
+	// 示例用法
+	const aliceKeyPair = generateKeyPair()
+	const bobKeyPair = generateKeyPair()
+
+	const sharedSecret1 = performKeyExchange(aliceKeyPair.privateKey, bobKeyPair.publicKey)
+	const sharedSecret2 = performKeyExchange(bobKeyPair.privateKey, aliceKeyPair.publicKey)
+
+	console.log('aliceKeyPair', aliceKeyPair)
+	console.log('bobKeyPair', bobKeyPair)
+
+	console.log('sharedSecret1', sharedSecret1)
+	console.log('sharedSecret2', sharedSecret2)
+
+	const nonce = cretateNonce()
+
+	const message = 'Hello, Bob!'
+
+	const encryptedMessage = encryptMessage(message, nonce, sharedSecret1)
+
+	const msg = { msg: encryptedMessage, nonce: nonce }
+
+	console.log('encryptedMessage', msg)
+
+	const decryptedMessage = decryptMessage(msg.msg, msg.nonce, sharedSecret2)
+	console.log('decryptedMessage', decryptedMessage)
+
+}

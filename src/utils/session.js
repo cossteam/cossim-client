@@ -1,10 +1,13 @@
 import { getPublicKeyApi } from '@/api/user'
 import { dbService } from '@/db'
+import commonService from '@/db/common'
 import { performKeyExchange, exportKey, importPublicKey } from '@/utils/signal/signal-crypto'
+import { importKey } from '@/utils/tweetnacl'
 
 export async function getSession(user_id, friend_id) {
 	try {
-		const userSession = await dbService.findOneById(dbService.TABLES.SESSION, friend_id)
+		const userSession = await dbService.findOneById(dbService.TABLES.USERS, friend_id)
+		const userInfo = await commonService.findOneById(commonService.TABLES.HISTORY, user_id)
 
 		if (!userSession) {
 			// const res = await getPublicKeyApi({ user_id: friend_id })
@@ -27,7 +30,15 @@ export async function getSession(user_id, friend_id) {
 			// 	preKey: await exportKey(preKey)
 			// }
 			const data = await getPublicKey(user_id, friend_id)
-			await dbService.add(dbService.TABLES.SESSION, { user_id: friend_id, data })
+			const publicKey = importKey(data?.data?.secret_bundle)
+			await dbService.add(dbService.TABLES.USERS, {
+				user_id: friend_id,
+				data: {
+					publicKey: publicKey,
+					shareKey: performKeyExchange(userInfo?.data?.keyPair?.privateKey, publicKey),
+					msgs:[]
+				}
+			})
 
 			return data
 		} else {
@@ -68,6 +79,6 @@ async function getPublicKey(user_id, friend_id) {
 		...result,
 		preKey: await exportKey(preKey)
 	}
-	
+
 	return data
 }
