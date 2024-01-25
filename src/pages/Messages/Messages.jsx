@@ -12,15 +12,22 @@ import { sendToUser, getMsgByUser } from '@/api/msg'
 import { getUserInfoApi } from '@/api/user'
 import { encryptMessage, decryptMessage, cretateNonce } from '@/utils/tweetnacl'
 import userService from '@/db'
+import { useHistoryStore } from '@/stores/history'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
 }
 
-async function getMsg(page, limit, user_id) {
-	const res = await getMsgByUser({ page_num: page, page_size: limit, user_id })
-	console.log('res', res)
-}
+// function msgCompare(oldData, newData, index = 0) {
+// 	const newLastMsg = newData[0]
+
+// 	// 查询最新数据是否在旧数据中
+// 	const current = oldData.findIndex((v) => v.id === newLastMsg.id)
+
+// 	if (current !== -1) {
+// 		msgCompare(oldData, newData, index++)
+// 	}
+// }
 
 export default function MessagesPage({ f7route }) {
 	// 会话信息
@@ -31,8 +38,6 @@ export default function MessagesPage({ f7route }) {
 	const ReceiverId = f7route.params.id
 	// 好友信息
 	const [contact, setContact] = useState({})
-	// 数据库所有消息
-	const allMsg = useLiveQuery(() => userService.findAll(userService.TABLES.USERS)) || []
 	// 页面显示消息列表
 	const [messages, setMessages] = useState([])
 	// 是否首次进入
@@ -41,34 +46,27 @@ export default function MessagesPage({ f7route }) {
 	const [isSend, setIsSend] = useState(false)
 	// 预共享密钥
 	const [preKey, setPreKey] = useState(null)
-
+	// 随机数
 	const [nonce] = useState(cretateNonce())
 
-	useEffect(() => {
-		getMsg(1, 100, ReceiverId)
+	const { ids } = useHistoryStore()
 
+	const [page, setPage] = useState(1)
+	const [limit, setLimit] = useState(30)
+
+	// 数据库所有消息
+	// const allMsg = useLiveQuery(() => userService.findAll(userService.TABLES.USERS)) || []
+	const msgList = useLiveQuery(async () => {
+		const msgs = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
+		return { msgs: msgs?.data?.msgs, shareKey: msgs?.data?.shareKey }
+	})
+
+	useEffect(() => {
 		// 基本初始化
 		const init = async () => {
-			// let userInfo = null,
-			// 	userSession = null,
-			// 	preKey = null
-
-			try {
-				const reslut = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
-				// userInfo = await userService.findOneById(userService.TABLES.USERS, user?.user_id)
-				if (!reslut) return
-				// console.log('reslut', reslut)
-				setPreKey(reslut?.data?.shareKey)
-				// userSession = await getSession(user?.user_id, ReceiverId)
-				// console.log('userSession', userSession)
-				// if (!userSession) return
-				// 预共享密钥
-				// preKey = await importKey(userSession?.preKey)
-			} finally {
-				// setUserInfo(userInfo)
-				// setUserSession(userSession)
-				// setPreKey(preKey || '1')
-			}
+			const reslut = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
+			if (!reslut) return
+			setPreKey(reslut?.data?.shareKey)
 
 			// 设置户消息
 			let userContact = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
@@ -79,9 +77,9 @@ export default function MessagesPage({ f7route }) {
 			}
 			setContact(userContact)
 
-			// // 触顶加载
+			// 触顶加载
 			// const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
-			// // 滚动到顶部加载更多
+			// 滚动到顶部加载更多
 			// messagesContent?.addEventListener(
 			// 	'scroll',
 			// 	_.throttle(async () => {
@@ -90,7 +88,6 @@ export default function MessagesPage({ f7route }) {
 			// 		}
 			// 	}, 1000)
 			// )
-
 			// return () => {
 			// 	messagesContent?.removeEventListener('scroll', () => {})
 			// }
@@ -102,22 +99,24 @@ export default function MessagesPage({ f7route }) {
 		// 首次进来初始化消息列表,把解密的消息放入到这里
 		const initMsgs = async () => {
 			try {
-				if (!preKey) return
+				if (!msgList?.shareKey) return
+				// console.log(msgList?.shareKey)
 				// 只截取最新的 30 条消息，从后面往前截取
-				const msgs = allMsg?.find((item) => item.user_id === ReceiverId)?.data?.msgs?.slice(-30) || []
+				const msgs = msgList?.msgs?.slice(-30) || []
 				for (let i = 0; i < msgs.length; i++) {
 					const msg = msgs[i]
 					let content = msg.content
 					try {
 						const msg = JSON.parse(content)
-						content = decryptMessage(msg.msg, msg.nonce, preKey)
+						content = decryptMessage(msg.msg, msg.nonce, msgList.shareKey)
 					} catch {
 						content = '该消息解密失败'
 					}
 					msg.content = content
 				}
 				setMessages(msgs)
-				setTimeout(() => setIsActive(false), 1000)
+				setTimeout(() => setIsActive(false), 0)
+				// initServerMsgs()
 			} catch (error) {
 				console.error('error', error)
 			}
@@ -125,7 +124,7 @@ export default function MessagesPage({ f7route }) {
 
 		const updateMsg = async () => {
 			try {
-				const lastMsg = allMsg?.find((item) => item.user_id === ReceiverId)?.data?.msgs?.at(-1) || []
+				const lastMsg = msgList?.msgs?.at(-1) || []
 
 				// 如果是发送消息
 				if (isSend) {
@@ -140,10 +139,10 @@ export default function MessagesPage({ f7route }) {
 				let content = lastMsg?.content
 				try {
 					const msg = JSON.parse(content)
-					content = decryptMessage(msg.msg, msg.nonce, preKey)
+					content = decryptMessage(msg.msg, msg.nonce, msgList.shareKey)
 				} catch {
 					// console.log('解密失败：', error)
-					content = '该消息解密失败'
+					content = lastMsg?.content
 					// const session = await updateSession(user?.user_id, ReceiverId)
 					// const preKey = await importKey(session?.preKey)
 					// setPreKey(preKey || '1')
@@ -155,61 +154,40 @@ export default function MessagesPage({ f7route }) {
 				console.error('解析消息失败：', error.message)
 			}
 		}
+		isActive ? initMsgs() : updateMsg()
+	}, [msgList])
 
-		if (isActive) {
-			// initContact()
-			initMsgs()
-			return
+	const handlerMsg = async () => {
+		try {
+			// 获取本地数据库中最后一条消息
+			const lastMsg = msgList?.msgs?.at(-1)
+			// 获取私聊消息
+			const { code, data } = await getMsgByUser({ page_num: page, page_size: limit, user_id: ReceiverId })
+			// 没有请求成功积极退出
+			if (code !== 200) return
+			// 远程消息中最后一条消息
+			const lastDataMsg = data?.user_messages?.at(-1)
+
+			// 如果已经是最新消息了，就需要再继续操作了
+			if (lastMsg?.id === lastDataMsg?.id) return
+
+			// 对比服务器上的消息和本地的消息，比较需要更新的消息
+		} catch (error) {
+			console.error('error', error)
 		}
-		updateMsg()
-	}, [preKey, allMsg])
-
+	}
 
 	useEffect(() => {
-		;(async () => {
-			try {
-				// console.log('ReceiverId', ReceiverId, user?.user_id)
-				// // 重连会话
-				// const cipher = await reconnectSession(ReceiverId, user?.user_id)
-				// setSessionCipher(cipher)
-				// // const selfCipher = await reconnectSession(ReceiverId, user?.user_id, true)
-				// // setSessionSlefCipher(selfCipher)
-
-				// if (isActive) setIsActive(false)
-				if (contact) return
-				const user = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
-				console.log('contact', user)
-				if (!user) {
-					const res = await getUserInfoApi({ user_id: ReceiverId })
-					console.log('查询用户信息', res)
-				}
-				setContact(user)
-
-				const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
-				// 滚动到顶部加载更多
-				messagesContent?.addEventListener(
-					'scroll',
-					_.throttle(async () => {
-						if (messagesContent.scrollTop === 0) {
-							console.log('触顶')
-						}
-					}, 1000)
-				)
-
-				return () => {
-					messagesContent?.removeEventListener('scroll', () => {})
-				}
-			} catch (error) {
-				console.log('消息初始化失败', error)
-			}
-		})()
-	}, [])
+		if (ids.includes[ReceiverId]) handlerMsg()
+		// handlerMsg()
+	}, [ids])
 
 	// 消息渲染处理
 	const messageTime = (message) => {
 		return message?.created_at
-			? Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.created_at))
+			? Intl.DateTimeFormat('zh-CN', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.created_at))
 			: ''
+		// return format(message?.created_at, 'zh_CN')
 	}
 	const isMessageFirst = (message) => {
 		const messageIndex = messages.indexOf(message)
@@ -243,20 +221,14 @@ export default function MessagesPage({ f7route }) {
 			if (isActive) setIsActive(false)
 			let encrypted = ''
 			try {
-				// encrypted = await encrypt(content, sessionCipher)
-				// encrypted = JSON.stringify(encrypted)
 				encrypted = encryptMessage(content, nonce, preKey)
 				console.log('发送加密消息', encrypted)
-			} catch (error) {
-				console.log('发送加密消息失败', error)
+			} catch {
+				// 加密失败就返回原文
 				encrypted = content
 			}
 			const msg = { msg: encrypted, nonce }
-
 			encrypted = JSON.stringify(msg)
-
-			// const fe = decryptMessage(encrypted, nonce, preKey)
-			// console.log('加密消息', encrypted, fe)
 
 			let send_state = 'sending'
 			const dbMsg = {
@@ -267,9 +239,10 @@ export default function MessagesPage({ f7route }) {
 				content: encrypted,
 				// 1: 文本, 2: 语音, 3: 图片
 				content_type: type,
-				date: new Date(),
+				send_time: Date.now(),
 				send_state,
-				is_read: true
+				is_read: true,
+				msg_id: 0
 			}
 			setIsSend(true)
 			// 先假设发送是 ok 的
@@ -277,8 +250,9 @@ export default function MessagesPage({ f7route }) {
 
 			// 发送消息接口
 			try {
-				const { code } = await sendToUser(dbMsgToReqMsg(dbMsg))
+				const { code, data } = await sendToUser(dbMsgToReqMsg(dbMsg))
 				dbMsg.send_state = code === 200 ? 'ok' : 'error'
+				dbMsg.msg_id = data?.msg_id
 			} catch (error) {
 				console.error('发送失败', error)
 				dbMsg.send_state = 'error'
@@ -289,12 +263,10 @@ export default function MessagesPage({ f7route }) {
 			result
 				? await userService.update(userService.TABLES.USERS, ReceiverId, {
 						user_id: ReceiverId,
-						// data: [...result.data, { ...dbMsg, content: encrypted }]
 						data: { ...result.data, msgs: [...result.data.msgs, { ...dbMsg, content: encrypted }] }
 					})
 				: await userService.add(userService.TABLES.USERS, {
 						user_id: ReceiverId,
-						// data: [{ ...dbMsg, content: encrypted }]
 						data: {}
 					})
 		} catch (error) {
@@ -307,9 +279,7 @@ export default function MessagesPage({ f7route }) {
 		sendMessage(1, messageText)
 		// 恢复输入框状态
 		setMessageText('')
-		setTimeout(() => {
-			messagebarRef.current.f7Messagebar().focus()
-		})
+		messagebarRef.current.f7Messagebar().focus()
 	}
 
 	// 图片表情
