@@ -15,6 +15,7 @@ const useLongPress = (callback, duration = 500) => {
 
 		const handleTouchMove = () => {
 			clearTimeout(timerRef.current)
+			handlerCancel()
 		}
 
 		const handleTouchEnd = () => {
@@ -25,12 +26,17 @@ const useLongPress = (callback, duration = 500) => {
 			clearTimeout(timerRef.current)
 		}
 
+		const handlerCancel = () => {
+			targetElement.current.removeEventListener('touchstart', handleTouchStart)
+			targetElement.current.removeEventListener('touchmove', handleTouchMove)
+			targetElement.current.removeEventListener('touchend', handleTouchEnd)
+			targetElement.current.removeEventListener('touchcancel', handleTouchCancel)
+		}
+
 		// 绑定事件到目标元素
 		if (targetElement.current) {
 			targetElement.current.addEventListener('contextmenu', (e) => {
 				e.preventDefault()
-				e.stopPropagation()
-				console.log(e)
 			})
 			targetElement.current.addEventListener('touchstart', handleTouchStart)
 			targetElement.current.addEventListener('touchmove', handleTouchMove)

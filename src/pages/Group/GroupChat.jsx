@@ -140,7 +140,6 @@ export default function GroupChat({ f7route }) {
 			type, // 1:文本 2:语音 3:图片
 			send_status: 0 // 0:未发送 1:发送中 2:发送成功 3:发送失败
 		}
-		console.log('发送消息', message)
 		const newAllMsg = {
 			user_id: ReceiverId,
 			data: [...messages, message]
@@ -186,45 +185,34 @@ export default function GroupChat({ f7route }) {
 		left: '9999px'
 	})
 	const onMsgLongPress = (e, msg) => {
-		const isSender = msg.sender === user.user_id
-		console.log(msg)
-		console.dir(e.changedTouches[0].target.parentElement.getBoundingClientRect())
-		// const clientWidth = msgMenuRef?.current?.clientWidth || 0
-		// const clientHeight = msgMenuRef?.current?.clientHeight || 0
-		// console.log(clientWidth, clientHeight)
-		// const { offsetWidth, offsetHeight } = messagesRef.current.el.offsetParent
-		// const maxWidth = offsetWidth
-		// const maxHeight = offsetHeight - 88
-		// console.log(maxWidth, maxHeight)
-		// const { clientX, clientY } = e.changedTouches[0]
-		// console.log(clientX, clientY)
-		// let x = Math.floor(clientX)
-		// let y = Math.floor(clientY)
-		// let translateX = '0'
-		// let translateY = '-50%'
-		// // 菜单超出屏幕宽度
-		// if (clientX + clientWidth >= maxWidth) {
-		// 	x = Math.floor(clientX - clientWidth)
-		// }
-		// // 菜单超出屏幕高度
-		// if (clientY + clientHeight >= maxHeight) {
-		// 	y = Math.floor(clientY - clientHeight)
-		// }
-		const { top, left, bottom, right, width, height } =
-			e.changedTouches[0].target.parentElement.getBoundingClientRect()
-
+		const msgViewRect = messagesRef.current.el.offsetParent.getBoundingClientRect()
+		const msgRect = e.changedTouches[0].target.parentElement.getBoundingClientRect()
+		const menuRect = msgMenuRef.current.getBoundingClientRect()
 		setMsgMenuData(msg)
+		const menuPosition = {
+			left: msgRect.left + msgRect.width / 2 - menuRect.width / 2, // left定位在消息上方中点
+			top: msgRect.top - menuRect.height - 12 // top定位在消息上方
+		}
+		// 左边边界处理
+		if (menuPosition.left <= 0) {
+			menuPosition.left = 12
+		}
+		// 上边边界处理
+		if (menuPosition.top <= 44) {
+			menuPosition.top = 12 + msgRect.bottom
+		}
+		// 右边边界处理
+		if (menuPosition.left + menuRect.width > msgViewRect.right) {
+			menuPosition.left = msgViewRect.right - menuRect.width - 12
+		}
 		// 开启消息菜单操作
-		setMsgMenuStyle({
-			left: isSender ? left + width : left,
-			top: top
-			// transform: `translate(${translateX}, ${translateY})`
-		})
+		setMsgMenuStyle(menuPosition)
 	}
 	useClickOutside(msgMenuRef, () => {
 		// 关闭消息菜单操作
 		setMsgMenuStyle({
-			left: '99999px'
+			top: '44px',
+			left: '9999px'
 		})
 	})
 
