@@ -15,6 +15,7 @@
 	"devDependencies": {
 		"cordova-android": "^12.0.1",
 		"cordova-ios": "^7.0.1",
+		"cordova-plugin-camera": "^7.0.0",
 		"cordova-plugin-device": "^2.1.0",
 		"cordova-plugin-file": "^8.0.1",
 		"cordova-plugin-inappbrowser": "^6.0.0",
@@ -35,6 +36,9 @@
 			"cordova-plugin-device": {},
 			"cordova-plugin-media": {
 				"KEEP_AVAUDIOSESSION_ALWAYS_ACTIVE": "NO"
+			},
+			"cordova-plugin-camera": {
+				"ANDROIDX_CORE_VERSION": "1.6.+"
 			}
 		},
 		"platforms": [

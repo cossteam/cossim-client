@@ -67,7 +67,10 @@ export async function useInitFriend(options) {
 		const user = await userService.findOneById(userService.TABLES.USERS, friend_id)
 		user
 			? await userService.update(userService.TABLES.USERS, friend_id, { data: result })
-			: await userService.add(userService.TABLES.USERS, { user_id: friend_id, data: result })
+			: await userService.add(userService.TABLES.USERS, {
+					user_id: friend_id,
+					data: { ...result, dialog_id: null }
+				})
 	} catch (error) {
 		console.error('收到好友申请处理时错误：', error)
 	}

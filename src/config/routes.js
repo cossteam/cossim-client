@@ -14,6 +14,7 @@ import NewContact from '@/pages/NewContact/NewContact'
 import GroupList from '@/pages/Group/GroupList/GroupList'
 import GroupChat from '@/pages/Group/GroupChat'
 import NewGroup from '@/pages/Group/NewGroup'
+import Camera from '@/pages/Camera/Camera'
 
 var routes = [
 	{
@@ -43,6 +44,10 @@ var routes = [
 	{
 		path: '/new_contact/',
 		component: NewContact
+	},
+	{
+		path: '/camera/',
+		component: Camera
 	},
 	{
 		path: '/add_details/:id/',

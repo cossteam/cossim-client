@@ -61,3 +61,17 @@ export function sendToGroup(data) {
 		data
 	})
 }
+
+/**
+ * 获取指定对话落后消息
+ * @param {Array} data
+ * @param {*} data.dialog_id
+ * @param {*} data.msg_id
+ */
+export function getBehindMsgApi(data) {
+	return request({
+		url: baseApi + '/after/get',
+		method: 'POST',
+		data: data
+	})
+}

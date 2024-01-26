@@ -8,26 +8,16 @@ import Emojis from '@/components/Emojis/Emojis.jsx'
 import './Messages.less'
 import { useUserStore } from '@/stores/user'
 import _ from 'lodash-es'
-import { sendToUser, getMsgByUser } from '@/api/msg'
+import { sendToUser } from '@/api/msg'
 import { getUserInfoApi } from '@/api/user'
-import { encryptMessage, decryptMessage, cretateNonce } from '@/utils/tweetnacl'
+import { encryptMessage, cretateNonce, decryptMessageWithKey } from '@/utils/tweetnacl'
 import userService from '@/db'
-import { useHistoryStore } from '@/stores/history'
+// import { useHistoryStore } from '@/stores/history'
+// import Camera from '@/components/Camera/Camera'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
 }
-
-// function msgCompare(oldData, newData, index = 0) {
-// 	const newLastMsg = newData[0]
-
-// 	// 查询最新数据是否在旧数据中
-// 	const current = oldData.findIndex((v) => v.id === newLastMsg.id)
-
-// 	if (current !== -1) {
-// 		msgCompare(oldData, newData, index++)
-// 	}
-// }
 
 export default function MessagesPage({ f7route }) {
 	// 会话信息
@@ -45,14 +35,14 @@ export default function MessagesPage({ f7route }) {
 	// 是否是发送方
 	const [isSend, setIsSend] = useState(false)
 	// 预共享密钥
-	const [preKey, setPreKey] = useState(null)
+	// const [preKey, setPreKey] = useState(null)
 	// 随机数
 	const [nonce] = useState(cretateNonce())
 
-	const { ids } = useHistoryStore()
+	// const { ids } = useHistoryStore()
 
-	const [page, setPage] = useState(1)
-	const [limit, setLimit] = useState(30)
+	// const [page, setPage] = useState(1)
+	// const [limit, setLimit] = useState(30)
 
 	// 数据库所有消息
 	// const allMsg = useLiveQuery(() => userService.findAll(userService.TABLES.USERS)) || []
@@ -64,19 +54,14 @@ export default function MessagesPage({ f7route }) {
 	useEffect(() => {
 		// 基本初始化
 		const init = async () => {
-			const reslut = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
-			if (!reslut) return
-			setPreKey(reslut?.data?.shareKey)
-
 			// 设置户消息
 			let userContact = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
 			if (!userContact) {
 				const res = await getUserInfoApi({ user_id: ReceiverId })
 				if (res.code !== 200) return
-				setContact(res.data)
+				return setContact(res.data)
 			}
 			setContact(userContact)
-
 			// 触顶加载
 			// const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
 			// 滚动到顶部加载更多
@@ -107,9 +92,9 @@ export default function MessagesPage({ f7route }) {
 					const msg = msgs[i]
 					let content = msg.content
 					try {
-						const msg = JSON.parse(content)
-						content = decryptMessage(msg.msg, msg.nonce, msgList.shareKey)
-					} catch {
+						content = decryptMessageWithKey(content, msgList.shareKey)
+					} catch (error) {
+						console.log('解密失败：', error)
 						content = '该消息解密失败'
 					}
 					msg.content = content
@@ -138,14 +123,11 @@ export default function MessagesPage({ f7route }) {
 				// 如果是接收消息
 				let content = lastMsg?.content
 				try {
-					const msg = JSON.parse(content)
-					content = decryptMessage(msg.msg, msg.nonce, msgList.shareKey)
-				} catch {
-					// console.log('解密失败：', error)
+					// const msg = JSON.parse(content)
+					content = decryptMessageWithKey(content, msgList.shareKey)
+				} catch (error) {
+					console.log('解密失败：', error)
 					content = lastMsg?.content
-					// const session = await updateSession(user?.user_id, ReceiverId)
-					// const preKey = await importKey(session?.preKey)
-					// setPreKey(preKey || '1')
 				}
 				lastMsg.content = content
 				// console.log('lastMsg', lastMsg, messages)
@@ -157,30 +139,30 @@ export default function MessagesPage({ f7route }) {
 		isActive ? initMsgs() : updateMsg()
 	}, [msgList])
 
-	const handlerMsg = async () => {
-		try {
-			// 获取本地数据库中最后一条消息
-			const lastMsg = msgList?.msgs?.at(-1)
-			// 获取私聊消息
-			const { code, data } = await getMsgByUser({ page_num: page, page_size: limit, user_id: ReceiverId })
-			// 没有请求成功积极退出
-			if (code !== 200) return
-			// 远程消息中最后一条消息
-			const lastDataMsg = data?.user_messages?.at(-1)
+	// const handlerMsg = async () => {
+	// 	try {
+	// 		// 获取本地数据库中最后一条消息
+	// 		const lastMsg = msgList?.msgs?.at(-1)
+	// 		// 获取私聊消息
+	// 		const { code, data } = await getMsgByUser({ page_num: page, page_size: limit, user_id: ReceiverId })
+	// 		// 没有请求成功积极退出
+	// 		if (code !== 200) return
+	// 		// 远程消息中最后一条消息
+	// 		const lastDataMsg = data?.user_messages?.at(-1)
 
-			// 如果已经是最新消息了，就需要再继续操作了
-			if (lastMsg?.id === lastDataMsg?.id) return
+	// 		// 如果已经是最新消息了，就需要再继续操作了
+	// 		if (lastMsg?.id === lastDataMsg?.id) return
 
-			// 对比服务器上的消息和本地的消息，比较需要更新的消息
-		} catch (error) {
-			console.error('error', error)
-		}
-	}
+	// 		// 对比服务器上的消息和本地的消息，比较需要更新的消息
+	// 	} catch (error) {
+	// 		console.error('error', error)
+	// 	}
+	// }
 
-	useEffect(() => {
-		if (ids.includes[ReceiverId]) handlerMsg()
-		// handlerMsg()
-	}, [ids])
+	// useEffect(() => {
+	// 	if (ids.includes[ReceiverId]) handlerMsg()
+	// 	// handlerMsg()
+	// }, [ids])
 
 	// 消息渲染处理
 	const messageTime = (message) => {
@@ -221,7 +203,7 @@ export default function MessagesPage({ f7route }) {
 			if (isActive) setIsActive(false)
 			let encrypted = ''
 			try {
-				encrypted = encryptMessage(content, nonce, preKey)
+				encrypted = encryptMessage(content, nonce, msgList.shareKey)
 				console.log('发送加密消息', encrypted)
 			} catch {
 				// 加密失败就返回原文
@@ -242,7 +224,7 @@ export default function MessagesPage({ f7route }) {
 				send_time: Date.now(),
 				send_state,
 				is_read: true,
-				msg_id: 0
+				msg_id: null
 			}
 			setIsSend(true)
 			// 先假设发送是 ok 的
@@ -258,7 +240,7 @@ export default function MessagesPage({ f7route }) {
 				dbMsg.send_state = 'error'
 			}
 
-			// 查找本地消息记录
+			// 更新本地消息记录
 			const result = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
 			result
 				? await userService.update(userService.TABLES.USERS, ReceiverId, {
@@ -267,8 +249,27 @@ export default function MessagesPage({ f7route }) {
 					})
 				: await userService.add(userService.TABLES.USERS, {
 						user_id: ReceiverId,
-						data: {}
+						data: {
+							msgs: [dbMsg],
+							shareKey: null,
+							dialog_id: null
+						}
 					})
+
+			// 更新本地会话
+			const chats = await userService.findOneById(userService.TABLES.CHATS, ReceiverId, 'user_id')
+
+			chats &&
+				(await userService.update(
+					userService.TABLES.CHATS,
+					ReceiverId,
+					{
+						...chats,
+						last_message: encrypted,
+						msg_id: dbMsg.msg_id ? dbMsg.msg_id : chats.msg_id
+					},
+					'user_id'
+				))
 		} catch (error) {
 			console.error('发送消息失败：', error)
 			// throw error
@@ -279,7 +280,10 @@ export default function MessagesPage({ f7route }) {
 		sendMessage(1, messageText)
 		// 恢复输入框状态
 		setMessageText('')
+		// 混搭
 		messagebarRef.current.f7Messagebar().focus()
+		// onViewportResize()
+		$('html, body').scrollTop(0)
 	}
 
 	// 图片表情
@@ -353,7 +357,7 @@ export default function MessagesPage({ f7route }) {
 					/>
 				) : (
 					<>
-						<Link slot="inner-end" href="/camera/" iconF7="camera" />
+						<Link slot="inner-end" iconF7="camera" href="/camera/" />
 						<Link slot="inner-end" iconF7="mic" />
 					</>
 				)}
@@ -397,6 +401,8 @@ export default function MessagesPage({ f7route }) {
 					</Message>
 				))}
 			</Messages>
+
+			{/* <Camera /> */}
 		</Page>
 	)
 }

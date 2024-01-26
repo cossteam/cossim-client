@@ -28,7 +28,6 @@ export function performKeyExchange(myPrivateKey, theirPublicKey) {
  * @returns {Uint8Array} 加密后的消息
  */
 export function encryptMessage(message, nonce, sharedKey) {
-	// 将消息转为 Uint8Array
 	return fromUint8Array(nacl.box.after(new TextEncoder().encode(message), toUint8Array(nonce), sharedKey))
 }
 
@@ -36,13 +35,30 @@ export function encryptMessage(message, nonce, sharedKey) {
  * 使用私钥解密消息
  * @param {string} encryptedMessage 加密的消息
  * @param {string} nonce 随机的一次性数字
- * @param {sharedKey} theirPublicKey 共享密钥
+ * @param {sharedKey} sharedKey 共享密钥
  * @returns {string} 解密后的消息
  */
 export function decryptMessage(encryptedMessage, nonce, sharedKey) {
 	encryptedMessage = toUint8Array(encryptedMessage)
 	const decryptedMessage = nacl.box.open.after(encryptedMessage, toUint8Array(nonce), sharedKey)
 	return new TextDecoder().decode(decryptedMessage)
+}
+
+/**
+ * 解密序列化字符的消息
+ * @param {string} encryptedMessage 加密的消息
+ * @param {Uint8Array} sharedKey 共享密钥
+ * @returns {string} 解密后的消息
+ */
+export function decryptMessageWithKey(encryptedMessage, sharedKey) {
+	let msg = encryptedMessage
+	try {
+		const data = JSON.parse(encryptedMessage)
+		msg = data.msg
+		return decryptMessage(data.msg, data.nonce, sharedKey)
+	} catch {
+		return msg
+	}
 }
 
 /**
@@ -93,5 +109,4 @@ export function test() {
 
 	const decryptedMessage = decryptMessage(msg.msg, msg.nonce, sharedSecret2)
 	console.log('decryptedMessage', decryptedMessage)
-
 }

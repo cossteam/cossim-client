@@ -11,6 +11,9 @@ devDependencies:
   cordova-ios:
     specifier: ^7.0.1
     version: 7.0.1
+  cordova-plugin-camera:
+    specifier: ^7.0.0
+    version: 7.0.0
   cordova-plugin-device:
     specifier: ^2.1.0
     version: 2.1.0
@@ -207,6 +210,11 @@ packages:
       which: 3.0.1
       xcode: 3.0.1
       xml-escape: 1.1.0
+    dev: true
+
+  /cordova-plugin-camera@7.0.0:
+    resolution: {integrity: sha512-OVQWZTBb18Y6e5c+bbXt3E4Z1yGnYqaywh2h5vVr/+nxMcdMIE+lm527bRK5vLN/RUqhGYP/Z+5n+O7Fk7fVNw==}
+    engines: {cordovaDependencies: {3.0.0: {cordova-android: '>=6.3.0'}, 4.1.0: {cordova: '>=7.1.0', cordova-android: '>=6.3.0'}, 5.0.0: {cordova: '>=9.0.0', cordova-android: '>=9.0.0', cordova-ios: '>=5.1.0'}, 5.0.4-dev: {cordova: '>=9.0.0', cordova-android: <10.0.0, cordova-ios: '>=5.1.0'}, 6.0.0: {cordova: '>=9.0.0', cordova-android: '>=10.0.0', cordova-ios: '>=5.1.0'}, 7.0.0: {cordova: '>=9.0.0', cordova-android: '>=12.0.0', cordova-ios: '>=5.1.0'}, 8.0.0: {cordova: '>100'}}}
     dev: true
 
   /cordova-plugin-device@2.1.0:

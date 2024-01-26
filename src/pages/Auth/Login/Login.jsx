@@ -9,6 +9,7 @@ import { loginApi } from '@/api/user'
 import { validEmail } from '@/utils/validate'
 import '../Auth.less'
 import { clsx } from 'clsx'
+import Qrcode from '@/components/QRCode/QRCode'
 
 // import Signal, { toBase64 } from '@/utils/signal/signal-protocol'
 import commonService from '@/db/common'
@@ -43,6 +44,9 @@ export default function Login({ disabled, defaultData }) {
 	// 用户信息
 	const userStore = useUserStore()
 
+	// 弹窗
+	const [opened, setOpened] = useState(false)
+
 	// 错误信息列表
 	const errorList = {
 		emailEmpty: $t('邮箱不能为空'),
@@ -59,10 +63,12 @@ export default function Login({ disabled, defaultData }) {
 	// const [signal] = useState(new Signal(deviceName, deviceId))
 
 	useEffect(() => {
-		if (defaultData && defaultData.email && defaultData.password) {
-			setFromData({ email: defaultData.email, password: defaultData.password })
+		if (defaultData) {
+			setTimeout(() => setFromData({ email: defaultData.email, password: defaultData.password }), 10)
 		}
 	}, [defaultData])
+
+	const close = () => setOpened(false)
 
 	// 登录
 	const signIn = async () => {
@@ -77,7 +83,8 @@ export default function Login({ disabled, defaultData }) {
 
 			// 判断是否是新设备
 			const valid = await validDeviceInfo(fromData)
-			if (valid) return f7.dialog.alert(errorList.deviceError)
+			if (valid) return setOpened(true)
+			// f7.dialog.alert(errorList.deviceError)
 
 			// loading
 			setLoading(true)
@@ -189,6 +196,7 @@ export default function Login({ disabled, defaultData }) {
 					{loading && <Preloader size="16" color="white" className="" />}
 				</Button>
 			</List>
+			<Qrcode title="扫码验证" opened={opened} close={close} />
 		</>
 	)
 }

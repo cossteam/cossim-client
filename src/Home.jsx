@@ -38,7 +38,7 @@ const handlerMessage = async (msg) => {
 		send_state: 'ok'
 	}
 
-	console.log('收到消息！！！', msg)
+	console.log('收到消息！！！', msg,msg.data.dialog_id)
 
 	// 查找本地消息记录
 	const result = await userService.findOneById(userService.TABLES.USERS, msg.data?.sender_id)
@@ -53,9 +53,12 @@ const handlerMessage = async (msg) => {
 		user_id: msg.data?.sender_id,
 		data: {
 			...result.data,
-			msgs: [...result.data.msgs, message]
+			msgs: [...result.data.msgs, message],
+			dialog_id: 1 || message.dialog_id
 		}
 	})
+
+	console.log("user",msg.data?.sender_id);
 
 	// 会话列表
 	const chats = await userService.findOneById(userService.TABLES.CHATS, msg.data?.dialog_id, 'dialog_id')

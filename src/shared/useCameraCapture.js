@@ -11,18 +11,18 @@ export default function useCameraCapture(videoElRef) {
 	}
 
 	const streamFromDevice = async (device) => {
-		const { deviceId, label } = device
-		const constraints = {
-			video: {
-				deviceId: { exact: deviceId }
-			}
-		}
 		try {
+			const { deviceId, label } = device
+			const constraints = {
+				video: {
+					deviceId: { exact: deviceId }
+				}
+			}
 			const stream = await navigator.mediaDevices.getUserMedia(constraints)
 			videoElRef.current.srcObject = stream
 			streamRef.current = stream
 			currentDeviceRef.current = { deviceId, label }
-		} catch (err) {
+		} catch {
 			setErrored(true)
 		}
 	}
@@ -54,6 +54,7 @@ export default function useCameraCapture(videoElRef) {
 			const devices = await getDevices()
 			streamFromDevice(devices[0])
 		} catch (err) {
+			console.log('摄像头初始化失败', err)
 			setErrored(true)
 		}
 	}

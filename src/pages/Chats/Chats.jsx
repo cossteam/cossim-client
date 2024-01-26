@@ -16,12 +16,13 @@ import DoubleTickIcon from '@/components/DoubleTickIcon'
 import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
 import userService, { dbService } from '@/db'
-import { getChatList } from '@/api/msg'
+import { getChatList, getBehindMsgApi } from '@/api/msg'
 import { mapKeys, omit } from 'lodash-es'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { format } from 'timeago.js'
 import { decryptMessage } from '@/utils/tweetnacl'
 import { useHistoryStore } from '@/stores/history'
+import { useUserStore } from '@/stores/user'
 
 export default function Chats(props) {
 	const swipeoutUnread = () => {
@@ -36,6 +37,7 @@ export default function Chats(props) {
 
 	const historyStore = useHistoryStore()
 
+	const { user } = useUserStore()
 
 	/**
 	 * 页面初始化时加载会话列表
@@ -74,10 +76,9 @@ export default function Chats(props) {
 					const item = respData[i]
 					const chatsData = await dbService.findOneById(dbService.TABLES.CHATS, item?.dialog_id, 'dialog_id')
 
-					if (isFirstIn && item.send_time === chatsData.send_time) {
-						// setUpdateIds([...updateIds, item.user_id])
+					// 对比最新会话，始终保持和服务器的最新消息和本地的最新消息是一致的
+					if (isFirstIn && item.send_time === chatsData?.send_time) {
 						historyStore.updateIds(item.user_id)
-						
 					}
 
 					chatsData
@@ -112,8 +113,58 @@ export default function Chats(props) {
 			}
 			setChatList(chatList)
 		}
+		console.log('chats 发生改变', chats)
 		decrypt()
 	}, [chats])
+
+	useEffect(() => {
+		const getBehindMsg = async () => {
+			const chats = await userService.findAll(userService.TABLES.CHATS)
+			if (!chats) return
+			const data = chats.map((v) => ({ dialog_id: v.dialog_id, msg_id: v.msg_id }))
+			const res = await getBehindMsgApi(data)
+			if (res.code !== 200) return
+
+			console.log('res', res)
+
+			const list = res?.data || []
+			if (list.length === 0) return
+
+			const msgs = await userService.findAll(userService.TABLES.USERS)
+			list.map((v) => {
+				const msg = msgs?.find((msg) => msg.dialog_id === v.dialog_id)
+
+				let newMsg = null
+
+				console.log("msg", msg,msgs)
+
+				v?.msg_list?.map(async (s) => {
+					newMsg = {
+						...s,
+						content_type: s?.msg_type,
+						created_at: s?.send_time,
+						send_state: 'ok',
+						type: s.sender_id === user.user_id ? 'sent' : 'received',
+						is_read: false
+					}
+
+					if (msg) {
+						await userService.update(userService.TABLES.MSGS, msg.user_id, {
+							user_id: msg.user_id,
+							msgs: [...msg.msgs, newMsg]
+						})
+					} else {
+						await userService.add(userService.TABLES.MSGS, {
+							user_id: v?.sender_id,
+							msgs: [newMsg]
+						})
+					}
+				})
+			})
+		}
+
+		getBehindMsg()
+	}, [])
 
 	const lastMessageHandler = (chat) => {
 		let msg = chat.last_message
@@ -152,7 +203,6 @@ export default function Chats(props) {
 						title={chat.dialog_name}
 						// badge={chat.dialog_unread_count}
 						after={format(chat.send_time, 'zh_CN')}
-						// after={chat.send_time}
 						swipeout
 					>
 						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
