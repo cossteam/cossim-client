@@ -81,7 +81,7 @@ cordova/platforms/
 Thumbs.db
 
 # Cordova
-# cordova/platforms/
+cordova/platforms/
 cordova/plugins/
 cordova/www/
 
