@@ -18,33 +18,37 @@ export default function Emojis({ onEmojiSelect }) {
 	}
 
 	return (
-		<div className="emojis bg-gray-100" onClick={(e) => e.stopPropagation()}>
-			<SwitchIcon fill={showImgEmojis} onClick={() => setShowImgEmojis(!showImgEmojis)} />
-			{!showImgEmojis ? (
-				// emojis
-				<div className="w-screen p-1 grid grid-cols-10 gap-1" onClick={(e) => e.stopPropagation()}>
-					{emojis.map((emoji, eKey) => (
-						<span key={eKey} className="text-2xl" onClick={() => onClickEmoji('emoji', emoji)}>
-							{emoji}
-						</span>
-					))}
-				</div>
-			) : (
-				// 图片表情
-				<div className="img-list-wrap w-screen p-1">
-					{emojisImg.map((emojiImg, index) => (
-						<div key={index} className="img-item-wrap">
-							<div className="img-item">
-								<img
-									src={emojiImg}
-									alt={`emoji_${index}`}
-									onClick={() => onClickEmoji('img', emojiImg)}
-								/>
+		<div className="emojis" onClick={(e) => e.stopPropagation()}>
+			<div className="w-full sticky top-0 bg-white z-10 h-10">
+				<SwitchIcon fill={showImgEmojis} onClick={() => setShowImgEmojis(!showImgEmojis)} />
+			</div>
+			<div className="bg-[#f5f5f5]">
+				{!showImgEmojis ? (
+					// emojis
+					<div className="w-full p-3 py-1 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+						{emojis.map((emoji, eKey) => (
+							<span key={eKey} className="text-2xl" onClick={() => onClickEmoji('emoji', emoji)}>
+								{emoji}
+							</span>
+						))}
+					</div>
+				) : (
+					// 图片表情
+					<div className="img-list-wrap w-screen p-1 cursor-pointer">
+						{emojisImg.map((emojiImg, index) => (
+							<div key={index} className="img-item-wrap">
+								<div className="img-item">
+									<img
+										src={emojiImg}
+										alt={`emoji_${index}`}
+										onClick={() => onClickEmoji('img', emojiImg)}
+									/>
+								</div>
 							</div>
-						</div>
-					))}
-				</div>
-			)}
+						))}
+					</div>
+				)}
+			</div>
 		</div>
 	)
 }

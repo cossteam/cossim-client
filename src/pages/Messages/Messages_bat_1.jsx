@@ -1,336 +1,313 @@
 import $ from 'dom7'
-import React, { useRef, useState } from 'react'
-import {
-	f7,
-	Navbar,
-	Link,
-	Page,
-	/*List, ListItem,*/ Messages,
-	Message,
-	Messagebar,
-	MessagebarSheet,
-	MessagebarSheetImage,
-	MessagebarAttachments,
-	MessagebarAttachment,
-	Icon
-} from 'framework7-react'
-import './Messages.less'
-import DoubleTickIcon from '@/components/DoubleTickIcon'
+import React, { useRef, useState, useEffect } from 'react'
 import PropType from 'prop-types'
-import { getMsgByUser, sendToUser } from '@/api/msg'
-import { useEffect } from 'react'
-import _ from 'lodash-es'
-import WebDB from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { f7, Navbar, Link, Page, Messages, Message, Messagebar, MessagebarSheet, Icon } from 'framework7-react'
+import DoubleTickIcon from '@/components/DoubleTickIcon'
+import Emojis from '@/components/Emojis/Emojis.jsx'
+import './Messages.less'
 import { useUserStore } from '@/stores/user'
-import { emojis, emojisImg } from '../../components/Emojis/emojis'
+import _ from 'lodash-es'
+import { sendToUser } from '@/api/msg'
+import { getUserInfoApi } from '@/api/user'
+import { encryptMessage, cretateNonce, decryptMessageWithKey } from '@/utils/tweetnacl'
+import userService from '@/db'
+// import { useHistoryStore } from '@/stores/history'
+// import Camera from '@/components/Camera/Camera'
+import MessageBox from '@/components/Message/Chat'
+import MsgBar from '@/components/Message/MsgBar'
+import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
 }
 
 export default function MessagesPage({ f7route }) {
-	const { user } = useUserStore()
-	const senderId = user?.UserId
-	const receiverId = f7route.params.id // 好友id/群聊id
+	// 会话信息
 	const dialogId = f7route.query.dialog_id
-	console.log('接收人', receiverId)
-
-	// 图片表情
-	const [attachments, setAttachments] = useState([])
-	const [sheetVisible, setSheetVisible] = useState(false)
-	const [showImgEmojis, setShowImgEmojis] = useState(false)
-	const IconComponent = (props) => (
-		<span onClick={() => setShowImgEmojis(!showImgEmojis)}>
-			<Icon f7={props.fill ? 'smiley_fill' : 'smiley'} color="primary" />
-		</span>
-	)
-	IconComponent.propTypes = {
-		fill: PropType.bool
-	}
-	const deleteAttachment = (image) => {
-		const index = attachments.indexOf(image)
-		attachments.splice(index, 1)
-		setAttachments([...attachments])
-	}
-	const attachmentsVisible = () => {
-		return attachments.length > 0
-	}
-	const placeholder = () => {
-		return attachments.length > 0 ? 'Add comment or Send' : 'Message'
-	}
-	const handleAttachment = (e) => {
-		const index = f7.$(e.target).parents('label.checkbox').index()
-		const image = emojisImg[index]
-		if (e.target.checked) {
-			// Add to attachments
-			attachments.unshift(image)
-		} else {
-			// Remove from attachments
-			attachments.splice(attachments.indexOf(image), 1)
-		}
-		setAttachments([...attachments])
-	}
-	const addEmojis = (emoji) => {
-		setMessageText(messageText + emoji)
-		// messagebarRef.current.f7Messagebar().focus()
-		// setSheetVisible(!sheetVisible)
-	}
-
-	// 联系人
+	// 用户信息
+	const { user } = useUserStore()
+	// 好友id/群聊id
+	const ReceiverId = f7route.params.id
+	// 好友信息
 	const [contact, setContact] = useState({})
-	useEffect(() => {
-		if (!receiverId) return
-		;async () => {
-			const contact = await WebDB.contacts.where('user_id').equals(receiverId).first()
-			setContact(contact || {})
-		}
-	}, [receiverId])
+	// 页面显示消息列表
+	const [messages, setMessages] = useState([])
+	// 是否首次进入
+	const [isActive, setIsActive] = useState(true)
+	// 是否是发送方
+	const [isSend, setIsSend] = useState(false)
+	// 随机数
+	const [nonce] = useState(cretateNonce())
 
-	// 获取消息
-	let pageNum = 1
-	let pageSize = 18
-	let total = 0
-	// 倒序分页查询
-	// async function reversePageQuery(pageSize, pageIndex) {
-	// 	// 计算起始位置
-	// 	const offset = (pageIndex - 1) * pageSize
-	// 	// 执行倒序查询
-	// 	console.log(pageSize, pageNum)
-	// 	const arr = await WebDB.messages
-	// 		.orderBy('id')
-	// 		// .reverse() // 倒序
-	// 		.offset(offset)
-	// 		.limit(pageSize)
-	// 		.toArray()
-	// 	console.log(arr)
-	// 	arr && (pageNum += 1)
-	// 	return arr
-	// }
-	// const messages = useLiveQuery(() => reversePageQuery(pageSize, pageNum)) || []
-	const messages = useLiveQuery(() => WebDB.messages.toArray()) || []
-	// 获取服务端消息数据
-	const getMessage = () => {
-		return new Promise((resolve, reject) => {
-			getMsgByUser({
-				user_id: receiverId,
-				page_num: pageNum,
-				page_size: pageSize
-			})
-				.then(({ data }) => {
-					data = data?.msg_list || data
-					total = data?.total
-					if (total / pageSize > pageNum) {
-						pageNum += 1
-					}
-					resolve(data)
-				})
-				.catch((err) => {
-					reject(err)
-				})
-		})
-	}
-	// 更新本地消息
-	const refreshMessage = async () => {
-		try {
-			const { user_messages } = await getMessage()
-			const respData = user_messages?.map((msg) => {
-				// id, sender_id, receiver_id, content, type, replay_id, is_read, read_at, created_at, dialog_id
-				// ||
-				// id, sender_id, receiver_id, content, type, replay_id, is_read, read_at, created_at, dialog_id, send_state
-				return {
-					...msg,
-					send_state: 'ok' // 'sending' => 'ok' or 'err'
-				}
-			})
-			console.log(respData)
-			const oldData = (await WebDB.messages.toArray()) || []
-			// 校验新数据和旧数据 => 更新数据 or 插入数据库
-			for (let i = 0; i < respData.length; i++) {
-				const item = respData[i]
-				const oldItem = oldData.find((oldItem) => oldItem.id === item.id)
-				oldItem ? await WebDB.messages.update(oldItem.id, item) : await WebDB.messages.add(item)
+	// 数据库所有消息
+	// const allMsg = useLiveQuery(() => userService.findAll(userService.TABLES.USERS)) || []
+	const msgList = useLiveQuery(async () => {
+		const msgs = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
+		return { msgs: msgs?.data?.msgs, shareKey: msgs?.data?.shareKey }
+	})
+
+	useEffect(() => {
+		// 基本初始化
+		const init = async () => {
+			// 设置户消息
+			let userContact = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
+			if (!userContact) {
+				const res = await getUserInfoApi({ user_id: ReceiverId })
+				if (res.code !== 200) return
+				return setContact(res.data)
 			}
-		} catch (error) {
-			console.log(error)
+			setContact(userContact)
+			// 触顶加载
+			// const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
+			// 滚动到顶部加载更多
+			// messagesContent?.addEventListener(
+			// 	'scroll',
+			// 	_.throttle(async () => {
+			// 		if (messagesContent.scrollTop === 0) {
+			// 			console.log('触顶')
+			// 		}
+			// 	}, 1000)
+			// )
+			// return () => {
+			// 	messagesContent?.removeEventListener('scroll', () => {})
+			// }
 		}
-	}
-
-	// 初始化后执行
-	useEffect(() => {
-		refreshMessage()
-		const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
-		// 滚动到顶部加载更多
-		messagesContent?.addEventListener(
-			'scroll',
-			_.throttle(async () => {
-				if (messagesContent.scrollTop === 0) {
-					console.log('触顶')
-					await refreshMessage()
-					// reversePageQuery(pageSize, pageNum)
-				}
-			}, 1000)
-		)
-
-		return () => {
-			messagesContent?.removeEventListener('scroll', () => {})
-		}
+		init()
 	}, [])
 
-	// 虚拟列表
-	const messagesRef = useRef(null)
-	// const [vlData, setVlData] = useState({
-	// 	items: []
-	// })
-	// const renderExternal = (vl, newData) => {
-	// 	console.table(newData.items)
-	// 	setVlData({ ...newData })
-	// }
+	useEffect(() => {
+		// 首次进来初始化消息列表,把解密的消息放入到这里
+		const initMsgs = async () => {
+			try {
+				if (!msgList?.shareKey) return
+				// console.log(msgList?.shareKey)
+				// 只截取最新的 30 条消息，从后面往前截取
+				const msgs = msgList?.msgs?.slice(-30) || []
+				for (let i = 0; i < msgs.length; i++) {
+					const msg = msgs[i]
+					let content = msg.content
+					try {
+						content = decryptMessageWithKey(content, msgList.shareKey)
+					} catch (error) {
+						console.log('解密失败：', error)
+						content = '该消息解密失败'
+					}
+					msg.content = content
+				}
+				setMessages(msgs)
+				setTimeout(() => setIsActive(false), 0)
+				// initServerMsgs()
+			} catch (error) {
+				console.error('error', error)
+			}
+		}
+
+		const updateMsg = async () => {
+			try {
+				const lastMsg = msgList?.msgs?.at(-1) || []
+
+				// 如果是发送消息
+				if (isSend) {
+					const msg = messages.at(-1)
+					msg.send_state = lastMsg?.send_state
+					setIsSend(false)
+					setMessages(messages)
+					return
+				}
+
+				// 如果是接收消息
+				let content = lastMsg?.content
+				try {
+					// const msg = JSON.parse(content)
+					content = decryptMessageWithKey(content, msgList.shareKey)
+				} catch (error) {
+					console.log('解密失败：', error)
+					content = lastMsg?.content
+				}
+				lastMsg.content = content
+				// console.log('lastMsg', lastMsg, messages)
+				setMessages([...messages, lastMsg])
+			} catch (error) {
+				console.error('解析消息失败：', error.message)
+			}
+		}
+		isActive ? initMsgs() : updateMsg()
+	}, [msgList])
 
 	// 消息渲染处理
-	const messageTime = (message) => {
-		return message?.created_at
-			? Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.created_at))
-			: ''
-	}
-	const isMessageFirst = (message) => {
-		const messageIndex = messages.indexOf(message)
-		const previousMessage = messages[messageIndex - 1]
-		return !previousMessage || previousMessage.type !== message.type
-	}
-	const isMessageLast = (message) => {
-		const messageIndex = messages.indexOf(message)
-		const nextMessage = messages[messageIndex + 1]
-		return !nextMessage || nextMessage.type !== message.type
-	}
-	const messageType = (message) => {
-		return message.receiver_id === receiverId ? 'sent' : 'received'
-	}
-	// const isJSONString = (jsonString) => {
-	// 	if (jsonString[0] === '{' && jsonString[jsonString.length - 1] === '}') return true
-	// 	return false
+	// const messageTime = (message) => {
+	// 	return message?.created_at
+	// 		? Intl.DateTimeFormat('zh-CN', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.created_at))
+	// 		: ''
+	// 	// return format(message?.created_at, 'zh_CN')
+	// }
+	// const isMessageFirst = (message) => {
+	// 	const messageIndex = messages.indexOf(message)
+	// 	const previousMessage = messages[messageIndex - 1]
+	// 	return !previousMessage || previousMessage.type !== message.type
+	// }
+	// const isMessageLast = (message) => {
+	// 	const messageIndex = messages.indexOf(message)
+	// 	const nextMessage = messages[messageIndex + 1]
+	// 	return !nextMessage || nextMessage.type !== message.type
+	// }
+	// const messageType = (message) => {
+	// 	return message.receiver_id === ReceiverId ? 'sent' : 'received'
 	// }
 
 	// 发送消息
-	const messagebarRef = useRef(null)
+	// const messagebarRef = useRef(null)
 	const [messageText, setMessageText] = useState('')
-	const sendMessage = async () => {
-		const allMsg = []
-		// 选择多个图片表情时拆分为多条消息发送
-		attachments.map((item) => {
-			allMsg.push({
-				sender_id: senderId,
-				receiver_id: receiverId,
-				type: 'sent', // 发送方
-				content: item,
-				content_type: 3, // 3: 图片消息
-				date: new Date(),
-				send_state: 'sending',
-				is_read: true
-			})
-		})
-		messageText &&
-			allMsg.push({
-				sender_id: senderId,
-				receiver_id: receiverId,
-				type: 'sent', // 发送方
-				content: messageText,
-				content_type: 1, // 1: 文本消息
-				date: new Date(),
-				send_state: 'sending',
-				is_read: true
-			})
-		// 消息持久化
-		const allMsgIds = await Promise.all(allMsg.map(async (item) => WebDB.messages.add(item)))
-		console.log(allMsg)
-		console.log(allMsgIds)
-		// 恢复输入框状态
-		setMessageText('')
-		setAttachments([])
-		setTimeout(() => {
-			messagebarRef.current.f7Messagebar().focus()
-		})
-		// 发送消息前格式化数据
-		const reqMsg = allMsg.map((item) => {
-			const messageFilter = _.mapKeys(_.pick(item, ['content', 'receiver_id', 'content_type']), (value, key) => {
+	const dbMsgToReqMsg = (obj) => {
+		return {
+			..._.mapKeys(_.pick(obj, ['content', 'receiver_id', 'content_type']), (value, key) => {
 				if (key === 'content_type') return 'type'
 				return key
-			})
-			return {
-				...messageFilter,
-				dialog_id: parseInt(dialogId) // 后端限制类型，一定要数值类型
-			}
-		})
-		console.log(reqMsg)
-		try {
-			const respMsgs = await Promise.all(
-				reqMsg.map(async (item, index) => {
-					return new Promise((resolve, reject) => {
-						sendToUser(item)
-							.then(({ code }) => {
-								WebDB.messages.update(allMsgIds[index], {
-									send_state: code === 200 ? 'ok' : 'error'
-								})
-								code === 200 ? resolve(allMsgIds[index]) : reject(allMsgIds[index])
-							})
-							.catch(() => {
-								WebDB.messages.update(allMsgIds[index], {
-									send_state: 'error'
-								})
-								// TODO: 消息发送失败后提供重新发送支持
-								reject(allMsgIds[index])
-							})
-					})
-				})
-			)
-			console.log(respMsgs)
-		} catch (errors) {
-			console.log(errors)
+			}),
+			dialog_id: parseInt(dialogId)
 		}
 	}
 
+	const sendMessage = async (type, content) => {
+		try {
+			if (isActive) setIsActive(false)
+			let encrypted = ''
+			try {
+				encrypted = encryptMessage(content, nonce, msgList.shareKey)
+				console.log('发送加密消息', encrypted)
+			} catch {
+				// 加密失败就返回原文
+				encrypted = content
+			}
+			const msg = { msg: encrypted, nonce }
+			encrypted = JSON.stringify(msg)
+
+			let send_state = 'sending'
+			const dbMsg = {
+				sender_id: user.user_id,
+				receiver_id: ReceiverId,
+				// 发送方
+				type: 'sent',
+				content: encrypted,
+				// 1: 文本, 2: 语音, 3: 图片
+				content_type: type,
+				send_time: Date.now(),
+				send_state,
+				is_read: true,
+				msg_id: null
+			}
+			setIsSend(true)
+			// 先假设发送是 ok 的
+			setMessages([...messages, { ...dbMsg, content, send_state: 'ok' }])
+
+			// 发送消息接口
+			try {
+				const { code, data } = await sendToUser(dbMsgToReqMsg(dbMsg))
+				dbMsg.send_state = code === 200 ? 'ok' : 'error'
+				dbMsg.msg_id = data?.msg_id
+			} catch (error) {
+				console.error('发送失败', error)
+				dbMsg.send_state = 'error'
+			}
+
+			// 更新本地消息记录
+			const result = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
+			result
+				? await userService.update(userService.TABLES.USERS, ReceiverId, {
+						user_id: ReceiverId,
+						data: { ...result.data, msgs: [...result.data.msgs, { ...dbMsg, content: encrypted }] }
+					})
+				: await userService.add(userService.TABLES.USERS, {
+						user_id: ReceiverId,
+						data: {
+							msgs: [dbMsg],
+							shareKey: null,
+							dialog_id: null
+						}
+					})
+
+			// 更新本地会话
+			const chats = await userService.findOneById(userService.TABLES.CHATS, ReceiverId, 'user_id')
+
+			chats &&
+				(await userService.update(
+					userService.TABLES.CHATS,
+					ReceiverId,
+					{
+						...chats,
+						last_message: encrypted,
+						msg_id: dbMsg.msg_id ? dbMsg.msg_id : chats.msg_id
+					},
+					'user_id'
+				))
+		} catch (error) {
+			console.error('发送消息失败：', error)
+			// throw error
+		}
+	}
+
+	// const sendTextMessage = async () => {
+	// 	sendMessage(1, messageText)
+	// 	// 恢复输入框状态
+	// 	setMessageText('')
+	// 	// 混搭
+	// 	messagebarRef.current.f7Messagebar().focus()
+	// 	// onViewportResize()
+	// 	$('html, body').scrollTop(0)
+
+	// 	console.log($('html, body'))
+	// }
+
+	// 图片表情
+	// const [sheetVisible, setSheetVisible] = useState(false)
+	// const onEmojiSelect = ({ type, emoji }) => {
+	// 	console.log(type, emoji)
+	// 	type === 'emoji' && setMessageText(`${messageText}${emoji}`)
+	// 	type === 'img' && sendMessage(3, emoji)
+	// }
+
 	// Fix for iOS web app scroll body when
-	const resizeTimeout = useRef(null)
-	const onViewportResize = () => {
-		$('html, body').css('height', `${visualViewport.height}px`)
-		$('html, body').scrollTop(0)
-	}
-	const onMessagebarFocus = () => {
-		const { device } = f7
-		if (!device.ios || device.cordova || device.capacitor) return
-		clearTimeout(resizeTimeout.current)
-		visualViewport.addEventListener('resize', onViewportResize)
-	}
-	const onMessagebarBlur = () => {
-		const { device } = f7
-		if (!device.ios || device.cordova || device.capacitor) return
-		resizeTimeout.current = setTimeout(() => {
-			visualViewport.removeEventListener('resize', onViewportResize)
-			$('html, body').css('height', '')
-			$('html, body').scrollTop(0)
-		}, 100)
-	}
-	// End of iOS web app fix
+	// const resizeTimeout = useRef(null)
+	// const onViewportResize = () => {
+	// 	// setHeight(visualViewport.height - 88 + 'px')
+	// 	$('html, body').css('height', `${visualViewport.height}px`)
+	// 	$('html, body').scrollTop(0)
+	// }
+	// const onMessagebarFocus = () => {
+	// 	const { device } = f7
+	// 	if (!device.ios || device.cordova || device.capacitor) return
+	// 	clearTimeout(resizeTimeout.current)
+	// 	visualViewport.addEventListener('resize', onViewportResize)
+	// }
+	// const onMessagebarBlur = () => {
+	// 	const { device } = f7
+	// 	if (!device.ios || device.cordova || device.capacitor) return
+	// 	resizeTimeout.current = setTimeout(() => {
+	// 		visualViewport.removeEventListener('resize', onViewportResize)
+	// 		$('html, body').css('height', '')
+	// 		$('html, body').scrollTop(0)
+	// 	}, 100)
+	// }
 
 	return (
-		<Page className="messages-page" noToolbar messagesContent>
-			<Navbar className="messages-navbar" backLink backLinkShowText={false}>
+		<Page className="messages-page" noToolbar>
+			{/* <Navbar className="messages-navbar" backLink backLinkShowText={false}>
 				<Link slot="right" iconF7="videocam" />
 				<Link slot="right" iconF7="phone" />
-				<Link slot="title" href={`/profile/${receiverId}/`} className="title-profile-link">
+				<Link slot="title" href={`/profile/${ReceiverId}/`} className="title-profile-link">
 					<img src={contact?.avatar} loading="lazy" />
 					<div>
 						<div>{contact?.name}</div>
 						<div className="subtitle">online</div>
 					</div>
 				</Link>
-			</Navbar>
-			<Messagebar
+			</Navbar> */}
+			{/* <Messagebar
 				ref={messagebarRef}
-				placeholder={placeholder()}
+				placeholder=""
 				value={messageText}
 				sheetVisible={sheetVisible}
-				attachmentsVisible={attachmentsVisible()}
 				onInput={(e) => setMessageText(e.target.value)}
 				onFocus={onMessagebarFocus}
 				onBlur={onMessagebarBlur}
@@ -344,59 +321,46 @@ export default function MessagesPage({ f7route }) {
 						setSheetVisible(!sheetVisible)
 					}}
 				/>
-				{messageText.trim().length || attachments.length > 0 ? (
+				{messageText.trim().length ? (
 					<Link
 						slot="inner-end"
 						className="messagebar-send-link"
 						iconF7="paperplane_fill"
-						onClick={sendMessage}
+						onClick={sendTextMessage}
 					/>
 				) : (
 					<>
-						<Link slot="inner-end" href="/camera/" iconF7="camera" />
+						<Link slot="inner-end" iconF7="camera" href="/camera/" />
 						<Link slot="inner-end" iconF7="mic" />
 					</>
 				)}
-				{/* 表情、图片选择 */}
-				<MessagebarAttachments>
-					{attachments.map((image, index) => (
-						<MessagebarAttachment
-							key={index}
-							image={image}
-							onAttachmentDelete={() => deleteAttachment(image)}
-						/>
-					))}
-				</MessagebarAttachments>
 				<MessagebarSheet>
-					<div onClick={(e) => e.stopPropagation()}>
-						<div className="m-1 p-1">{showImgEmojis ? <IconComponent /> : <IconComponent fill />}</div>
-						{!showImgEmojis ? (
-							// emojis
-							<div className="pl-3.5" onClick={(e) => e.stopPropagation()}>
-								{emojis.map((emoji, eKey) => (
-									<span key={eKey} className="m-1 p-1 text-2xl" onClick={() => addEmojis(emoji)}>
-										{emoji}
-									</span>
-								))}
-							</div>
-						) : (
-							// 图片表情
-							<div className="p-1">
-								{emojisImg.map((image, index) => (
-									<MessagebarSheetImage
-										key={index}
-										image={image}
-										checked={attachments.indexOf(image) >= 0}
-										onChange={handleAttachment}
-									/>
-								))}
-							</div>
-						)}
-					</div>
+					<Emojis onEmojiSelect={onEmojiSelect} />
 				</MessagebarSheet>
-			</Messagebar>
+			</Messagebar> */}
 
-			<Messages ref={messagesRef}>
+			{/* <div slot="page-content"> */}
+			<MessageBox
+				messages={messages}
+				header={
+					<div className="fixed top-0 left-0 right-0 h-14 border-b flex items-center px-4 z-[999] bg-white">
+						<div className="flex items-center w-full">
+							<ArrowLeftIcon className="w-5 h-5 mr-3" />
+							<div className="flex items-center">
+								<img src="https://picsum.photos/200" alt="" className="w-8 h-8 rounded-full mr-2" />
+								<span>test</span>
+							</div>
+							<div className="flex-1 flex justify-end">
+								<MoreIcon className="w-7 h-7" />
+							</div>
+						</div>
+					</div>
+				}
+				footer={<MsgBar />}
+			/>
+			{/* </div> */}
+
+			{/* <Messages>
 				{messages.map((message, index) => (
 					<Message
 						key={index}
@@ -405,18 +369,16 @@ export default function MessagesPage({ f7route }) {
 						first={isMessageFirst(message)}
 						last={isMessageLast(message)}
 						tail={isMessageLast(message)}
-						image={message.content_type === 3 ? [message.content] : []}
+						image={message.content_type === 3 ? [message.content] : ''}
 						type={messageType(message)}
 						text={message.content_type === 3 ? '' : message.content}
 					>
 						<span slot="text-footer">
 							{messageTime(message)}
-							{/* 发送状态 */}
 							{message?.send_state && message.type === 'sent' ? (
 								message.send_state === 'ok' ? (
 									<DoubleTickIcon />
 								) : (
-									// message.send_state
 									<Icon
 										className="text-base"
 										f7={message.send_state === 'sending' ? 'slowmo' : 'wifi_slash'}
@@ -429,38 +391,7 @@ export default function MessagesPage({ f7route }) {
 						</span>
 					</Message>
 				))}
-			</Messages>
-
-			{/* <List
-				medialList
-				virtualList
-				virtualListParams={{
-					items: messages,
-					renderExternal
-				}}
-			>
-				<ul>
-					{vlData.items.map((message, index) => (
-						<ListItem
-							key={index}
-							first={isMessageFirst(message)}
-							last={isMessageLast(message)}
-							tail={isMessageLast(message)}
-							type={message.type}
-							text={message.text}
-							title={message.text}
-							className="message-appear-from-bottom"
-							style={{ top: `${vlData.topPosition}px` }}
-							virtualListIndex={messages.indexOf(message)}
-						>
-							<span slot="text-footer">
-								{message.type === 'sent' && <DoubleTickIcon />}
-								{messageTime(message)}
-							</span>
-						</ListItem>
-					))}
-				</ul>
-			</List> */}
+			</Messages> */}
 		</Page>
 	)
 }

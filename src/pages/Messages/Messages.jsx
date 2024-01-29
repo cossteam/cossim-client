@@ -14,13 +14,16 @@ import { encryptMessage, cretateNonce, decryptMessageWithKey } from '@/utils/twe
 import userService from '@/db'
 // import { useHistoryStore } from '@/stores/history'
 // import Camera from '@/components/Camera/Camera'
-// import MessageBox from '@/components/Message/Message'
+import MessageBox from '@/components/Message/Chat'
+import MsgBar from '@/components/Message/MsgBar'
+import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
 
 MessagesPage.propTypes = {
-	f7route: PropType.object.isRequired
+	f7route: PropType.object.isRequired,
+	f7router: PropType.object.isRequired
 }
 
-export default function MessagesPage({ f7route }) {
+export default function MessagesPage({ f7route, f7router }) {
 	// 会话信息
 	const dialogId = f7route.query.dialog_id
 	// 用户信息
@@ -35,15 +38,8 @@ export default function MessagesPage({ f7route }) {
 	const [isActive, setIsActive] = useState(true)
 	// 是否是发送方
 	const [isSend, setIsSend] = useState(false)
-	// 预共享密钥
-	// const [preKey, setPreKey] = useState(null)
 	// 随机数
 	const [nonce] = useState(cretateNonce())
-
-	// const { ids } = useHistoryStore()
-
-	// const [page, setPage] = useState(1)
-	// const [limit, setLimit] = useState(30)
 
 	// 数据库所有消息
 	// const allMsg = useLiveQuery(() => userService.findAll(userService.TABLES.USERS)) || []
@@ -140,54 +136,8 @@ export default function MessagesPage({ f7route }) {
 		isActive ? initMsgs() : updateMsg()
 	}, [msgList])
 
-	// const handlerMsg = async () => {
-	// 	try {
-	// 		// 获取本地数据库中最后一条消息
-	// 		const lastMsg = msgList?.msgs?.at(-1)
-	// 		// 获取私聊消息
-	// 		const { code, data } = await getMsgByUser({ page_num: page, page_size: limit, user_id: ReceiverId })
-	// 		// 没有请求成功积极退出
-	// 		if (code !== 200) return
-	// 		// 远程消息中最后一条消息
-	// 		const lastDataMsg = data?.user_messages?.at(-1)
-
-	// 		// 如果已经是最新消息了，就需要再继续操作了
-	// 		if (lastMsg?.id === lastDataMsg?.id) return
-
-	// 		// 对比服务器上的消息和本地的消息，比较需要更新的消息
-	// 	} catch (error) {
-	// 		console.error('error', error)
-	// 	}
-	// }
-
-	// useEffect(() => {
-	// 	if (ids.includes[ReceiverId]) handlerMsg()
-	// 	// handlerMsg()
-	// }, [ids])
-
-	// 消息渲染处理
-	const messageTime = (message) => {
-		return message?.created_at
-			? Intl.DateTimeFormat('zh-CN', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.created_at))
-			: ''
-		// return format(message?.created_at, 'zh_CN')
-	}
-	const isMessageFirst = (message) => {
-		const messageIndex = messages.indexOf(message)
-		const previousMessage = messages[messageIndex - 1]
-		return !previousMessage || previousMessage.type !== message.type
-	}
-	const isMessageLast = (message) => {
-		const messageIndex = messages.indexOf(message)
-		const nextMessage = messages[messageIndex + 1]
-		return !nextMessage || nextMessage.type !== message.type
-	}
-	const messageType = (message) => {
-		return message.receiver_id === ReceiverId ? 'sent' : 'received'
-	}
-
 	// 发送消息
-	const messagebarRef = useRef(null)
+	// const messagebarRef = useRef(null)
 	const [messageText, setMessageText] = useState('')
 	const dbMsgToReqMsg = (obj) => {
 		return {
@@ -277,133 +227,32 @@ export default function MessagesPage({ f7route }) {
 		}
 	}
 
-	const sendTextMessage = async () => {
-		sendMessage(1, messageText)
-		// 恢复输入框状态
-		setMessageText('')
-		// 混搭
-		messagebarRef.current.f7Messagebar().focus()
-		// onViewportResize()
-		$('html, body').scrollTop(0)
+	console.log(contact)
 
-		console.log($('html, body'));
-	}
-
-	// 图片表情
-	const [sheetVisible, setSheetVisible] = useState(false)
-	const onEmojiSelect = ({ type, emoji }) => {
-		console.log(type, emoji)
-		type === 'emoji' && setMessageText(`${messageText}${emoji}`)
-		type === 'img' && sendMessage(3, emoji)
-	}
-
-	// Fix for iOS web app scroll body when
-	const resizeTimeout = useRef(null)
-	const onViewportResize = () => {
-		// setHeight(visualViewport.height - 88 + 'px')
-		$('html, body').css('height', `${visualViewport.height}px`)
-		$('html, body').scrollTop(0)
-	}
-	const onMessagebarFocus = () => {
-		const { device } = f7
-		if (!device.ios || device.cordova || device.capacitor) return
-		clearTimeout(resizeTimeout.current)
-		visualViewport.addEventListener('resize', onViewportResize)
-	}
-	const onMessagebarBlur = () => {
-		const { device } = f7
-		if (!device.ios || device.cordova || device.capacitor) return
-		resizeTimeout.current = setTimeout(() => {
-			visualViewport.removeEventListener('resize', onViewportResize)
-			$('html, body').css('height', '')
-			$('html, body').scrollTop(0)
-		}, 100)
+	const send = (content) => {
+		console.log("content",content)
 	}
 
 	return (
-		<Page className="messages-page" noToolbar messagesContent>
-			<Navbar className="messages-navbar" backLink backLinkShowText={false}>
-				<Link slot="right" iconF7="videocam" />
-				<Link slot="right" iconF7="phone" />
-				<Link slot="title" href={`/profile/${ReceiverId}/`} className="title-profile-link">
-					<img src={contact?.avatar} loading="lazy" />
-					<div>
-						<div>{contact?.name}</div>
-						<div className="subtitle">online</div>
+		<Page className="messages-page h-screen overflow-hidden relative" noToolbar>
+			<MessageBox
+				messages={messages}
+				header={
+					<div className="fixed top-0 left-0 right-0 h-14 border-b flex items-center px-4 z-[999] bg-white">
+						<div className="flex items-center w-full">
+							<ArrowLeftIcon className="w-5 h-5 mr-3" onClick={() => f7router.back()} />
+							<div className="flex items-center">
+								<img src={contact?.avatar} alt="" className="w-8 h-8 rounded-full mr-2" />
+								<span>{contact?.nickname}</span>
+							</div>
+							<div className="flex-1 flex justify-end">
+								<MoreIcon className="w-7 h-7" />
+							</div>
+						</div>
 					</div>
-				</Link>
-			</Navbar>
-			<Messagebar
-				ref={messagebarRef}
-				placeholder=""
-				value={messageText}
-				sheetVisible={sheetVisible}
-				onInput={(e) => setMessageText(e.target.value)}
-				onFocus={onMessagebarFocus}
-				onBlur={onMessagebarBlur}
-			>
-				<Link slot="inner-start" iconF7="plus" />
-				<Link
-					className="messagebar-sticker-link"
-					slot="after-area"
-					iconF7="smiley"
-					onClick={() => {
-						setSheetVisible(!sheetVisible)
-					}}
-				/>
-				{messageText.trim().length ? (
-					<Link
-						slot="inner-end"
-						className="messagebar-send-link"
-						iconF7="paperplane_fill"
-						onClick={sendTextMessage}
-					/>
-				) : (
-					<>
-						<Link slot="inner-end" iconF7="camera" href="/camera/" />
-						<Link slot="inner-end" iconF7="mic" />
-					</>
-				)}
-				<MessagebarSheet>
-					<Emojis onEmojiSelect={onEmojiSelect} />
-				</MessagebarSheet>
-			</Messagebar>
-
-			{/* <MessageBox messages={messages} /> */}
-
-			<Messages>
-				{messages.map((message, index) => (
-					<Message
-						key={index}
-						className="message-appear-from-bottom"
-						data-key={index}
-						first={isMessageFirst(message)}
-						last={isMessageLast(message)}
-						tail={isMessageLast(message)}
-						image={message.content_type === 3 ? [message.content] : ''}
-						type={messageType(message)}
-						text={message.content_type === 3 ? '' : message.content}
-					>
-						<span slot="text-footer">
-							{messageTime(message)}
-							{message?.send_state && message.type === 'sent' ? (
-								message.send_state === 'ok' ? (
-									<DoubleTickIcon />
-								) : (
-									<Icon
-										className="text-base"
-										f7={message.send_state === 'sending' ? 'slowmo' : 'wifi_slash'}
-										color="primary"
-									/>
-								)
-							) : (
-								''
-							)}
-						</span>
-					</Message>
-				))}
-			</Messages>
-
+				}
+				footer={<MsgBar send={send}/>}
+			/>
 		</Page>
 	)
 }

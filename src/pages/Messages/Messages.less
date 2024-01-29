@@ -17,7 +17,9 @@
 .messages-page {
 	background: #f5f5f5;
 	background-image: url('@/assets/message-bg-light.jpg');
-	background-size: 828px auto;
+	// background-size: 828px auto;
+	// height: 100vh;
+	// overflow-y: hidden;
 	// overflow-y: auto;
 
 	.dark & {
@@ -26,7 +28,11 @@
 
 	&:not(.page-current) .message-appear-from-bottom {
 		animation-duration: 0ms;
-		margin-bottom: 10px;
+		// margin-bottom: 10px;
+	}
+
+	.page-content {
+		padding: 0;
 	}
 }
 

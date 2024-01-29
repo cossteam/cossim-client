@@ -17,6 +17,7 @@ import './styles/app.less'
 import Home from './Home.jsx'
 
 import 'animate.css'
+// import 'tdesign-mobile-react/es/style/index.css'
 
 // import { test } from '@/utils/tweetnacl'
 // test()
