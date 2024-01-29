@@ -32,6 +32,7 @@ export default function MessageBox(props) {
 		if (msgRef.current) {
 			// 滚动到最低部
 			console.log('msgRef.current', msgRef.current)
+			// 滚动到底部
 			msgRef.current.scrollTo(0, document.body.scrollHeight)
 		}
 	}, [messages])
@@ -74,7 +75,7 @@ export default function MessageBox(props) {
 						)}
 					>
 						<div className="px-2 max-w-[75%] w-[fit-content] flex items-start break-all">
-							{/* <div
+							<div
 								className={clsx(
 									'w-10 h-10 rounded-full min-w-[40px]',
 									isSend(message.type) ? 'order-last' : 'order-first'
@@ -89,7 +90,7 @@ export default function MessageBox(props) {
 										className="w-full h-full rounded-full object-cover"
 									/>
 								)}
-							</div> */}
+							</div>
 							<div className={clsx('px-[6px]', isSend(message.type) ? 'order-first' : 'order-last')}>
 								{/* <div className={clsx('text-[12px]',isSend(message.type) ? 'text-right' : 'order-last')}>群聊</div> */}
 								<div

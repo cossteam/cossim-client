@@ -46,8 +46,9 @@ export default function NewContact() {
 				// 	publicKey: await exportPublicKey(users?.data?.keyPair?.publicKey)
 				// }
 				// 同意或拒绝添加好友
+				console.log("id",id);
 				const { code } = await confirmAddFriendApi({
-					user_id: id,
+					request_id: id,
 					e2e_public_key: JSON.stringify(directory),
 					action: status
 				})
@@ -72,7 +73,7 @@ export default function NewContact() {
 				const { code } = await confirmAddGroupApi({
 					group_id,
 					action: status, // 1 同意 0 拒绝
-					inviter_id: ''
+					id
 				})
 				getResquestList() // 更新列表
 				if (code !== 200) return

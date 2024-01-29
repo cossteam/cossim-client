@@ -75,3 +75,31 @@ export function getBehindMsgApi(data) {
 		data: data
 	})
 }
+
+/**
+ * 编辑群聊消息
+ * @param {*} data
+ * @param {*} data.content			消息内容
+ * @param {*} data.msg_id			消息id
+ * @param {*} data.type				消息类型
+ */
+export function editGroupMsgApi(data) {
+	return request({
+		url: baseApi + '/edit/group',
+		method: 'POST',
+		data
+	})
+}
+
+/**
+ * 撤回群消息
+ * @param {*} data
+ * @param {*} data.msg_id
+ */
+export function recallGroupMsgApi(data) {
+	return request({
+		url: baseApi + '/recall/group',
+		method: 'POST',
+		data
+	})
+}

@@ -46,13 +46,13 @@ export default function RequestList({ listData, confirm }) {
 						>
 							<img
 								slot="media"
-								src={chat?.user_avatar || chat?.group_avatar}
+								src={chat?.receiver_info?.user_avatar || chat?.group_avatar}
 								loading="lazy"
 								alt={chat?.user_name || chat?.group_name}
 								className="w-10 h-10 rounded-full"
 							/>
 							<span slot="title">
-								{chat.user_name}
+								{chat?.receiver_info?.user_name}
 								{chat?.group_name ? (
 									<>
 										<span className=" text-xs text-gray-500">邀请你加入</span>
@@ -69,13 +69,13 @@ export default function RequestList({ listData, confirm }) {
 								<div slot="content" className="pr-2 flex">
 									<Button
 										className="text-sm text-red-500"
-										onClick={() => confirm(chat?.user_id, 0, chat?.group_id)}
+										onClick={() => confirm(chat?.id, 0, chat?.group_id)}
 									>
 										拒绝
 									</Button>
 									<Button
 										className="text-sm text-primary"
-										onClick={() => confirm(chat?.user_id, 1, chat?.group_id)}
+										onClick={() => confirm(chat?.id, 1, chat?.group_id)}
 									>
 										同意
 									</Button>

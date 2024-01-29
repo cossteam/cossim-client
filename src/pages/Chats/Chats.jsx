@@ -13,7 +13,7 @@ import {
 } from 'framework7-react'
 import './Chats.less'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
-import { Search, Plus, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
+import { Search, Plus, Person2Alt, PersonBadgePlusFill,ViewfinderCircleFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
 import userService, { dbService } from '@/db'
 import { getChatList, getBehindMsgApi } from '@/api/msg'
@@ -113,7 +113,6 @@ export default function Chats(props) {
 			}
 			setChatList(chatList)
 		}
-		console.log('chats 发生改变', chats)
 		decrypt()
 	}, [chats])
 
@@ -125,20 +124,18 @@ export default function Chats(props) {
 			const res = await getBehindMsgApi(data)
 			if (res.code !== 200) return
 
-			console.log('res', res)
-
 			const list = res?.data || []
 			if (list.length === 0) return
 
 			const msgs = await userService.findAll(userService.TABLES.USERS)
-			list.map((v) => {
-				const msg = msgs?.find((msg) => msg.dialog_id === v.dialog_id)
+			list.map(async (v) => {
+				const msg = msgs?.find((msg) => msg?.data?.dialog_id === v.dialog_id)
 
 				let newMsg = null
 
-				console.log("msg", msg,msgs)
+				const list = []
 
-				v?.msg_list?.map(async (s) => {
+				v?.msg_list?.map((s) => {
 					newMsg = {
 						...s,
 						content_type: s?.msg_type,
@@ -148,18 +145,18 @@ export default function Chats(props) {
 						is_read: false
 					}
 
-					if (msg) {
-						await userService.update(userService.TABLES.MSGS, msg.user_id, {
-							user_id: msg.user_id,
-							msgs: [...msg.msgs, newMsg]
-						})
-					} else {
-						await userService.add(userService.TABLES.MSGS, {
-							user_id: v?.sender_id,
-							msgs: [newMsg]
-						})
-					}
+					list.push(newMsg)
 				})
+
+				if (msg) {
+					await userService.update(userService.TABLES.USERS, msg.user_id, {
+						...msg,
+						data: {
+							...msg.data,
+							msgs: [...msg.data.msgs, ...list]
+						}
+					})
+				}
 			})
 		}
 
@@ -238,6 +235,10 @@ export default function Chats(props) {
 					<ListItem link="/add_friend/" popoverClose className="el-list">
 						<PersonBadgePlusFill className="el-list__icon" />
 						<span className="el-text">{$t('添加朋友')}</span>
+					</ListItem>
+					<ListItem link="/camera/" popoverClose className="el-list">
+						<ViewfinderCircleFill className="el-list__icon" />
+						<span className="el-text">{$t('扫一扫')}</span>
 					</ListItem>
 				</List>
 			</Popover>

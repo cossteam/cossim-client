@@ -14,6 +14,7 @@ import { encryptMessage, cretateNonce, decryptMessageWithKey } from '@/utils/twe
 import userService from '@/db'
 // import { useHistoryStore } from '@/stores/history'
 // import Camera from '@/components/Camera/Camera'
+// import MessageBox from '@/components/Message/Message'
 
 MessagesPage.propTypes = {
 	f7route: PropType.object.isRequired
@@ -284,6 +285,8 @@ export default function MessagesPage({ f7route }) {
 		messagebarRef.current.f7Messagebar().focus()
 		// onViewportResize()
 		$('html, body').scrollTop(0)
+
+		console.log($('html, body'));
 	}
 
 	// 图片表情
@@ -361,13 +364,12 @@ export default function MessagesPage({ f7route }) {
 						<Link slot="inner-end" iconF7="mic" />
 					</>
 				)}
-				{/* 表情、图片选择 */}
 				<MessagebarSheet>
 					<Emojis onEmojiSelect={onEmojiSelect} />
 				</MessagebarSheet>
 			</Messagebar>
 
-			{/* <MessageBox messages={messages} height={height} /> */}
+			{/* <MessageBox messages={messages} /> */}
 
 			<Messages>
 				{messages.map((message, index) => (
@@ -402,7 +404,6 @@ export default function MessagesPage({ f7route }) {
 				))}
 			</Messages>
 
-			{/* <Camera /> */}
 		</Page>
 	)
 }

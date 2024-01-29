@@ -9,7 +9,8 @@ import {
 	NavRight,
 	NavTitle,
 	Navbar,
-	Page
+	Page,
+	f7
 } from 'framework7-react'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import Emojis from '@/components/Emojis/Emojis.jsx'
@@ -20,10 +21,11 @@ import { dbService } from '@/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { uniqueId } from 'lodash-es'
 import { groupInfoApi, groupMemberApi } from '@/api/group'
-import { sendToGroup } from '@/api/msg'
+import { sendToGroup, editGroupMsgApi, recallGroupMsgApi } from '@/api/msg'
 import clsx from 'clsx'
 import LongPressWrap from './LongPressWrap'
 import { useClickOutside } from '@reactuses/core'
+import { Trash } from 'framework7-icons/react'
 
 GroupChat.propTypes = {
 	f7route: PropType.object.isRequired
@@ -34,6 +36,9 @@ export default function GroupChat({ f7route }) {
 	const DialogId = f7route.query.dialog_id // 会话 ID
 	const [chatInfo, setGroupInfo] = useState({}) // 群聊信息
 	const [member, setMember] = useState(new Map()) // 成员信息
+
+	// 是否是编辑消息
+	const [isEdit, setIsEdit] = useState(false)
 
 	// 消息处理（加密、解密）
 	const msgHendler = (message) => {
@@ -126,6 +131,7 @@ export default function GroupChat({ f7route }) {
 	 */
 	const sendMessage = async (sandText = msgText, type = 1) => {
 		if (sandText === '') return
+		if (isEdit) return edit()
 		// 发送消息
 		const time = Date.now()
 		const unique_id = uniqueId(`${time}_`)
@@ -154,13 +160,16 @@ export default function GroupChat({ f7route }) {
 		try {
 			message['send_status'] = 1
 			dbService.update(dbService.TABLES.MSGS, ReceiverId, newAllMsg)
-			const { code } = await sendToGroup({
+			const { code,data } = await sendToGroup({
 				content: JSON.stringify(message),
 				dialog_id: message.dialog_id,
 				group_id: message.group_id,
 				type: message.type
 			})
 			message['send_status'] = code === 200 ? 2 : 3
+			message['msg_id'] = data.msg_id
+			// setMsgMenuData({...msgMenuData, msg_id: data.msg_id})
+			
 		} catch (error) {
 			console.log(error)
 			message['send_status'] = 3
@@ -188,6 +197,7 @@ export default function GroupChat({ f7route }) {
 		const msgViewRect = messagesRef.current.el.offsetParent.getBoundingClientRect()
 		const msgRect = e.changedTouches[0].target.parentElement.getBoundingClientRect()
 		const menuRect = msgMenuRef.current.getBoundingClientRect()
+		console.log("msg",msg);
 		setMsgMenuData(msg)
 		const menuPosition = {
 			left: msgRect.left + msgRect.width / 2 - menuRect.width / 2, // left定位在消息上方中点
@@ -210,11 +220,67 @@ export default function GroupChat({ f7route }) {
 	}
 	useClickOutside(msgMenuRef, () => {
 		// 关闭消息菜单操作
-		setMsgMenuStyle({
-			top: '44px',
-			left: '9999px'
-		})
+		closeMenu()
 	})
+	const closeMenu = () => setMsgMenuStyle({ top: '44px', left: '9999px' })
+
+	// 发送编辑消息
+	const edit = async () => {
+		console.log(msgMenuData);
+		const res = await editGroupMsgApi({
+			content: msgMenuData.content,
+			msg_id: msgMenuData.msg_id,
+			msg_type: msgMenuData.type
+		})
+		if (res.code !== 200) return
+
+		setIsEdit(false)
+		const result = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
+		const data = result.data
+		const index = data.findIndex((v) => v.unique_id === msgMenuData.unique_id)
+		console.log("index",index);
+		if (index === -1) return
+		data[index].content = msgText
+		await dbService.update(dbService.TABLES.MSGS, ReceiverId, {
+			...res,
+			data
+		})
+	}
+
+	// 编辑消息
+	const editMsg = () => {
+		// console.log('msg', msgMenuData)
+		setMsgText(msgMenuData.content)
+		setIsEdit(true)
+		closeMenu()
+	}
+
+	// 撤回消息
+	const withdrawMsg = async () => {
+		try {
+			const result = await recallGroupMsgApi({ msg_id: msgMenuData.msg_id })
+			if (result.code !== 200) return f7.dialog.alert(result.msg)
+			const res = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
+			if (!res) return
+			const data = res.data
+			const index = data.findIndex((v) => v.unique_id === msgMenuData.unique_id)
+			if (index === -1) return
+			data.splice(index, 1)
+			await dbService.update(dbService.TABLES.MSGS, ReceiverId, {
+				...res,
+				data
+			})
+		} finally {
+			closeMenu()
+		}
+	}
+
+	// 消除编辑状态
+	useEffect(() => {
+		if (isEdit && msgText === '') {
+			setIsEdit(false)
+		}
+	}, [isEdit])
 
 	return (
 		<Page className="chat-group-page messages-page" noToolbar messagesContent>
@@ -297,10 +363,31 @@ export default function GroupChat({ f7route }) {
 			</Messages>
 			<div
 				ref={msgMenuRef}
-				className=" w-44 h-28 fixed z-[999] bg-white p-2 rounded-md shadow-md"
+				className="w-44 h-auto fixed z-[999] bg-white p-2 rounded-md shadow-md"
 				style={msgMenuStyle}
 			>
-				{msgMenuData.content}
+				<div className="flex flex-wrap">
+					<div className="p-2" onClick={editMsg}>
+						<Trash className="w-5 h-5 mb-1" />
+						<span className="text-[0.75rem]">编辑</span>
+					</div>
+					<div className="p-2">
+						<Trash className="w-5 h-5 mb-1" onClick={withdrawMsg} />
+						<span className="text-[0.75rem]">撤回</span>
+					</div>
+					<div className="p-2">
+						<Trash className="w-5 h-5 mb-1" />
+						<span className="text-[0.75rem]">转发</span>
+					</div>
+					<div className="p-2">
+						<Trash className="w-5 h-5 mb-1" />
+						<span className="text-[0.75rem]">多选</span>
+					</div>
+					{/* <div className="p-2">
+						<Trash className="w-5 h-5 mb-1" onClick={del} />
+						<span className="text-[0.75rem]">删除</span>
+					</div> */}
+				</div>
 			</div>
 		</Page>
 	)

@@ -54,7 +54,7 @@ const handlerMessage = async (msg) => {
 		data: {
 			...result.data,
 			msgs: [...result.data.msgs, message],
-			dialog_id: 1 || message.dialog_id
+			dialog_id: message.dialog_id
 		}
 	})
 
