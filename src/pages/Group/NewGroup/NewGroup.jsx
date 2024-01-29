@@ -1,12 +1,23 @@
-import { $t } from '@/i18n'
-import { Card, CardContent, CardHeader, Link, List, ListItem, NavRight, NavTitle, Navbar, Page } from 'framework7-react'
 import React from 'react'
-import { useState } from 'react'
-import { useEffect } from 'react'
-import { f7 } from 'framework7-react'
+import { $t } from '@/i18n'
+import {
+	f7,
+	Card,
+	CardContent,
+	CardHeader,
+	Link,
+	List,
+	ListItem,
+	NavRight,
+	NavTitle,
+	Navbar,
+	Page
+} from 'framework7-react'
+import './NewGroup.less'
+import { useState, useEffect } from 'react'
 import PropType from 'prop-types'
 import { friendListApi } from '@/api/relation'
-import { groupInfoApi, groupCreateApi, groupMemberApi } from '@/api/group'
+import { groupInfoApi, groupCreateApi } from '@/api/group'
 
 NewGroup.propTypes = {
 	f7route: PropType.object.isRequired
@@ -53,6 +64,7 @@ export default function NewGroup({ f7route }) {
 	// 选择群成员
 	const groupMemberChange = (e, user_id) => {
 		// const checked = e.target.checked
+		console.log(group.member)
 		const member = [...group.member]
 		const index = member.indexOf(user_id)
 		if (index > -1) {
@@ -74,35 +86,34 @@ export default function NewGroup({ f7route }) {
 
 	// 好友列表
 	const [friends, setFriends] = useState([])
+	// const [members, setMembers] = useState([])
 	useEffect(() => {
-		;(async () => {
-            if (GroupId) {
-                // 获取成员信息
-                groupMemberApi({ group_id: GroupId }).then(({ code, data }) => {
-                    if (code === 200) {
-                        setFriends(data)
-                        console.log(data);
-                    }
-                })
-            } else {
-                const { code, data: groups } = await friendListApi()
-                if (code !== 200) return
-                const friends = []
-                for (const group in groups) {
-                    if (Object.hasOwnProperty.call(groups, group)) {
-                        const groupItem = groups[group] || []
-                        for (const friend of groupItem) {
-                            friends.push({
-                                ...friend,
-                                group
-                            })
-                        }
-                    }
-                }
-                setFriends(friends)
-                console.log(friends);
-            }
-		})()
+		// 获取成员信息
+		// groupMemberApi({ group_id: GroupId }).then(({ code, data }) => {
+		// 	if (code === 200) {
+		// 		setMembers(data)
+		// 		console.log(data)
+		// 	}
+		// })
+		// 好友列表
+		friendListApi().then(({ code, data: groups }) => {
+			if (code === 200) {
+				const groupMember = []
+				for (const group in groups) {
+					if (Object.hasOwnProperty.call(groups, group)) {
+						const groupItem = groups[group] || []
+						for (const friend of groupItem) {
+							groupMember.push({
+								...friend,
+								group
+							})
+						}
+					}
+				}
+				setFriends(groupMember)
+				console.log(groupMember)
+			}
+		})
 	}, [])
 
 	// 新建群聊
@@ -135,14 +146,12 @@ export default function NewGroup({ f7route }) {
 	}
 
 	return (
-		<Page className="bg-gray-50 p-4" noToolbar>
+		<Page className="new-group bg-gray-50 p-4" noToolbar>
 			<Navbar className="messages-navbar" backLink>
 				<NavTitle>
-                    <span className={GroupId && "mr-14"}>{$t(GroupId ? '群组设置' : '新建群组')}</span>
-                </NavTitle>
-				<NavRight>
-                    {!GroupId && <Link onClick={() => createGroup()}>{$t('完成')}</Link>}
-				</NavRight>
+					<span className={GroupId && 'mr-14'}>{$t(GroupId ? '群组设置' : '新建群组')}</span>
+				</NavTitle>
+				<NavRight>{!GroupId && <Link onClick={() => createGroup()}>{$t('完成')}</Link>}</NavRight>
 			</Navbar>
 			<Card className="m-0 py-6 mb-4" outlineMd>
 				<CardHeader className="flex flex-col justify-center">
@@ -153,42 +162,48 @@ export default function NewGroup({ f7route }) {
 						name="name"
 						value={group.name}
 						onChange={onInput}
-                        disabled={GroupId}
+						disabled={GroupId}
 					/>
 				</CardHeader>
 			</Card>
 			<Card className="m-0 mb-4" outlineMd>
 				<CardHeader className="flex">
-					<span className="text-xl text-slate-400">{$t('群类型')}</span>
+					<span className="text-base text-slate-400">{$t('群类型')}</span>
 				</CardHeader>
 				<CardContent>
 					<List strongIos outlineIos dividersIos>
 						<ListItem
 							radio
 							radioIcon="end"
-							title={$t('加密')}
 							defaultChecked={group.type == 1 ? true : false}
 							name="type"
 							value="1"
 							onChange={(e) => updateGroup({ [e.target.name]: e.target.value })}
-                            disabled={GroupId}
-						/>
+							disabled={GroupId}
+						>
+							<span slot="title" className="text-base">
+								{$t('加密')}
+							</span>
+						</ListItem>
 						<ListItem
 							radio
 							radioIcon="end"
-							title={$t('常规')}
 							defaultChecked={group.type == 0 ? true : false}
 							name="type"
 							value="0"
 							onChange={(e) => updateGroup({ [e.target.name]: e.target.value })}
-                            disabled={GroupId}
-						/>
+							disabled={GroupId}
+						>
+							<span slot="title" className="text-base">
+								{$t('常规')}
+							</span>
+						</ListItem>
 					</List>
 				</CardContent>
 			</Card>
 			<Card className="m-0 mb-4" outlineMd>
 				<CardHeader className="flex">
-					<span className="text-xl text-slate-400">{$t('群成员')}</span>
+					<span className="text-base text-slate-400">{$t('群成员')}</span>
 				</CardHeader>
 				<CardContent>
 					<List strongIos outlineIos dividersIos>
@@ -198,13 +213,12 @@ export default function NewGroup({ f7route }) {
 								checkbox={!GroupId}
 								checkboxIcon="end"
 								onChange={(e) => groupMemberChange(e, friend.user_id)}
-                                // disabled={GroupId}
 							>
 								<img slot="media" className="w-12 h-12 rounded-full" src={friend.avatar} alt="" />
-								<span slot="title" className="text-xl">
+								<span slot="title" className="text-base">
 									{friend.nick_name || friend.nickname}
 								</span>
-								<span slot="footer" className="text-base">
+								<span slot="footer" className="text-sm">
 									{friend.email}
 								</span>
 								<span slot="after">{friend.group}</span>

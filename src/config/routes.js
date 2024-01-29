@@ -12,9 +12,11 @@ import UserInfo from '@/pages/UserInfo/Userinfo'
 import UpdateUserInfo from '@/pages/UpdateUserInfo/UpdateUserInfo'
 import NewContact from '@/pages/NewContact/NewContact'
 import GroupList from '@/pages/Group/GroupList/GroupList'
-import GroupChat from '@/pages/Group/GroupChat'
-import NewGroup from '@/pages/Group/NewGroup'
+import GroupChat from '@/pages/Group/GroupChat/GroupChat'
+import NewGroup from '@/pages/Group/NewGroup/NewGroup'
 import Camera from '@/pages/Camera/Camera'
+import ChatInfo from '@/pages/Group/ChatInfo/ChatInfo'
+import MemberList from '@/pages/Group/ChatInfo/MemberList'
 
 var routes = [
 	{
@@ -80,6 +82,14 @@ var routes = [
 	{
 		path: '/groups/:id/',
 		component: GroupChat
+	},
+	{
+		path: '/chatinfo/:type/:id/',
+		component: ChatInfo
+	},
+	{
+		path: '/memberlist/:type/:id/',
+		component: MemberList
 	},
 	{
 		path: '(.*)',

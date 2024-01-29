@@ -115,3 +115,46 @@ export function groupMemberApi(param) {
 	})
 }
 
+/**
+ * 邀请加入群聊
+ * @param {*} data
+ * @param {*} data.group_id
+ * @param {*} data.member
+ * @returns
+ */
+export function groupInviteApi(data) {
+	return {
+		url: relationGroup + '/invite',
+		method: 'POST',
+		data
+	}
+}
+
+/**
+ * 将用户从群聊移除
+ * @param {*} data
+ * @param {*} data.group_id
+ * @param {*} data.user_id
+ * @returns
+ */
+export function groupRemoveApi(data) {
+	return request({
+		url: relationGroup + '/admin/manage/remove',
+		method: 'POST',
+		data
+	})
+}
+
+/**
+ * 退出群聊
+ * @param {*} data
+ * @param {*} data.group_id
+ * @returns
+ */
+export function groupQuitApi(data) {
+	return request({
+		url: relationGroup + '/quit',
+		method: 'POST',
+		data
+	})
+}
