@@ -23,7 +23,7 @@ import { uniqueId } from 'lodash-es'
 import { groupInfoApi, groupMemberApi } from '@/api/group'
 import { sendToGroup, editGroupMsgApi, recallGroupMsgApi } from '@/api/msg'
 import clsx from 'clsx'
-import LongPressWrap from './LongPressWrap'
+import LongPressWrap from '../LongPressWrap'
 import { useClickOutside } from '@reactuses/core'
 import { Trash } from 'framework7-icons/react'
 
@@ -160,7 +160,7 @@ export default function GroupChat({ f7route }) {
 		try {
 			message['send_status'] = 1
 			dbService.update(dbService.TABLES.MSGS, ReceiverId, newAllMsg)
-			const { code,data } = await sendToGroup({
+			const { code, data } = await sendToGroup({
 				content: JSON.stringify(message),
 				dialog_id: message.dialog_id,
 				group_id: message.group_id,
@@ -169,7 +169,6 @@ export default function GroupChat({ f7route }) {
 			message['send_status'] = code === 200 ? 2 : 3
 			message['msg_id'] = data.msg_id
 			// setMsgMenuData({...msgMenuData, msg_id: data.msg_id})
-			
 		} catch (error) {
 			console.log(error)
 			message['send_status'] = 3
@@ -197,7 +196,7 @@ export default function GroupChat({ f7route }) {
 		const msgViewRect = messagesRef.current.el.offsetParent.getBoundingClientRect()
 		const msgRect = e.changedTouches[0].target.parentElement.getBoundingClientRect()
 		const menuRect = msgMenuRef.current.getBoundingClientRect()
-		console.log("msg",msg);
+		console.log('msg', msg)
 		setMsgMenuData(msg)
 		const menuPosition = {
 			left: msgRect.left + msgRect.width / 2 - menuRect.width / 2, // left定位在消息上方中点
@@ -226,7 +225,7 @@ export default function GroupChat({ f7route }) {
 
 	// 发送编辑消息
 	const edit = async () => {
-		console.log(msgMenuData);
+		console.log(msgMenuData)
 		const res = await editGroupMsgApi({
 			content: msgMenuData.content,
 			msg_id: msgMenuData.msg_id,
@@ -238,7 +237,7 @@ export default function GroupChat({ f7route }) {
 		const result = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
 		const data = result.data
 		const index = data.findIndex((v) => v.unique_id === msgMenuData.unique_id)
-		console.log("index",index);
+		console.log('index', index)
 		if (index === -1) return
 		data[index].content = msgText
 		await dbService.update(dbService.TABLES.MSGS, ReceiverId, {
@@ -289,7 +288,8 @@ export default function GroupChat({ f7route }) {
 					<span className="">{$t(chatInfo.name)}</span>
 				</NavTitle>
 				<NavRight>
-					<Link href={`/new_group/?id=${ReceiverId}`} iconF7="ellipsis" onClick={() => {}} />
+					{/* <Link href={`/new_group/?id=${ReceiverId}`} iconF7="ellipsis" onClick={() => {}} /> */}
+					<Link href={`/chatinfo/${'group'}/${ReceiverId}/`} iconF7="ellipsis" />
 				</NavRight>
 			</Navbar>
 			{/* 消息输入框 */}

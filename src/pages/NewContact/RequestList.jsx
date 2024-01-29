@@ -1,6 +1,7 @@
 import { Button, List, ListItem, SwipeoutActions, SwipeoutButton } from 'framework7-react'
 import React from 'react'
 import PropTypes from 'prop-types'
+import { useUserStore } from '@/stores/user'
 
 RequestList.propTypes = {
 	listData: PropTypes.array.isRequired,
@@ -8,25 +9,23 @@ RequestList.propTypes = {
 }
 
 export default function RequestList({ listData, confirm }) {
+	const userStore = useUserStore()
+
 	const getUserStatusText = (status) => {
 		const user_status = {
 			0: '申请中',
-			1: '待通过',
-			2: '已添加',
-			3: '已拒绝',
-			4: '已拉黑',
-			5: '已删除'
+			1: '已同意',
+			2: '已拒绝'
 		}
 		return user_status[status]
 	}
 	const getGroupStatusText = (status) => {
 		const group_status = {
-			0: '申请中',
-			1: '待通过',
-			2: '已加入',
-			3: '已删除',
-			4: '已拒绝',
-			5: '被封禁'
+			0: '等待验证',
+			1: '已通过',
+			2: '已拒绝',
+			3: '邀请发送者',
+			4: '邀请接收者'
 		}
 		return group_status[status]
 	}
@@ -52,7 +51,7 @@ export default function RequestList({ listData, confirm }) {
 								className="w-10 h-10 rounded-full"
 							/>
 							<span slot="title">
-								{chat?.receiver_info?.user_name}
+								{chat?.sender_info?.user_name}
 								{chat?.group_name ? (
 									<>
 										<span className=" text-xs text-gray-500">邀请你加入</span>
@@ -65,7 +64,8 @@ export default function RequestList({ listData, confirm }) {
 							<span slot="text" className="text-gray-500 text-sm">
 								{chat?.msg || '对方没有留言'}
 							</span>
-							{chat.group_status == 1 || chat.user_status == 0 ? (
+							{chat.status == 0 ||
+							(chat.status == 4 && userStore.user.user_id === chat.receiver_info.user_id) ? (
 								<div slot="content" className="pr-2 flex">
 									<Button
 										className="text-sm text-red-500"
@@ -82,7 +82,7 @@ export default function RequestList({ listData, confirm }) {
 								</div>
 							) : (
 								<span className="text-gray-500 text-sm whitespace-nowrap pr-2" slot="content">
-									{getUserStatusText(chat.user_status) || getGroupStatusText(chat.group_status)}
+									{getUserStatusText(chat.status) || getGroupStatusText(chat.status)}
 								</span>
 							)}
 							<SwipeoutActions right>

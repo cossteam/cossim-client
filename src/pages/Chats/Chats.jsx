@@ -13,7 +13,7 @@ import {
 } from 'framework7-react'
 import './Chats.less'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
-import { Search, Plus, Person2Alt, PersonBadgePlusFill,ViewfinderCircleFill } from 'framework7-icons/react'
+import { Search, Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
 import userService, { dbService } from '@/db'
 import { getChatList, getBehindMsgApi } from '@/api/msg'
@@ -198,7 +198,8 @@ export default function Chats(props) {
 								: `/chats/${chat.user_id}/?dialog_id=${chat?.dialog_id || ''}`
 						}
 						title={chat.dialog_name}
-						// badge={chat.dialog_unread_count}
+						badge={chat.dialog_unread_count}
+						badgeColor="red"
 						after={format(chat.send_time, 'zh_CN')}
 						swipeout
 					>
