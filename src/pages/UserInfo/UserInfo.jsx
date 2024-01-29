@@ -48,7 +48,7 @@ export default function Userinfo({ f7router }) {
 					</div>
 				</ListItem>
 				<ListItem link={`/updateuserinfo/${'nickname'}/?title=${encodeURIComponent('昵称')}`} title="昵称">
-					<div slot="after">{user?.nick_name}</div>
+					<div slot="after">{user?.nickname}</div>
 				</ListItem>
 				<ListItem link title="状态" noChevron>
 					<div slot="after">{user?.status}</div>

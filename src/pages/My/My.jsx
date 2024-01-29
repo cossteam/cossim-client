@@ -10,7 +10,7 @@ export default function My() {
 
 	return (
 		<Page className="settings-page">
-			<Navbar title={user.nick_name} large transparent />
+			<Navbar title={user.nickname} large transparent />
 			<List strong dividers outline mediaList className="settings-profile-list">
 				<ListItem link={`/userinfo/${user.id}}/`} noChevron title={user.email} text={user.signature}>
 					{/* <img slot="media" src="/avatars/vladimir-kharlampidi.jpg" alt="" /> */}
