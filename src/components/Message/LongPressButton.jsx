@@ -53,7 +53,7 @@ function LongPressButton(props) {
 				handleTouchStart(event)
 			}}
 			onMouseUp={() => handleTouchEnd()}
-			onMouseMove={handleScroll}
+			// onMouseMove={handleScroll}
 			className={props.className}
 		>
 			{props.children}

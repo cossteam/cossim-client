@@ -3,8 +3,8 @@ import React, { useRef, useState, useEffect } from 'react'
 import PropType from 'prop-types'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { f7, Navbar, Link, Page, Messages, Message, Messagebar, MessagebarSheet, Icon } from 'framework7-react'
-import DoubleTickIcon from '@/components/DoubleTickIcon'
-import Emojis from '@/components/Emojis/Emojis.jsx'
+// import DoubleTickIcon from '@/components/DoubleTickIcon'
+// import Emojis from '@/components/Emojis/Emojis.jsx'
 import './Messages.less'
 import { useUserStore } from '@/stores/user'
 import _ from 'lodash-es'
@@ -40,9 +40,10 @@ export default function MessagesPage({ f7route, f7router }) {
 	const [isSend, setIsSend] = useState(false)
 	// 随机数
 	const [nonce] = useState(cretateNonce())
+	// 错误消息列表
+	// const [errorMsg, setErrorMsg] = useState([])
 
-	// 数据库所有消息
-	// const allMsg = useLiveQuery(() => userService.findAll(userService.TABLES.USERS)) || []
+	// 数据库所有消息\
 	const msgList = useLiveQuery(async () => {
 		const msgs = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
 		return { msgs: msgs?.data?.msgs, shareKey: msgs?.data?.shareKey }
@@ -59,20 +60,6 @@ export default function MessagesPage({ f7route, f7router }) {
 				return setContact(res.data)
 			}
 			setContact(userContact)
-			// 触顶加载
-			// const messagesContent = document.getElementsByClassName('page-content messages-content')[0]
-			// 滚动到顶部加载更多
-			// messagesContent?.addEventListener(
-			// 	'scroll',
-			// 	_.throttle(async () => {
-			// 		if (messagesContent.scrollTop === 0) {
-			// 			console.log('触顶')
-			// 		}
-			// 	}, 1000)
-			// )
-			// return () => {
-			// 	messagesContent?.removeEventListener('scroll', () => {})
-			// }
 		}
 		init()
 	}, [])
@@ -81,6 +68,7 @@ export default function MessagesPage({ f7route, f7router }) {
 		// 首次进来初始化消息列表,把解密的消息放入到这里
 		const initMsgs = async () => {
 			try {
+				console.log("msgList",msgList)
 				if (!msgList?.shareKey) return
 				// console.log(msgList?.shareKey)
 				// 只截取最新的 30 条消息，从后面往前截取
@@ -98,7 +86,7 @@ export default function MessagesPage({ f7route, f7router }) {
 				}
 				setMessages(msgs)
 				setTimeout(() => setIsActive(false), 0)
-				// initServerMsgs()
+				console.log("msgList",msgList)
 			} catch (error) {
 				console.error('error', error)
 			}
@@ -120,14 +108,12 @@ export default function MessagesPage({ f7route, f7router }) {
 				// 如果是接收消息
 				let content = lastMsg?.content
 				try {
-					// const msg = JSON.parse(content)
 					content = decryptMessageWithKey(content, msgList.shareKey)
 				} catch (error) {
 					console.log('解密失败：', error)
 					content = lastMsg?.content
 				}
 				lastMsg.content = content
-				// console.log('lastMsg', lastMsg, messages)
 				setMessages([...messages, lastMsg])
 			} catch (error) {
 				console.error('解析消息失败：', error.message)
@@ -138,7 +124,7 @@ export default function MessagesPage({ f7route, f7router }) {
 
 	// 发送消息
 	// const messagebarRef = useRef(null)
-	const [messageText, setMessageText] = useState('')
+	// const [messageText, setMessageText] = useState('')
 	const dbMsgToReqMsg = (obj) => {
 		return {
 			..._.mapKeys(_.pick(obj, ['content', 'receiver_id', 'content_type']), (value, key) => {
@@ -150,6 +136,7 @@ export default function MessagesPage({ f7route, f7router }) {
 	}
 
 	const sendMessage = async (type, content) => {
+		const reslutMsg = { status: 1, msg: 'ok' }
 		try {
 			if (isActive) setIsActive(false)
 			let encrypted = ''
@@ -183,9 +170,11 @@ export default function MessagesPage({ f7route, f7router }) {
 
 			// 发送消息接口
 			try {
-				const { code, data } = await sendToUser(dbMsgToReqMsg(dbMsg))
+				const { code, data, msg } = await sendToUser(dbMsgToReqMsg(dbMsg))
 				dbMsg.send_state = code === 200 ? 'ok' : 'error'
 				dbMsg.msg_id = data?.msg_id
+				reslutMsg.code = code === 200 ? 1 : 0
+				reslutMsg.msg = msg
 			} catch (error) {
 				console.error('发送失败', error)
 				dbMsg.send_state = 'error'
@@ -221,20 +210,20 @@ export default function MessagesPage({ f7route, f7router }) {
 					},
 					'user_id'
 				))
+			return reslutMsg
 		} catch (error) {
 			console.error('发送消息失败：', error)
 			// throw error
+			return reslutMsg
 		}
 	}
 
-	console.log(contact)
-
-	const send = (content) => {
-		console.log("content",content)
+	const send = async (content) => {
+		return await sendMessage(1, content)
 	}
 
 	return (
-		<Page className="messages-page h-screen overflow-hidden relative" noToolbar>
+		<Page className="messages-page" noToolbar>
 			<MessageBox
 				messages={messages}
 				header={
@@ -251,7 +240,9 @@ export default function MessagesPage({ f7route, f7router }) {
 						</div>
 					</div>
 				}
-				footer={<MsgBar send={send}/>}
+				footer={<MsgBar send={send} />}
+				isFristIn={isActive}
+				contact={contact}
 			/>
 		</Page>
 	)

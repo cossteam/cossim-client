@@ -1,13 +1,15 @@
-// import { useState } from 'react'
 import React, { useEffect, useRef, useState } from 'react'
-import { VoiceIcon, EmojiIcon, AddIcon } from '@/components/Icon/Icon'
+import { VoiceIcon, AddIcon } from '@/components/Icon/Icon'
 import { clsx } from 'clsx'
 import { Button } from 'framework7-react'
 import PropType from 'prop-types'
 import Emojis from '@/components/Emojis/Emojis.jsx'
+import Editor from '@/utils/editor'
 
 function MsgBar(props) {
-    const msgbarRef = useRef(null)
+	// 整个底部
+	const msgbarRef = useRef(null)
+	// 文本输入框
 	const textareaRef = useRef(null)
 	// 发送按钮显示隐藏
 	const [showSendBtn, setShowSendBtn] = useState(false)
@@ -17,19 +19,16 @@ function MsgBar(props) {
 	const [showMore, setShowMore] = useState(false)
 	// 操作类型
 	const [type, setType] = useState('emoji')
-
-	const handlerTextareHeight = (e) => {
-		setContent(e.target.textContent)
-		if (textareaRef.current) {
-			textareaRef.current.style.height = '42px'
-			textareaRef.current.style.height = e.target.scrollHeight + 'px'
-			textareaRef.current.style.overflow = e.target.scrollHeight >= 150 ? 'auto' : 'hidden'
-		}
-	}
+	// 首次进入
+	const [isFrist, setIsFrist] = useState(true)
+	// 编辑器
+	const [editor, setEditor] = useState(null)
 
 	const send = () => {
 		if (!content) return
 		props.send(content)
+		setContent('')
+		editor.clear().focus()
 	}
 
 	const handlerShowMore = (moreType) => {
@@ -38,45 +37,59 @@ function MsgBar(props) {
 	}
 
 	useEffect(() => {
+		if (textareaRef.current) {
+			const editor = new Editor(textareaRef.current, {
+				placeholder: '请输入内容',
+				defaultHeight: '42px'
+			})
+			// 输入事件
+			editor.on('input', (e) => setContent(e.target.textContent))
+			setEditor(editor)
+		}
+	}, [])
+
+	useEffect(() => {
 		setShowSendBtn(!!content)
-        !showMore && setTimeout(() => textareaRef.current.focus(), 150)
-	}, [content,showMore])
+
+		if (!isFrist && !showMore) {
+			requestAnimationFrame(() => setTimeout(() => textareaRef.current.focus(), 200))
+		}
+		isFrist && setIsFrist(false)
+	}, [content, showMore])
 
 	return (
 		<div
 			className={clsx(
-				'fixed transition-all bottom-0 duration-300 left-0 right-0 h-auto min-h-14 border-t z-[999] bg-white msg-chat',
-                showMore ? 'translate-y-0' : 'translate-y-[300px]'
+				'fixed transition-all bottom-0 duration-[350ms] ease-in-out  left-0 right-0 h-auto min-h-14 border-t z-[999] bg-white msg-chat',
+				showMore ? 'translate-y-0' : 'translate-y-[300px]'
 			)}
-            ref={msgbarRef}
+			ref={msgbarRef}
 		>
 			<div className="rounded-2xl w-full h-auto flex items-end gap-2 p-2">
 				<VoiceIcon className="w-9 h-9" />
-				{/* <textarea
-					name=""
-					id=""
-					placeholder="输入消息..."
-					className="w-full resize-none border-none outline-none h-[40px] max-h-[150px] p-2 rounded-xl"
-					ref={textareaRef}
-					onChange={(e) => handlerTextareHeight(e)}
-					onFocus={() => setShowMore(false)}
-					value={content}
-				/> */}
-				<div
+				{/* <div
 					contentEditable
 					data-placeholder="输入消息"
 					className="textarea w-full resize-none outline-none h-[40px] max-h-[150px] rounded-xl border p-2 empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 focus:before:content-none"
 					ref={textareaRef}
 					onInput={(e) => handlerTextareHeight(e)}
-					onFocus={() => setShowMore(false)}
+					onFocus={handlerFocus}
+					onBlur={handlerBlur}
+				/> */}
+				<div
+					className="textarea w-full resize-none outline-none h-[40px] max-h-[150px] rounded-xl border p-2 empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 focus:before:content-none"
+					ref={textareaRef}
+					id="chat-editor"
 				/>
 
-				<EmojiIcon className="w-9 h-9" onClick={() => handlerShowMore('emoji')} />
+				<AddIcon
+					className={clsx('w-9 h-9', showSendBtn ? 'hidden' : 'flex')}
+					onClick={() => handlerShowMore('emoji')}
+				/>
 				<AddIcon
 					className={clsx('w-9 h-9', showSendBtn ? 'hidden' : 'flex')}
 					onClick={() => handlerShowMore('more')}
 				/>
-
 				<Button
 					raised
 					fill
@@ -89,7 +102,7 @@ function MsgBar(props) {
 					发送
 				</Button>
 			</div>
-			<div className={clsx('w-full h-[300px] overflow-y-auto bg-[#f5f5f5]')} >
+			<div className={clsx('w-full h-[300px] overflow-y-auto bg-[#f5f5f5]')}>
 				{type === 'emoji' ? <Emojis /> : null}
 			</div>
 		</div>

@@ -30,6 +30,8 @@
     ],
     "dependencies": {
         "@aomao/engine": "^2.10.25",
+        "@emoji-mart/data": "^1.1.2",
+        "@emoji-mart/react": "^1.1.1",
         "@privacyresearch/libsignal-protocol-typescript": "^0.0.16",
         "@reactuses/core": "^4.0.13",
         "@signalapp/libsignal-client": "^0.38.0",
@@ -61,6 +63,7 @@
         "react-i18next": "^14.0.0",
         "rxjs": "^7.8.1",
         "skeleton-elements": "^4.0.1",
+        "styled-components": "^6.1.8",
         "swiper": "^11.0.5",
         "timeago.js": "4.0.0-beta.3",
         "tippy.js": "^6.3.7",
