@@ -9,7 +9,9 @@ import {
 	SwipeoutActions,
 	SwipeoutButton,
 	Icon,
-	Popover
+	Popover,
+	Subnavbar,
+	Searchbar
 } from 'framework7-react'
 import './Chats.less'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
@@ -178,20 +180,21 @@ export default function Chats(props) {
 	return (
 		<Page className="chats-page">
 			<Navbar title="COSS" className="coss-header">
-				<Link slot="right" popoverOpen=".popover-menu">
+				{/* <Link slot="right" popoverOpen=".popover-menu">
 					<Search className="w-[24px] h-[24px]" />
-				</Link>
+				</Link> */}
 				<Link slot="right" popoverOpen=".popover-menu">
 					<Plus className="w-[28px] h-[28px] mr-2" />
 				</Link>
+				<Subnavbar>
+					<Searchbar searchContainer=".contacts-list" disableButton={false} />
+				</Subnavbar>
 			</Navbar>
 
-			<List noChevron dividers mediaList className="chats-list">
-				{chatList.map((chat, index) => (
+			<List contactsList noChevron dividers mediaList className="chats-list">
+				{chatList.map((chat) => (
 					<ListItem
 						key={chat.dialog_id}
-						data-index={index}
-						data-id={chat.group_id}
 						link={
 							chat.dialog_type === 1
 								? `/groups/${chat.group_id}/?dialog_id=${chat?.dialog_id || ''}`

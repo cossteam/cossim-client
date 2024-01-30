@@ -47,7 +47,7 @@ export default function NewGroup({ f7route }) {
 			if (!GroupId) return
 			try {
 				f7.dialog.preloader('请稍候...')
-				const { code, data, msg } = await groupInfoApi({ gid: GroupId })
+				const { code, data, msg } = await groupInfoApi({ group_id: GroupId })
 				if (code === 200) {
 					updateGroup(data)
 					return

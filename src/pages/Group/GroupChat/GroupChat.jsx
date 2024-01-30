@@ -34,7 +34,7 @@ export default function GroupChat({ f7route }) {
 	const { user } = useUserStore()
 	const ReceiverId = f7route.params.id // 群号 /（TODO：用户ID）
 	const DialogId = f7route.query.dialog_id // 会话 ID
-	const [chatInfo, setGroupInfo] = useState({}) // 群聊信息
+	const [groupInfo, setGroupInfo] = useState({}) // 群聊信息
 	const [member, setMember] = useState(new Map()) // 成员信息
 
 	// 是否是编辑消息
@@ -51,7 +51,7 @@ export default function GroupChat({ f7route }) {
 	})
 	useEffect(() => {
 		// 获取群聊信息
-		groupInfoApi({ gid: ReceiverId }).then(({ code, data }) => {
+		groupInfoApi({ group_id: ReceiverId }).then(({ code, data }) => {
 			code === 200 && setGroupInfo(data)
 		})
 		// 获取成员信息
@@ -285,7 +285,7 @@ export default function GroupChat({ f7route }) {
 		<Page className="chat-group-page messages-page" noToolbar messagesContent>
 			<Navbar className="messages-navbar" backLink>
 				<NavTitle>
-					<span className="">{$t(chatInfo.name)}</span>
+					<span className="">{$t(groupInfo.name)}</span>
 				</NavTitle>
 				<NavRight>
 					{/* <Link href={`/new_group/?id=${ReceiverId}`} iconF7="ellipsis" onClick={() => {}} /> */}

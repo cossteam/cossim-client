@@ -9,8 +9,11 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useRelationRequestStore } from '@/stores/relationRequest'
 import { friendApplyListApi } from '@/api/relation'
 import { groupRequestListApi } from '@/api/group'
+import { useUserStore } from '@/stores/user'
 
 export default function Contacts(props) {
+	const { user } = useUserStore()
+
 	/**
 	 * 将联系人分组转成数组结构
 	 * @param {*} obj
@@ -87,11 +90,12 @@ export default function Contacts(props) {
 				let count = 0
 				friendResquest &&
 					friendResquest.forEach((item) => {
-						if (item.user_status === 0) count++
+						if (item.status === 0) count++
 					})
 				groupResquest &&
 					groupResquest.forEach((item) => {
-						if (item.group_status === 1) count++
+						if (item.status === 0 || (item.status === 4 && user.user_id === item.receiver_info.user_id))
+							count++
 					})
 				setRequestNumber(count)
 				updateFriendResquest(friendResquest || [])
@@ -134,7 +138,6 @@ export default function Contacts(props) {
 								title={contact.nickname}
 								footer={contact.signature}
 								popupClose
-								data-test={contact.email}
 							>
 								<img slot="media" src={contact.avatar} alt="" />
 							</ListItem>
