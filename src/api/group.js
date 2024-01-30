@@ -123,18 +123,18 @@ export function groupMemberApi(param) {
  * @returns
  */
 export function groupInviteApi(data) {
-	return {
+	return request({
 		url: relationGroup + '/invite',
 		method: 'POST',
 		data
-	}
+	})
 }
 
 /**
  * 将用户从群聊移除
  * @param {*} data
  * @param {*} data.group_id
- * @param {*} data.user_id
+ * @param {*} data.member
  * @returns
  */
 export function groupRemoveApi(data) {
@@ -154,6 +154,20 @@ export function groupRemoveApi(data) {
 export function groupQuitApi(data) {
 	return request({
 		url: relationGroup + '/quit',
+		method: 'POST',
+		data
+	})
+}
+
+/**
+ * 解散群聊
+ * @param {*} data
+ * @param {*} data.gid
+ * @returns
+ */
+export function groupDissolve(data) {
+	return request({
+		url: group + '/delete',
 		method: 'POST',
 		data
 	})

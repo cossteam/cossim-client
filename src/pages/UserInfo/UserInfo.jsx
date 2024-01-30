@@ -41,7 +41,7 @@ export default function Userinfo({ f7router }) {
 					<div className="mr-16">个人信息</div>
 				</NavTitle>
 			</Navbar>
-			<List strong dividers outline>
+			<List className="m-0" strong dividers outline>
 				<ListItem link title="头像" noChevron>
 					<div slot="after">
 						<img className="w-16 h-16 rounded-full" src={user.avatar} alt="" />
