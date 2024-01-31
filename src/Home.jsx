@@ -8,6 +8,9 @@ import { useUserStore } from '@/stores/user'
 import WebSocketClient from '@/utils/WebSocketClient'
 import userService from '@/db'
 import { useInitUser, useInitFriend } from '@/helpers/handler'
+import { handlerMsgType } from '@/helpers/handlerType'
+
+import { msgStatus, sendState } from '@/utils/constants'
 
 /**
  * 异步处理消息。
@@ -15,85 +18,62 @@ import { useInitUser, useInitFriend } from '@/helpers/handler'
  * @param {Object} msg -要处理的消息。
  */
 const handlerMessage = async (msg) => {
-	const message = {
-		// 发送者id
-		sender_id: '',
-		// 接收者id
-		receiver_id: msg.uid,
-		// 消息内容
-		content: msg.data.content,
-		// 消息类型 => 1: 文本消息
-		content_type: msg.data.msgType,
-		// 接收方
-		type: 'received',
-		// 所回复消息的id
-		reply_id: msg.data.reply_id,
-		// 接收时间/读取时间
-		read_at: null,
-		// 发送时间
-		created_at: msg.data.send_at,
-		// 会话id
-		dialog_id: msg.data.dialog_id,
-		// 发送成功/接收成功
-		send_state: 'ok'
-	}
+	try {
+		const message = {
+			msg_read_status: msgStatus.NOT_READ,
+			msg_type: handlerMsgType(msg.msgType),
+			msg_content: msg.content,
+			msg_id: msg.msg_id,
+			msg_time: msg.send_at,
+			msg_is_self: false,
+			meg_sender_id: msg.uid,
+			dialog_id: msg.dialog_id,
+			msg_send_state: sendState.OK
+		}
 
-	console.log('收到消息！！！', msg,msg.data.dialog_id)
+		// 加入消息列表
+		await userService.add(userService.TABLES.USER_MSGS, message)
 
-	// 查找本地消息记录
-	const result = await userService.findOneById(userService.TABLES.USERS, msg.data?.sender_id)
-	// 如果有记录就更新，没有就添加到表中
-	// console.log('result', result)
+		const result = await userService.findOne(userService.TABLES.CHATS_LIST, 'dialog_id' + message.dialog_id)
+		if (!result) {
+			// 会话列表
+			await userService.add(userService.TABLES.CHATS_LIST, message)
+			return
+		}
 
-	if (!result) {
+		// 更新会话列表
+		await userService.update(userService.TABLES.CHATS_LIST, result.id, {
+			...result,
+			last_message: message.msg_content
+		})
+	} catch (error) {
+		console.log('更新会话列表失败！', error)
 		// TODO: 做一些额外操作
 	}
+}
 
-	await userService.update(userService.TABLES.USERS, msg.data?.sender_id, {
-		user_id: msg.data?.sender_id,
-		data: {
-			...result.data,
-			msgs: [...result.data.msgs, message],
-			dialog_id: message.dialog_id
+/**
+ * 好友管理
+ * @param {*} msg
+ * @returns
+ */
+const handlerManger = async (msg) => {
+	try {
+		if (msg.data?.status === 0) {
+			console.log('收到对方拒绝')
+			// 提醒用户
+			return
 		}
-	})
 
-	console.log("user",msg.data?.sender_id);
-
-	// 会话列表
-	const chats = await userService.findOneById(userService.TABLES.CHATS, msg.data?.dialog_id, 'dialog_id')
-	// &dialog_id,
-	// 	user_id,
-	// 	dialog_type,
-	// 	dialog_name,
-	// 	dialog_avatar,
-	// 	dialog_unread_count,
-	// 	msg_type,
-	// 	last_message,
-	// 	sender_id,
-	// 	send_time,
-	// 	msg_id`,
-	// const chatMsg = {
-	// 	user_id: msg.data?.sender_id,
-	// 	dialog_id: msg.data?.dialog_id,
-	// 	dialog_type: msg.data?.dialog_type,
-	// 	dialog_name: msg.data?.dialog_name,
-	// 	dialog_avatar: msg.data?.dialog_avatar,
-	// 	dialog_unread_count: msg.data?.dialog_unread_count,
-	// 	msg_type: msg.data?.msgType,
-	// 	last_message: msg.data?.content,
-	// 	sender_id: msg.data?.sender_id,
-	// 	send_time: msg.data?.send_at,
-	// 	msg_id: msg.data?.msg_id
-	// }
-	// chats
-	// 	? await userService.update(userService.TABLES.CHATS, chats.id, chatMsg)
-	// 	: await userService.add(userService.TABLES.CHA
-	if (!result) return
-	await userService.update(userService.TABLES.CHATS, chats.id, { ...chats, last_message: msg.data?.content }, 'id')
-
-	// console.log('chats', chats)
-	// WebSocketClient.triggerEvent('onChats', { ...chats, last_message: msg.data.content })
+		await useInitFriend({
+			user_id: msg?.uid,
+			friend_id: msg?.data?.user_id,
+			data: JSON.parse(msg?.data?.e2e_public_key || '{}') || {}
+		})
+	} catch (error) {
+		// TODO: 这里可以统一上报
+		console.log('error', error)
+	}
 }
 
 const handlerGroupMessage = async (msg) => {
@@ -173,41 +153,11 @@ const Home = () => {
 	// 注册 cordova API
 	f7ready(() => f7.device.cordova && cordovaApp.init(f7))
 
-	// useEffect(() => {
-	// 	console.log('visibility', visibility)
-	// }, [visibility])
-
-	/**
-	 * 好友管理
-	 * @param {*} msg
-	 * @returns
-	 */
-	const handlerManger = async (msg) => {
-		try {
-			if (msg.data?.status === 0) {
-				// TODO: 添加被拒绝处理
-				console.log('添加被拒绝处理')
-				return
-			} else {
-				console.log('收到添加或同意信息', msg)
-				await useInitFriend({
-					user_id: user?.user_id,
-					friend_id: msg.data?.user_id,
-					data: JSON.parse(msg.data?.e2e_public_key || '{}')
-				})
-			}
-		} catch (error) {
-			// TODO: 这里可以统一上报
-			console.log('error', error)
-		}
-	}
-
 	// 连接ws并监听消息推送
 	useEffect(() => {
 		if (!isLogin) return
 
 		// 初始化 users 表
-		// initUsers()
 		useInitUser(user)
 
 		// 初始化 websocket
@@ -220,19 +170,19 @@ const Home = () => {
 		 */
 		const handlerInit = (e) => {
 			const data = JSON.parse(e.data)
-
+			// event: 1 => 用户上线，2 => 用户下线，3 => 用户发送消息，4 => 群聊发送消息，5 => 系统推送消息
+			// event: 6 => 收到好友请求 event: 7 => 收到好友确认 event: 8 => 公钥交换
 			switch (data.event) {
-				// event: 1 => 用户上线，2 => 用户下线，3 => 用户发送消息，4 => 群聊发送消息，5 => 系统推送消息
 				case 3:
-					console.log('接收消息', e.data)
-					handlerMessage(data)
+					console.info('接收到消息：', data)
+					handlerMessage(data.data)
 					break
 				case 4:
 					handlerGroupMessage(data)
 					break
-				// event: 6 => 收到好友请求 event: 7 => 收到好友确认 event: 8 => 公钥交换
 				case 6:
 				case 7:
+					console.info('收到好友请求或确认：', data)
 					handlerManger(data)
 					break
 			}

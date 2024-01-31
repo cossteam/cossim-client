@@ -14,19 +14,20 @@ import { useUserStore } from '@/stores/user'
 export default function Contacts(props) {
 	const { user } = useUserStore()
 
-	/**
-	 * 将联系人分组转成数组结构
-	 * @param {*} obj
-	 * @returns
-	 */
-	const groupsToArray = (obj) => {
-		obj = typeof obj !== 'object' ? {} : obj
-		return Object.entries(obj)
-			.map(([group, users]) => {
-				return users.map((user) => ({ group, ...user }))
-			})
-			.flat()
-	}
+	// /**
+	//  * 将联系人分组转成数组结构
+	//  * @param {*} obj
+	//  * @returns
+	//  */
+	// const groupsToArray = (obj) => {
+	// 	obj = typeof obj !== 'object' ? {} : obj
+	// 	return Object.entries(obj)
+	// 		.map(([group, users]) => {
+	// 			return users.map((user) => ({ group, ...user }))
+	// 		})
+	// 		.flat()
+	// }
+
 	/**
 	 * 将联系人数组转成分组结构
 	 * @param {*} array
@@ -44,33 +45,44 @@ export default function Contacts(props) {
 		}, {})
 	}
 	// 获取好友列表
-	const contacts = arrayToGroups(useLiveQuery(() => userService.findAll(userService.TABLES.CONTACTS)) || [])
+	// const contacts = arrayToGroups(useLiveQuery(() => userService.findAll(userService.TABLES.CONTACTS)) || [])
+
+	// 好友列表
+	const friends = arrayToGroups(useLiveQuery(() => userService.findAll(userService.TABLES.FRIENDS_LIST)) || [])
+
 	useEffect(() => {
 		;(async () => {
 			const { code, data } = await friendListApi()
 			if (code !== 200) return
 			let respData = data || {}
+
+			const oldData = (await userService.findAll(userService.TABLES.FRIENDS_LIST)) || []
+
 			for (const key in respData) {
-				if (Object.hasOwnProperty.call(respData, key)) {
-					respData[key] = respData[key].map((user) => {
-						return {
-							...user,
-							name: user.nick_name || '',
-							avatar: user.avatar || ''
-						}
-					})
-				}
+				// respData[key] = respData[key].map((user) => {
+				// 	return {
+				// 		...user,
+				// 		name: user.nick_name || '',
+				// 		avatar: user.avatar || ''
+				// 	}
+				// })
+				respData[key].forEach(async (user) => {
+					const oldItem = oldData.find((oldItem) => oldItem.user_id === user.user_id)
+					oldItem
+						? await userService.update(userService.TABLES.FRIENDS_LIST, oldItem.id, { ...oldItem,...user, group: key })
+						: await userService.add(userService.TABLES.FRIENDS_LIST, { ...user, group: key })
+				})
 			}
-			respData = groupsToArray(respData) // 转换为目标数据结构
-			const oldData = (await userService.findAll(userService.TABLES.CONTACTS)) || []
-			// 校验新数据和旧数据 => 更新数据 or 插入数据库
-			for (let i = 0; i < respData.length; i++) {
-				const item = respData[i]
-				const oldItem = oldData.find((oldItem) => oldItem.user_id === item.user_id)
-				oldItem
-					? await userService.update(userService.TABLES.CONTACTS, oldItem.id, item)
-					: await userService.add(userService.TABLES.CONTACTS, item)
-			}
+			// respData = groupsToArray(respData) // 转换为目标数据结构
+			// const oldData = (await userService.findAll(userService.TABLES.CONTACTS)) || []
+			// // 校验新数据和旧数据 => 更新数据 or 插入数据库
+			// for (let i = 0; i < respData.length; i++) {
+			// 	const item = respData[i]
+			// 	const oldItem = oldData.find((oldItem) => oldItem.user_id === item.user_id)
+			// 	oldItem
+			// 		? await userService.update(userService.TABLES.CONTACTS, oldItem.id, item)
+			// 		: await userService.add(userService.TABLES.CONTACTS, item)
+			// }
 		})()
 	}, [props])
 
@@ -128,10 +140,10 @@ export default function Contacts(props) {
 					</span>
 				</ListItem>
 
-				{Object.keys(contacts).map((groupKey) => (
+				{Object.keys(friends).map((groupKey) => (
 					<ListGroup key={groupKey}>
 						<ListItem groupTitle title={groupKey} />
-						{contacts[groupKey].map((contact, index) => (
+						{friends[groupKey].map((contact, index) => (
 							<ListItem
 								key={index}
 								link={`/profile/${contact.user_id}/`}

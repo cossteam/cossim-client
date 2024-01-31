@@ -49,11 +49,11 @@ export default i18n.use(initReactI18next).init({
  * @param {string} ch 翻译的 key
  * @returns {string}
  */
-export function $t(ch) {
-	const { t } = useTranslation()
-	return t(ch)
-}
-
 // export function $t(ch) {
-// 	return ch
+// 	// const { t } = useTranslation()
+// 	return t(ch)
 // }
+
+export function $t(ch) {
+	return ch
+}

@@ -1,35 +1,31 @@
-import $ from 'dom7'
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropType from 'prop-types'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { f7, Navbar, Link, Page, Messages, Message, Messagebar, MessagebarSheet, Icon } from 'framework7-react'
-// import DoubleTickIcon from '@/components/DoubleTickIcon'
-// import Emojis from '@/components/Emojis/Emojis.jsx'
+import { Page } from 'framework7-react'
 import './Messages.less'
 import { useUserStore } from '@/stores/user'
-import _ from 'lodash-es'
+// import _ from 'lodash-es'
 import { sendToUser } from '@/api/msg'
-import { getUserInfoApi } from '@/api/user'
+// import { getUserInfoApi } from '@/api/user'
 import { encryptMessage, cretateNonce, decryptMessageWithKey } from '@/utils/tweetnacl'
 import userService from '@/db'
-// import { useHistoryStore } from '@/stores/history'
-// import Camera from '@/components/Camera/Camera'
 import MessageBox from '@/components/Message/Chat'
 import MsgBar from '@/components/Message/MsgBar'
 import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
+import { msgStatus, sendState } from '@/utils/constants'
+import { handlerMsgType } from '@/helpers/handlerType'
+import { $t } from '@/i18n'
 
-MessagesPage.propTypes = {
-	f7route: PropType.object.isRequired,
-	f7router: PropType.object.isRequired
-}
+import Contact from '@/components/Contact/Contact'
 
 export default function MessagesPage({ f7route, f7router }) {
-	// 会话信息
-	const dialogId = f7route.query.dialog_id
-	// 用户信息
+	// 会话 id
+	const DIALOG_ID = parseInt(f7route.query.dialog_id)
+	// 接收人 id
+	const { id: RECEIVER_ID } = f7route.params
+
+	// 用户信
 	const { user } = useUserStore()
-	// 好友id/群聊id
-	const ReceiverId = f7route.params.id
 	// 好友信息
 	const [contact, setContact] = useState({})
 	// 页面显示消息列表
@@ -40,53 +36,79 @@ export default function MessagesPage({ f7route, f7router }) {
 	const [isSend, setIsSend] = useState(false)
 	// 随机数
 	const [nonce] = useState(cretateNonce())
-	// 错误消息列表
-	// const [errorMsg, setErrorMsg] = useState([])
+	// 好友信息列表
+	const [friendsList, setFriendsList] = useState([])
+	// 弹出转发
+	const [opened,setOpened] = useState(false)
 
-	// 数据库所有消息\
-	const msgList = useLiveQuery(async () => {
-		const msgs = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
-		return { msgs: msgs?.data?.msgs, shareKey: msgs?.data?.shareKey }
-	})
+	// 数据库所有消息
+	const msgList = useLiveQuery(() => userService.findOneAll(userService.TABLES.USER_MSGS, 'dialog_id', DIALOG_ID))
+
+	// 基本初始化
+	const init = async () => {
+		// 设置户消息
+		let userContact = await userService.findOneById(userService.TABLES.FRIENDS_LIST, RECEIVER_ID, 'user_id')
+		// if (!userContact) {
+		// 	const res = await getUserInfoApi({ user_id: RECEIVER_ID })
+		// 	if (res.code !== 200) return
+		// 	return setContact(res.data)
+		// }
+		setFriendsList([userContact, user])
+		setContact(userContact)
+	}
 
 	useEffect(() => {
-		// 基本初始化
-		const init = async () => {
-			// 设置户消息
-			let userContact = await userService.findOneById(userService.TABLES.CONTACTS, ReceiverId)
-			if (!userContact) {
-				const res = await getUserInfoApi({ user_id: ReceiverId })
-				if (res.code !== 200) return
-				return setContact(res.data)
-			}
-			setContact(userContact)
-		}
 		init()
 	}, [])
+
+	useEffect(() => {
+		try {
+			console.log('contact', contact)
+			if (!contact?.shareKey) return
+			// 只截取最新的 30 条消息，从后面往前截取
+			const msgs = msgList?.msgs?.slice(-30) || []
+			for (let i = 0; i < msgs.length; i++) {
+				const msg = msgs[i]
+				let content = msg.msg_content
+				try {
+					content = decryptMessageWithKey(content, msgList.shareKey)
+				} catch (error) {
+					console.log('解密失败：', error)
+					content = '该消息解密失败'
+				}
+				msg.msg_content = content
+			}
+			setMessages(msgs)
+			setTimeout(() => setIsActive(false), 0)
+			console.log('msgList', msgList)
+		} catch (error) {
+			console.error('error', error)
+		}
+	}, [contact])
 
 	useEffect(() => {
 		// 首次进来初始化消息列表,把解密的消息放入到这里
 		const initMsgs = async () => {
 			try {
-				console.log("msgList",msgList)
-				if (!msgList?.shareKey) return
-				// console.log(msgList?.shareKey)
+				return
+				console.log('contact', contact)
+				if (!contact?.shareKey) return
 				// 只截取最新的 30 条消息，从后面往前截取
 				const msgs = msgList?.msgs?.slice(-30) || []
 				for (let i = 0; i < msgs.length; i++) {
 					const msg = msgs[i]
-					let content = msg.content
+					let content = msg.msg_content
 					try {
 						content = decryptMessageWithKey(content, msgList.shareKey)
 					} catch (error) {
 						console.log('解密失败：', error)
 						content = '该消息解密失败'
 					}
-					msg.content = content
+					msg.msg_content = content
 				}
 				setMessages(msgs)
 				setTimeout(() => setIsActive(false), 0)
-				console.log("msgList",msgList)
+				console.log('msgList', msgList)
 			} catch (error) {
 				console.error('error', error)
 			}
@@ -122,104 +144,72 @@ export default function MessagesPage({ f7route, f7router }) {
 		isActive ? initMsgs() : updateMsg()
 	}, [msgList])
 
-	// 发送消息
-	// const messagebarRef = useRef(null)
-	// const [messageText, setMessageText] = useState('')
-	const dbMsgToReqMsg = (obj) => {
-		return {
-			..._.mapKeys(_.pick(obj, ['content', 'receiver_id', 'content_type']), (value, key) => {
-				if (key === 'content_type') return 'type'
-				return key
-			}),
-			dialog_id: parseInt(dialogId)
-		}
-	}
-
 	const sendMessage = async (type, content) => {
-		const reslutMsg = { status: 1, msg: 'ok' }
-		try {
-			if (isActive) setIsActive(false)
-			let encrypted = ''
-			try {
-				encrypted = encryptMessage(content, nonce, msgList.shareKey)
-				console.log('发送加密消息', encrypted)
-			} catch {
-				// 加密失败就返回原文
-				encrypted = content
-			}
-			const msg = { msg: encrypted, nonce }
-			encrypted = JSON.stringify(msg)
+		if (isActive) setIsActive(false)
+		setIsSend(true)
 
-			let send_state = 'sending'
-			const dbMsg = {
-				sender_id: user.user_id,
-				receiver_id: ReceiverId,
-				// 发送方
-				type: 'sent',
-				content: encrypted,
-				// 1: 文本, 2: 语音, 3: 图片
-				content_type: type,
-				send_time: Date.now(),
-				send_state,
-				is_read: true,
-				msg_id: null
-			}
-			setIsSend(true)
-			// 先假设发送是 ok 的
-			setMessages([...messages, { ...dbMsg, content, send_state: 'ok' }])
+		// 加密消息
+		const encrypted = encryptMessage(content, nonce, contact?.shareKey)
 
-			// 发送消息接口
-			try {
-				const { code, data, msg } = await sendToUser(dbMsgToReqMsg(dbMsg))
-				dbMsg.send_state = code === 200 ? 'ok' : 'error'
-				dbMsg.msg_id = data?.msg_id
-				reslutMsg.code = code === 200 ? 1 : 0
-				reslutMsg.msg = msg
-			} catch (error) {
-				console.error('发送失败', error)
-				dbMsg.send_state = 'error'
-			}
+		console.log('tyoe', type)
 
-			// 更新本地消息记录
-			const result = await userService.findOneById(userService.TABLES.USERS, ReceiverId)
-			result
-				? await userService.update(userService.TABLES.USERS, ReceiverId, {
-						user_id: ReceiverId,
-						data: { ...result.data, msgs: [...result.data.msgs, { ...dbMsg, content: encrypted }] }
-					})
-				: await userService.add(userService.TABLES.USERS, {
-						user_id: ReceiverId,
-						data: {
-							msgs: [dbMsg],
-							shareKey: null,
-							dialog_id: null
-						}
-					})
-
-			// 更新本地会话
-			const chats = await userService.findOneById(userService.TABLES.CHATS, ReceiverId, 'user_id')
-
-			chats &&
-				(await userService.update(
-					userService.TABLES.CHATS,
-					ReceiverId,
-					{
-						...chats,
-						last_message: encrypted,
-						msg_id: dbMsg.msg_id ? dbMsg.msg_id : chats.msg_id
-					},
-					'user_id'
-				))
-			return reslutMsg
-		} catch (error) {
-			console.error('发送消息失败：', error)
-			// throw error
-			return reslutMsg
+		const msg = {
+			msg_read_status: msgStatus.READ,
+			msg_type: handlerMsgType(type),
+			msg_content: encrypted,
+			msg_id: null,
+			msg_time: Date.now(),
+			msg_is_self: true,
+			meg_sender_id: user.user_id,
+			dialog_id: DIALOG_ID,
+			msg_send_state: sendState.LOADING
 		}
+
+		// 先假设发送是 ok 的
+		setMessages([...messages, { ...msg, content, msg_send_state: sendState.LOADING }])
+
+		// 发送消息
+		try {
+			const { code, data } = await sendToUser({
+				content: encrypted,
+				dialog_id: parseInt(DIALOG_ID),
+				receiver_id: RECEIVER_ID,
+				type
+			})
+			msg.msg_send_state = code === 200 ? sendState.OK : sendState.ERROR
+			msg.msg_id = data?.msg_id
+		} catch {
+			msg.send_state = sendState.ERROR
+		}
+
+		// 添加到消息列表中，无论成功与否
+		await userService.add(userService.TABLES.USER_MSGS, msg)
+
+		// 更新会话
+		const chat = await userService.findOneById(userService.TABLES.CHATS, DIALOG_ID, 'dialog_id')
+		chat &&
+			(await userService.update(userService.TABLES.CHATS, DIALOG_ID, {
+				...chat,
+				last_message: encrypted,
+				msg_id: msg.msg_id,
+				msg_type: msg.msg_type,
+				send_time: msg.msg_time
+			}))
 	}
 
-	const send = async (content) => {
-		return await sendMessage(1, content)
+
+
+	/**
+	 * 长按事件回调
+	 * @param {string} type
+	 */
+	const handlerLongPress = (type) => {
+		console.log('tyow', type)
+		switch (type) {
+			case 'forward':
+				// f7router.navigate('/memberlist/:type/:id/')
+				break
+		}
 	}
 
 	return (
@@ -240,10 +230,19 @@ export default function MessagesPage({ f7route, f7router }) {
 						</div>
 					</div>
 				}
-				footer={<MsgBar send={send} />}
+				footer={<MsgBar send={(content, type = 1) => sendMessage(type, content)} />}
 				isFristIn={isActive}
 				contact={contact}
+				handlerLongPress={handlerLongPress}
+				list={friendsList}
 			/>
+
+			<Contact title={$t('联系人')} list={friendsList} opened={opened}/>
 		</Page>
 	)
+}
+
+MessagesPage.propTypes = {
+	f7route: PropType.object.isRequired,
+	f7router: PropType.object.isRequired
 }

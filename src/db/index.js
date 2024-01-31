@@ -1,13 +1,12 @@
 // import Dexie from 'dexie'
 import { getStorage } from '@/utils/stroage'
 import { dbService as service } from '@/utils/db'
-import { BASE_VERSION, BASE_PRIMARY_KEY } from './constants'
+import { BASE_VERSION } from './constants'
 
 const state = getStorage()?.state?.user
 
 // COSSIM 客户端数据库
-const user_id =  state?.user_id || state?.dbName ||  'DB'
-// const WebDB = new Dexie(`COSSIM_${user_id}`)
+const user_id = state?.user_id || state?.dbName || 'DB'
 
 // export const PRIMARY_KEY = 'user_id'
 
@@ -23,21 +22,12 @@ const user_id =  state?.user_id || state?.dbName ||  'DB'
 const BASE_KEYS = '&user_id, data'
 
 // contacts, chats, messages
-const TABLE_NAMES = ['session', 'users', 'msgs', 'pgpkeys']
+const TABLE_NAMES = ['users', 'msgs']
 
 const TABLES = {
 	// 建立唯一索引在 字段 前添加 & 符号
 	// 联系人
-	contacts: `
-		++id,
-		group,
-		&user_id,
-		avatar,
-		name,
-		nick_name,
-		email,
-		signature,
-		status`,
+	contacts: `++id, group, &user_id, avatar, name, nick_name, email, signature, status, tel, &dialog_id`,
 	// 会话
 	chats: `
 		++id,
@@ -52,95 +42,26 @@ const TABLES = {
 		sender_id,
 		send_time,
 		msg_id`,
-	// 消息：send_state(客户端消息发送时状态)：'sending' => 'ok' or 'err'
-	messages: `
-		++id,
-		msg_id,
-		sender_id,
-		receiver_id,
-		content,
-		content_type,
-		type,
-		reply_id,
-		read_at,
-		created_at,
-		dialog_id,
-		send_state`,
+	// 用户私聊消息
+	user_msgs: `++id, &msg_id, msg_time, mgs_is_self, msg_read_status ,msg_type, msg_content, msg_send_time, meg_sender_id, dialog_id, msg_send_state`,
+	// 用户群聊消息
+	group_msgs: `++id, &msg_id, msg_time, mgs_is_self, msg_read_status ,msg_type, msg_content, msg_send_time, meg_sender_id, group_id, dialog_id, msg_send_state`,
+	// 会话列表
+	// chats_list: `++id, &dialog_id, dialog_type, dialog_name, dialog_avatar, dialog_unread_count, last_message, sender_id, send_time, &msg_id`,
+	// 好友列表
+	friends_list: `++id, &user_id, nick_name, avatar, signature, tel, email, status, publicKey, shareKey, &dialog_id, is_black, group`,
+	// 群聊列表：	
+	// 	自增id 	| 群聊id | 群聊名称 | 群聊头像 	| 群聊人数 | 是否公开 | 群聊id | 是否禁言 | 是否管理员 | 是否群主 | 是否锁定 | 群聊备注 | 群聊类型
+	//  是否置顶 | 是否免打扰 | 是否被禁言 | 群聊公告 | 群聊公告时间 | 群聊公告发送者 | 群聊公告发送者id | 群聊公告发送者头像 | 群聊公告发送者昵称 
+	//  群聊描述
+	groups_list: `
+		++id, &group_id, group_name, group_avatar, total_count, is_public, &dialog_id, is_muted, is_admin, is_lord, is_locked, group_remark, group_type,
+		is_top, is_disturb, is_banned, group_notice, group_notice_time, group_notice_sender, group_notice_sender_id, group_notice_sender_avatar, group_notice_sender_nickname,
+		group_description
+	`,
+	// TODO：
 	...Object.assign({}, ...TABLE_NAMES.map((table) => ({ [table]: BASE_KEYS })))
 }
-
-// WebDB.version(WEBDB_VERSION).stores(TABLES)
-
-// export class dbService {
-// 	static TABLES = Object.assign({}, ...Object.keys(TABLES).map((key) => ({ [key.toLocaleUpperCase()]: key })))
-
-// 	/**
-// 	 * 根据ID查找指定表中的一条记录。
-// 	 *
-// 	 * @param {string} table -要搜索的表的名称。
-// 	 * @param {any} id -要查找的记录的 ID。
-// 	 * @param {string} key -要查找的字段的名称。
-// 	 * @return {Promise<any>} 一个用找到的记录解析的承诺。
-// 	 */
-// 	static async findOneById(table, id, key) {
-// 		return WebDB[table] && (await WebDB[table].where(key || PRIMARY_KEY).equals(id).first())
-// 	}
-
-// 	/**
-// 	 * 查找指定表中的所有记录。
-// 	 *
-// 	 * @param {string} table -要从中检索记录的表的名称。
-// 	 * @return {Promise<any[]>} 指定表中的记录数组。
-// 	 */
-// 	static async findAll(table) {
-// 		return WebDB[table] && (await WebDB[table].toArray())
-// 	}
-
-// 	/**
-// 	 * 将数据添加到 WebDB 中的指定表。
-// 	 *
-// 	 * @param {string} table -要添加数据的表的名称。
-// 	 * @param {object} data -要添加到表中的数据。
-// 	 * @return {Promise} 成功添加数据后解析的承诺。
-// 	 */
-// 	static async add(table, data) {
-// 		return WebDB[table] && (await WebDB[table].add(data))
-// 	}
-
-// 	/**
-// 	 * 使用给定的 ID 和数据更新指定表中的记录。
-// 	 *
-// 	 * @param {string} table -要更新记录的表的名称。
-// 	 * @param {string} id -要更新的记录的 ID。
-// 	 * @param {object} data -用于更新记录的数据。
-// 	 * @return {Promise} 解析为更新记录的 Promise。
-// 	 */
-// 	static async update(table, id, data, key) {
-// 		// return WebDB[table] && (await WebDB[table].update(id, data))
-// 		return WebDB[table] && (await WebDB[table].where(key || PRIMARY_KEY).equals(id).modify(data))
-// 	}
-
-// 	/**
-// 	 * 使用提供的 id 从指定表中删除记录。
-// 	 *
-// 	 * @param {string} table -要从中删除的表的名称。
-// 	 * @param {number} id -要删除的记录的 id。
-// 	 * @return {Promise} 成功删除记录时解析的承诺。
-// 	 */
-// 	static async delete(table, id, key) {
-// 		return WebDB[table] &&  WebDB.contacts.where(key || PRIMARY_KEY).equals(id).delete()
-// 	}
-
-// 	/**
-// 	 * 删除指定表中的所有记录。
-// 	 *
-// 	 * @param {string} table -要从中删除记录的表的名称。
-// 	 * @return {Promise} -当所有记录都被删除时解决的承诺。
-// 	 */
-// 	static async deleteAll(table) {
-// 		return WebDB[table] && (await WebDB[table].clear())
-// 	}
-// }
 
 const userService = new service({
 	name: 'COSS_' + state?.user_id || 'DB',
@@ -152,6 +73,3 @@ const userService = new service({
 export { userService as dbService }
 
 export default userService
-
-// export default WebDB
-console.log(`IndexedDB\n【COSSIM_${user_id}】\nReady...`)

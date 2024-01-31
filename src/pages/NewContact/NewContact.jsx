@@ -30,26 +30,17 @@ export default function NewContact() {
 			data: friendResquest || [],
 			onClick: () => setActiveTabbar(0),
 			itemConfirm: async (id, status) => {
-				// const users = await dbService.findOneById(dbService.TABLES.USERS, user?.user_id)
-				// if (!users) return f7.dialog.alert('系统内部错误')
 				const result = await commonService.findOneById(commonService.TABLES.HISTORY, user?.user_id)
-				
 				if (!result) f7.dialog.alert('本地数据库中没有该用户！请重新登录后重试')
 
 				const directory = {
 					publicKey: exportKey(result?.data?.keyPair?.publicKey)
 				}
-				// const exportedPublicKey = await crypto.subtle.exportKey('spki', users?.data?.keyPair?.publicKey)
-				// const exportedKeyBase64 = fromUint8Array(new Uint8Array(exportedPublicKey))
-				// const directory = {
-				// 	...JSON.parse(users?.data?.directory),
-				// 	publicKey: await exportPublicKey(users?.data?.keyPair?.publicKey)
-				// }
+
 				// 同意或拒绝添加好友
-				console.log("id",id);
 				const { code } = await confirmAddFriendApi({
 					request_id: id,
-					e2e_public_key: JSON.stringify(directory),
+					e2e_public_key: status === 1 ? JSON.stringify(directory) : '{}',
 					action: status
 				})
 				getResquestList() // 更新列表

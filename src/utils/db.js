@@ -37,6 +37,41 @@ export class dbService {
 	}
 
 	/**
+	 * 查询指定表中的记录
+	 *
+	 * @param {*} table
+	 * @param {*} key
+	 * @param {*} value
+	 * @returns
+	 */
+	async findOne(table, key, value) {
+		return (
+			this.DB[table] &&
+			(await this.DB[table]
+				.where(key || this.PRIMARY_KEY)
+				.equals(value)
+				.first())
+		)
+	}
+
+	/**
+	 * 查询符合多个条件的记录
+	 * @param {*} table
+	 * @param {*} key
+	 * @param {*} value
+	 * @returns
+	 */
+	async findOneAll(table, key, value) {
+		return (
+			this.DB[table] &&
+			(await this.DB[table]
+				.where(key || this.PRIMARY_KEY)
+				.anyOf(value)
+				.toArray())
+		)
+	}
+
+	/**
 	 * 查找指定表中的所有记录。
 	 *
 	 * @param {string} table -要从中检索记录的表的名称。
@@ -63,6 +98,7 @@ export class dbService {
 	 * @param {string} table -要更新记录的表的名称。
 	 * @param {string} id -要更新的记录的 ID。
 	 * @param {object} data -用于更新记录的数据。
+	 * @param {string} key -要更新的字段的名称。
 	 * @return {Promise} 解析为更新记录的 Promise。
 	 */
 	async update(table, id, data, key) {

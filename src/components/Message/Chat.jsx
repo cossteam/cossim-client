@@ -13,7 +13,8 @@ import { f7 } from 'framework7-react'
 import { format } from 'timeago.js'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import { ArrowUpRight, Exclamationmark, Gobackward } from 'framework7-icons/react'
-import { useUserStore } from '@/stores/user'
+import { msgType } from '@/utils/constants'
+import { Link } from 'framework7-react'
 
 Marked.setOptions({ highlight: (code, lang) => hljs.highlight(lang, code).value })
 
@@ -42,11 +43,6 @@ const PreHeader = (props) => {
 	)
 }
 
-PreHeader.propTypes = {
-	text: PropType.string,
-	lang: PropType.string
-}
-
 const Tooltip = ({ el, handler }) => {
 	const tooltipRef = useRef(null)
 	const triangleRef = useRef(null)
@@ -57,34 +53,34 @@ const Tooltip = ({ el, handler }) => {
 
 	const tips = [
 		{
+			name: 'forward',
 			title: '转发',
-			icon: <ArrowUpRight className="tooltip__icon" />,
-			handler: () => handler('forward')
+			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
+			name: 'edit',
 			title: '编辑',
-			icon: <ArrowUpRight className="tooltip__icon" />,
-			handler: () => handler('edit')
+			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
+			name: 'del',
 			title: '删除',
-			icon: <ArrowUpRight className="tooltip__icon" />,
-			handler: () => handler('del')
+			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
+			name: 'choice',
 			title: '多选',
-			icon: <ArrowUpRight className="tooltip__icon" />,
-			handler: () => handler('choice')
+			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
+			name: 'reply',
 			title: '回复',
-			icon: <ArrowUpRight className="tooltip__icon" />,
-			handler: () => handler('reply')
+			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
+			name: 'mark',
 			title: '标注',
-			icon: <ArrowUpRight className="tooltip__icon" />,
-			handler: () => handler('mark')
+			icon: <ArrowUpRight className="tooltip__icon" />
 		}
 	]
 
@@ -132,12 +128,17 @@ const Tooltip = ({ el, handler }) => {
 				<div className="flex flex-wrap">
 					{tips.map((item, index) => (
 						<>
-							<div className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')} key={index}>
+							<Link
+								className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')}
+								key={item.name}
+								onClick={() => handler(item.name)}
+								panelOpen={item.name === 'forward' && 'contact-popup'}
+							>
 								<div className="flex flex-col items-center justify-center">
 									<div className="mb-[6px]">{item.icon}</div>
 									<span className="text-[0.75rem]">{item.title}</span>
 								</div>
-							</div>
+							</Link>
 							{index === 3 && <div className="w-full h-[1px] bg-[rgba(255,255,255,0.2)]" />}
 						</>
 					))}
@@ -147,19 +148,12 @@ const Tooltip = ({ el, handler }) => {
 	) : null
 }
 
-Tooltip.propTypes = {
-	el: PropType.any,
-	handler: PropType.func
-}
-
-const isSelf = (type) => type === 'sent'
-
-function App({ messages, header, footer, isFristIn }) {
+export default function Chat({ messages, header, footer, isFristIn, ...porps }) {
 	const chatRef = useRef(null)
 	const markdownRef = useRef(null)
 	const msgRefs = useRef([])
 
-	const { user } = useUserStore()
+	const findOne = (id) => porps.list.find((v) => v?.user_id === id)
 
 	useEffect(() => {
 		// 渲染 markdown
@@ -222,7 +216,7 @@ function App({ messages, header, footer, isFristIn }) {
 	 */
 	const handlerLongPress = (index) => {
 		const div = document.createElement('div')
-		createRoot(div).render(<Tooltip el={msgRefs.current[index]} />)
+		createRoot(div).render(<Tooltip el={msgRefs.current[index]} handler={porps.handlerLongPress} />)
 		msgRefs.current[index].appendChild(div)
 	}
 
@@ -238,17 +232,17 @@ function App({ messages, header, footer, isFristIn }) {
 						key={index}
 						className={clsx(
 							'w-full flex items-center mb-4 animate__animated  animate__fadeInUp',
-							isSelf(msg.type) ? 'justify-end' : 'justify-start'
+							msg.msg_is_self ? 'justify-end' : 'justify-start'
 						)}
 						style={{ '--animate-duration': '0.3s' }}
 					>
 						<div className="flex max-w-[80%] items-start">
 							<img
-								src={isSelf(msg.type) ? user.avatar : msg.avatar}
+								src={findOne(msg.meg_sender_id)?.avatar}
 								alt=""
 								className={clsx(
 									'w-8 h-8 rounded-full',
-									isSelf(msg.type) ? 'order-last ml-2' : 'order-first mr-2'
+									msg.msg_is_self ? 'order-last ml-2' : 'order-first mr-2'
 								)}
 							/>
 							<div className="flex-1">
@@ -256,32 +250,32 @@ function App({ messages, header, footer, isFristIn }) {
 									callback={() => handlerLongPress(index)}
 									className={clsx(
 										'w-full mb-1 flex select-none h-auto',
-										isSelf(msg.type) ? 'justify-end' : 'justify-start'
+										msg.msg_is_self ? 'justify-end' : 'justify-start'
 									)}
 								>
 									<div
 										data-index={index}
 										className={clsx(
 											'relative flex w-[fit-content] break-all',
-											isSelf(msg.type) ? 'justify-end' : 'justify-start'
+											msg.msg_is_self ? 'justify-end' : 'justify-start'
 										)}
 										ref={(el) => (msgRefs.current[index] = el)}
 									>
-										{msg.content_type === 1 && (
+										{msg.msg_type === msgType.TEXT && (
 											<div
 												className={clsx(
 													'p-3 rounded relative',
 													'after:block after:absolute after:w-0 after:h-0 after:border-[5px] after:top-[10px] after:border-transparent',
-													isSelf(msg.type)
+													msg.msg_is_self
 														? 'bg-primary text-white after:left-full after:border-l-primary'
 														: 'bg-white after:right-full after:border-r-white'
 												)}
 											>
-												{msg.content}
+												{msg.msg_content}
 											</div>
 										)}
 
-										{msg.type === 'image' && (
+										{msg.msg_type === msgType.IMAGE && (
 											<img
 												src={msg.content}
 												alt=""
@@ -289,12 +283,12 @@ function App({ messages, header, footer, isFristIn }) {
 											/>
 										)}
 
-										{msg.type === 'markdown' && (
+										{/* {msg.msg_type === 'markdown' && (
 											<div
 												className={clsx(
 													'p-3 rounded relative markdown-body',
 													'after:block after:absolute after:w-0 after:h-0 after:border-[5px] after:top-[10px] after:border-transparent',
-													isSelf(msg.type)
+													msg.msg_is_self
 														? 'bg-green-500 text-white after:left-full after:border-l-green-500'
 														: 'bg-white after:right-full after:border-r-white'
 												)}
@@ -303,17 +297,17 @@ function App({ messages, header, footer, isFristIn }) {
 												}}
 												ref={markdownRef}
 											/>
-										)}
+										)} */}
 									</div>
 								</LongPressButton>
 								<div
 									className={clsx(
 										'text-[0.75rem] text-gray-400 flex items-center',
-										isSelf(msg.type) ? 'justify-end' : 'justify-start'
+										msg.msg_is_self ? 'justify-end' : 'justify-start'
 									)}
 								>
 									<span>{format(msg.send_time, 'zh_CN')}</span>
-									{isSelf(msg.type) &&
+									{msg.msg_is_self &&
 										(msg.send_state === 'ok' ? (
 											<DoubleTickIcon />
 										) : msg.send_state === 'error' ? (
@@ -333,11 +327,20 @@ function App({ messages, header, footer, isFristIn }) {
 	)
 }
 
-App.propTypes = {
+PreHeader.propTypes = {
+	text: PropType.string,
+	lang: PropType.string
+}
+
+Tooltip.propTypes = {
+	el: PropType.any,
+	handler: PropType.func
+}
+Chat.propTypes = {
 	messages: PropType.array.isRequired,
 	header: PropType.node,
 	footer: PropType.node,
-	isFristIn: PropType.bool
+	isFristIn: PropType.bool,
+	handlerLongPress: PropType.func,
+	list: PropType.array
 }
-
-export default App

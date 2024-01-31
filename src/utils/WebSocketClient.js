@@ -2,6 +2,9 @@ import { getStorage } from '@/utils/stroage'
 import { HOST } from '@/utils/request'
 
 class WebSocketClient {
+	// 重连次数
+	reconnectTimes = 0
+
 	constructor(serverAddress) {
 		this.serverAddress = serverAddress
 		this.socket = null
@@ -33,11 +36,19 @@ class WebSocketClient {
 			this.socket.addEventListener('close', (event) => {
 				this.triggerEvent('onWsClose', event)
 				console.log('WebSocket连接已关闭')
+				if (this.reconnectTimes < 3) {
+					this.reconnectTimes++
+					this.connect()
+				}
 			})
 
 			this.socket.addEventListener('error', (event) => {
 				this.triggerEvent('onWsError', event)
 				console.error('WebSocket错误:', event)
+				if (this.reconnectTimes < 3) {
+					this.reconnectTimes++
+					this.connect()
+				}
 			})
 		}
 	}

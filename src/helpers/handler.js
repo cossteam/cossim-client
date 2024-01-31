@@ -45,8 +45,7 @@ export const useInitUser = async (user) => {
  */
 export async function useInitFriend(options) {
 	try {
-		console.log('收到好友申请是处理', options)
-		let result = { publicKey: null, shareKey: null, msgs: [] }
+		let result = { publicKey: null, shareKey: null, user_id: options.friend_id }
 
 		const { data, friend_id, user_id } = options
 
@@ -59,18 +58,16 @@ export async function useInitFriend(options) {
 			result.publicKey = importKey(data?.publicKey)
 		}
 
+		// 获取自己的信息
 		const userInfo = await commonService.findOneById(commonService.TABLES.HISTORY, user_id)
-
+		// 生成共享密钥
 		result.shareKey = performKeyExchange(userInfo?.data?.keyPair?.privateKey, result?.publicKey)
 
-		// 更新用户信息
-		const user = await userService.findOneById(userService.TABLES.USERS, friend_id)
-		user
-			? await userService.update(userService.TABLES.USERS, friend_id, { data: result })
-			: await userService.add(userService.TABLES.USERS, {
-					user_id: friend_id,
-					data: { ...result, dialog_id: null }
-				})
+		// 添加好友
+		const friend = await userService.findOne(userService.TABLES.FRIENDS_LIST, 'user_id', friend_id)
+		friend
+			? await userService.update(userService.TABLES.FRIENDS_LIST, friend.id, { ...friend, ...result })
+			: await userService.add(userService.TABLES.FRIENDS_LIST, result)
 	} catch (error) {
 		console.error('收到好友申请处理时错误：', error)
 	}

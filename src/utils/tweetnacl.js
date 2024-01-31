@@ -28,7 +28,15 @@ export function performKeyExchange(myPrivateKey, theirPublicKey) {
  * @returns {Uint8Array} 加密后的消息
  */
 export function encryptMessage(message, nonce, sharedKey) {
-	return fromUint8Array(nacl.box.after(new TextEncoder().encode(message), toUint8Array(nonce), sharedKey))
+	const reslut = { msg: message, nonce }
+	try {
+		reslut.msg = fromUint8Array(nacl.box.after(new TextEncoder().encode(message), toUint8Array(nonce), sharedKey))
+	} catch (error) {
+		console.error('加密失败：', error.message)
+		return JSON.stringify(reslut)
+	}
+	console.log('加密的消息:', reslut)
+	return JSON.stringify(reslut)
 }
 
 /**
