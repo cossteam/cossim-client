@@ -24,6 +24,14 @@ function MsgBar(props) {
 	// 编辑器
 	const [editor, setEditor] = useState(null)
 
+	const onEmojiSelect = ({ type, emoji }) => {
+		console.log(type, emoji)
+		console.log(type === 'emoji')
+		console.log(window.getSelection())
+		// type === 'emoji' && editor.insertEmoji(emoji)
+		// editor.focus()
+	}
+
 	const send = () => {
 		if (!content) return
 		props.send(content)
@@ -103,7 +111,7 @@ function MsgBar(props) {
 				</Button>
 			</div>
 			<div className={clsx('w-full h-[300px] overflow-y-auto bg-[#f5f5f5]')}>
-				{type === 'emoji' ? <Emojis /> : null}
+				{type === 'emoji' ? <Emojis onEmojiSelect={onEmojiSelect} /> : null}
 			</div>
 		</div>
 	)
