@@ -24,7 +24,7 @@ const handlerMessage = async (msg) => {
 			msg_type: handlerMsgType(msg.msgType),
 			msg_content: msg.content,
 			msg_id: msg.msg_id,
-			msg_time: msg.send_at,
+			msg_send_time: msg.send_at,
 			msg_is_self: false,
 			meg_sender_id: msg.uid,
 			dialog_id: msg.dialog_id,

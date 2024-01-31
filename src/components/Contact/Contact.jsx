@@ -1,45 +1,93 @@
 import React, { useState } from 'react'
-import { Navbar, NavLeft, NavTitle, Link, Page, Block, Popup, Subnavbar, Searchbar, f7 } from 'framework7-react'
+import {
+	Navbar,
+	NavLeft,
+	NavTitle,
+	Link,
+	Block,
+	Subnavbar,
+	Searchbar,
+	List,
+	LoginScreen,
+	ListItem,
+	NavRight,
+	Button
+} from 'framework7-react'
 import { ChevronLeft } from 'framework7-icons/react'
 import PropTypes from 'prop-types'
-import { clsx } from 'clsx'
+// import { clsx } from 'clsx'
 import { $t } from '@/i18n'
 import { useEffect } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import userService from '@/db'
 
-export default function Contact(props) {
+export default function Contact({ opened, setOpened, ...props }) {
 	const [keywords, setKeywords] = useState('')
-    const [opened, setOpened] = useState(false)
+	const [chats, setChats] = useState([])
+	const [select, setSelect] = useState([])
+	const chatsList = useLiveQuery(() => userService.findAll(userService.TABLES.CHATS))
 
-    useEffect(()=>{},[props.opened])
+	const onChange = (chat) => {
+		const index = select.findIndex((v) => v.group_id === chat.group_id)
+		if (index !== -1) return
+		setSelect([...select, chat])
+	}
+
+	useEffect(() => {
+		if (chatsList) setChats(chatsList)
+	}, [chatsList])
 
 	return (
-		<Popup className="contact-popup" opened={opened}>
-			<Page>
-				<Navbar>
-					<NavLeft>
-						<Link popupClose>
-							<ChevronLeft className="w-5 h-5" />
-						</Link>
-					</NavLeft>
-					<NavTitle>{props.title}</NavTitle>
-				</Navbar>
+		<LoginScreen opened={opened}>
+			<Navbar>
+				<NavLeft>
+					<Link onClick={() => setOpened(false)}>
+						<ChevronLeft className="w-5 h-5" />
+					</Link>
+				</NavLeft>
+				<NavTitle>{props.title}</NavTitle>
+				<NavRight>
+					<Button
+						onClick={() => {
+							setOpened(false)
+							props.send(select)
+						}}
+					>
+						{$t('发送')}
+					</Button>
+				</NavRight>
+			</Navbar>
+			<Subnavbar>
+				<Searchbar
+					placeholder={props.placeholder || $t('搜索')}
+					disableButtonText={$t('取消')}
+					onInput={(e) => setKeywords(e.target.value)}
+				/>
+			</Subnavbar>
 
-				<Subnavbar>
-					<Searchbar
-						placeholder={props.placeholder || $t('搜索')}
-						disableButtonText={$t('取消')}
-						onInput={(e) => setKeywords(e.target.value)}
-					/>
-				</Subnavbar>
-
-				<Block className="my-5">最近</Block>
-			</Page>
-		</Popup>
+			<Block className="py-5 h-screen overflow-auto">
+				<List contactsList noChevron dividers mediaList className="chats-list">
+					{chats.map((chat) => (
+						<ListItem
+							key={chat.dialog_id}
+							title={chat.dialog_name}
+							checkbox
+							checkboxIcon="end"
+							onChange={() => onChange(chat)}
+						>
+							<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
+						</ListItem>
+					))}
+				</List>
+			</Block>
+		</LoginScreen>
 	)
 }
 
 Contact.propTypes = {
 	title: PropTypes.string,
 	placeholder: PropTypes.string,
-    opened: PropTypes.bool
+	opened: PropTypes.bool,
+	setOpened: PropTypes.func,
+	send: PropTypes.func
 }

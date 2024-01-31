@@ -15,6 +15,8 @@ import DoubleTickIcon from '@/components/DoubleTickIcon'
 import { ArrowUpRight, Exclamationmark, Gobackward } from 'framework7-icons/react'
 import { msgType } from '@/utils/constants'
 import { Link } from 'framework7-react'
+import Contact from '@/components/Contact/Contact'
+import { $t } from '@/i18n'
 
 Marked.setOptions({ highlight: (code, lang) => hljs.highlight(lang, code).value })
 
@@ -43,7 +45,7 @@ const PreHeader = (props) => {
 	)
 }
 
-const Tooltip = ({ el, handler }) => {
+const Tooltip = ({ el, handler, msg }) => {
 	const tooltipRef = useRef(null)
 	const triangleRef = useRef(null)
 	// 显示隐藏弹窗
@@ -131,7 +133,7 @@ const Tooltip = ({ el, handler }) => {
 							<Link
 								className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')}
 								key={item.name}
-								onClick={() => handler(item.name)}
+								onClick={() => handler(item.name, msg)}
 								panelOpen={item.name === 'forward' && 'contact-popup'}
 							>
 								<div className="flex flex-col items-center justify-center">
@@ -139,7 +141,7 @@ const Tooltip = ({ el, handler }) => {
 									<span className="text-[0.75rem]">{item.title}</span>
 								</div>
 							</Link>
-							{index === 3 && <div className="w-full h-[1px] bg-[rgba(255,255,255,0.2)]" />}
+							{index === 3 && <div className="w-full h-[1px] bg-[rgba(255,255,255,0.2)]" key={index} />}
 						</>
 					))}
 				</div>
@@ -148,12 +150,15 @@ const Tooltip = ({ el, handler }) => {
 	) : null
 }
 
-export default function Chat({ messages, header, footer, isFristIn, ...porps }) {
+export default function Chat({ messages, header, footer, isFristIn, ...props }) {
 	const chatRef = useRef(null)
 	const markdownRef = useRef(null)
 	const msgRefs = useRef([])
 
-	const findOne = (id) => porps.list.find((v) => v?.user_id === id)
+	const [opened, setOpened] = useState(false)
+	const [msg, setMsg] = useState({})
+
+	const findOne = (id) => props.list.find((v) => v?.user_id === id)
 
 	useEffect(() => {
 		// 渲染 markdown
@@ -214,10 +219,28 @@ export default function Chat({ messages, header, footer, isFristIn, ...porps }) 
 	 * 长按事件回调
 	 * @param {number} index 	当前长按元素的索引
 	 */
-	const handlerLongPress = (index) => {
+	const handlerLongPress = (index, data) => {
 		const div = document.createElement('div')
-		createRoot(div).render(<Tooltip el={msgRefs.current[index]} handler={porps.handlerLongPress} />)
+		createRoot(div).render(<Tooltip el={msgRefs.current[index]} handler={handlerSelect} msg={data} />)
 		msgRefs.current[index].appendChild(div)
+	}
+
+	const handlerSelect = (type, data) => {
+		// 当前选择的消息
+		setMsg(data)
+
+		console.log('type', type, data)
+
+		switch (type) {
+			case 'forward':
+				setOpened(true)
+				break
+			case 'edit':
+				props.sendEdit && props.sendEdit(data)
+				break
+			case 'del':
+				props.sendDel && props.sendDel(data)
+		}
 	}
 
 	return (
@@ -247,7 +270,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...porps }) 
 							/>
 							<div className="flex-1">
 								<LongPressButton
-									callback={() => handlerLongPress(index)}
+									callback={() => handlerLongPress(index, msg)}
 									className={clsx(
 										'w-full mb-1 flex select-none h-auto',
 										msg.msg_is_self ? 'justify-end' : 'justify-start'
@@ -323,6 +346,13 @@ export default function Chat({ messages, header, footer, isFristIn, ...porps }) 
 			</div>
 
 			{footer}
+
+			<Contact
+				title={$t('选择联系人')}
+				opened={opened}
+				setOpened={setOpened}
+				send={(list) => props.sendForward(list, msg)}
+			/>
 		</div>
 	)
 }
@@ -334,7 +364,8 @@ PreHeader.propTypes = {
 
 Tooltip.propTypes = {
 	el: PropType.any,
-	handler: PropType.func
+	handler: PropType.func,
+	msg: PropType.object
 }
 Chat.propTypes = {
 	messages: PropType.array.isRequired,
@@ -342,5 +373,8 @@ Chat.propTypes = {
 	footer: PropType.node,
 	isFristIn: PropType.bool,
 	handlerLongPress: PropType.func,
-	list: PropType.array
+	list: PropType.array,
+	sendForward: PropType.func,
+	sendEdit: PropType.func,
+	sendDel: PropType.func
 }

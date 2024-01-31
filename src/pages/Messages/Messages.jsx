@@ -14,9 +14,9 @@ import MsgBar from '@/components/Message/MsgBar'
 import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
 import { msgStatus, sendState } from '@/utils/constants'
 import { handlerMsgType } from '@/helpers/handlerType'
-import { $t } from '@/i18n'
-
-import Contact from '@/components/Contact/Contact'
+// import { $t } from '@/i18n'
+//
+// import Contact from '@/components/Contact/Contact'
 
 export default function MessagesPage({ f7route, f7router }) {
 	// 会话 id
@@ -38,8 +38,6 @@ export default function MessagesPage({ f7route, f7router }) {
 	const [nonce] = useState(cretateNonce())
 	// 好友信息列表
 	const [friendsList, setFriendsList] = useState([])
-	// 弹出转发
-	const [opened,setOpened] = useState(false)
 
 	// 数据库所有消息
 	const msgList = useLiveQuery(() => userService.findOneAll(userService.TABLES.USER_MSGS, 'dialog_id', DIALOG_ID))
@@ -87,32 +85,32 @@ export default function MessagesPage({ f7route, f7router }) {
 	}, [contact])
 
 	useEffect(() => {
-		// 首次进来初始化消息列表,把解密的消息放入到这里
-		const initMsgs = async () => {
-			try {
-				return
-				console.log('contact', contact)
-				if (!contact?.shareKey) return
-				// 只截取最新的 30 条消息，从后面往前截取
-				const msgs = msgList?.msgs?.slice(-30) || []
-				for (let i = 0; i < msgs.length; i++) {
-					const msg = msgs[i]
-					let content = msg.msg_content
-					try {
-						content = decryptMessageWithKey(content, msgList.shareKey)
-					} catch (error) {
-						console.log('解密失败：', error)
-						content = '该消息解密失败'
-					}
-					msg.msg_content = content
-				}
-				setMessages(msgs)
-				setTimeout(() => setIsActive(false), 0)
-				console.log('msgList', msgList)
-			} catch (error) {
-				console.error('error', error)
-			}
-		}
+		// // 首次进来初始化消息列表,把解密的消息放入到这里
+		// const initMsgs = async () => {
+		// 	// try {
+		// 	// 	return
+		// 	// 	// console.log('contact', contact)
+		// 	// 	// if (!contact?.shareKey) return
+		// 	// 	// // 只截取最新的 30 条消息，从后面往前截取
+		// 	// 	// const msgs = msgList?.msgs?.slice(-30) || []
+		// 	// 	// for (let i = 0; i < msgs.length; i++) {
+		// 	// 	// 	const msg = msgs[i]
+		// 	// 	// 	let content = msg.msg_content
+		// 	// 	// 	try {
+		// 	// 	// 		content = decryptMessageWithKey(content, msgList.shareKey)
+		// 	// 	// 	} catch (error) {
+		// 	// 	// 		console.log('解密失败：', error)
+		// 	// 	// 		content = '该消息解密失败'
+		// 	// 	// 	}
+		// 	// 	// 	msg.msg_content = content
+		// 	// 	// }
+		// 	// 	// setMessages(msgs)
+		// 	// 	// setTimeout(() => setIsActive(false), 0)
+		// 	// 	// console.log('msgList', msgList)
+		// 	// } catch (error) {
+		// 	// 	console.error('error', error)
+		// 	// }
+		// }
 
 		const updateMsg = async () => {
 			try {
@@ -121,7 +119,7 @@ export default function MessagesPage({ f7route, f7router }) {
 				// 如果是发送消息
 				if (isSend) {
 					const msg = messages.at(-1)
-					msg.send_state = lastMsg?.send_state
+					msg.msg_send_state = lastMsg?.msg_send_state
 					setIsSend(false)
 					setMessages(messages)
 					return
@@ -141,7 +139,8 @@ export default function MessagesPage({ f7route, f7router }) {
 				console.error('解析消息失败：', error.message)
 			}
 		}
-		isActive ? initMsgs() : updateMsg()
+		// isActive ? initMsgs() : updateMsg()
+		!isActive && updateMsg()
 	}, [msgList])
 
 	const sendMessage = async (type, content) => {
@@ -158,7 +157,7 @@ export default function MessagesPage({ f7route, f7router }) {
 			msg_type: handlerMsgType(type),
 			msg_content: encrypted,
 			msg_id: null,
-			msg_time: Date.now(),
+			msg_send_time: Date.now(),
 			msg_is_self: true,
 			meg_sender_id: user.user_id,
 			dialog_id: DIALOG_ID,
@@ -193,23 +192,17 @@ export default function MessagesPage({ f7route, f7router }) {
 				last_message: encrypted,
 				msg_id: msg.msg_id,
 				msg_type: msg.msg_type,
-				send_time: msg.msg_time
+				send_time: msg.msg_send_time
 			}))
 	}
 
-
-
 	/**
-	 * 长按事件回调
-	 * @param {string} type
+	 * 转发
+	 * @param {Array} list 	需要转发的人或群列表
+	 * @param {Object} msg 	要转发的消息
 	 */
-	const handlerLongPress = (type) => {
-		console.log('tyow', type)
-		switch (type) {
-			case 'forward':
-				// f7router.navigate('/memberlist/:type/:id/')
-				break
-		}
+	const sendForward = async (list, msg) => {
+		console.log('list', list, msg)
 	}
 
 	return (
@@ -233,11 +226,9 @@ export default function MessagesPage({ f7route, f7router }) {
 				footer={<MsgBar send={(content, type = 1) => sendMessage(type, content)} />}
 				isFristIn={isActive}
 				contact={contact}
-				handlerLongPress={handlerLongPress}
 				list={friendsList}
+				sendForward={sendForward}
 			/>
-
-			<Contact title={$t('联系人')} list={friendsList} opened={opened}/>
 		</Page>
 	)
 }
