@@ -131,7 +131,7 @@ export default function MemberList({ f7router, type: PageType, id: GroupId }) {
 		<Page className="" noToolbar messagesContent>
 			<Navbar className="messages-navbar bg-white" backLink>
 				<NavTitle>
-					<div className="">{getTitle()}</div>
+					<div className={PageType === 'show' && 'mr-14'}>{getTitle()}</div>
 				</NavTitle>
 				<NavRight>
 					{PageType === 'plus' && <Link onClick={inviteMembers}>邀请</Link>}
@@ -175,7 +175,19 @@ export default function MemberList({ f7router, type: PageType, id: GroupId }) {
 					))}
 				</List>
 			)}
-			{PageType === 'show' && <div>成员展示列表</div>}
+			{PageType === 'show' && (
+				<List contactsList noChevron dividers>
+					{members.map((member, index) => (
+						<ListItem key={index} media={member.avatar} title={member.nickname} footer={member.email}>
+							<div slot="after" className="text-sm">
+								{member.identity === 2 && <span>群主</span>}
+								{member.identity === 1 && <span>管理员</span>}
+								{member.identity === 0 && <span>成员</span>}
+							</div>
+						</ListItem>
+					))}
+				</List>
+			)}
 		</Page>
 	)
 }

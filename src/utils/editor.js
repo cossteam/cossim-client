@@ -45,6 +45,23 @@ export default class Editor {
 		return this
 	}
 
+	/**
+	 *  将指定节点插入到光标位置
+	 * @param {DOM} fileDom dom节点
+	 */
+	insertNode(dom) {
+		// 获取光标
+		const selection = window.getSelection()
+		// 获取选中的内容
+		const range = selection.getRangeAt(0)
+		// 删除选中的内容
+		range.deleteContents()
+		// 将节点插入范围最前面添加节点
+		range.insertNode(dom)
+		// 将光标移到选中范围的最后面
+		selection.collapseToEnd()
+	}
+
 	insertEmoji() {}
 
 	/**
