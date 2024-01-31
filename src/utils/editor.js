@@ -52,6 +52,7 @@ export default class Editor {
 	insertNode(dom) {
 		// 获取光标
 		const selection = window.getSelection()
+		console.log(selection)
 		// 获取选中的内容
 		const range = selection.getRangeAt(0)
 		// 删除选中的内容
@@ -62,7 +63,13 @@ export default class Editor {
 		selection.collapseToEnd()
 	}
 
-	insertEmoji() {}
+	insertImg() {}
+
+	insertEmoji(emoji) {
+		const emojiDOM = document.createTextNode(emoji)
+		console.log(emojiDOM)
+		this.insertNode(emojiDOM)
+	}
 
 	/**
 	 * 清空输入框元素
