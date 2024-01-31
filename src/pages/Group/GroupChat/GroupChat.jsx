@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Page, f7 } from 'framework7-react'
+import React, { useState, useEffect } from 'react'
+import { Page } from 'framework7-react'
 import MessageBox from '@/components/Message/Chat'
-import PropType from 'prop-types'
-import { useUserStore } from '@/stores/user'
-import { $t } from '@/i18n'
-import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
 import MsgBar from '@/components/Message/MsgBar'
+import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
+import { useUserStore } from '@/stores/user'
+import { groupInfoApi, groupMemberApi } from '@/api/group'
+import PropType from 'prop-types'
+import { $t } from '@/i18n'
 
 GroupChat.propTypes = {
 	f7route: PropType.object.isRequired,
@@ -15,16 +16,35 @@ export default function GroupChat({ f7route, f7router }) {
 	// 用户信息
 	const { user } = useUserStore()
 	// 群号ID
-	const receiverId = f7route.params.id
+	const groupId = f7route.params.id
 	// 会话ID
 	const dialogId = f7route.query.dialog_id
 	// 群信息
 	const [groupInfo, setGroupInfo] = useState({})
+	// 群成员信息
+	const [members, setMembers] = useState([])
 	// 页面显示消息列表
 	const [messages, setMessages] = useState([])
 	// 是否首次进入
 	const [isActive, setIsActive] = useState(true)
 
+	useEffect(() => {
+		groupInfoApi({
+			group_id: groupId
+		}).then(({ code, data }) => {
+			console.log(data)
+			code === 200 && setGroupInfo(data)
+		})
+		groupMemberApi({
+			group_id: groupId
+		}).then(({ code, data }) => {
+			console.log(data)
+			code === 200 && setMembers(data)
+		})
+	}, [])
+	useEffect(() => {
+		console.log(groupInfo)
+	}, [groupInfo])
 	// const message = {
 	//     msg_id: null,
 	//     mgs_is_self: true,
@@ -60,7 +80,7 @@ export default function GroupChat({ f7route, f7router }) {
 							<div className="flex-1 flex justify-end">
 								<MoreIcon
 									className="w-7 h-7"
-									onClick={() => f7router.navigate(`/chatinfo/${'group'}/${receiverId}/`)}
+									onClick={() => f7router.navigate(`/chatinfo/${'group'}/${groupId}/`)}
 								/>
 							</div>
 						</div>
@@ -69,7 +89,7 @@ export default function GroupChat({ f7route, f7router }) {
 				footer={<MsgBar send={(content, type = 1) => sendMessage(type, content)} />}
 				isFristIn={isActive}
 				handlerLongPress={handlerMsgLongPress}
-				list={groupInfo?.members || []}
+				list={members || []}
 			/>
 		</Page>
 	)
