@@ -1,394 +1,76 @@
 import React, { useState, useEffect, useRef } from 'react'
-import {
-	Icon,
-	Link,
-	Message,
-	Messagebar,
-	MessagebarSheet,
-	Messages,
-	NavRight,
-	NavTitle,
-	Navbar,
-	Page,
-	f7
-} from 'framework7-react'
-import DoubleTickIcon from '@/components/DoubleTickIcon'
-import Emojis from '@/components/Emojis/Emojis.jsx'
+import { Page, f7 } from 'framework7-react'
+import MessageBox from '@/components/Message/Chat'
 import PropType from 'prop-types'
-import { $t } from '@/i18n'
 import { useUserStore } from '@/stores/user'
-import { dbService } from '@/db'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { uniqueId } from 'lodash-es'
-import { groupInfoApi, groupMemberApi } from '@/api/group'
-import { sendToGroup, editGroupMsgApi, recallGroupMsgApi } from '@/api/msg'
-import clsx from 'clsx'
-import LongPressWrap from '../LongPressWrap'
-import { useClickOutside } from '@reactuses/core'
-import { Trash } from 'framework7-icons/react'
+import { $t } from '@/i18n'
+import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
+import MsgBar from '@/components/Message/MsgBar'
 
 GroupChat.propTypes = {
-	f7route: PropType.object.isRequired
+	f7route: PropType.object.isRequired,
+	f7router: PropType.object.isRequired
 }
-export default function GroupChat({ f7route }) {
+export default function GroupChat({ f7route, f7router }) {
+	// 用户信息
 	const { user } = useUserStore()
-	const ReceiverId = f7route.params.id // 群号 /（TODO：用户ID）
-	const DialogId = f7route.query.dialog_id // 会话 ID
-	const [groupInfo, setGroupInfo] = useState({}) // 群聊信息
-	const [member, setMember] = useState(new Map()) // 成员信息
+	// 群号ID
+	const receiverId = f7route.params.id
+	// 会话ID
+	const dialogId = f7route.query.dialog_id
+	// 群信息
+	const [groupInfo, setGroupInfo] = useState({})
+	// 页面显示消息列表
+	const [messages, setMessages] = useState([])
+	// 是否首次进入
+	const [isActive, setIsActive] = useState(true)
 
-	// 是否是编辑消息
-	const [isEdit, setIsEdit] = useState(false)
-
-	// 消息处理（加密、解密）
-	const msgHendler = (message) => {
-		return message
-	}
-	// 消息列表
-	const messages = useLiveQuery(async () => {
-		const allMsg = (await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId))?.data || []
-		return allMsg.map((msgItem) => msgHendler(msgItem))
-	})
-	useEffect(() => {
-		// 获取群聊信息
-		groupInfoApi({ group_id: ReceiverId }).then(({ code, data }) => {
-			code === 200 && setGroupInfo(data)
-		})
-		// 获取成员信息
-		groupMemberApi({ group_id: ReceiverId }).then(({ code, data }) => {
-			if (code === 200) {
-				const obj = new Map()
-				for (const dataItem of Array.isArray(data) ? data : []) {
-					if (dataItem.user_id) {
-						obj.set(dataItem.user_id, dataItem)
-					}
-				}
-				setMember(obj)
-			}
-		})
-	}, [])
-
-	// 发送消息
-	const messagebarRef = useRef(null)
-	const [msgText, setMsgText] = useState('')
-	const messageTime = (message) => {
-		return message?.time
-			? Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric' }).format(new Date(message.time))
-			: ''
-	}
-	const isMessageFirst = (message) => {
-		const messageIndex = messages.indexOf(message)
-		const previousMessage = messages[messageIndex - 1]
-		return !previousMessage || previousMessage.type !== message.type
-	}
-	const isMessageLast = (message) => {
-		const messageIndex = messages.indexOf(message)
-		const nextMessage = messages[messageIndex + 1]
-		return !nextMessage || nextMessage.type !== message.type
-	}
-	const sendStatusToText = (code) => {
-		const status = {
-			0: '未发送',
-			1: '发送中',
-			2: '发送成功',
-			3: '发送失败'
-		}
-		return status[code] ? status[code] : '未知状态'
-	}
-	// 发送状态图标
-	const sendStatusIcon = (message) => {
-		if (message?.send_status === undefined) return sendStatusToText(message?.send_status)
-		switch (message.send_status) {
-			case 2:
-				return (
-					<span className="mb-2 mr-2 text-xs">
-						<DoubleTickIcon />
-					</span>
-				)
-			default:
-				return (
-					<Icon
-						className="mb-2 mr-2 text-sm"
-						f7={message.send_status == 1 ? 'slowmo' : 'wifi_slash'}
-						color="primary"
-					/>
-				)
-		}
+	// const message = {
+	//     msg_id: null,
+	//     mgs_is_self: true,
+	//     msg_read_status: msgStatus.NOT_READ,
+	//     msg_type: type,
+	//     msg_content: sandText,
+	//     msg_send_time: Date.now(),
+	//     meg_sender_id: user.user_id,
+	//     group_id: parseInt(ReceiverId),
+	//     dialog_id: parseInt(DialogId),
+	//     msg_send_state: sendState.LOADING
+	// }
+	const sendMessage = async (type, content) => {
+		console.log(type, content)
 	}
 
-	const send = () => {
-		sendMessage(msgText, 1)
-		// 恢复输入框状态
-		setMsgText('')
-		messagebarRef.current.f7Messagebar().focus()
+	const handlerMsgLongPress = (type, data) => {
+		console.log(type, data)
 	}
-
-	/**
-	 * 发送消息
-	 * @param {*} sandText 内容
-	 * @param {*} type 内容类型 1:文本 2:语音 3:图片
-	 * @returns
-	 */
-	const sendMessage = async (sandText = msgText, type = 1) => {
-		if (sandText === '') return
-		if (isEdit) return edit()
-		// 发送消息
-		const time = Date.now()
-		const unique_id = uniqueId(`${time}_`)
-		const message = {
-			unique_id,
-			content: sandText, // 内容
-			sender: user.user_id, // 发送人
-			dialog_id: parseInt(DialogId), // 会话
-			group_id: parseInt(ReceiverId), // 群组(私聊时为receiver_id)
-			// receiver_id: parseInt(ReceiverId), // 接收人(群聊时为group_id)
-			time, // 时间
-			type, // 1:文本 2:语音 3:图片
-			send_status: 0 // 0:未发送 1:发送中 2:发送成功 3:发送失败
-		}
-		const newAllMsg = {
-			user_id: ReceiverId,
-			data: [...messages, message]
-		}
-		// 存入本地数据库
-		if (messages.length === 0) {
-			await dbService.add(dbService.TABLES.MSGS, newAllMsg)
-		} else {
-			await dbService.update(dbService.TABLES.MSGS, ReceiverId, newAllMsg)
-		}
-		// 发送
-		try {
-			message['send_status'] = 1
-			dbService.update(dbService.TABLES.MSGS, ReceiverId, newAllMsg)
-			const { code, data } = await sendToGroup({
-				content: JSON.stringify(message),
-				dialog_id: message.dialog_id,
-				group_id: message.group_id,
-				type: message.type
-			})
-			message['send_status'] = code === 200 ? 2 : 3
-			message['msg_id'] = data.msg_id
-			// setMsgMenuData({...msgMenuData, msg_id: data.msg_id})
-		} catch (error) {
-			console.log(error)
-			message['send_status'] = 3
-		} finally {
-			dbService.update(dbService.TABLES.MSGS, ReceiverId, newAllMsg)
-		}
-	}
-
-	// 图片表情
-	const [sheetVisible, setSheetVisible] = useState(false)
-	const onEmojiSelect = ({ type, emoji }) => {
-		type === 'emoji' && setMsgText(`${msgText}${emoji}`)
-		type === 'img' && sendMessage(emoji, 3)
-	}
-
-	// 消息操作菜单
-	const messagesRef = useRef(null)
-	const [msgMenuData, setMsgMenuData] = useState({})
-	const msgMenuRef = useRef(null)
-	const [msgMenuStyle, setMsgMenuStyle] = useState({
-		top: '44px',
-		left: '9999px'
-	})
-	const onMsgLongPress = (e, msg) => {
-		const msgViewRect = messagesRef.current.el.offsetParent.getBoundingClientRect()
-		const msgRect = e.changedTouches[0].target.parentElement.getBoundingClientRect()
-		const menuRect = msgMenuRef.current.getBoundingClientRect()
-		console.log('msg', msg)
-		setMsgMenuData(msg)
-		const menuPosition = {
-			left: msgRect.left + msgRect.width / 2 - menuRect.width / 2, // left定位在消息上方中点
-			top: msgRect.top - menuRect.height - 12 // top定位在消息上方
-		}
-		// 左边边界处理
-		if (menuPosition.left <= 0) {
-			menuPosition.left = 12
-		}
-		// 上边边界处理
-		if (menuPosition.top <= 44) {
-			menuPosition.top = 12 + msgRect.bottom
-		}
-		// 右边边界处理
-		if (menuPosition.left + menuRect.width > msgViewRect.right) {
-			menuPosition.left = msgViewRect.right - menuRect.width - 12
-		}
-		// 开启消息菜单操作
-		setMsgMenuStyle(menuPosition)
-	}
-	useClickOutside(msgMenuRef, () => {
-		// 关闭消息菜单操作
-		closeMenu()
-	})
-	const closeMenu = () => setMsgMenuStyle({ top: '44px', left: '9999px' })
-
-	// 发送编辑消息
-	const edit = async () => {
-		console.log(msgMenuData)
-		const res = await editGroupMsgApi({
-			content: msgMenuData.content,
-			msg_id: msgMenuData.msg_id,
-			msg_type: msgMenuData.type
-		})
-		if (res.code !== 200) return
-
-		setIsEdit(false)
-		const result = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
-		const data = result.data
-		const index = data.findIndex((v) => v.unique_id === msgMenuData.unique_id)
-		console.log('index', index)
-		if (index === -1) return
-		data[index].content = msgText
-		await dbService.update(dbService.TABLES.MSGS, ReceiverId, {
-			...res,
-			data
-		})
-	}
-
-	// 编辑消息
-	const editMsg = () => {
-		// console.log('msg', msgMenuData)
-		setMsgText(msgMenuData.content)
-		setIsEdit(true)
-		closeMenu()
-	}
-
-	// 撤回消息
-	const withdrawMsg = async () => {
-		try {
-			const result = await recallGroupMsgApi({ msg_id: msgMenuData.msg_id })
-			if (result.code !== 200) return f7.dialog.alert(result.msg)
-			const res = await dbService.findOneById(dbService.TABLES.MSGS, ReceiverId)
-			if (!res) return
-			const data = res.data
-			const index = data.findIndex((v) => v.unique_id === msgMenuData.unique_id)
-			if (index === -1) return
-			data.splice(index, 1)
-			await dbService.update(dbService.TABLES.MSGS, ReceiverId, {
-				...res,
-				data
-			})
-		} finally {
-			closeMenu()
-		}
-	}
-
-	// 消除编辑状态
-	useEffect(() => {
-		if (isEdit && msgText === '') {
-			setIsEdit(false)
-		}
-	}, [isEdit])
 
 	return (
-		<Page className="chat-group-page messages-page" noToolbar messagesContent>
-			<Navbar className="messages-navbar" backLink>
-				<NavTitle>
-					<span className="">{$t(groupInfo.name)}</span>
-				</NavTitle>
-				<NavRight>
-					{/* <Link href={`/new_group/?id=${ReceiverId}`} iconF7="ellipsis" onClick={() => {}} /> */}
-					<Link href={`/chatinfo/${'group'}/${ReceiverId}/`} iconF7="ellipsis" />
-				</NavRight>
-			</Navbar>
-			{/* 消息输入框 */}
-			<Messagebar
-				ref={messagebarRef}
-				sheetVisible={sheetVisible}
-				value={msgText}
-				placeholder={$t('请输入消息')}
-				onInput={(e) => setMsgText(e.target.value)}
-			>
-				<Link slot="inner-start" iconF7="plus" />
-				<Link
-					slot="after-area"
-					className="messagebar-sticker-link"
-					iconF7="smiley"
-					onClick={() => {
-						setSheetVisible(!sheetVisible)
-					}}
-				/>
-				{msgText !== '' ? (
-					<Link slot="inner-end" className="messagebar-send-link" iconF7="paperplane_fill" onClick={send} />
-				) : (
-					<>
-						<Link slot="inner-end" href="/camera/" iconF7="camera" />
-						<Link slot="inner-end" iconF7="mic" />
-					</>
-				)}
-				{/* 表情、图片选择 */}
-				<MessagebarSheet>
-					<Emojis onEmojiSelect={onEmojiSelect} />
-				</MessagebarSheet>
-			</Messagebar>
-			<Messages ref={messagesRef}>
-				{messages?.map((message, index) => {
-					const first = isMessageFirst(message)
-					// const last = isMessageLast(message)
-					const tail = isMessageLast(message)
-					const isSender = message.sender === user.user_id
-					return (
-						<div key={index} className="messages">
-							{/* 消息 */}
-							<Message
-								first={first}
-								last={true}
-								tail={false}
-								name={member.get(message.sender)?.nickname}
-								avatar={member.get(message.sender)?.avatar}
-								type={message.sender === user.user_id ? 'sent' : 'received'}
-							>
-								<LongPressWrap
-									className={clsx(message.type === 3 && 'message-image')}
-									onLongPress={(e) => onMsgLongPress(e, message)}
-								>
-									{message.type === 3 ? <img slot="image" src={message.content} /> : ''}
-									{message.type === 1 ? <span slot="text">{message.content}</span> : ''}
-								</LongPressWrap>
-							</Message>
-							{/* 时间、状态 */}
-							<div
-								className={clsx(
-									'mt-1 pl-14 pr-8 flex flex-row justify-between items-center text-xs text-gray-500',
-									isSender && 'message-sent'
-								)}
-							>
-								{tail && <span className={clsx(isSender && 'mr-2')}>{messageTime(message)}</span>}
-								{isSender && <span>{sendStatusIcon(message)}</span>}
+		<Page className="messages-page" noToolbar>
+			<MessageBox
+				messages={messages}
+				header={
+					<div className="fixed top-0 left-0 right-0 h-14 border-b flex items-center px-4 z-[999] bg-white">
+						<div className="flex items-center w-full">
+							<ArrowLeftIcon className="w-5 h-5 mr-3" onClick={() => f7router.back()} />
+							<div className="flex items-center">
+								<img src={groupInfo?.avatar} alt="" className="w-8 h-8 rounded-full mr-2" />
+								<span>{groupInfo?.name}</span>
+							</div>
+							<div className="flex-1 flex justify-end">
+								<MoreIcon
+									className="w-7 h-7"
+									onClick={() => f7router.navigate(`/chatinfo/${'group'}/${receiverId}/`)}
+								/>
 							</div>
 						</div>
-					)
-				})}
-			</Messages>
-			<div
-				ref={msgMenuRef}
-				className="w-44 h-auto fixed z-[999] bg-white p-2 rounded-md shadow-md"
-				style={msgMenuStyle}
-			>
-				<div className="flex flex-wrap">
-					<div className="p-2" onClick={editMsg}>
-						<Trash className="w-5 h-5 mb-1" />
-						<span className="text-[0.75rem]">编辑</span>
 					</div>
-					<div className="p-2">
-						<Trash className="w-5 h-5 mb-1" onClick={withdrawMsg} />
-						<span className="text-[0.75rem]">撤回</span>
-					</div>
-					<div className="p-2">
-						<Trash className="w-5 h-5 mb-1" />
-						<span className="text-[0.75rem]">转发</span>
-					</div>
-					<div className="p-2">
-						<Trash className="w-5 h-5 mb-1" />
-						<span className="text-[0.75rem]">多选</span>
-					</div>
-					{/* <div className="p-2">
-						<Trash className="w-5 h-5 mb-1" onClick={del} />
-						<span className="text-[0.75rem]">删除</span>
-					</div> */}
-				</div>
-			</div>
+				}
+				footer={<MsgBar send={(content, type = 1) => sendMessage(type, content)} />}
+				isFristIn={isActive}
+				handlerLongPress={handlerMsgLongPress}
+				list={groupInfo?.members || []}
+			/>
 		</Page>
 	)
 }
