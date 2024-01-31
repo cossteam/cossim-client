@@ -92,6 +92,7 @@ export function groupListApi(param) {
 /**
  * 获取群聊信息
  * @param {*} param
+ * @param {*} param.group_id
  * @returns
  */
 export function groupInfoApi(param) {
@@ -105,6 +106,7 @@ export function groupInfoApi(param) {
 /**
  * 获取群成员列表
  * @param {*} param
+ * @param {*} param.group_id
  * @returns
  */
 export function groupMemberApi(param) {
