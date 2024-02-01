@@ -121,7 +121,7 @@ export class dbService {
 	async delete(table, id, key) {
 		return (
 			this.DB[table] &&
-			this.DB.contacts
+			this.DB[table]
 				.where(key || this.PRIMARY_KEY)
 				.equals(id)
 				.delete()

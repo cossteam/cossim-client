@@ -30,6 +30,9 @@
     ],
     "dependencies": {
         "@aomao/engine": "^2.10.25",
+        "@aomao/plugin-mention": "^2.10.3",
+        "@aomao/plugin-quote": "^2.10.0",
+        "@editablejs/plugins": "^1.0.6",
         "@emoji-mart/data": "^1.1.2",
         "@emoji-mart/react": "^1.1.1",
         "@privacyresearch/libsignal-protocol-typescript": "^0.0.16",

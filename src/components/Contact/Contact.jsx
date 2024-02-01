@@ -28,9 +28,20 @@ export default function Contact({ opened, setOpened, ...props }) {
 	const chatsList = useLiveQuery(() => userService.findAll(userService.TABLES.CHATS))
 
 	const onChange = (chat) => {
-		const index = select.findIndex((v) => v.group_id === chat.group_id)
-		if (index !== -1) return
+		const index = select.findIndex((v) => v.dialog_id === chat.dialog_id)
+		// 取消选择
+		if (index !== -1) {
+			select.splice(index, 1)
+			setSelect([...select])
+			return
+		}
 		setSelect([...select, chat])
+	}
+
+	const send = () => {
+		setSelect([])
+		setOpened(false)
+		props.send(select)
 	}
 
 	useEffect(() => {
@@ -47,14 +58,7 @@ export default function Contact({ opened, setOpened, ...props }) {
 				</NavLeft>
 				<NavTitle>{props.title}</NavTitle>
 				<NavRight>
-					<Button
-						onClick={() => {
-							setOpened(false)
-							props.send(select)
-						}}
-					>
-						{$t('发送')}
-					</Button>
+					<Button onClick={send}>{$t('发送')}</Button>
 				</NavRight>
 			</Navbar>
 			<Subnavbar>
@@ -74,6 +78,7 @@ export default function Contact({ opened, setOpened, ...props }) {
 							checkbox
 							checkboxIcon="end"
 							onChange={() => onChange(chat)}
+							checked={select.some((v) => v.dialog_id === chat.dialog_id)}
 						>
 							<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
 						</ListItem>

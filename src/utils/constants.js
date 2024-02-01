@@ -43,3 +43,35 @@ export const sendState = {
 	/** 发送中 */
 	LOADING: 2
 }
+
+/**
+ * 发送类型 发送 ｜ 编辑 ｜ 回复
+ */
+export const sendType = {
+	/** 发送 */
+	SEND: 0,
+	/** 编辑 */
+	EDIT: 1,
+	/** 回复 */
+	REPLY: 2
+}
+
+/**
+ * 提示框
+ */
+export const tooltipsType = {
+	/** 转发 */
+	FORWARD: 0,
+	/** 编辑 */
+	EDIT: 1,
+	/** 删除 */
+	DELETE: 2,
+	/** 复制 */
+	COPY: 3,
+	/** 多选 */
+	SELECT: 4,
+	/** 回复 */
+	REPLY: 5,
+	/** 标注 */
+	MARK: 6
+}

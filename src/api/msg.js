@@ -103,3 +103,18 @@ export function recallGroupMsgApi(data) {
 		data
 	})
 }
+
+/**
+ * 编辑用户信息
+ * @param {*} data
+ * @param {string} data.content		消息
+ * @param {number} data.msg_id		消息id
+ * @param {number} data.msg_type		消息类型
+ */
+export function editUserMsgApi(data) {
+	return request({
+		url: baseApi + '/edit/user',
+		method: 'POST',
+		data
+	})
+}

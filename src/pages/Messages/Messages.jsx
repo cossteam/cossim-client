@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import PropType from 'prop-types'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Page } from 'framework7-react'
+import { Page, f7 } from 'framework7-react'
 import './Messages.less'
 import { useUserStore } from '@/stores/user'
 // import _ from 'lodash-es'
-import { sendToUser } from '@/api/msg'
+import { sendToUser, editUserMsgApi } from '@/api/msg'
 // import { getUserInfoApi } from '@/api/user'
 import { encryptMessage, cretateNonce, decryptMessageWithKey } from '@/utils/tweetnacl'
 import userService from '@/db'
 import MessageBox from '@/components/Message/Chat'
 import MsgBar from '@/components/Message/MsgBar'
 import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
-import { msgStatus, sendState } from '@/utils/constants'
+import { msgStatus, sendState, sendType } from '@/utils/constants'
 import { handlerMsgType } from '@/helpers/handlerType'
-// import { $t } from '@/i18n'
+import { $t } from '@/i18n'
 //
 // import Contact from '@/components/Contact/Contact'
 
@@ -37,6 +37,9 @@ export default function MessagesPage({ f7route, f7router }) {
 	// 好友信息列表
 	const [friendsList, setFriendsList] = useState([])
 
+	// 提示消息
+	const toastRef = useRef(null)
+
 	// 数据库所有消息
 	const msgList = useLiveQuery(() => userService.findOneAll(userService.TABLES.USER_MSGS, 'dialog_id', DIALOG_ID))
 
@@ -56,8 +59,6 @@ export default function MessagesPage({ f7route, f7router }) {
 	useEffect(() => {
 		init()
 	}, [])
-
-	useEffect(() => {}, [contact])
 
 	useEffect(() => {
 		const initMsg = async () => {
@@ -94,33 +95,50 @@ export default function MessagesPage({ f7route, f7router }) {
 		isActive ? initMsg() : updateMsg()
 	}, [msgList])
 
-	const sendMessage = async (type, content) => {
+	const createTotast = (msg) => {
+		toastRef.current = f7.toast.create({
+			text: $t(msg),
+			position: 'center',
+			closeTimeout: 1000
+		})
+		toastRef.current.open()
+	}
+
+	const sendMessage = async (type, content, options) => {
 		if (isActive) setIsActive(false)
 
+		// 一些额外的操作
+		const {
+			receiver_id = RECEIVER_ID,
+			dialog_id = DIALOG_ID,
+			update = true,
+			shareKey = contact?.shareKey
+		} = options
+
 		// 加密消息
-		const encrypted = encryptMessage(content, nonce, contact?.shareKey)
+		const encrypted = encryptMessage(content, nonce, shareKey)
 
 		const msg = {
 			msg_read_status: msgStatus.READ,
 			msg_type: handlerMsgType(type),
 			msg_content: encrypted,
-			msg_id: null,
+			msg_id: Date.now(),
 			msg_send_time: Date.now(),
 			msg_is_self: true,
-			meg_sender_id: user.user_id,
-			dialog_id: DIALOG_ID,
+			msg_sender_id: user?.user_id,
+			dialog_id,
 			msg_send_state: sendState.LOADING
 		}
 
 		// 先假设发送是 ok 的
-		setMessages([...messages, { ...msg, msg_content: content }])
+		update && setMessages([...messages, { ...msg, msg_content: content }])
 
 		// 发送消息
 		try {
 			const { code, data } = await sendToUser({
 				content: encrypted,
-				dialog_id: parseInt(DIALOG_ID),
-				receiver_id: RECEIVER_ID,
+				dialog_id: parseInt(dialog_id),
+				receiver_id,
 				type
 			})
 			msg.msg_send_state = code === 200 ? sendState.OK : sendState.ERROR
@@ -133,30 +151,80 @@ export default function MessagesPage({ f7route, f7router }) {
 		await userService.add(userService.TABLES.USER_MSGS, msg)
 
 		// 更新会话
-		const chat = await userService.findOneById(userService.TABLES.CHATS, DIALOG_ID, 'dialog_id')
-		chat &&
-			(await userService.update(userService.TABLES.CHATS, DIALOG_ID, {
-				...chat,
-				last_message: encrypted,
-				msg_id: msg.msg_id ? msg.msg_id : chat?.msg_id,
-				msg_type: msg.msg_type,
-				send_time: msg.msg_send_time
-			}))
+		// const chat = await userService.findOneById(userService.TABLES.CHATS, dialog_id, 'dialog_id')
+		// chat &&
+		// 	(await userService.update(userService.TABLES.CHATS, dialog_id, {
+		// 		...chat,
+		// 		last_message: encrypted,
+		// 		msg_id: msg.msg_id ? msg.msg_id : chat?.msg_id,
+		// 		msg_type: msg.msg_type,
+		// 		send_time: msg.msg_send_time
+		// 	}))
 	}
 
-	/**
-	 * 转发
-	 * @param {Array} list 	需要转发的人或群列表
-	 * @param {Object} msg 	要转发的消息
-	 */
-	const sendForward = async (list, msg) => {
-		console.log('list', list, msg)
+	const send = async (content, type, msg) => {
+		// console.log('msg', content, type, msg)
+		switch (type) {
+			case sendType.SEND:
+				await sendMessage(1, content, {})
+				break
+			case sendType.EDIT:
+				await sendEdit(content, msg)
+				break
+			case sendType.REPLY: 
+				await sendReply(content, msg)
+				break
+		}
 	}
 
+	// 删除
 	const sendDel = async (msg) => {
-		const id = msg.msg_id ? msg.msg_id : msg.msg_content
-		const key = msg.msg_id ? 'msg_id' : 'msg_content'
-		await userService.delete(userService.TABLES.USER_MSGS, id, key)
+		try {
+			const id = msg?.msg_id ? msg.msg_id : msg.msg_send_time
+			const key = msg?.msg_id ? 'msg_id' : 'msg_send_time'
+			await userService.delete(userService.TABLES.USER_MSGS, id, key)
+			setMessages(messages.filter((item) => item[key] !== id))
+			createTotast('删除成功')
+		} catch {
+			createTotast('删除失败')
+		}
+	}
+
+	// 编辑消息
+	const sendEdit = async (content, msg) => {
+		try {
+			const encrypted = encryptMessage(content, nonce, contact?.shareKey)
+			const reslut = await editUserMsgApi({ msg_id: msg.msg_id, content: encrypted, msg_type: 1 })
+
+			if (reslut?.code === 200) {
+				setMessages(
+					messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, msg_content: content } : item))
+				)
+				createTotast('编辑成功')
+
+				const user = await userService.findOneById(userService.TABLES.USER_MSGS, msg.msg_id, 'msg_id')
+				if (!user) return createTotast('编辑失败')
+
+				await userService.update(
+					userService.TABLES.USER_MSGS,
+					msg.msg_id,
+					{
+						...user,
+						msg_content: encrypted
+					},
+					'msg_id'
+				)
+			}
+		} catch (error) {
+			console.log('error', error)
+			createTotast('编辑失败')
+		}
+	}
+
+	// 回复
+	const sendReply = async (msg) => {
+		// send(msg.msg_content, sendType.SEND, msg)
+		console.log('回复', msg)
 	}
 
 	return (
@@ -177,12 +245,12 @@ export default function MessagesPage({ f7route, f7router }) {
 						</div>
 					</div>
 				}
-				footer={<MsgBar send={async (content, type = 1) => await sendMessage(type, content)} />}
 				isFristIn={isActive}
 				contact={contact}
 				list={friendsList}
-				sendForward={sendForward}
 				sendDel={sendDel}
+				sendMessage={sendMessage}
+				send={send}
 			/>
 		</Page>
 	)

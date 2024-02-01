@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { createRoot } from 'react-dom/client'
-import { CopyIcon } from '@/components/Icon/Icon'
+// import { CopyIcon } from '@/components/Icon/Icon'
 import { clsx } from 'clsx'
 import { Marked } from '@ts-stack/markdown'
 import hljs from 'highlight.js'
@@ -13,37 +13,14 @@ import { f7 } from 'framework7-react'
 import { format } from 'timeago.js'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import { ArrowUpRight, Exclamationmark, Gobackward } from 'framework7-icons/react'
-import { msgType, sendState } from '@/utils/constants'
+import { sendType, sendState, tooltipsType } from '@/utils/constants'
 import { Link } from 'framework7-react'
 import Contact from '@/components/Contact/Contact'
 import { $t } from '@/i18n'
-
+import userService from '@/db'
+import Editor from '@/components/Editor/Editor'
+import MsgBar from '@/components/Message/MsgBar'
 Marked.setOptions({ highlight: (code, lang) => hljs.highlight(lang, code).value })
-
-const PreHeader = (props) => {
-	const [, copy] = useClipboard()
-	const toastRef = useRef(null)
-
-	toastRef.current = f7.toast.create({
-		text: '复制成功',
-		position: 'center',
-		closeTimeout: 1000
-	})
-
-	const handlerCopy = () => {
-		copy(props.text)
-		toastRef.current.open()
-	}
-
-	return (
-		<>
-			<div className="flex justify-between h-7 absolute top-0  left-0 right-0 items-center px-2 border-b">
-				<span className="text-gray-500 text-[0.75rem]">{props.lang}</span>
-				<CopyIcon className="text-gray-500 w-4 h-4" onClick={handlerCopy} />
-			</div>
-		</>
-	)
-}
 
 const Tooltip = ({ el, handler, msg }) => {
 	const tooltipRef = useRef(null)
@@ -55,32 +32,32 @@ const Tooltip = ({ el, handler, msg }) => {
 
 	const tips = [
 		{
-			name: 'forward',
+			name: tooltipsType.FORWARD,
 			title: '转发',
 			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
-			name: 'edit',
+			name: tooltipsType.EDIT,
 			title: '编辑',
 			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
-			name: 'del',
+			name: tooltipsType.DELETE,
 			title: '删除',
 			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
-			name: 'choice',
+			name: tooltipsType.SELECT,
 			title: '多选',
 			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
-			name: 'reply',
+			name: tooltipsType.REPLY,
 			title: '回复',
 			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
-			name: 'mark',
+			name: tooltipsType.MARK,
 			title: '标注',
 			icon: <ArrowUpRight className="tooltip__icon" />
 		}
@@ -129,12 +106,13 @@ const Tooltip = ({ el, handler, msg }) => {
 			<div className="h-auto p-4 py-5">
 				<div className="flex flex-wrap">
 					{tips.map((item, index) => (
-						<>
+						<div key={item.name} className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')}>
 							<Link
-								className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')}
-								key={item.name}
-								onClick={() => handler(item.name, msg)}
-								panelOpen={item.name === 'forward' && 'contact-popup'}
+								onClick={() => {
+									setShowToolTip(false)
+									handler(item.name, msg)
+								}}
+								className="w-full"
 							>
 								<div className="flex flex-col items-center justify-center">
 									<div className="mb-[6px]">{item.icon}</div>
@@ -142,7 +120,7 @@ const Tooltip = ({ el, handler, msg }) => {
 								</div>
 							</Link>
 							{index === 3 && <div className="w-full h-[1px] bg-[rgba(255,255,255,0.2)]" key={index} />}
-						</>
+						</div>
 					))}
 				</div>
 			</div>
@@ -152,54 +130,34 @@ const Tooltip = ({ el, handler, msg }) => {
 
 export default function Chat({ messages, header, footer, isFristIn, ...props }) {
 	const chatRef = useRef(null)
-	const markdownRef = useRef(null)
+	// const markdownRef = useRef(null)
 	const msgRefs = useRef([])
+	const toastRef = useRef([])
 
 	const [opened, setOpened] = useState(false)
 	const [msg, setMsg] = useState({})
 
-	const [isFrist, setIsFrist] = useState(true)
+	// 输入框默认值
+	const [defaultMsg, setDefaultMsg] = useState({})
+	// 发送类型 发送 ｜ 编辑  ｜ 回复
+	const [type, setType] = useState(sendType.SEND)
 
 	const memoizedMessages = useMemo(() => messages, [messages])
 
 	const findOne = (id) => props.list.find((v) => v?.user_id === id)
 
-	useEffect(() => {
-		// 渲染 markdown
-		if (markdownRef.current) {
-			const presEl = markdownRef.current.querySelectorAll('pre')
-
-			presEl.forEach((pre) => {
-				const code = pre.querySelector('code')
-				const lang = code?.className.split('-')?.[1] || 'plain'
-				const div = document.createElement('div')
-				createRoot(div).render(<PreHeader lang={lang} text={code?.textContent} />)
-				pre.appendChild(div)
-			})
-		}
-
-		// 如果消息已经在底部，在键盘弹起后，自动滚动到底部
-		const handelerSize = () => {
-			chatRef.current.style.height = document.body.clientHeight + 'px'
-			// 当前滚动条到底部的距离
-			const scrollTop = chatRef.current.scrollTop
-			// 总高度
-			const scrollHeight = chatRef.current.scrollHeight
-			// 可视高度
-			const clientHeight = chatRef.current.clientHeight
-			// 判断距离底部的距离有多少
-			if (scrollHeight - clientHeight - scrollTop < 500) {
-				scroll(false)
-			}
-		}
-
-		scroll(false)
-
-		window.addEventListener('resize', handelerSize)
-		return () => {
-			window.removeEventListener('resize', handelerSize)
-		}
-	}, [])
+	/**
+	 * Totast 提示
+	 * @param {string} text 提示文字
+	 */
+	const toast = (text) => {
+		toastRef.current = f7.toast.create({
+			text: $t(text),
+			position: 'center',
+			closeTimeout: 1000
+		})
+		toastRef.current.open()
+	}
 
 	/**
 	 * 平滑滚动或者直接滚动到底部
@@ -212,11 +170,10 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 					behavior: 'smooth'
 				})
 			: chatRef.current.scrollTo(0, chatRef.current.scrollHeight)
-		isFrist && setIsFrist(false)
 	}
 
 	useEffect(() => {
-		scroll(isFrist ? false : true)
+		scroll(true)
 	}, [memoizedMessages])
 
 	/**
@@ -233,19 +190,54 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 		// 当前选择的消息
 		setMsg(data)
 
-		console.log('type', type, data)
+		console.log('data', data)
 
 		switch (type) {
-			case 'forward':
+			case tooltipsType.FORWARD:
 				setOpened(true)
 				break
-			case 'edit':
-				props.sendEdit && props.sendEdit(data)
+			case tooltipsType.EDIT:
+				setDefaultMsg(data)
+				setType(sendType.EDIT)
 				break
-			case 'del':
+			case tooltipsType.DELETE:
 				props.sendDel && props.sendDel(data)
 				break
+			case tooltipsType.REPLY:
+				setDefaultMsg(data)
+				setType(sendType.REPLY)
+				break
 		}
+	}
+
+	//  转发
+	const sendForward = (list, msg) => {
+		try {
+			list.forEach(async (v) => {
+				// TODO: 群聊
+				if (v?.group_id) {
+					console.log('群')
+					return
+				}
+
+				const contact = await userService.findOneById(userService.TABLES.FRIENDS_LIST, v.dialog_id, 'dialog_id')
+				await props.sendMessage(1, msg?.msg_content, {
+					dialog_id: v.dialog_id,
+					receiver_id: v.user_id,
+					update: v?.dialog_id === msg?.dialog_id ? true : false,
+					shareKey: contact?.shareKey
+				})
+			})
+			toast('转发成功')
+		} catch {
+			toast('转发失败')
+		}
+	}
+
+	// 点击发送按钮的回调
+	const send = (content, type, msg) => {
+		setType(sendType.SEND)
+		props.send(content, type, msg)
 	}
 
 	return (
@@ -260,17 +252,17 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 						key={index}
 						className={clsx(
 							'w-full flex items-center mb-4 animate__animated  animate__fadeInUp',
-							msg.msg_is_self ? 'justify-end' : 'justify-start'
+							msg?.msg_is_self ? 'justify-end' : 'justify-start'
 						)}
 						style={{ '--animate-duration': '0.3s' }}
 					>
 						<div className="flex max-w-[80%] items-start">
 							<img
-								src={findOne(msg.meg_sender_id)?.avatar}
+								src={findOne(msg?.meg_sender_id)?.avatar}
 								alt=""
 								className={clsx(
 									'w-8 h-8 rounded-full',
-									msg.msg_is_self ? 'order-last ml-2' : 'order-first mr-2'
+									msg?.msg_is_self ? 'order-last ml-2' : 'order-first mr-2'
 								)}
 							/>
 							<div className="flex-1">
@@ -278,18 +270,31 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 									callback={() => handlerLongPress(index, msg)}
 									className={clsx(
 										'w-full mb-1 flex select-none h-auto',
-										msg.msg_is_self ? 'justify-end' : 'justify-start'
+										msg?.msg_is_self ? 'justify-end' : 'justify-start'
 									)}
 								>
 									<div
 										data-index={index}
 										className={clsx(
-											'relative flex w-[fit-content] break-all',
-											msg.msg_is_self ? 'justify-end' : 'justify-start'
+											'relative flex w-[fit-content] break-all z-0',
+											msg?.msg_is_self ? 'justify-end' : 'justify-start'
 										)}
 										ref={(el) => (msgRefs.current[index] = el)}
 									>
-										{msg.msg_type === msgType.TEXT && (
+										<div
+											className={clsx(
+												'p-3 rounded relative',
+												'after:block after:absolute after:w-0 after:h-0 after:border-[5px] after:top-[10px] after:border-transparent',
+												msg.msg_is_self
+													? 'bg-primary text-white after:left-full after:border-l-primary'
+													: 'bg-white after:right-full after:border-r-white'
+											)}
+											id={'data-' + msg?.msg_id}
+										>
+											<Editor readonly={true} defaultValue={msg?.msg_content} />
+										</div>
+
+										{/* {msg?.msg_type === msgType.TEXT && (
 											<div
 												className={clsx(
 													'p-3 rounded relative',
@@ -299,17 +304,17 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 														: 'bg-white after:right-full after:border-r-white'
 												)}
 											>
-												{msg.msg_content}
+												{msg?.msg_content}
 											</div>
 										)}
 
-										{msg.msg_type === msgType.IMAGE && (
+										{msg?.msg_type === msgType.IMAGE && (
 											<img
-												src={msg.content}
+												src={msg?.content}
 												alt=""
 												className="max-w-[80%] object-cover rounded"
 											/>
-										)}
+										)} */}
 
 										{/* {msg.msg_type === 'markdown' && (
 											<div
@@ -331,14 +336,14 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 								<div
 									className={clsx(
 										'text-[0.75rem] text-gray-400 flex items-center',
-										msg.msg_is_self ? 'justify-end' : 'justify-start'
+										msg?.msg_is_self ? 'justify-end' : 'justify-start'
 									)}
 								>
-									<span>{format(msg.msg_send_time, 'zh_CN')}</span>
-									{msg.msg_is_self &&
-										(msg.msg_send_state === sendState.OK ? (
+									<span>{format(msg?.msg_send_time, 'zh_CN')}</span>
+									{msg?.msg_is_self &&
+										(msg?.msg_send_state === sendState.OK ? (
 											<DoubleTickIcon />
-										) : msg.msg_send_state === sendState.ERROR ? (
+										) : msg?.msg_send_state === sendState.ERROR ? (
 											<Exclamationmark className="text-red-500" />
 										) : (
 											<Gobackward />
@@ -350,21 +355,17 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 				))}
 			</div>
 
-			{footer}
+			{/* {footer} */}
+			<MsgBar send={send} defaultMsg={defaultMsg} type={type} setType={setType} />
 
 			<Contact
 				title={$t('选择联系人')}
 				opened={opened}
 				setOpened={setOpened}
-				send={(list) => props.sendForward(list, msg)}
+				send={(list) => sendForward(list, msg)}
 			/>
 		</div>
 	)
-}
-
-PreHeader.propTypes = {
-	text: PropType.string,
-	lang: PropType.string
 }
 
 Tooltip.propTypes = {
@@ -380,6 +381,8 @@ Chat.propTypes = {
 	handlerLongPress: PropType.func,
 	list: PropType.array,
 	sendForward: PropType.func,
-	sendEdit: PropType.func,
-	sendDel: PropType.func
+	sendDel: PropType.func,
+	sendMessage: PropType.func,
+	send: PropType.func,
+	edit: PropType.func
 }

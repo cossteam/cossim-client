@@ -4,25 +4,28 @@ import { clsx } from 'clsx'
 import { Button } from 'framework7-react'
 import PropType from 'prop-types'
 import Emojis from '@/components/Emojis/Emojis.jsx'
-import Editor from '@/utils/editor'
+// import Editor from '@/utils/editor'
+import Editor from '@/components/Editor/Editor'
+import { sendType } from '@/utils/constants'
+import { Multiply } from 'framework7-icons/react'
 
 function MsgBar(props) {
 	// 整个底部
 	const msgbarRef = useRef(null)
 	// 文本输入框
-	const textareaRef = useRef(null)
+	// const textareaRef = useRef(null)
 	// 发送按钮显示隐藏
 	const [showSendBtn, setShowSendBtn] = useState(false)
 	// 文本内容
-	const [content, setContent] = useState('')
+	// const [content, setContent] = useState('')
 	// 更多操作
 	const [showMore, setShowMore] = useState(false)
 	// 操作类型
 	const [type, setType] = useState('emoji')
 	// 首次进入
 	const [isFrist, setIsFrist] = useState(true)
-	// 编辑器
-	const [editor, setEditor] = useState(null)
+	// 编辑器引擎实例
+	const [engine, setEngine] = useState(null)
 
 	const onEmojiSelect = ({ type, emoji }) => {
 		console.log(type, emoji)
@@ -33,10 +36,16 @@ function MsgBar(props) {
 	}
 
 	const send = () => {
-		if (!content) return
-		props.send(content)
-		setContent('')
-		editor.clear().focus()
+		let value = engine.model.toValue()
+		if (props.type === sendType.REPLY) {
+			// replay_id
+			// const content = props.defaultMsg?.msg_content + value
+
+		} else {
+			props.send(value, props.type, props.defaultMsg)
+		}
+		engine?.setValue('')
+		engine?.focus()
 	}
 
 	const handlerShowMore = (moreType) => {
@@ -45,25 +54,19 @@ function MsgBar(props) {
 	}
 
 	useEffect(() => {
-		if (textareaRef.current) {
-			const editor = new Editor(textareaRef.current, {
-				placeholder: '请输入内容',
-				defaultHeight: '42px'
+		if (engine) {
+			engine.on('change', () => {
+				setShowSendBtn(!engine.isEmpty())
 			})
-			// 输入事件
-			editor.on('input', (e) => setContent(e.target.textContent))
-			setEditor(editor)
 		}
-	}, [])
+	}, [engine])
 
 	useEffect(() => {
-		setShowSendBtn(!!content)
-
 		if (!isFrist && !showMore) {
-			requestAnimationFrame(() => setTimeout(() => textareaRef.current.focus(), 200))
+			requestAnimationFrame(() => setTimeout(() => engine.focus(), 200))
 		}
 		isFrist && setIsFrist(false)
-	}, [content, showMore])
+	}, [showMore])
 
 	return (
 		<div
@@ -76,19 +79,29 @@ function MsgBar(props) {
 			<div className="rounded-2xl w-full h-auto flex items-end gap-2 p-2">
 				<VoiceIcon className="w-9 h-9" />
 				{/* <div
-					contentEditable
-					data-placeholder="输入消息"
-					className="textarea w-full resize-none outline-none h-[40px] max-h-[150px] rounded-xl border p-2 empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 focus:before:content-none"
+					className="w-full min-h-[42px] max-h-[150px] rounded-xl border p-2 overflow-y-auto"
 					ref={textareaRef}
-					onInput={(e) => handlerTextareHeight(e)}
-					onFocus={handlerFocus}
-					onBlur={handlerBlur}
 				/> */}
-				<div
-					className="textarea w-full resize-none outline-none h-[40px] max-h-[150px] rounded-xl border p-2 empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 focus:before:content-none"
-					ref={textareaRef}
-					id="chat-editor"
-				/>
+				<div className="w-full" >
+					<Editor
+						setEditor={setEngine}
+						className="min-h-[42px] max-h-[150px] rounded-xl border p-2 overflow-y-auto"
+						defaultValue={(props.type === sendType.EDIT && props.defaultMsg?.msg_content) || ''}
+					/>
+					{props.type === sendType.REPLY && (
+						<div className="bg-[#f5f5f5] mt-2 px-2 py-1 rounded relative felx justify-between items-center">
+							<Editor
+								className="w-[calc(100%-40px)] overflow-hidden h-[24px] line-clamp-1"
+								readonly={true}
+								defaultValue={props.defaultMsg?.msg_content || ''}
+							/>
+							<Multiply
+								className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+								onClick={() => props?.setType(sendType.SEND)}
+							/>
+						</div>
+					)}
+				</div>
 
 				<AddIcon
 					className={clsx('w-9 h-9', showSendBtn ? 'hidden' : 'flex')}
@@ -118,7 +131,10 @@ function MsgBar(props) {
 }
 
 MsgBar.propTypes = {
-	send: PropType.func
+	send: PropType.func,
+	defaultMsg: PropType.object,
+	type: PropType.number,
+	setType: PropType.func
 }
 
 export default MsgBar
