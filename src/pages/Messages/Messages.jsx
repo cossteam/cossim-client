@@ -32,8 +32,6 @@ export default function MessagesPage({ f7route, f7router }) {
 	const [messages, setMessages] = useState([])
 	// 是否首次进入
 	const [isActive, setIsActive] = useState(true)
-	// 是否是发送方
-	const [isSend, setIsSend] = useState(false)
 	// 随机数
 	const [nonce] = useState(cretateNonce())
 	// 好友信息列表
@@ -59,98 +57,48 @@ export default function MessagesPage({ f7route, f7router }) {
 		init()
 	}, [])
 
-	useEffect(() => {
-		try {
-			console.log('contact', contact)
-			if (!contact?.shareKey) return
-			// 只截取最新的 30 条消息，从后面往前截取
-			const msgs = msgList?.msgs?.slice(-30) || []
-			for (let i = 0; i < msgs.length; i++) {
-				const msg = msgs[i]
-				let content = msg.msg_content
-				try {
-					content = decryptMessageWithKey(content, msgList.shareKey)
-				} catch (error) {
-					console.log('解密失败：', error)
-					content = '该消息解密失败'
-				}
-				msg.msg_content = content
-			}
-			setMessages(msgs)
-			setTimeout(() => setIsActive(false), 0)
-			console.log('msgList', msgList)
-		} catch (error) {
-			console.error('error', error)
-		}
-	}, [contact])
+	useEffect(() => {}, [contact])
 
 	useEffect(() => {
-		// // 首次进来初始化消息列表,把解密的消息放入到这里
-		// const initMsgs = async () => {
-		// 	// try {
-		// 	// 	return
-		// 	// 	// console.log('contact', contact)
-		// 	// 	// if (!contact?.shareKey) return
-		// 	// 	// // 只截取最新的 30 条消息，从后面往前截取
-		// 	// 	// const msgs = msgList?.msgs?.slice(-30) || []
-		// 	// 	// for (let i = 0; i < msgs.length; i++) {
-		// 	// 	// 	const msg = msgs[i]
-		// 	// 	// 	let content = msg.msg_content
-		// 	// 	// 	try {
-		// 	// 	// 		content = decryptMessageWithKey(content, msgList.shareKey)
-		// 	// 	// 	} catch (error) {
-		// 	// 	// 		console.log('解密失败：', error)
-		// 	// 	// 		content = '该消息解密失败'
-		// 	// 	// 	}
-		// 	// 	// 	msg.msg_content = content
-		// 	// 	// }
-		// 	// 	// setMessages(msgs)
-		// 	// 	// setTimeout(() => setIsActive(false), 0)
-		// 	// 	// console.log('msgList', msgList)
-		// 	// } catch (error) {
-		// 	// 	console.error('error', error)
-		// 	// }
-		// }
+		const initMsg = async () => {
+			try {
+				// 只截取最新的 30 条消息，从后面往前截取
+				const msgs = msgList?.slice(-30) || []
+				if (msgs.length === 0) return
+
+				for (let i = 0; i < msgs.length; i++) {
+					const msg = msgs[i]
+					let content = msg.msg_content
+					try {
+						content = decryptMessageWithKey(content, contact?.shareKey)
+					} catch (error) {
+						console.log('解密失败：', error)
+						content = '该消息解密失败'
+					}
+					msg.msg_content = content
+				}
+				setMessages(msgs)
+				setIsActive(false)
+				console.log('msgList', messages, msgList)
+			} catch (error) {
+				console.error('error', error)
+			}
+		}
 
 		const updateMsg = async () => {
-			try {
-				const lastMsg = msgList?.msgs?.at(-1) || []
-
-				// 如果是发送消息
-				if (isSend) {
-					const msg = messages.at(-1)
-					msg.msg_send_state = lastMsg?.msg_send_state
-					setIsSend(false)
-					setMessages(messages)
-					return
-				}
-
-				// 如果是接收消息
-				let content = lastMsg?.content
-				try {
-					content = decryptMessageWithKey(content, msgList.shareKey)
-				} catch (error) {
-					console.log('解密失败：', error)
-					content = lastMsg?.content
-				}
-				lastMsg.content = content
-				setMessages([...messages, lastMsg])
-			} catch (error) {
-				console.error('解析消息失败：', error.message)
-			}
+			const lastMsg = msgList?.at(-1) || []
+			const msg = messages.at(-1)
+			setMessages([...messages.slice(0, -1), { ...lastMsg, msg_content: msg.msg_content }])
 		}
-		// isActive ? initMsgs() : updateMsg()
-		!isActive && updateMsg()
+
+		isActive ? initMsg() : updateMsg()
 	}, [msgList])
 
 	const sendMessage = async (type, content) => {
 		if (isActive) setIsActive(false)
-		setIsSend(true)
 
 		// 加密消息
 		const encrypted = encryptMessage(content, nonce, contact?.shareKey)
-
-		console.log('tyoe', type)
 
 		const msg = {
 			msg_read_status: msgStatus.READ,
@@ -165,7 +113,7 @@ export default function MessagesPage({ f7route, f7router }) {
 		}
 
 		// 先假设发送是 ok 的
-		setMessages([...messages, { ...msg, content, msg_send_state: sendState.LOADING }])
+		setMessages([...messages, { ...msg, msg_content: content }])
 
 		// 发送消息
 		try {
@@ -178,7 +126,7 @@ export default function MessagesPage({ f7route, f7router }) {
 			msg.msg_send_state = code === 200 ? sendState.OK : sendState.ERROR
 			msg.msg_id = data?.msg_id
 		} catch {
-			msg.send_state = sendState.ERROR
+			msg.msg_send_state = sendState.ERROR
 		}
 
 		// 添加到消息列表中，无论成功与否
@@ -190,7 +138,7 @@ export default function MessagesPage({ f7route, f7router }) {
 			(await userService.update(userService.TABLES.CHATS, DIALOG_ID, {
 				...chat,
 				last_message: encrypted,
-				msg_id: msg.msg_id,
+				msg_id: msg.msg_id ? msg.msg_id : chat?.msg_id,
 				msg_type: msg.msg_type,
 				send_time: msg.msg_send_time
 			}))
@@ -203,6 +151,12 @@ export default function MessagesPage({ f7route, f7router }) {
 	 */
 	const sendForward = async (list, msg) => {
 		console.log('list', list, msg)
+	}
+
+	const sendDel = async (msg) => {
+		const id = msg.msg_id ? msg.msg_id : msg.msg_content
+		const key = msg.msg_id ? 'msg_id' : 'msg_content'
+		await userService.delete(userService.TABLES.USER_MSGS, id, key)
 	}
 
 	return (
@@ -223,11 +177,12 @@ export default function MessagesPage({ f7route, f7router }) {
 						</div>
 					</div>
 				}
-				footer={<MsgBar send={(content, type = 1) => sendMessage(type, content)} />}
+				footer={<MsgBar send={async (content, type = 1) => await sendMessage(type, content)} />}
 				isFristIn={isActive}
 				contact={contact}
 				list={friendsList}
 				sendForward={sendForward}
+				sendDel={sendDel}
 			/>
 		</Page>
 	)

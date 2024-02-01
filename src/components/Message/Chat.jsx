@@ -13,7 +13,7 @@ import { f7 } from 'framework7-react'
 import { format } from 'timeago.js'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import { ArrowUpRight, Exclamationmark, Gobackward } from 'framework7-icons/react'
-import { msgType } from '@/utils/constants'
+import { msgType, sendState } from '@/utils/constants'
 import { Link } from 'framework7-react'
 import Contact from '@/components/Contact/Contact'
 import { $t } from '@/i18n'
@@ -240,6 +240,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 				break
 			case 'del':
 				props.sendDel && props.sendDel(data)
+				break
 		}
 	}
 
@@ -329,11 +330,11 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 										msg.msg_is_self ? 'justify-end' : 'justify-start'
 									)}
 								>
-									<span>{format(msg.send_time, 'zh_CN')}</span>
+									<span>{format(msg.msg_send_time, 'zh_CN')}</span>
 									{msg.msg_is_self &&
-										(msg.send_state === 'ok' ? (
+										(msg.msg_send_state === sendState.OK ? (
 											<DoubleTickIcon />
-										) : msg.send_state === 'error' ? (
+										) : msg.msg_send_state === sendState.ERROR ? (
 											<Exclamationmark className="text-red-500" />
 										) : (
 											<Gobackward />
