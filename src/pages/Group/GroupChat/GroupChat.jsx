@@ -4,9 +4,14 @@ import MessageBox from '@/components/Message/Chat'
 import MsgBar from '@/components/Message/MsgBar'
 import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
 import { useUserStore } from '@/stores/user'
-import { groupInfoApi, groupMemberApi } from '@/api/group'
 import PropType from 'prop-types'
-import { $t } from '@/i18n'
+// import { $t } from '@/i18n'
+import { msgStatus, msgType, sendState } from '@/utils/constants'
+import { groupInfoApi, groupMemberApi } from '@/api/group'
+import { sendToGroup } from '@/api/msg'
+import userService from '@/db'
+import { f7 } from 'framework7-react'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 GroupChat.propTypes = {
 	f7route: PropType.object.isRequired,
@@ -24,46 +29,100 @@ export default function GroupChat({ f7route, f7router }) {
 	// 群成员信息
 	const [members, setMembers] = useState([])
 	// 页面显示消息列表
+	const msgList =
+		useLiveQuery(() => userService.findOneAll(userService.TABLES.GROUP_MSGS, 'group_id', parseInt(groupId))) || []
 	const [messages, setMessages] = useState([])
 	// 是否首次进入
 	const [isActive, setIsActive] = useState(true)
 
 	useEffect(() => {
-		groupInfoApi({
-			group_id: groupId
-		}).then(({ code, data }) => {
-			console.log(data)
-			code === 200 && setGroupInfo(data)
-		})
-		groupMemberApi({
-			group_id: groupId
-		}).then(({ code, data }) => {
-			console.log(data)
-			code === 200 && setMembers(data)
-		})
-	}, [])
-	useEffect(() => {
-		console.log(groupInfo)
-	}, [groupInfo])
-	// const message = {
-	//     msg_id: null,
-	//     mgs_is_self: true,
-	//     msg_read_status: msgStatus.NOT_READ,
-	//     msg_type: type,
-	//     msg_content: sandText,
-	//     msg_send_time: Date.now(),
-	//     meg_sender_id: user.user_id,
-	//     group_id: parseInt(ReceiverId),
-	//     dialog_id: parseInt(DialogId),
-	//     msg_send_state: sendState.LOADING
-	// }
+		// 只截取最新的 30 条消息，从后面往前截取
+		const msgs = msgList?.slice(-30) || []
+		if (msgs.length === 0) return
+		setMessages(msgs)
+	}, [msgList])
+
 	const sendMessage = async (type, content) => {
 		console.log(type, content)
+
+		// 构造消息对象
+		const msg = {
+			msg_id: null,
+			msg_is_self: true,
+			msg_read_status: msgStatus.NOT_READ,
+			msg_type: type,
+			msg_content: content,
+			msg_send_time: Date.now(),
+			msg_sender_id: user.user_id,
+			group_id: parseInt(groupId),
+			dialog_id: parseInt(dialogId),
+			msg_send_state: sendState.LOADING
+		}
+
+		// 添加到消息列表
+		setMessages([...messages, msg])
+
+		// 发送消息
+		try {
+			const {
+				code,
+				data,
+				msg: errMsg
+			} = await sendToGroup({
+				content: msg.msg_content,
+				dialog_id: msg.dialog_id,
+				group_id: msg.group_id,
+				type: msg.msg_type
+			})
+			code !== 200 &&
+				f7.toast
+					.create({
+						text: errMsg,
+						position: 'center',
+						closeTimeout: 1000
+					})
+					.open()
+			// 更新消息状态
+			msg.msg_send_state = code === 200 ? sendState.OK : sendState.ERROR
+			msg.msg_id = data?.msg_id
+		} catch {
+			// 更新消息状态
+			msg.msg_send_state = sendState.ERROR
+		} finally {
+			// 更新消息列表
+			setMessages([...messages, msg])
+			// 保存到数据库
+			await userService.add(userService.TABLES.GROUP_MSGS, msg)
+			// 更新会话
+			const chat = await userService.findOneById(userService.TABLES.CHATS, dialogId, 'dialog_id')
+			chat &&
+				(await userService.update(userService.TABLES.CHATS, dialogId, {
+					...chat,
+					last_message: msg.msg_content,
+					msg_id: msg.msg_id ? msg.msg_id : chat?.msg_id,
+					msg_type: msg.msg_type,
+					send_time: msg.msg_send_time
+				}))
+		}
 	}
 
 	const handlerMsgLongPress = (type, data) => {
 		console.log(type, data)
 	}
+
+	useEffect(() => {
+		setIsActive(true)
+		groupInfoApi({
+			group_id: groupId
+		}).then(({ code, data }) => {
+			code === 200 && setGroupInfo(data)
+		})
+		groupMemberApi({
+			group_id: groupId
+		}).then(({ code, data }) => {
+			code === 200 && setMembers(data)
+		})
+	}, [])
 
 	return (
 		<Page className="messages-page" noToolbar>
@@ -86,7 +145,7 @@ export default function GroupChat({ f7route, f7router }) {
 						</div>
 					</div>
 				}
-				footer={<MsgBar send={(content, type = 1) => sendMessage(type, content)} />}
+				footer={<MsgBar send={(content, type = msgType.TEXT) => sendMessage(type, content)} />}
 				isFristIn={isActive}
 				handlerLongPress={handlerMsgLongPress}
 				list={members || []}
