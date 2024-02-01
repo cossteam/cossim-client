@@ -12,10 +12,10 @@ export const msgStatus = {
 export const msgType = {
 	/** 文本 */
 	TEXT: 1,
-	/** 图片 */
-	IMAGE: 2,
 	/** 音频 */
-	AUDIO: 3
+	AUDIO: 2,
+	/** 图片 */
+	IMAGE: 3
 }
 
 /** 会话类型 */
