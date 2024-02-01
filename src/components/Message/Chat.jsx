@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { createRoot } from 'react-dom/client'
 import { CopyIcon } from '@/components/Icon/Icon'
 import { clsx } from 'clsx'
@@ -158,6 +158,10 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 	const [opened, setOpened] = useState(false)
 	const [msg, setMsg] = useState({})
 
+	const [isFrist, setIsFrist] = useState(true)
+
+	const memoizedMessages = useMemo(() => messages, [messages])
+
 	const findOne = (id) => props.list.find((v) => v?.user_id === id)
 
 	useEffect(() => {
@@ -208,12 +212,12 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 					behavior: 'smooth'
 				})
 			: chatRef.current.scrollTo(0, chatRef.current.scrollHeight)
+		isFrist && setIsFrist(false)
 	}
 
 	useEffect(() => {
-		console.log('接收到msg', messages)
-		scroll(isFristIn ? false : true)
-	}, [messages])
+		scroll(isFrist ? false : true)
+	}, [memoizedMessages])
 
 	/**
 	 * 长按事件回调
@@ -251,7 +255,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 
 			{/* Content */}
 			<div className="w-full py-20 pb-20 px-2">
-				{messages.map((msg, index) => (
+				{memoizedMessages.map((msg, index) => (
 					<div
 						key={index}
 						className={clsx(
