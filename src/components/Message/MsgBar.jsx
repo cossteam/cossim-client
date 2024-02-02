@@ -24,6 +24,8 @@ function MsgBar(props) {
 	const [isFrist, setIsFrist] = useState(true)
 	// 编辑器引擎实例
 	const [engine, setEngine] = useState(null)
+	// 消息类型
+	const [msgType, setMsgType] = useState(props.type)
 
 	const onEmojiSelect = ({ type, emoji }) => {
 		console.log(type, emoji)

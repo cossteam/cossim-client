@@ -235,7 +235,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 
 	//  转发
 	const sendForward = (list, msg) => {
-		// console.log('list', list, msg)
+		console.log('list', list, msg)
 		try {
 			list.forEach(async (v) => {
 				const msgList = Array.isArray(msg) ? msg : [msg]
@@ -245,8 +245,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 					console.log('群')
 					return
 				}
-
-				// console.log('msg', msgList)
+				console.log('msg', msgList)
 				const contact = await userService.findOneById(userService.TABLES.FRIENDS_LIST, v.dialog_id, 'dialog_id')
 				msgList.forEach(async (item) => {
 					await props.sendMessage(1, item?.msg_content, {
@@ -268,8 +267,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 	// 点击发送按钮的回调
 	const send = (content, type, msg) => {
 		setType(sendType.SEND)
-		// props.send(content, 1, msg)
-		sendFriendMessage(type, content, {})
+		props.send(content, type, msg)
 	}
 
 	// 多选
@@ -326,15 +324,12 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 		}
 	}
 
+	// 发送消息
 	// 随机数
 	const [nonce] = useState(cretateNonce())
-
-	// 发送消息
 	const sendFriendMessage = async (type, content, options) => {
-		const contact = props?.list[0]
-
-		console.log('contact', contact)
-
+		const contact = props?.contact[0]
+		
 		const {
 			receiver_id = contact?.user_id,
 			dialog_id = contact?.dialog_id,
@@ -356,6 +351,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 			msg_sender_id: user?.user_id,
 			dialog_id,
 			msg_send_state: sendState.LOADING,
+			// 只有回复某条消息时需要带上该消息的 id
 			replay_msg_id: replay_id || null,
 			is_marked: false
 		}

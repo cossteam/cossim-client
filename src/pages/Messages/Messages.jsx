@@ -46,7 +46,7 @@ export default function MessagesPage({ f7route, f7router }) {
 	const init = async () => {
 		// 设置户消息
 		const userContact = await userService.findOneById(userService.TABLES.FRIENDS_LIST, RECEIVER_ID, 'user_id')
-		setFriendsList([userContact, user])
+		setFriendsList([userContact])
 		setContact(userContact)
 	}
 
@@ -275,6 +275,7 @@ export default function MessagesPage({ f7route, f7router }) {
 				send={send}
 				contact={contact}
 				f7router={f7router}
+				msgList={msgList}
 			/>
 		</Page>
 	)
