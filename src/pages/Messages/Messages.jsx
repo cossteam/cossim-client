@@ -5,13 +5,13 @@ import { Page, f7 } from 'framework7-react'
 import './Messages.less'
 import { useUserStore } from '@/stores/user'
 // import _ from 'lodash-es'
-import { sendToUser, editUserMsgApi } from '@/api/msg'
+import { sendToUser, editUserMsgApi, setReadApi } from '@/api/msg'
 // import { getUserInfoApi } from '@/api/user'
 import { encryptMessage, cretateNonce, decryptMessageWithKey } from '@/utils/tweetnacl'
 import userService from '@/db'
 import MessageBox from '@/components/Message/Chat'
-import MsgBar from '@/components/Message/MsgBar'
-import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
+// import MsgBar from '@/components/Message/MsgBar'
+// import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
 import { msgStatus, sendState, sendType } from '@/utils/constants'
 import { handlerMsgType } from '@/helpers/handlerType'
 import { $t } from '@/i18n'
@@ -36,7 +36,6 @@ export default function MessagesPage({ f7route, f7router }) {
 	const [nonce] = useState(cretateNonce())
 	// 好友信息列表
 	const [friendsList, setFriendsList] = useState([])
-
 	// 提示消息
 	const toastRef = useRef(null)
 
@@ -46,12 +45,7 @@ export default function MessagesPage({ f7route, f7router }) {
 	// 基本初始化
 	const init = async () => {
 		// 设置户消息
-		let userContact = await userService.findOneById(userService.TABLES.FRIENDS_LIST, RECEIVER_ID, 'user_id')
-		// if (!userContact) {
-		// 	const res = await getUserInfoApi({ user_id: RECEIVER_ID })
-		// 	if (res.code !== 200) return
-		// 	return setContact(res.data)
-		// }
+		const userContact = await userService.findOneById(userService.TABLES.FRIENDS_LIST, RECEIVER_ID, 'user_id')
 		setFriendsList([userContact, user])
 		setContact(userContact)
 	}
@@ -80,7 +74,26 @@ export default function MessagesPage({ f7route, f7router }) {
 				}
 				setMessages(msgs)
 				setIsActive(false)
-				console.log('msgList', messages, msgList)
+
+				// 设置已读状态
+				const reads = []
+				for (let i = msgList.length - 1; i > 0; i--) {
+					const msg = msgList[i]
+					if (msg.msg_read_status === msgStatus.READ) break
+					reads.push(msg.msg_id)
+				}
+
+				const reslut = await setReadApi({ msg_ids: reads, dialog_id: DIALOG_ID })
+
+				if (reslut.code !== 200) return
+
+				// 设置已读状态
+				reads.forEach((item) => {
+					const index = msgList.findIndex((v) => v.msg_id === item)
+					if (index !== -1) {
+						msgList[index].msg_read_status = msgStatus.READ
+					}
+				})
 			} catch (error) {
 				console.error('error', error)
 			}
@@ -89,7 +102,14 @@ export default function MessagesPage({ f7route, f7router }) {
 		const updateMsg = async () => {
 			const lastMsg = msgList?.at(-1) || []
 			const msg = messages.at(-1)
-			setMessages([...messages.slice(0, -1), { ...lastMsg, msg_content: msg.msg_content }])
+			if (lastMsg.msg_is_self) {
+				setMessages([...messages.slice(0, -1), { ...lastMsg, msg_content: msg.msg_content }])
+			} else {
+				setMessages([
+					...messages,
+					{ ...lastMsg, msg_content: decryptMessageWithKey(lastMsg.msg_content, contact?.shareKey) }
+				])
+			}
 		}
 
 		isActive ? initMsg() : updateMsg()
@@ -113,7 +133,7 @@ export default function MessagesPage({ f7route, f7router }) {
 			dialog_id = DIALOG_ID,
 			update = true,
 			shareKey = contact?.shareKey,
-			replay_id
+			replay_id = null
 		} = options
 
 		// 加密消息
@@ -130,7 +150,8 @@ export default function MessagesPage({ f7route, f7router }) {
 			dialog_id,
 			msg_send_state: sendState.LOADING,
 			// 只有回复某条消息时需要带上该消息的 id
-			replay_msg_id: replay_id || null
+			replay_msg_id: replay_id || null,
+			is_marked: false
 		}
 
 		// 先假设发送是 ok 的
@@ -153,19 +174,19 @@ export default function MessagesPage({ f7route, f7router }) {
 
 		// 添加到消息列表中，无论成功与否
 		replay_id
-			? await userService.add(userService.TABLES.USER_MSGS, msg)
-			: await userService.update(userService.TABLES.USER_MSGS, msg.msg_id, msg, 'msg_id')
+			? await userService.update(userService.TABLES.USER_MSGS, msg.msg_id, msg, 'msg_id')
+			: await userService.add(userService.TABLES.USER_MSGS, msg)
 
 		// 更新会话
-		// const chat = await userService.findOneById(userService.TABLES.CHATS, dialog_id, 'dialog_id')
-		// chat &&
-		// 	(await userService.update(userService.TABLES.CHATS, dialog_id, {
-		// 		...chat,
-		// 		last_message: encrypted,
-		// 		msg_id: msg.msg_id ? msg.msg_id : chat?.msg_id,
-		// 		msg_type: msg.msg_type,
-		// 		send_time: msg.msg_send_time
-		// 	}))
+		const chat = await userService.findOneById(userService.TABLES.CHATS, dialog_id, 'dialog_id')
+		chat &&
+			(await userService.update(userService.TABLES.CHATS, dialog_id, {
+				...chat,
+				last_message: encrypted,
+				msg_id: msg.msg_id ? msg.msg_id : chat?.msg_id,
+				msg_type: msg.msg_type,
+				send_time: msg.msg_send_time
+			}))
 	}
 
 	const send = async (content, type, msg) => {
@@ -247,26 +268,13 @@ export default function MessagesPage({ f7route, f7router }) {
 		<Page className="messages-page" noToolbar>
 			<MessageBox
 				messages={messages}
-				header={
-					<div className="fixed top-0 left-0 right-0 h-14 border-b flex items-center px-4 z-[999] bg-white">
-						<div className="flex items-center w-full">
-							<ArrowLeftIcon className="w-5 h-5 mr-3" onClick={() => f7router.back()} />
-							<div className="flex items-center">
-								<img src={contact?.avatar} alt="" className="w-8 h-8 rounded-full mr-2" />
-								<span>{contact?.nickname}</span>
-							</div>
-							<div className="flex-1 flex justify-end">
-								<MoreIcon className="w-7 h-7" />
-							</div>
-						</div>
-					</div>
-				}
 				isFristIn={isActive}
-				contact={contact}
 				list={friendsList}
 				sendDel={sendDel}
 				sendMessage={sendMessage}
 				send={send}
+				contact={contact}
+				f7router={f7router}
 			/>
 		</Page>
 	)

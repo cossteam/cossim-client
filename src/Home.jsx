@@ -26,10 +26,14 @@ const handlerMessage = async (msg) => {
 			msg_id: msg.msg_id,
 			msg_send_time: msg.send_at,
 			msg_is_self: false,
-			meg_sender_id: msg.uid,
+			meg_sender_id: msg.sender_id,
 			dialog_id: msg.dialog_id,
-			msg_send_state: sendState.OK
+			msg_send_state: sendState.OK,
+			replay_msg_id: msg.reply_id,
+			is_marked: false
 		}
+
+		console.log("存储消息",message);
 
 		// 加入消息列表
 		await userService.add(userService.TABLES.USER_MSGS, message)
