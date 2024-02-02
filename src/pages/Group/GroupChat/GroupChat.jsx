@@ -36,6 +36,20 @@ export default function GroupChat({ f7route, f7router }) {
 	const [isActive, setIsActive] = useState(true)
 
 	useEffect(() => {
+		setIsActive(true)
+		groupInfoApi({
+			group_id: groupId
+		}).then(({ code, data }) => {
+			code === 200 && setGroupInfo(data)
+		})
+		groupMemberApi({
+			group_id: groupId
+		}).then(({ code, data }) => {
+			code === 200 && setMembers(data)
+		})
+	}, [])
+
+	useEffect(() => {
 		// 只截取最新的 30 条消息，从后面往前截取
 		const msgs = msgList?.slice(-30) || []
 		if (msgs.length === 0) return
@@ -110,19 +124,14 @@ export default function GroupChat({ f7route, f7router }) {
 		console.log(type, data)
 	}
 
-	useEffect(() => {
-		setIsActive(true)
-		groupInfoApi({
-			group_id: groupId
-		}).then(({ code, data }) => {
-			code === 200 && setGroupInfo(data)
-		})
-		groupMemberApi({
-			group_id: groupId
-		}).then(({ code, data }) => {
-			code === 200 && setMembers(data)
-		})
-	}, [])
+	const handlerFunc = (funcType, data) => {
+		console.log(funcType, data)
+		switch (funcType) {
+			case 'call':
+				f7router.navigate('/call/')
+				break
+		}
+	}
 
 	return (
 		<Page className="messages-page" noToolbar>
@@ -145,9 +154,9 @@ export default function GroupChat({ f7route, f7router }) {
 						</div>
 					</div>
 				}
-				footer={<MsgBar send={(content, type = msgType.TEXT) => sendMessage(type, content)} />}
 				isFristIn={isActive}
 				handlerLongPress={handlerMsgLongPress}
+				onSelectFunc={handlerFunc}
 				list={members || []}
 			/>
 		</Page>

@@ -17,6 +17,7 @@ import NewGroup from '@/pages/Group/NewGroup/NewGroup'
 import Camera from '@/pages/Camera/Camera'
 import ChatInfo from '@/pages/Group/ChatInfo/ChatInfo'
 import MemberList from '@/pages/Group/ChatInfo/MemberList'
+import Call from '@/pages/Call/Call'
 
 var routes = [
 	{
@@ -90,6 +91,10 @@ var routes = [
 	{
 		path: '/memberlist/:type/:id/',
 		component: MemberList
+	},
+	{
+		path: '/call/',
+		component: Call
 	},
 	{
 		path: '(.*)',
