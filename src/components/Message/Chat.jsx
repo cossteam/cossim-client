@@ -7,7 +7,7 @@ import LongPressButton from './LongPressButton'
 import PropType from 'prop-types'
 import { format } from 'timeago.js'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
-import { ArrowUpRight, Exclamationmark, Gobackward } from 'framework7-icons/react'
+import { ArrowUpRight, Exclamationmark, Gobackward, BookmarkFill } from 'framework7-icons/react'
 import { sendType, sendState, tooltipsType } from '@/utils/constants'
 import { Link, f7 } from 'framework7-react'
 import Contact from '@/components/Contact/Contact'
@@ -15,6 +15,10 @@ import { $t } from '@/i18n'
 import userService from '@/db'
 import Editor from '@/components/Editor/Editor'
 import MsgBar from '@/components/Message/MsgBar'
+import { Checkbox } from 'antd-mobile'
+import { useUserStore } from '@/stores/user'
+import { labelMsgApi } from '@/api/msg'
+import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
 
 const Tooltip = ({ el, handler, msg }) => {
 	const tooltipRef = useRef(null)
@@ -76,7 +80,7 @@ const Tooltip = ({ el, handler, msg }) => {
 
 		// 控制左右边界
 		if (elRect.width <= 150) {
-			const isLeft = elRect.left <= 50
+			const isLeft = elRect.left <= 100
 			// 控制弹窗
 			tooltipRef.current.style.left = isLeft ? '-40px' : 'auto'
 			tooltipRef.current.style.right = isLeft ? 'auto' : '-40px'
@@ -129,7 +133,6 @@ const Tooltip = ({ el, handler, msg }) => {
 
 export default function Chat({ messages, header, footer, isFristIn, ...props }) {
 	const chatRef = useRef(null)
-	// const markdownRef = useRef(null)
 	const msgRefs = useRef([])
 	const toastRef = useRef([])
 	// 打开关闭转发弹窗
@@ -145,10 +148,11 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 	// 根据id查找好友
 	const findOne = (id) => props.list.find((v) => v?.user_id === id)
 
-	/**
-	 * Totast 提示
-	 * @param {string} text 提示文字
-	 */
+	// 消息列表
+	const [msgs, setMsgs] = useState([])
+
+	const { user } = useUserStore()
+
 	const toast = (text) => {
 		toastRef.current = f7.toast.create({
 			text: $t(text),
@@ -158,10 +162,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 		toastRef.current.open()
 	}
 
-	/**
-	 * 平滑滚动或者直接滚动到底部
-	 * @param {*} isSmooth 	是否平滑滚动
-	 */
+	// 平滑滚动或者直接滚动到底部
 	const scroll = (isSmooth = false) => {
 		isSmooth
 			? chatRef.current.scrollTo({
@@ -217,28 +218,41 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 			case tooltipsType.COPY:
 				copyString(data?.msg_content)
 				break
+			case tooltipsType.SELECT:
+				setIsSelect(true)
+				break
+			case tooltipsType.MARK:
+				sendMark(data)
+				break
 		}
 	}
 
 	//  转发
 	const sendForward = (list, msg) => {
+		console.log('list', list, msg)
 		try {
 			list.forEach(async (v) => {
+				const msgList = Array.isArray(msg) ? msg : [msg]
+
 				// TODO: 群聊
 				if (v?.group_id) {
 					console.log('群')
 					return
 				}
-
+				console.log('msg', msgList)
 				const contact = await userService.findOneById(userService.TABLES.FRIENDS_LIST, v.dialog_id, 'dialog_id')
-				await props.sendMessage(1, msg?.msg_content, {
-					dialog_id: v.dialog_id,
-					receiver_id: v.user_id,
-					update: v?.dialog_id === msg?.dialog_id ? true : false,
-					shareKey: contact?.shareKey
+				msgList.forEach(async (item) => {
+					await props.sendMessage(1, item?.msg_content, {
+						dialog_id: v.dialog_id,
+						receiver_id: v.user_id,
+						update: v?.dialog_id === item?.dialog_id ? true : false,
+						shareKey: contact?.shareKey
+					})
 				})
 			})
 			toast('转发成功')
+			setMsg({})
+			setSelectList([])
 		} catch {
 			toast('转发失败')
 		}
@@ -250,10 +264,79 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 		props.send(content, type, msg)
 	}
 
+	// 多选
+	const [isSelect, setIsSelect] = useState(false)
+	const [selectList, setSelectList] = useState([])
+
+	const selectChange = (msg) => {
+		const index = selectList.findIndex((v) => v?.msg_id === msg.msg_id)
+		if (index !== -1) {
+			selectList.splice(index, 1)
+			setSelectList([...selectList])
+			return
+		}
+		setSelectList([...selectList, msg])
+	}
+
+	const select = (name) => {
+		switch (name) {
+			case tooltipsType.FORWARD:
+				setOpened(true)
+				break
+		}
+
+		setIsSelect(!isSelect)
+	}
+
+	// 标注
+	const sendMark = async (msg) => {
+		try {
+			// console.log('标注', msg)
+
+			const reslut = await labelMsgApi({ msg_id: msg.msg_id, is_label: 1 })
+
+			if (reslut?.code !== 200) return toast('标注失败')
+
+			const user = await userService.findOne(userService.TABLES.USER_MSGS, 'msg_id', msg?.msg_id)
+			if (!user) return
+			// 更新数据库状态
+			await userService.update(
+				userService.TABLES.USER_MSGS,
+				msg.msg_id,
+				{
+					...user,
+					is_marked: true
+				},
+				'msg_id'
+			)
+
+			toast('标注成功')
+			setMsg({})
+			setSelectList([])
+		} catch {
+			toast('标注失败')
+		}
+	}
+
 	return (
 		<div className="w-full h-screen overflow-y-auto text-[0.888rem] bg-[#f8f8f8] relative" ref={chatRef}>
 			{/* Header */}
-			{header}
+			{header ? (
+				header
+			) : (
+				<div className="fixed top-0 left-0 right-0 h-14 border-b flex items-center px-4 z-[999] bg-white">
+					<div className="flex items-center w-full">
+						<ArrowLeftIcon className="w-5 h-5 mr-3" onClick={() => props?.f7router.back()} />
+						<div className="flex items-center">
+							<img src={props?.contact?.avatar} alt="" className="w-8 h-8 rounded-full mr-2" />
+							<span>{props?.contact?.nickname}</span>
+						</div>
+						<Link className="flex-1 flex justify-end" href={`/profile/${props?.contact?.user_id}/`}>
+							<MoreIcon className="w-7 h-7" />
+						</Link>
+					</div>
+				</div>
+			)}
 
 			{/* Content */}
 			<div className="w-full py-20 pb-20 px-2">
@@ -261,90 +344,95 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 					<div
 						key={index}
 						className={clsx(
-							'w-full flex items-center mb-4 animate__animated  animate__fadeInUp',
-							msg?.msg_is_self ? 'justify-end' : 'justify-start'
+							'w-full flex mb-4 animate__animated  animate__fadeInUp items-start gap-2',
+							!isSelect && msg?.msg_is_self ? 'justify-end' : 'justify-start',
+							isSelect && 'justify-between'
 						)}
 						style={{ '--animate-duration': '0.3s' }}
 					>
-						<div className="w-full flex justify-between">
-							<div className=""></div>
-							<div className="flex max-w-[80%] items-start">
-								<img
-									src={findOne(msg?.meg_sender_id)?.avatar}
-									alt=""
+						{isSelect && <Checkbox className="text-red-500 w-auto" onChange={() => selectChange(msg)} />}
+
+						<div className={clsx('flex max-w-[80%] items-start', isSelect && 'max-w-[100%] flex-1')}>
+							<img
+								src={msg?.msg_is_self ? user?.avatar : findOne(msg?.meg_sender_id)?.avatar}
+								alt=""
+								className={clsx(
+									'w-8 h-8 rounded-full',
+									msg?.msg_is_self ? 'order-last ml-2' : 'order-first mr-2'
+								)}
+							/>
+							<div className="flex-1">
+								<LongPressButton
+									callback={() => handlerLongPress(index, msg)}
 									className={clsx(
-										'w-8 h-8 rounded-full',
-										msg?.msg_is_self ? 'order-last ml-2' : 'order-first mr-2'
+										'w-full mb-1 flex select-none h-auto',
+										msg?.msg_is_self ? 'justify-end' : 'justify-start'
 									)}
-								/>
-								<div className="flex-1">
-									<LongPressButton
-										callback={() => handlerLongPress(index, msg)}
+								>
+									<div
+										data-index={index}
 										className={clsx(
-											'w-full mb-1 flex select-none h-auto',
+											'relative flex w-[fit-content] break-all z-0',
 											msg?.msg_is_self ? 'justify-end' : 'justify-start'
 										)}
+										ref={(el) => (msgRefs.current[index] = el)}
+										id={'data-' + msg?.msg_id}
 									>
 										<div
-											data-index={index}
 											className={clsx(
-												'relative flex w-[fit-content] break-all z-0',
-												msg?.msg_is_self ? 'justify-end' : 'justify-start'
+												'px-3 py-1 rounded relative',
+												'after:block after:absolute after:w-0 after:h-0 after:border-[5px] after:top-[10px] after:border-transparent',
+												msg.msg_is_self
+													? 'bg-primary text-white after:left-full after:border-l-primary'
+													: 'bg-white after:right-full after:border-r-white'
 											)}
-											ref={(el) => (msgRefs.current[index] = el)}
-											id={'data-' + msg?.msg_id}
 										>
-											<div
-												className={clsx(
-													'p-3 rounded relative',
-													'after:block after:absolute after:w-0 after:h-0 after:border-[5px] after:top-[10px] after:border-transparent',
-													msg.msg_is_self
-														? 'bg-primary text-white after:left-full after:border-l-primary'
-														: 'bg-white after:right-full after:border-r-white'
-												)}
-											>
-												<Editor readonly={true} defaultValue={msg?.msg_content} />
-											</div>
+											<Editor readonly={true} defaultValue={msg?.msg_content} />
 										</div>
-									</LongPressButton>
-									<div
-										className={clsx(
-											'text-[0.75rem] text-gray-400 flex items-center mb-1',
-											msg?.msg_is_self ? 'justify-end' : 'justify-start'
-										)}
-									>
-										<span>{format(msg?.msg_send_time, 'zh_CN')}</span>
-										{msg?.msg_is_self &&
-											(msg?.msg_send_state === sendState.OK ? (
-												<DoubleTickIcon />
-											) : msg?.msg_send_state === sendState.ERROR ? (
-												<Exclamationmark className="text-red-500" />
-											) : (
-												<Gobackward />
-											))}
 									</div>
-									{msg?.replay_msg_id && (
-										<a
-											href={`#data-${msg?.replay_msg_id}`}
-											className={clsx('flex', msg?.msg_is_self ? 'justify-end' : 'justify-start')}
-										>
-											<div
-												className={clsx(
-													'text-[0.71rem] w-[fit-content] max-w-[200px] bg-[#e7e7e7] px-2 rounded line-clamp-1 overflow-hidden !text-[#666]'
-												)}
-											>
-												<Editor
-													readonly={true}
-													defaultValue={
-														memoizedMessages.find((v) => v.msg_id === msg?.replay_msg_id)
-															?.msg_content || ''
-													}
-													className="w-[fit-content] !text-[#666]"
-												/>
-											</div>
-										</a>
+								</LongPressButton>
+								<div
+									className={clsx(
+										'text-[0.75rem] text-gray-400 flex items-center mb-1',
+										msg?.msg_is_self ? 'justify-end' : 'justify-start'
 									)}
+								>
+									<span>{format(msg?.msg_send_time, 'zh_CN')}</span>
+									{msg?.msg_is_self &&
+										(msg?.msg_send_state === sendState.OK ? (
+											<DoubleTickIcon />
+										) : msg?.msg_send_state === sendState.ERROR ? (
+											<Exclamationmark className="text-red-500" />
+										) : (
+											<Gobackward />
+										))}
+									{msg?.is_marked && <BookmarkFill className="text-primary" />}
 								</div>
+
+								{/* 回复消息 */}
+								{msg?.replay_msg_id ? (
+									<a
+										href={`#data-${msg?.replay_msg_id}`}
+										className={clsx('flex', msg?.msg_is_self ? 'justify-end' : 'justify-start')}
+									>
+										<div
+											className={clsx(
+												'text-[0.71rem] w-[fit-content] max-w-[200px] bg-[#e7e7e7] px-2 rounded line-clamp-1 overflow-hidden !text-[#666]'
+											)}
+										>
+											<Editor
+												readonly={true}
+												defaultValue={
+													memoizedMessages.find((v) => v.msg_id === msg?.replay_msg_id)
+														?.msg_content || ''
+												}
+												className="w-[fit-content] !text-[#666]"
+											/>
+										</div>
+									</a>
+								) : (
+									<></>
+								)}
 							</div>
 						</div>
 					</div>
@@ -352,13 +440,21 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 			</div>
 
 			{/* {footer} */}
-			<MsgBar send={send} defaultMsg={defaultMsg} type={type} setType={setType} onMoreSelect={props?.onMoreSelect}/>
+			<MsgBar
+				send={send}
+				defaultMsg={defaultMsg}
+				type={type}
+				setType={setType}
+				onMoreSelect={props?.onMoreSelect}
+				isSelect={isSelect}
+				select={select}
+			/>
 
 			<Contact
 				title={$t('选择联系人')}
 				opened={opened}
 				setOpened={setOpened}
-				send={(list) => sendForward(list, msg)}
+				send={(list) => sendForward(list, [...selectList, msg])}
 			/>
 		</div>
 	)
@@ -381,5 +477,7 @@ Chat.propTypes = {
 	sendMessage: PropType.func,
 	send: PropType.func,
 	edit: PropType.func,
-	onMoreSelect: PropType.func
+	onMoreSelect: PropType.func,
+	contact: PropType.object,
+	f7router: PropType.object
 }

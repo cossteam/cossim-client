@@ -118,3 +118,31 @@ export function editUserMsgApi(data) {
 		data
 	})
 }
+
+/**
+ * 标注消息
+ * @param {*} data
+ * @param {*} data.msg_id			消息id
+ * @param {*} data.is_label			是否标记
+ */
+export function labelMsgApi(data) {
+	return request({
+		url: baseApi + '/label/user',
+		method: 'POST',
+		data
+	})
+}
+
+/**
+ * 设置已读
+ * @param {*} data
+ * @param {*} data.msg_ids			消息id列表
+ * @param {*} data.dialog_id		对话id
+ */
+export function setReadApi(data) {
+	return request({
+		url: baseApi + '/read/user',
+		method: 'POST',
+		data
+	})
+}

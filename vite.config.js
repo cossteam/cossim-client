@@ -10,6 +10,11 @@ import { createHtmlPlugin } from 'vite-plugin-html'
 // import requireTransform from 'vite-plugin-require-transform'
 // import commonjs from '@rollup/plugin-commonjs'
 
+// import Components from 'unplugin-vue-components/vite'
+// import { VantResolver } from '@vant/auto-import-resolver'
+// import babel from 'vite-plugin-babel'
+// import babelConfig from './babel.config'
+
 process.env.TARGET = process.env.TARGET || 'web'
 const isCordova = process.env.TARGET === 'cordova'
 const SRC_DIR = path.resolve(__dirname, './src')
@@ -31,6 +36,10 @@ export default async ({ mode }) => {
 					}
 				}
 			}),
+			// babel()
+			// Components({
+			// 	resolvers: [VantResolver()]
+			// })
 			// commonjs()
 			// requireTransform({
 			// 	fileRegex: /.js$|.vue$|.ts$|.tsx$|.jsx$/
@@ -130,7 +139,7 @@ export default async ({ mode }) => {
 		},
 		define: {
 			// 'process': true
-			'process.env': {},
+			'process.env': {}
 		}
 	})
 }

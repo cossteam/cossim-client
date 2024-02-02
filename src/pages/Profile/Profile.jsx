@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { List, ListItem, Navbar, Link, Page, f7, Toggle } from 'framework7-react'
+import { List, ListItem, Navbar, Link, Page, f7, Toggle, ListButton } from 'framework7-react'
 import './Profile.less'
 // import ListColorIcon from '@/components/ListColorIcon'
 // import { contacts } from '@/data'
@@ -7,8 +7,9 @@ import { $t } from '@/i18n'
 import { getUserInfoApi } from '@/api/user'
 import { deleteFriendApi, addBlackListApi, deleteBlackListApi } from '@/api/relation'
 import PropTypes from 'prop-types'
+// import { StarFill } from 'framework7-icons/react'
 
-import { dbService } from '@/db'
+import userService, { dbService } from '@/db'
 
 Profile.propTypes = {
 	f7route: PropTypes.object,
@@ -41,6 +42,13 @@ export default function Profile(props) {
 	// 页面安装时将页面滚动到头像大小的一半
 	useEffect(() => {
 		const getUserInfo = async () => {
+			const user = await userService.findOneById(dbService.TABLES.FRIENDS_LIST, f7route.params.id, 'user_id')
+
+			if (user) {
+				setInfo(user)
+				return
+			}
+
 			const res = await getUserInfoApi({ user_id: f7route.params.id, type: 1 })
 			// console.log('获取用户信息', res)
 			if (res.code !== 200) return
@@ -52,6 +60,8 @@ export default function Profile(props) {
 
 		const profileAvatarHeight = profileAvatarRef.current.offsetHeight
 		pageRef.current.el.querySelector('.page-content').scrollTop = profileAvatarHeight / 2
+
+		// console.log('profileAvatarHeight', info)
 	}, [])
 
 	const deleteFriend = () => {
@@ -123,7 +133,10 @@ export default function Profile(props) {
 				<List strong outline dividers mediaList className="no-margin-top">
 					<ListItem title={info?.name} text={info?.nick_name || info?.nickname}>
 						<div slot="after" className="profile-actions-links">
-							<Link iconF7="chat_bubble_fill" />
+							<Link
+								iconF7="chat_bubble_fill"
+								href={`/chats/${f7route.params.id}/?dialog_id=${info?.dialog_id}`}
+							/>
 							{/* <Link iconF7="camera_fill" /> */}
 							{/* <Link iconF7="phone_fill" /> */}
 						</div>
@@ -132,18 +145,6 @@ export default function Profile(props) {
 				</List>
 
 				{/* <List strong outline dividers>
-					<ListItem link title={$t('媒体、链接和文档')} after="1 758">
-						<ListColorIcon color="#007BFD" icon="photo" slot="media" />
-					</ListItem>
-					<ListItem link title="Starred Messages" after="3">
-						<ListColorIcon color="#FFC601" icon="star_fill" slot="media" />
-					</ListItem>
-					<ListItem link title="Chat Search">
-						<ListColorIcon color="#FF8E35" icon="search" slot="media" />
-					</ListItem>
-				</List>
-
-				<List strong outline dividers>
 					<ListItem link title="Mute" after="No">
 						<ListColorIcon color="#35C759" icon="speaker_3_fill" slot="media" />
 					</ListItem>
@@ -153,46 +154,38 @@ export default function Profile(props) {
 					<ListItem link title="Save to Camera Roll" after="Default">
 						<ListColorIcon color="#FFC601" icon="square_arrow_down_fill" slot="media" />
 					</ListItem>
-				</List>
-
-				<List strong outline dividers>
-					<ListItem link title="Disappearing Messages" after="Off">
-						<ListColorIcon color="#007BFD" icon="timer" slot="media" />
-					</ListItem>
-					<ListItem
-						link
-						title="Encription"
-						footer="Messages and calls are end-to-end encrypted. Tap to verify."
-					>
-						<ListColorIcon color="#007BFD" icon="lock_fill" slot="media" />
-					</ListItem>
-				</List>
-
-				<List strong outline dividers>
-					<ListItem link title="Contact Details">
-						<ListColorIcon color="#8E8E92" icon="person_circle" slot="media" />
-					</ListItem>
-				</List>
-
-				<List strong outline dividers>
-					<ListButton>Share Contact</ListButton>
-					<ListButton>Export Chat</ListButton>
-					<ListButton color="red">Clear Chat</ListButton>
-				</List>
-				<List strong outline dividers>
-					<ListButton color="red">Block Contact</ListButton>
-					<ListButton color="red">Report Contact</ListButton>
 				</List> */}
 
 				{/* <List strong outline dividers>
-					<ListButton>Share Contact</ListButton>
-					<ListButton>Export Chat</ListButton>
-					<ListButton color="red">Clear Chat</ListButton>
+					<ListItem link title={$t('媒体、链接和文档')} after="1 758">
+						<ListColorIcon color="#007BFD" icon="photo" slot="media" />
+					</ListItem>
+					<ListItem link title={$t('聊天记录')} after="3">
+						<StarFill color="#FFC601" slot="media" />
+					</ListItem>
+					<ListItem link title="Chat Search">
+					<ListColorIcon color="#FF8E35" icon="search" slot="media" />
+					</ListItem>
 				</List> */}
 
-				{/* <ListButton color="red" onClick={deleteFriend}>
-						{$t('删除好友')}
-					</ListButton> */}
+				{/* <List strong outline dividers>
+					<ListItem link title="Mute" after="No">
+						<ListColorIcon color="#35C759" icon="speaker_3_fill" slot="media" />
+					</ListItem>
+					<ListItem link title="Wallpaper & Sound">
+						<ListColorIcon color="#EC72D7" icon="camera_filters" slot="media" />
+					</ListItem>
+					<ListItem link title="Save to Camera Roll" after="Default">
+						<ListColorIcon color="#FFC601" icon="square_arrow_down_fill" slot="media" />
+					</ListItem>
+				</List> */}
+
+				<List strong outline dividers>
+					<ListItem title={$t('阅后即焚')}>
+						<Toggle slot="after" onToggleChange={onToggleChange} checked={isBlackList} />
+					</ListItem>
+					<ListButton color="red">{$t('清除聊天记录')}</ListButton>
+				</List>
 
 				<List strong outline dividers>
 					<ListItem>

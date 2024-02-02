@@ -14,17 +14,18 @@ import {
 	Searchbar
 } from 'framework7-react'
 import './Chats.less'
-import DoubleTickIcon from '@/components/DoubleTickIcon'
-import { Search, Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } from 'framework7-icons/react'
+// import DoubleTickIcon from '@/components/DoubleTickIcon'
+import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
 import userService, { dbService } from '@/db'
 import { getChatList, getBehindMsgApi } from '@/api/msg'
 import { mapKeys, omit } from 'lodash-es'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { format } from 'timeago.js'
-import { decryptMessage } from '@/utils/tweetnacl'
+import { decryptMessageWithKey } from '@/utils/tweetnacl'
 import { useHistoryStore } from '@/stores/history'
 import { useUserStore } from '@/stores/user'
+import Editor from '@/components/Editor/Editor'
 
 export default function Chats(props) {
 	const swipeoutUnread = () => {
@@ -51,6 +52,9 @@ export default function Chats(props) {
 	const [chatList, setChatList] = useState([])
 	// 是否是首次进入
 	const [isFirstIn, setIsFirstIn] = useState(true)
+
+	// const msgList = useLiveQuery(() => userService.findAll(userService.TABLES.USER_MSGS))
+	// const userList = useLiveQuery(() => userService.findAll(userService.TABLES.FRIENDS_LIST))
 
 	useEffect(() => {
 		try {
@@ -106,9 +110,9 @@ export default function Chats(props) {
 				const item = chatList[i]
 				try {
 					if (!item.last_message) continue
-					const session = await userService.findOneById(userService.TABLES.USERS, item.user_id)
-					const msgJSON = JSON.parse(item.last_message)
-					item.last_message = decryptMessage(msgJSON.msg, msgJSON.nonce, session?.data?.shareKey)
+					const session = await userService.findOneById(userService.TABLES.FRIENDS_LIST, item.user_id)
+					// const msgJSON = JSON.parse(item.last_message)
+					item.last_message = decryptMessageWithKey(item.last_message, session?.shareKey)
 				} catch {
 					continue
 				}
@@ -165,16 +169,18 @@ export default function Chats(props) {
 		getBehindMsg()
 	}, [])
 
+
 	const lastMessageHandler = (chat) => {
-		let msg = chat.last_message
-		if (!chat?.group_id) return msg
+		// let msg = ''
+
 		try {
-			msg = JSON.parse(chat?.last_message).content
+			// if (chat?.group_id) {
+			// 	console.log("chat",chat)
+			// }
+			return chat?.last_message
 		} catch {
-			msg = '该消息解密失败'
-			// console.log(error)
+			return '该消息解密失败'
 		}
-		return msg
 	}
 
 	return (
@@ -207,9 +213,10 @@ export default function Chats(props) {
 						swipeout
 					>
 						<img slot="media" src={`${chat.dialog_avatar}`} loading="lazy" alt={chat.dialog_name} />
-						<div slot="text" className="max-w-[60%] overflow-hidden overflow-ellipsis ">
-							{chat.send_time === 'sent' && <DoubleTickIcon />}
-							{lastMessageHandler(chat)}
+						<div slot="text" className="max-w-[60%] overflow-hidden overflow-ellipsis line-clamp-1 ">
+							{/* {chat.send_time === 'sent' && <DoubleTickIcon />} */}
+							{/* {lastMessageHandler(chat)} */}
+							<Editor readonly={true} defaultValue={lastMessageHandler(chat)} />
 						</div>
 						<SwipeoutActions right>
 							<SwipeoutButton close overswipe color="blue" onClick={swipeoutUnread}>
