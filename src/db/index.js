@@ -43,9 +43,9 @@ const TABLES = {
 		send_time,
 		msg_id`,
 	// 用户私聊消息
-	user_msgs: `++id, &msg_id, msg_is_self, msg_read_status ,msg_type, msg_content, msg_send_time, meg_sender_id, dialog_id, msg_send_state`,
+	user_msgs: `++id, &msg_id, msg_is_self, msg_read_status ,msg_type, msg_content, msg_send_time, meg_sender_id, dialog_id, msg_send_state, replay_msg_id`,
 	// 用户群聊消息
-	group_msgs: `++id, &msg_id, msg_is_self, msg_read_status ,msg_type, msg_content, msg_send_time, meg_sender_id, group_id, dialog_id, msg_send_state`,
+	group_msgs: `++id, &msg_id, msg_is_self, msg_read_status ,msg_type, msg_content, msg_send_time, meg_sender_id, group_id, dialog_id, msg_send_state, replay_msg_id`,
 	// 会话列表
 	// chats_list: `++id, &dialog_id, dialog_type, dialog_name, dialog_avatar, dialog_unread_count, last_message, sender_id, send_time, &msg_id`,
 	// 好友列表

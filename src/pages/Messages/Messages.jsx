@@ -112,7 +112,8 @@ export default function MessagesPage({ f7route, f7router }) {
 			receiver_id = RECEIVER_ID,
 			dialog_id = DIALOG_ID,
 			update = true,
-			shareKey = contact?.shareKey
+			shareKey = contact?.shareKey,
+			replay_id
 		} = options
 
 		// 加密消息
@@ -127,7 +128,9 @@ export default function MessagesPage({ f7route, f7router }) {
 			msg_is_self: true,
 			msg_sender_id: user?.user_id,
 			dialog_id,
-			msg_send_state: sendState.LOADING
+			msg_send_state: sendState.LOADING,
+			// 只有回复某条消息时需要带上该消息的 id
+			replay_msg_id: replay_id || null
 		}
 
 		// 先假设发送是 ok 的
@@ -139,6 +142,7 @@ export default function MessagesPage({ f7route, f7router }) {
 				content: encrypted,
 				dialog_id: parseInt(dialog_id),
 				receiver_id,
+				replay_id,
 				type
 			})
 			msg.msg_send_state = code === 200 ? sendState.OK : sendState.ERROR
@@ -148,7 +152,9 @@ export default function MessagesPage({ f7route, f7router }) {
 		}
 
 		// 添加到消息列表中，无论成功与否
-		await userService.add(userService.TABLES.USER_MSGS, msg)
+		replay_id
+			? await userService.add(userService.TABLES.USER_MSGS, msg)
+			: await userService.update(userService.TABLES.USER_MSGS, msg.msg_id, msg, 'msg_id')
 
 		// 更新会话
 		// const chat = await userService.findOneById(userService.TABLES.CHATS, dialog_id, 'dialog_id')
@@ -171,7 +177,7 @@ export default function MessagesPage({ f7route, f7router }) {
 			case sendType.EDIT:
 				await sendEdit(content, msg)
 				break
-			case sendType.REPLY: 
+			case sendType.REPLY:
 				await sendReply(content, msg)
 				break
 		}
@@ -222,9 +228,19 @@ export default function MessagesPage({ f7route, f7router }) {
 	}
 
 	// 回复
-	const sendReply = async (msg) => {
+	const sendReply = async (content, msg) => {
 		// send(msg.msg_content, sendType.SEND, msg)
-		console.log('回复', msg)
+		console.log('回复', content, msg)
+		try {
+			await sendMessage(1, content, {
+				replay_id: msg.msg_id
+			})
+			// await userService.update(userService.TABLES.USER_MSGS, msg.msg_id, {})
+			createTotast('回复成功')
+		} catch (error) {
+			console.log('error', error)
+			createTotast('回复失败')
+		}
 	}
 
 	return (

@@ -19,7 +19,7 @@ export default function Editor({ setEditor, readonly, options, defaultValue, ...
 		// 实例化引擎
 		const engine = new Engine(editorRef.current, {
 			readonly: readonly ? readonly : false,
-			placeholder: $t('请输入内容'),
+			placeholder: readonly ? '' : $t('请输入内容'),
 			cards: [MentionComponent],
 			plugins: [Quote, Mention],
 			config: {

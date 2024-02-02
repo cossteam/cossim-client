@@ -8,6 +8,7 @@ import Emojis from '@/components/Emojis/Emojis.jsx'
 import Editor from '@/components/Editor/Editor'
 import { sendType } from '@/utils/constants'
 import { Multiply } from 'framework7-icons/react'
+import More from './More'
 
 function MsgBar(props) {
 	// 整个底部
@@ -37,13 +38,12 @@ function MsgBar(props) {
 
 	const send = () => {
 		let value = engine.model.toValue()
-		if (props.type === sendType.REPLY) {
-			// replay_id
-			// const content = props.defaultMsg?.msg_content + value
-
-		} else {
-			props.send(value, props.type, props.defaultMsg)
-		}
+		// if (props.type === sendType.REPLY) {
+		// 	// replay_id
+		// 	// const content = props.defaultMsg?.msg_content + value
+		// } else {
+		props.send(value, props.type, props.defaultMsg)
+		// }
 		engine?.setValue('')
 		engine?.focus()
 	}
@@ -82,7 +82,7 @@ function MsgBar(props) {
 					className="w-full min-h-[42px] max-h-[150px] rounded-xl border p-2 overflow-y-auto"
 					ref={textareaRef}
 				/> */}
-				<div className="w-full" >
+				<div className="w-full">
 					<Editor
 						setEditor={setEngine}
 						className="min-h-[42px] max-h-[150px] rounded-xl border p-2 overflow-y-auto"
@@ -124,7 +124,7 @@ function MsgBar(props) {
 				</Button>
 			</div>
 			<div className={clsx('w-full h-[300px] overflow-y-auto bg-[#f5f5f5]')}>
-				{type === 'emoji' ? <Emojis onEmojiSelect={onEmojiSelect} /> : null}
+				{type === 'emoji' ? <Emojis onEmojiSelect={onEmojiSelect} /> : <More />}
 			</div>
 		</div>
 	)
