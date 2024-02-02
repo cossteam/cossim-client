@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Page } from 'framework7-react'
 import MessageBox from '@/components/Message/Chat'
-import MsgBar from '@/components/Message/MsgBar'
 import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
 import { useUserStore } from '@/stores/user'
 import PropType from 'prop-types'
 // import { $t } from '@/i18n'
-import { msgStatus, msgType, sendState } from '@/utils/constants'
+import { msgStatus, sendState } from '@/utils/constants'
 import { groupInfoApi, groupMemberApi } from '@/api/group'
 import { sendToGroup } from '@/api/msg'
 import userService from '@/db'
@@ -56,15 +55,15 @@ export default function GroupChat({ f7route, f7router }) {
 		setMessages(msgs)
 	}, [msgList])
 
-	const sendMessage = async (type, content) => {
-		console.log(type, content)
+	const sendMessage = async (content, type, currentMsg) => {
+		console.log(type, content, currentMsg)
 
 		// 构造消息对象
 		const msg = {
 			msg_id: null,
 			msg_is_self: true,
 			msg_read_status: msgStatus.NOT_READ,
-			msg_type: type,
+			msg_type: type || 1,
 			msg_content: content,
 			msg_send_time: Date.now(),
 			msg_sender_id: user.user_id,
@@ -155,8 +154,9 @@ export default function GroupChat({ f7route, f7router }) {
 					</div>
 				}
 				isFristIn={isActive}
+				send={sendMessage}
 				handlerLongPress={handlerMsgLongPress}
-				onSelectFunc={handlerFunc}
+				onMoreSelect={handlerFunc}
 				list={members || []}
 			/>
 		</Page>

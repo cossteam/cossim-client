@@ -169,7 +169,6 @@ export default function Chats(props) {
 		getBehindMsg()
 	}, [])
 
-
 	const lastMessageHandler = (chat) => {
 		// let msg = ''
 

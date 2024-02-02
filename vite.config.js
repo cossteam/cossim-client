@@ -20,6 +20,7 @@ const isCordova = process.env.TARGET === 'cordova'
 const SRC_DIR = path.resolve(__dirname, './src')
 const PUBLIC_DIR = path.resolve(__dirname, './public')
 const BUILD_DIR = path.resolve(__dirname, isCordova ? './cordova/www' : './www')
+import mkcert from 'vite-plugin-mkcert'
 
 /*** @type {import('vite').UserConfig} */
 export default async ({ mode }) => {
@@ -36,6 +37,7 @@ export default async ({ mode }) => {
 					}
 				}
 			}),
+			mkcert()
 			// babel()
 			// Components({
 			// 	resolvers: [VantResolver()]
@@ -128,14 +130,14 @@ export default async ({ mode }) => {
 			}
 		},
 		server: {
-			// host: true,
-			// proxy: {
-			// 	'/api/v1': {
-			// 		target: mode === 'development' ? http.VITE_DEV_BASE_URL : http.VITE_PROD_BASE_URL,
-			// 		changeOrigin: true,
-			// 		rewrite: (path) => path.replace(/^\/api\/v1/, '')
-			// 	}
-			// }
+			https: true,
+			proxy: {
+				'/api/v1': {
+					target: 'https://coss.gezi.vip',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/api\/v1/, '')
+				}
+			}
 		},
 		define: {
 			// 'process': true

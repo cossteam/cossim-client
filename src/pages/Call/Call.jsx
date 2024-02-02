@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import '@livekit/components-styles'
 import {
 	ControlBar,
@@ -9,36 +9,43 @@ import {
 	useTracks
 } from '@livekit/components-react'
 import { Track } from 'livekit-client'
-
-const serverUrl = 'wss://coss-kn6tndc5.livekit.cloud'
-const token =
-	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY5MjYwNTEsImlzcyI6IkFQSVp4Nldmdm9QU1BxWCIsIm5iZiI6MTcwNjgzOTY1MSwic3ViIjoicXVpY2tzdGFydCB1c2VyIHdtMzNocSIsInZpZGVvIjp7ImNhblB1Ymxpc2giOnRydWUsImNhblB1Ymxpc2hEYXRhIjp0cnVlLCJjYW5TdWJzY3JpYmUiOnRydWUsInJvb20iOiJxdWlja3N0YXJ0IHJvb20iLCJyb29tSm9pbiI6dHJ1ZX19.jvOiC5Jdxj81kgJnEPc6Dyrb3gGfb9TYlMdUA9eJWoA'
+import { Navbar, Page } from 'framework7-react'
+import { useLiveStore } from '@/stores/live'
 
 export default function App() {
+	const [init, setInit] = useState(false)
+	const { live } = useLiveStore()
+	useEffect(() => {
+		if (live) {
+			const { token, url } = live
+			console.log('token', token)
+			console.log('serverUrl', url)
+			setInit(true)
+		}
+	}, [])
+
 	return (
-		<LiveKitRoom
-			video={true}
-			audio={true}
-			token={token}
-			serverUrl={serverUrl}
-			// Use the default LiveKit theme for nice styles.
-			data-lk-theme="default"
-			style={{ height: '100vh' }}
-		>
-			{/* Your custom component with basic video conferencing functionality. */}
-			<MyVideoConference />
-			{/* The RoomAudioRenderer takes care of room-wide audio for you. */}
-			<RoomAudioRenderer />
-			{/* Controls for the user to start/stop audio, video, and screen 
-      share tracks and to leave the room. */}
-			<ControlBar />
-		</LiveKitRoom>
+		<Page noToolbar>
+			<Navbar className="messages-navbar bg-white" backLink></Navbar>
+			{init && (
+				<LiveKitRoom
+					video={true}
+					audio={true}
+					token={live.token}
+					serverUrl={live.url}
+					data-lk-theme="default"
+					style={{ height: '100%' }}
+				>
+					<MyVideoConference />
+					<RoomAudioRenderer />
+					<ControlBar />
+				</LiveKitRoom>
+			)}
+		</Page>
 	)
 }
 
 function MyVideoConference() {
-	// `useTracks` returns all camera and screen share tracks. If a user
-	// joins without a published camera track, a placeholder track is returned.
 	const tracks = useTracks(
 		[
 			{ source: Track.Source.Camera, withPlaceholder: true },
@@ -47,9 +54,7 @@ function MyVideoConference() {
 		{ onlySubscribed: false }
 	)
 	return (
-		<GridLayout tracks={tracks} style={{ height: 'calc(100vh - var(--lk-control-bar-height))' }}>
-			{/* The GridLayout accepts zero or one child. The child is used
-      as a template to render all passed in tracks. */}
+		<GridLayout tracks={tracks} style={{ height: 'calc(100% - var(--lk-control-bar-height))' }}>
 			<ParticipantTile />
 		</GridLayout>
 	)
