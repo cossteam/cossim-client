@@ -124,7 +124,7 @@ function MsgBar(props) {
 				</Button>
 			</div>
 			<div className={clsx('w-full h-[300px] overflow-y-auto bg-[#f5f5f5]')}>
-				{type === 'emoji' ? <Emojis onEmojiSelect={onEmojiSelect} /> : <More />}
+				{type === 'emoji' ? <Emojis onEmojiSelect={onEmojiSelect} /> : <More onMoreSelect={props?.onMoreSelect} />}
 			</div>
 		</div>
 	)
@@ -134,7 +134,8 @@ MsgBar.propTypes = {
 	send: PropType.func,
 	defaultMsg: PropType.object,
 	type: PropType.number,
-	setType: PropType.func
+	setType: PropType.func,
+	onMoreSelect: PropType.func
 }
 
 export default MsgBar

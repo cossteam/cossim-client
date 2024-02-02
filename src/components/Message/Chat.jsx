@@ -352,7 +352,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 			</div>
 
 			{/* {footer} */}
-			<MsgBar send={send} defaultMsg={defaultMsg} type={type} setType={setType} />
+			<MsgBar send={send} defaultMsg={defaultMsg} type={type} setType={setType} onMoreSelect={props?.onMoreSelect}/>
 
 			<Contact
 				title={$t('选择联系人')}
@@ -380,5 +380,6 @@ Chat.propTypes = {
 	sendDel: PropType.func,
 	sendMessage: PropType.func,
 	send: PropType.func,
-	edit: PropType.func
+	edit: PropType.func,
+	onMoreSelect: PropType.func
 }
