@@ -124,7 +124,11 @@ function MsgBar(props) {
 				</Button>
 			</div>
 			<div className={clsx('w-full h-[300px] overflow-y-auto bg-[#f5f5f5]')}>
-				{type === 'emoji' ? <Emojis onEmojiSelect={onEmojiSelect} /> : <More onMoreSelect={props?.onMoreSelect} />}
+				{type === 'emoji' ? (
+					<Emojis onEmojiSelect={onEmojiSelect} />
+				) : (
+					<More onMoreSelect={props?.onMoreSelect} />
+				)}
 			</div>
 		</div>
 	)

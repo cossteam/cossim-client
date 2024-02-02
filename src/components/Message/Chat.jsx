@@ -352,7 +352,13 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 			</div>
 
 			{/* {footer} */}
-			<MsgBar send={send} defaultMsg={defaultMsg} type={type} setType={setType} onMoreSelect={props?.onMoreSelect}/>
+			<MsgBar
+				send={send}
+				defaultMsg={defaultMsg}
+				type={type}
+				setType={setType}
+				onMoreSelect={props?.onMoreSelect}
+			/>
 
 			<Contact
 				title={$t('选择联系人')}

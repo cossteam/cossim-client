@@ -93,7 +93,7 @@ class WebSocketClient {
 }
 
 const token = getStorage()?.state?.token
-const wsClient = new WebSocketClient(`ws://${HOST}/api/v1/msg/ws?token=${token}`)
+const wsClient = new WebSocketClient(`wss://${HOST}/api/v1/msg/ws?token=${token}`)
 
 // 导出模块
 export default wsClient

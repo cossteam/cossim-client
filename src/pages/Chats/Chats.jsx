@@ -15,7 +15,7 @@ import {
 } from 'framework7-react'
 import './Chats.less'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
-import { Search, Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } from 'framework7-icons/react'
+import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } from 'framework7-icons/react'
 import { $t } from '@/i18n'
 import userService, { dbService } from '@/db'
 import { getChatList, getBehindMsgApi } from '@/api/msg'

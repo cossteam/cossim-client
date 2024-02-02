@@ -10,6 +10,15 @@ import { useRelationRequestStore } from '@/stores/relationRequest'
 import { friendApplyListApi } from '@/api/relation'
 import { groupRequestListApi } from '@/api/group'
 import { useUserStore } from '@/stores/user'
+import { PhoneFill } from 'framework7-icons/react'
+import { liveUserApi } from '@/api/live'
+import PropType from 'prop-types'
+import { useLiveStore } from '@/stores/live'
+import { f7 } from 'framework7-react'
+
+Contacts.propTypes = {
+	f7router: PropType.object.isRequired
+}
 
 export default function Contacts(props) {
 	const { user } = useUserStore()
@@ -68,8 +77,13 @@ export default function Contacts(props) {
 				// })
 				respData[key].forEach(async (user) => {
 					const oldItem = oldData.find((oldItem) => oldItem.user_id === user.user_id)
+					console.log(oldItem)
 					oldItem
-						? await userService.update(userService.TABLES.FRIENDS_LIST, oldItem.id, { ...oldItem,...user, group: key })
+						? await userService.update(userService.TABLES.FRIENDS_LIST, oldItem.id, {
+								...oldItem,
+								...user,
+								group: key
+							})
 						: await userService.add(userService.TABLES.FRIENDS_LIST, { ...user, group: key })
 				})
 			}
@@ -119,6 +133,16 @@ export default function Contacts(props) {
 		getResquestList()
 	}, [props])
 
+	const liveStore = useLiveStore()
+	const callUser = async (contact) => {
+		const { code, data, msg } = await liveUserApi({ user_id: contact.user_id })
+		code !== 200 && f7.dialog.alert(msg)
+		if (code === 200) {
+			liveStore.updateLive(data)
+			props.f7router.navigate('/call/')
+		}
+	}
+
 	return (
 		<Page className="contacts-page">
 			<Navbar title="联系人">
@@ -144,14 +168,22 @@ export default function Contacts(props) {
 					<ListGroup key={groupKey}>
 						<ListItem groupTitle title={groupKey} />
 						{friends[groupKey].map((contact, index) => (
-							<ListItem
-								key={index}
-								link={`/profile/${contact.user_id}/`}
-								title={contact.nickname}
-								footer={contact.signature}
-								popupClose
-							>
-								<img slot="media" src={contact.avatar} alt="" />
+							<ListItem key={index} footer={contact.signature} popupClose>
+								<span
+									slot="title"
+									onClick={() => props.f7router.navigate(`/profile/${contact.user_id}/`)}
+								>
+									{contact.nickname}
+								</span>
+								<img
+									slot="media"
+									onClick={() => props.f7router.navigate(`/profile/${contact.user_id}/`)}
+									src={contact.avatar}
+									alt=""
+								/>
+								<span slot="after" className="text-color-primary" onClick={(e) => e.stopPropagation()}>
+									<PhoneFill className="w-[24px] h-[24px]" onClick={() => callUser(contact)} />
+								</span>
 							</ListItem>
 						))}
 					</ListGroup>

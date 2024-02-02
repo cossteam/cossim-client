@@ -4,11 +4,13 @@ import PGPUtils from '@/utils/PGPUtils'
 import { f7 } from 'framework7-react'
 
 export const mode = import.meta.env.MODE || 'development'
-export const HOST = '43.229.28.107:8080' // 线上
+export const HOST = 'coss.gezi.vip' // 线上
+// export const HOST = '43.229.28.107:8080' // 线上
 // export const HOST = '192.168.100.143:8080' // 本地
+// export const HOST = '172.0.0.1:8080' // 本地
 export const baseURL = {
-	development: `http://${HOST}/api/v1`,
-	production: `http://${HOST}/api/v1`
+	development: `https://${HOST}/api/v1`,
+	production: `https://${HOST}/api/v1`
 }
 const axiosConfig = {
 	baseURL: baseURL[mode],
