@@ -66,7 +66,6 @@ export default function Contacts(props) {
 			let respData = data || {}
 
 			const oldData = (await userService.findAll(userService.TABLES.FRIENDS_LIST)) || []
-
 			for (const key in respData) {
 				// respData[key] = respData[key].map((user) => {
 				// 	return {
@@ -77,9 +76,8 @@ export default function Contacts(props) {
 				// })
 				respData[key].forEach(async (user) => {
 					const oldItem = oldData.find((oldItem) => oldItem.user_id === user.user_id)
-					console.log(oldItem)
 					oldItem
-						? await userService.update(userService.TABLES.FRIENDS_LIST, oldItem.id, {
+						? await userService.update(userService.TABLES.FRIENDS_LIST, oldItem.user_id, {
 								...oldItem,
 								...user,
 								group: key

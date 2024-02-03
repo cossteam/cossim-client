@@ -9,7 +9,7 @@ import {
 	useTracks
 } from '@livekit/components-react'
 import { Track } from 'livekit-client'
-import { Navbar, Page } from 'framework7-react'
+import { Page } from 'framework7-react'
 import { useLiveStore } from '@/stores/live'
 
 export default function App() {
@@ -26,7 +26,7 @@ export default function App() {
 
 	return (
 		<Page noToolbar>
-			<Navbar className="messages-navbar bg-white" backLink></Navbar>
+			{/* <Navbar className="messages-navbar bg-white" backLink></Navbar> */}
 			{init && (
 				<LiveKitRoom
 					video={true}
