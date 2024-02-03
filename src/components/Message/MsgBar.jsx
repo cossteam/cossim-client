@@ -6,7 +6,7 @@ import PropType from 'prop-types'
 import Emojis from '@/components/Emojis/Emojis.jsx'
 // import Editor from '@/utils/editor'
 import Editor from '@/components/Editor/Editor'
-import { sendType, tooltipsType } from '@/utils/constants'
+import { sendType, tooltipsType, msgType } from '@/utils/constants'
 import { Multiply } from 'framework7-icons/react'
 import More from './More'
 import { ArrowUpRight } from 'framework7-icons/react'
@@ -25,7 +25,7 @@ function MsgBar(props) {
 	// 编辑器引擎实例
 	const [engine, setEngine] = useState(null)
 	// 消息类型
-	const [msgType, setMsgType] = useState(props.type)
+	const [msgtype, setMsgtype] = useState(msgType.TEXT)
 
 	const onEmojiSelect = ({ type, emoji }) => {
 		console.log(type, emoji)
@@ -37,7 +37,7 @@ function MsgBar(props) {
 
 	const send = () => {
 		let value = engine.model.toValue()
-		props.send(value, props.type, props.defaultMsg)
+		props.send(value, msgtype, props.defaultMsg)
 		engine?.setValue('')
 		engine?.focus()
 	}
@@ -107,7 +107,7 @@ function MsgBar(props) {
 							className="min-h-[42px] max-h-[150px] rounded-xl border p-2 overflow-y-auto"
 							defaultValue={(props.type === sendType.EDIT && props.defaultMsg?.msg_content) || ''}
 						/>
-						{props.type === sendType.REPLY && (
+						{[sendType.REPLY, sendType.EDIT].includes(props.type) && (
 							<div className="bg-[#f5f5f5] mt-2 px-2 py-1 rounded relative felx justify-between items-center">
 								<Editor
 									className="w-[calc(100%-40px)] overflow-hidden h-[24px] line-clamp-1"

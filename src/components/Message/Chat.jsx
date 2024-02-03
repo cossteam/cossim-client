@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { createRoot } from 'react-dom/client'
 import { clsx } from 'clsx'
 import 'highlight.js/styles/github.min.css'
-import { useClipboard, useClickOutside } from '@reactuses/core'
+import { useClickOutside } from '@reactuses/core'
 import LongPressButton from './LongPressButton'
 import PropType from 'prop-types'
 import { format } from 'timeago.js'
 import DoubleTickIcon from '@/components/DoubleTickIcon'
 import { ArrowUpRight, Exclamationmark, Gobackward, BookmarkFill } from 'framework7-icons/react'
-import { sendType, sendState, tooltipsType, msgStatus } from '@/utils/constants'
+import { sendType, sendState, tooltipsType } from '@/utils/constants'
 import { Link, f7 } from 'framework7-react'
 import Contact from '@/components/Contact/Contact'
 import { $t } from '@/i18n'
@@ -17,10 +17,10 @@ import Editor from '@/components/Editor/Editor'
 import MsgBar from '@/components/Message/MsgBar'
 import { Checkbox } from 'antd-mobile'
 import { useUserStore } from '@/stores/user'
-import { labelMsgApi, sendToUser } from '@/api/msg'
+import { labelMsgApi } from '@/api/msg'
 import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
-import { handlerMsgType } from '@/helpers/handlerType'
-import { encryptMessage, cretateNonce } from '@/utils/tweetnacl'
+import { useMessageStore } from '@/stores/message'
+import { useClipboard } from '@/shared/useClipboard'
 
 const Tooltip = ({ el, handler, msg }) => {
 	const tooltipRef = useRef(null)
@@ -84,8 +84,8 @@ const Tooltip = ({ el, handler, msg }) => {
 		if (elRect.width <= 150) {
 			const isLeft = elRect.left <= 100
 			// 控制弹窗
-			tooltipRef.current.style.left = isLeft ? '-40px' : 'auto'
-			tooltipRef.current.style.right = isLeft ? 'auto' : '-40px'
+			tooltipEl.style.left = isLeft ? '-40px' : 'auto'
+			tooltipEl.style.right = isLeft ? 'auto' : '-40px'
 			// 修改小三角的位置
 			triangleRef.current.style.left = isLeft ? elRect.width / 2 + 40 + 'px' : 'auto'
 			triangleRef.current.style.right = isLeft ? 'auto' : elRect.width / 2 + 40 + 'px'
@@ -133,7 +133,7 @@ const Tooltip = ({ el, handler, msg }) => {
 	) : null
 }
 
-export default function Chat({ messages, header, footer, isFristIn, ...props }) {
+export default function Chat(props) {
 	// 整个聊天框
 	const chatRef = useRef(null)
 	// 消息列表元素
@@ -149,16 +149,16 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 	const [defaultMsg, setDefaultMsg] = useState({})
 	// 发送类型 发送 ｜ 编辑  ｜ 回复
 	const [type, setType] = useState(sendType.SEND)
-	// 消息列表
-	const [msgs, setMsgs] = useState([])
-
-	// 消息列表
-	const memoizedMessages = useMemo(() => messages, [messages])
+	// 首次进入
+	const [isFrist, setIsFrist] = useState(true)
 	// 根据id查找好友
 	const findOne = (id) => props.list.find((v) => v?.user_id === id)
 	// 用户信息
 	const { user } = useUserStore()
+	// 消息管理
+	const msgStore = useMessageStore()
 
+	// 提示
 	const toast = (text) => {
 		toastRef.current = f7.toast.create({
 			text: $t(text),
@@ -167,7 +167,6 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 		})
 		toastRef.current.open()
 	}
-
 	// 平滑滚动或者直接滚动到底部
 	const scroll = (isSmooth = false) => {
 		isSmooth
@@ -179,8 +178,16 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 	}
 
 	useEffect(() => {
+		if (!isFrist) return
+		props.msgList && props.is_group
+			? msgStore.initGroupMessage(props?.msgList, user?.user_id)
+			: msgStore.initFriendMessage(props?.msgList, user?.user_id, props?.receiver_id)
+		if (isFrist && props.msgList) setIsFrist(false)
+	}, [props.msgList])
+
+	useEffect(() => {
 		scroll(true)
-	}, [memoizedMessages])
+	}, [msgStore.message])
 
 	/**
 	 * 长按事件回调
@@ -192,19 +199,36 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 		msgRefs.current[index].appendChild(div)
 	}
 
-	// eslint-disable-next-line no-unused-vars
-	const [_, copy] = useClipboard()
-	const copyString = (str) => {
-		const doc = new DOMParser().parseFromString(str, 'text/html')
-		copy(doc.body.textContent)
-		toast('复制成功')
+	// 点击发送按钮的回调
+	const send = (content, msgType, msg) => {
+		if (type === sendType.EDIT) {
+			msgStore.editMessage(msgType, content, {
+				is_group: props?.is_group,
+				receiver_id: props?.receiver_id,
+				user_id: user?.user_id,
+				msg_id: msg?.msg_id
+			})
+		} else {
+			msgStore.sendMessage(msgType, content, {
+				is_group: props?.is_group,
+				receiver_id: props?.receiver_id,
+				dialog_id: props?.dialog_id,
+				user_id: user?.user_id,
+				replay_id: type === sendType.REPLY ? msg?.msg_id : null,
+				group_id: props?.group_id
+			})
+		}
+
+		setMsg({})
+		setSelectList([])
+		setType(sendType.SEND)
 	}
 
-	const handlerSelect = (type, data) => {
+	const handlerSelect = async (type, data) => {
 		// 当前选择的消息
 		setMsg(data)
 
-		console.log('data', data)
+		console.log('选择类型：', type, '数据：', data)
 
 		switch (type) {
 			case tooltipsType.FORWARD:
@@ -222,7 +246,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 				setType(sendType.REPLY)
 				break
 			case tooltipsType.COPY:
-				copyString(data?.msg_content)
+				sendCopy(data?.msg_content)
 				break
 			case tooltipsType.SELECT:
 				setIsSelect(true)
@@ -233,43 +257,35 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 		}
 	}
 
+	// 复制
+	const sendCopy = async (str) => {
+		const doc = new DOMParser().parseFromString(str, 'text/html')
+		const txt = doc.body.textContent
+		const flag = useClipboard(txt)
+		flag ? toast('复制成功') : toast('复制失败')
+	}
+
 	//  转发
 	const sendForward = (list, msg) => {
-		// console.log('list', list, msg)
 		try {
 			list.forEach(async (v) => {
 				const msgList = Array.isArray(msg) ? msg : [msg]
-
-				// TODO: 群聊
-				if (v?.group_id) {
-					console.log('群')
-					return
-				}
-
-				// console.log('msg', msgList)
-				const contact = await userService.findOneById(userService.TABLES.FRIENDS_LIST, v.dialog_id, 'dialog_id')
 				msgList.forEach(async (item) => {
-					await props.sendMessage(1, item?.msg_content, {
-						dialog_id: v.dialog_id,
-						receiver_id: v.user_id,
-						update: v?.dialog_id === item?.dialog_id ? true : false,
-						shareKey: contact?.shareKey
+					await msgStore.sendMessage(1, item?.msg_content, {
+						is_group: v?.group_id ? true : false,
+						receiver_id: v?.user_id,
+						dialog_id: v?.dialog_id,
+						user_id: user?.user_id,
+						replay_id: type === sendType.REPLY ? msg?.id : null,
+						group_id: v?.group_id ? v?.group_id : null,
+						is_update: v?.dialog_id === item?.dialog_id ? true : false
 					})
 				})
 			})
 			toast('转发成功')
-			setMsg({})
-			setSelectList([])
 		} catch {
 			toast('转发失败')
 		}
-	}
-
-	// 点击发送按钮的回调
-	const send = (content, type, msg) => {
-		setType(sendType.SEND)
-		// props.send(content, 1, msg)
-		sendFriendMessage(type, content, {})
 	}
 
 	// 多选
@@ -326,98 +342,32 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 		}
 	}
 
-	// 随机数
-	const [nonce] = useState(cretateNonce())
-
-	// 发送消息
-	const sendFriendMessage = async (type, content, options) => {
-		const contact = props?.list[0]
-
-		console.log('contact', contact)
-
-		const {
-			receiver_id = contact?.user_id,
-			dialog_id = contact?.dialog_id,
-			update = true,
-			shareKey = contact?.shareKey,
-			replay_id = null
-		} = options
-
-		// 加密消息
-		const encrypted = encryptMessage(content, nonce, shareKey)
-
-		const msg = {
-			msg_read_status: msgStatus.READ,
-			msg_type: handlerMsgType(type),
-			msg_content: encrypted,
-			msg_id: Date.now(),
-			msg_send_time: Date.now(),
-			msg_is_self: true,
-			msg_sender_id: user?.user_id,
-			dialog_id,
-			msg_send_state: sendState.LOADING,
-			replay_msg_id: replay_id || null,
-			is_marked: false
-		}
-
-		// 先假设发送是 ok 的
-		update && setMsgs([...messages, { ...msg, msg_content: content }])
-
-		// 发送消息
-		try {
-			const { code, data } = await sendToUser({
-				content: encrypted,
-				dialog_id: parseInt(dialog_id),
-				receiver_id,
-				replay_id,
-				type
-			})
-			msg.msg_send_state = code === 200 ? sendState.OK : sendState.ERROR
-			msg.msg_id = data?.msg_id
-		} catch {
-			msg.msg_send_state = sendState.ERROR
-		}
-
-		// 添加到消息列表中，无论成功与否
-		replay_id
-			? await userService.update(userService.TABLES.USER_MSGS, msg.msg_id, msg, 'msg_id')
-			: await userService.add(userService.TABLES.USER_MSGS, msg)
-
-		// 更新会话
-		const chat = await userService.findOneById(userService.TABLES.CHATS, dialog_id, 'dialog_id')
-		chat &&
-			(await userService.update(userService.TABLES.CHATS, dialog_id, {
-				...chat,
-				last_message: encrypted,
-				msg_id: msg.msg_id ? msg.msg_id : chat?.msg_id,
-				msg_type: msg.msg_type,
-				send_time: msg.msg_send_time
-			}))
-	}
-
 	return (
 		<div className="w-full h-screen overflow-y-auto text-[0.888rem] bg-[#f8f8f8] relative" ref={chatRef}>
 			{/* Header */}
-			{header ? (
-				header
-			) : (
-				<div className="fixed top-0 left-0 right-0 h-14 border-b flex items-center px-4 z-[999] bg-white">
-					<div className="flex items-center w-full">
-						<ArrowLeftIcon className="w-5 h-5 mr-3" onClick={() => props?.f7router.back()} />
-						<div className="flex items-center">
-							<img src={props?.contact?.avatar} alt="" className="w-8 h-8 rounded-full mr-2" />
-							<span>{props?.contact?.nickname}</span>
-						</div>
-						<Link className="flex-1 flex justify-end" href={`/profile/${props?.contact?.user_id}/`}>
-							<MoreIcon className="w-7 h-7" />
-						</Link>
+			<div className="fixed top-0 left-0 right-0 h-14 border-b flex items-center px-4 z-[999] bg-white">
+				<div className="flex items-center w-full">
+					<ArrowLeftIcon className="w-5 h-5 mr-3" onClick={() => props?.f7router.back()} />
+					<div className="flex items-center">
+						<img src={props?.contact?.avatar} alt="" className="w-8 h-8 rounded-full mr-2" />
+						<span>{props?.contact?.nickname}</span>
 					</div>
+					<Link
+						className="flex-1 flex justify-end"
+						href={
+							props?.is_group
+								? `/chatinfo/group/${props?.group_id}/`
+								: `/profile/${props?.contact?.user_id}/`
+						}
+					>
+						<MoreIcon className="w-7 h-7" />
+					</Link>
 				</div>
-			)}
+			</div>
 
 			{/* Content */}
 			<div className="w-full py-20 pb-20 px-2">
-				{msgs.map((msg, index) => (
+				{msgStore.message.map((msg, index) => (
 					<div
 						key={index}
 						className={clsx(
@@ -449,7 +399,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 									<div
 										data-index={index}
 										className={clsx(
-											'relative flex w-[fit-content] break-all z-0',
+											'relative flex w-[fit-content] break-all',
 											msg?.msg_is_self ? 'justify-end' : 'justify-start'
 										)}
 										ref={(el) => (msgRefs.current[index] = el)}
@@ -500,7 +450,7 @@ export default function Chat({ messages, header, footer, isFristIn, ...props }) 
 											<Editor
 												readonly={true}
 												defaultValue={
-													memoizedMessages.find((v) => v.msg_id === msg?.replay_msg_id)
+													props.msgList.find((v) => v.msg_id === msg?.replay_msg_id)
 														?.msg_content || ''
 												}
 												className="w-[fit-content] !text-[#666]"
@@ -543,11 +493,6 @@ Tooltip.propTypes = {
 	msg: PropType.object
 }
 Chat.propTypes = {
-	messages: PropType.array.isRequired,
-	header: PropType.node,
-	footer: PropType.node,
-	isFristIn: PropType.bool,
-	handlerLongPress: PropType.func,
 	list: PropType.array,
 	sendForward: PropType.func,
 	sendDel: PropType.func,
@@ -557,5 +502,9 @@ Chat.propTypes = {
 	onMoreSelect: PropType.func,
 	contact: PropType.object,
 	f7router: PropType.object,
-	msgList: PropType.array
+	msgList: PropType.array,
+	is_group: PropType.bool,
+	receiver_id: PropType.string,
+	dialog_id: PropType.number,
+	group_id: PropType.number
 }

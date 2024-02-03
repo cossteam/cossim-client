@@ -9,14 +9,15 @@ import WebSocketClient from '@/utils/WebSocketClient'
 import userService from '@/db'
 import { useInitUser, useInitFriend } from '@/helpers/handler'
 import { handlerMsgType } from '@/helpers/handlerType'
-import { msgStatus, sendState } from '@/utils/constants'
+import { msgStatus, sendState, chatType } from '@/utils/constants'
+import { addOrUpdateMsg, updateChat } from '@/helpers/messages'
 
 /**
  * 异步处理消息。
  *
  * @param {Object} msg -要处理的消息。
  */
-const handlerMessage = async (msg) => {
+const handlerMessage = async (msg, user_id, type) => {
 	try {
 		const message = {
 			msg_read_status: msgStatus.NOT_READ,
@@ -24,31 +25,22 @@ const handlerMessage = async (msg) => {
 			msg_content: msg.content,
 			msg_id: msg.msg_id,
 			msg_send_time: msg.send_at,
-			msg_is_self: false,
-			meg_sender_id: msg.sender_id,
+			msg_is_self: user_id === msg.sender_id ? true : false,
+			msg_sender_id: msg.sender_id,
 			dialog_id: msg.dialog_id,
 			msg_send_state: sendState.OK,
 			replay_msg_id: msg.reply_id,
-			is_marked: false
+			is_marked: false,
+			msg_read_destroy: msg?.is_burn_after_reading === 1 ? true : false
 		}
+		// 如果是群聊
+		if (type === chatType.GROUP) message.group_id = msg.group_id
 
-		console.log('存储消息', message)
-
-		// 加入消息列表
-		await userService.add(userService.TABLES.USER_MSGS, message)
-
-		const result = await userService.findOne(userService.TABLES.CHATS_LIST, 'dialog_id' + message.dialog_id)
-		if (!result) {
-			// 会话列表
-			await userService.add(userService.TABLES.CHATS_LIST, message)
-			return
+		// 更新本地消息或会话
+		if (user_id !== msg.sender_id) {
+			await addOrUpdateMsg(message.msg_id, message, type)
+			await updateChat(message)
 		}
-
-		// 更新会话列表
-		await userService.update(userService.TABLES.CHATS_LIST, result.id, {
-			...result,
-			last_message: message.msg_content
-		})
 	} catch (error) {
 		console.log('更新会话列表失败！', error)
 		// TODO: 做一些额外操作
@@ -79,40 +71,63 @@ const handlerManger = async (msg) => {
 	}
 }
 
-const handlerGroupMessage = async (msg) => {
-	console.log('msg', msg)
-	console.log('msg.data.content', JSON.parse(msg?.data?.content))
+const handlerGroupMessage = async (msg, user_id, type) => {
+	try {
+		const message = {
+			msg_read_status: msgStatus.NOT_READ,
+			msg_type: handlerMsgType(msg.msgType),
+			msg_content: msg.content,
+			msg_id: msg.msg_id,
+			msg_send_time: msg.send_at,
+			msg_is_self: false,
+			msg_sender_id: msg.sender_id,
+			dialog_id: msg.dialog_id,
+			msg_send_state: sendState.OK,
+			replay_msg_id: msg.reply_id,
+			is_marked: false,
+			group_id: msg.group_id
+		}
+
+		// 加入消息列表
+		await userService.add(userService.TABLES.GROUP_MSGS, message)
+
+		const result = await userService.findOneById(userService.TABLES.CHATS_LIST, message.dialog_id, 'dialog_id')
+		if (!result) {
+			// 会话列表
+			await userService.add(userService.TABLES.CHATS_LIST, message)
+			return
+		}
+
+		// 更新会话列表
+		await userService.update(userService.TABLES.CHATS_LIST, result.id, {
+			...result,
+			last_message: message.msg_content
+		})
+	} catch (error) {
+		console.log('更新会话列表失败！', error)
+		console.log('错误')
+	}
+	// console.log('msg', msg)
+	// console.log('msg.data.content', JSON.parse(msg?.data?.content))
 
 	// 查找本地消息记录
-	const sender = `${msg.data?.group_id}`
-	const messages = await userService.findOneById(userService.TABLES.MSGS, sender)
+	// const sender = `${msg.data?.group_id}`
+	// const messages = await userService.findOneById(userService.TABLES.MSGS, sender)
 
-	// 收到的消息
-	const message = JSON.parse(msg?.data?.content)
-	// const message = {
-	// 	unique_id,
-	// 	content: msg.data.content, // 内容
-	// 	sender: msg.data.user_id, // 发送人
-	// 	dialog_id: msg.data.dialog_id, // 会话
-	// 	group_id: msg.data.group_id, // 群组(私聊时为receiver_id)
-	// 	// receiver_id: parseInt(ReceiverId), // 接收人(群聊时为group_id)
-	// 	time, // 时间
-	// 	type: '' // 1:文本 2:语音 3:图片
-	// 	// send_status: 0 // 0:未发送 1:发送中 2:发送成功 3:发送失败
+	// // 收到的消息
+	// const message = JSON.parse(msg?.data?.content)
+	// // 存入本地数据库
+	// const newAllMsg = {
+	// 	user_id: sender,
+	// 	data: messages?.data || []
 	// }
-
-	// 存入本地数据库
-	const newAllMsg = {
-		user_id: sender,
-		data: messages?.data || []
-	}
-	if (!messages) {
-		newAllMsg.data.push(message)
-		await userService.add(userService.TABLES.MSGS, newAllMsg)
-	} else if (!newAllMsg.data.find((obj) => obj.unique_id === message.unique_id)) {
-		newAllMsg.data.push(message)
-		await userService.update(userService.TABLES.MSGS, sender, newAllMsg)
-	}
+	// if (!messages) {
+	// 	newAllMsg.data.push(message)
+	// 	await userService.add(userService.TABLES.MSGS, newAllMsg)
+	// } else if (!newAllMsg.data.find((obj) => obj.unique_id === message.unique_id)) {
+	// 	newAllMsg.data.push(message)
+	// 	await userService.update(userService.TABLES.MSGS, sender, newAllMsg)
+	// }
 }
 
 /**
@@ -178,13 +193,15 @@ const Home = () => {
 			const data = JSON.parse(e.data)
 			// event: 1 => 用户上线，2 => 用户下线，3 => 用户发送消息，4 => 群聊发送消息，5 => 系统推送消息
 			// event: 6 => 收到好友请求 event: 7 => 收到好友确认 event: 8 => 公钥交换
+			console.log('接收ws消息：', data)
 			switch (data.event) {
 				case 3:
-					console.info('接收到消息：', data)
-					handlerMessage(data.data)
+					// console.info('接收到消息：', data)
+					handlerMessage(data.data, user?.user_id, chatType.PRIVATE)
 					break
 				case 4:
-					handlerGroupMessage(data)
+					// handlerGroupMessage(data)
+					handlerMessage(data.data, user?.user_id, chatType.GROUP)
 					break
 				case 6:
 				case 7:

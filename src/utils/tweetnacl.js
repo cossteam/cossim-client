@@ -60,12 +60,13 @@ export function decryptMessage(encryptedMessage, nonce, sharedKey) {
  */
 export function decryptMessageWithKey(encryptedMessage, sharedKey) {
 	let msg = encryptedMessage
+	let data = {}
 	try {
-		const data = JSON.parse(encryptedMessage)
+		data = JSON.parse(encryptedMessage)
 		msg = data.msg
 		return decryptMessage(data.msg, data.nonce, sharedKey)
 	} catch {
-		return msg
+		return data?.content || msg
 	}
 }
 

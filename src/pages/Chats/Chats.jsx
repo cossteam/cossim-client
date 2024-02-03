@@ -201,9 +201,10 @@ export default function Chats(props) {
 					<ListItem
 						key={chat.dialog_id}
 						link={
-							chat.dialog_type === 1
-								? `/groups/${chat.group_id}/?dialog_id=${chat?.dialog_id || ''}`
-								: `/chats/${chat.user_id}/?dialog_id=${chat?.dialog_id || ''}`
+							`/chats/${chat.user_id}/?dialog_id=${chat?.dialog_id || ''}&group_id=${chat?.group_id || ''}`
+							// chat.dialog_type === 1
+							// 	? `/groups/${chat.group_id}/?dialog_id=${chat?.dialog_id || ''}`
+							// 	: `/chats/${chat.user_id}/?dialog_id=${chat?.dialog_id || ''}`
 						}
 						title={chat.dialog_name}
 						badge={chat.dialog_unread_count}

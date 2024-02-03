@@ -75,3 +75,11 @@ export const tooltipsType = {
 	/** 标注 */
 	MARK: 6
 }
+
+/** 消息类型， 群聊消息， 私聊消息 */
+export const chatType = {
+	/** 私聊 */
+	PRIVATE: 1,
+	/** 群聊 */
+	GROUP: 2
+}
