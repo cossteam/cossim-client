@@ -9,7 +9,6 @@ import WebSocketClient from '@/utils/WebSocketClient'
 import userService from '@/db'
 import { useInitUser, useInitFriend } from '@/helpers/handler'
 import { handlerMsgType } from '@/helpers/handlerType'
-
 import { msgStatus, sendState } from '@/utils/constants'
 
 /**
@@ -33,7 +32,7 @@ const handlerMessage = async (msg) => {
 			is_marked: false
 		}
 
-		console.log("存储消息",message);
+		console.log('存储消息', message)
 
 		// 加入消息列表
 		await userService.add(userService.TABLES.USER_MSGS, message)
@@ -155,7 +154,10 @@ const Home = () => {
 	// i18next.changeLanguage('zh-CN')
 
 	// 注册 cordova API
-	f7ready(() => f7.device.cordova && cordovaApp.init(f7))
+	f7ready(() => {
+		console.log(f7, f7.device)
+		return f7.device.cordova && cordovaApp.init(f7)
+	})
 
 	// 连接ws并监听消息推送
 	useEffect(() => {
@@ -189,6 +191,9 @@ const Home = () => {
 					console.info('收到好友请求或确认：', data)
 					handlerManger(data)
 					break
+				case 14: // 用户来电
+				case 15: // 群聊来电
+					break
 			}
 		}
 
@@ -199,9 +204,17 @@ const Home = () => {
 		}
 	}, [isLogin])
 
+	useEffect(() => {
+		document.addEventListener('deviceready', onDeviceReady, false)
+		function onDeviceReady() {
+			console.log(navigator.notification)
+		}
+	}, [])
+
 	return (
 		<App {...f7params}>
 			<Views tabs className="safe-area">
+				{/* <View id="view-call" name="call" url="/call/" /> */}
 				{isLogin ? <AppComponent isLogin={isLogin} /> : <View id="view-auth" name="auth" url="/auth/" />}
 			</Views>
 		</App>
