@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { clsx } from 'clsx'
 import 'highlight.js/styles/github.min.css'
@@ -12,12 +12,11 @@ import { sendType, sendState, tooltipsType } from '@/utils/constants'
 import { Link, f7 } from 'framework7-react'
 import Contact from '@/components/Contact/Contact'
 import { $t } from '@/i18n'
-import userService from '@/db'
+// import userService from '@/db'
 import Editor from '@/components/Editor/Editor'
 import MsgBar from '@/components/Message/MsgBar'
 import { Checkbox } from 'antd-mobile'
 import { useUserStore } from '@/stores/user'
-import { labelMsgApi } from '@/api/msg'
 import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
 import { useMessageStore } from '@/stores/message'
 import { useClipboard } from '@/shared/useClipboard'
@@ -63,7 +62,7 @@ const Tooltip = ({ el, handler, msg }) => {
 		},
 		{
 			name: tooltipsType.MARK,
-			title: '标注',
+			title: msg?.is_marked ? '取消标注' : '标注',
 			icon: <ArrowUpRight className="tooltip__icon" />
 		}
 	]
@@ -177,16 +176,30 @@ export default function Chat(props) {
 			: chatRef.current.scrollTo(0, chatRef.current.scrollHeight)
 	}
 
+	const init = async () => {
+		if (!isFrist) {
+			msgStore.updateMessage(props.msgList, user?.user_id)
+			return
+		}
+		if (!props.msgList) return
+		await msgStore.readMessage(props?.dialog_id, props?.is_group)
+		props.is_group
+			? await msgStore.initGroupMessage(props?.msgList, user?.user_id)
+			: await msgStore.initFriendMessage(props?.msgList, user?.user_id, props?.receiver_id)
+
+		if (isFrist && props.msgList) {
+			// scroll(false)
+			setIsFrist(false)
+		}
+	}
+
 	useEffect(() => {
-		if (!isFrist) return
-		props.msgList && props.is_group
-			? msgStore.initGroupMessage(props?.msgList, user?.user_id)
-			: msgStore.initFriendMessage(props?.msgList, user?.user_id, props?.receiver_id)
-		if (isFrist && props.msgList) setIsFrist(false)
+		console.log('props', props)
+		init()
 	}, [props.msgList])
 
 	useEffect(() => {
-		scroll(true)
+		scroll(isFrist ? false : true)
 	}, [msgStore.message])
 
 	/**
@@ -201,6 +214,7 @@ export default function Chat(props) {
 
 	// 点击发送按钮的回调
 	const send = (content, msgType, msg) => {
+		// 编辑
 		if (type === sendType.EDIT) {
 			msgStore.editMessage(msgType, content, {
 				is_group: props?.is_group,
@@ -239,7 +253,7 @@ export default function Chat(props) {
 				setType(sendType.EDIT)
 				break
 			case tooltipsType.DELETE:
-				props.sendDel && props.sendDel(data)
+				sendDel(data)
 				break
 			case tooltipsType.REPLY:
 				setDefaultMsg(data)
@@ -268,10 +282,10 @@ export default function Chat(props) {
 	//  转发
 	const sendForward = (list, msg) => {
 		try {
-			list.forEach(async (v) => {
-				const msgList = Array.isArray(msg) ? msg : [msg]
-				msgList.forEach(async (item) => {
-					await msgStore.sendMessage(1, item?.msg_content, {
+			list.forEach((v) => {
+				const msgList = Array.isArray(msg) ? msg.slice(0, -1) : [msg]
+				msgList.forEach((item) => {
+					msgStore.sendMessage(1, item?.msg_content, {
 						is_group: v?.group_id ? true : false,
 						receiver_id: v?.user_id,
 						dialog_id: v?.dialog_id,
@@ -286,6 +300,16 @@ export default function Chat(props) {
 		} catch {
 			toast('转发失败')
 		}
+	}
+
+	// 删除
+	const sendDel = async (msg) => {
+		let success = true
+		const msgList = Array.isArray(msg) ? msg : [msg]
+		msgList.map(async (item) => {
+			success = await msgStore.deleteMessage(item, props.is_group)
+		})
+		success ? toast('删除成功') : toast('删除失败')
 	}
 
 	// 多选
@@ -307,36 +331,25 @@ export default function Chat(props) {
 			case tooltipsType.FORWARD:
 				setOpened(true)
 				break
+			case tooltipsType.DELETE:
+				sendDel(selectList)
+				break
 		}
-
 		setIsSelect(!isSelect)
 	}
 
 	// 标注
 	const sendMark = async (msg) => {
 		try {
-			// console.log('标注', msg)
+			const is_marked = !msg?.is_marked
 
-			const reslut = await labelMsgApi({ msg_id: msg.msg_id, is_label: 1 })
+			const success = await msgStore.markMessage(msg, is_marked, props?.is_group)
 
-			if (reslut?.code !== 200) return toast('标注失败')
-
-			const user = await userService.findOne(userService.TABLES.USER_MSGS, 'msg_id', msg?.msg_id)
-			if (!user) return
-			// 更新数据库状态
-			await userService.update(
-				userService.TABLES.USER_MSGS,
-				msg.msg_id,
-				{
-					...user,
-					is_marked: true
-				},
-				'msg_id'
-			)
-
-			toast('标注成功')
-			setMsg({})
-			setSelectList([])
+			if (success) {
+				toast(is_marked ? '标注成功' : '取消标注成功')
+				setMsg({})
+				setSelectList([])
+			}
 		} catch {
 			toast('标注失败')
 		}
@@ -350,18 +363,30 @@ export default function Chat(props) {
 					<ArrowLeftIcon className="w-5 h-5 mr-3" onClick={() => props?.f7router.back()} />
 					<div className="flex items-center">
 						<img src={props?.contact?.avatar} alt="" className="w-8 h-8 rounded-full mr-2" />
-						<span>{props?.contact?.nickname}</span>
+						<span>{props?.contact?.nickname || props?.contact?.name}</span>
 					</div>
-					<Link
-						className="flex-1 flex justify-end"
-						href={
-							props?.is_group
-								? `/chatinfo/group/${props?.group_id}/`
-								: `/profile/${props?.contact?.user_id}/`
-						}
-					>
-						<MoreIcon className="w-7 h-7" />
-					</Link>
+					<div className="flex-1 flex justify-end">
+						{isSelect ? (
+							<Link
+								onClick={() => {
+									setIsSelect(false)
+									setSelectList([])
+								}}
+							>
+								取消
+							</Link>
+						) : (
+							<Link
+								href={
+									props?.is_group
+										? `/chatinfo/group/${props?.group_id}/`
+										: `/profile/${props?.contact?.user_id}/`
+								}
+							>
+								<MoreIcon className="w-7 h-7" />
+							</Link>
+						)}
+					</div>
 				</div>
 			</div>
 
@@ -373,7 +398,7 @@ export default function Chat(props) {
 						className={clsx(
 							'w-full flex mb-4 animate__animated  animate__fadeInUp items-start gap-2',
 							!isSelect && msg?.msg_is_self ? 'justify-end' : 'justify-start',
-							isSelect && 'justify-between'
+							isSelect && msg?.msg_is_self ? 'justify-between' : 'justify-start'
 						)}
 						style={{ '--animate-duration': '0.3s' }}
 					>
@@ -381,7 +406,7 @@ export default function Chat(props) {
 
 						<div className={clsx('flex max-w-[80%] items-start', isSelect && 'max-w-[100%] flex-1')}>
 							<img
-								src={msg?.msg_is_self ? user?.avatar : findOne(msg?.meg_sender_id)?.avatar}
+								src={msg?.msg_is_self ? user?.avatar : findOne(msg?.msg_sender_id)?.avatar}
 								alt=""
 								className={clsx(
 									'w-8 h-8 rounded-full',
@@ -424,15 +449,22 @@ export default function Chat(props) {
 										msg?.msg_is_self ? 'justify-end' : 'justify-start'
 									)}
 								>
-									<span>{format(msg?.msg_send_time, 'zh_CN')}</span>
-									{msg?.msg_is_self &&
-										(msg?.msg_send_state === sendState.OK ? (
-											<DoubleTickIcon />
-										) : msg?.msg_send_state === sendState.ERROR ? (
-											<Exclamationmark className="text-red-500" />
-										) : (
-											<Gobackward />
-										))}
+									<div
+										className={clsx(
+											'flex items-center',
+											msg?.msg_is_self ? 'order-first' : 'order-last'
+										)}
+									>
+										<span>{format(msg?.msg_send_time, 'zh_CN')}</span>
+										{msg?.msg_is_self &&
+											(msg?.msg_send_state === sendState.OK ? (
+												<DoubleTickIcon />
+											) : msg?.msg_send_state === sendState.ERROR ? (
+												<Exclamationmark className="text-red-500" />
+											) : (
+												<Gobackward />
+											))}
+									</div>
 									{msg?.is_marked && <BookmarkFill className="text-primary" />}
 								</div>
 
@@ -450,7 +482,7 @@ export default function Chat(props) {
 											<Editor
 												readonly={true}
 												defaultValue={
-													props.msgList.find((v) => v.msg_id === msg?.replay_msg_id)
+													props?.msgList?.find((v) => v.msg_id === msg?.replay_msg_id)
 														?.msg_content || ''
 												}
 												className="w-[fit-content] !text-[#666]"
@@ -475,6 +507,8 @@ export default function Chat(props) {
 				onMoreSelect={props?.onMoreSelect}
 				isSelect={isSelect}
 				select={select}
+				is_group={props?.is_group}
+				list={props?.list}
 			/>
 
 			<Contact

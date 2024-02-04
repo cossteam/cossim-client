@@ -10,9 +10,9 @@ import { chatType } from '@/utils/constants'
  */
 export const addOrUpdateMsg = async (msg_id, msg, type = chatType.PRIVATE, update = false) => {
 	try {
-		const result = await userService.findOneById(userService.TABLES.USER_MSGS, msg_id, 'msg_id')
-
 		const tableName = type === chatType.GROUP ? userService.TABLES.GROUP_MSGS : userService.TABLES.USER_MSGS
+
+		const result = await userService.findOneById(tableName, msg_id, 'msg_id')
 
 		// 添加消息
 		if (!result) return await userService.add(tableName, msg)

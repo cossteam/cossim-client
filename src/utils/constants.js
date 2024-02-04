@@ -83,3 +83,11 @@ export const chatType = {
 	/** 群聊 */
 	GROUP: 2
 }
+
+/** 是否阅后即焚 */
+export const isBurn = {
+	/** 阅后即焚 */
+	TRUE: 1,
+	/** 非阅后即焚 */
+	FALSE: 0
+}

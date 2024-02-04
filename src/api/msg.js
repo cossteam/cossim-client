@@ -14,7 +14,7 @@ export function getChatList(params) {
  * 获取私聊消息
  * @param {*} data
  * @param {*} data.user_id
- * @param {*} data.type			消息类型 => 1: 文本消息 2: 语音消息 3: 图片消息 
+ * @param {*} data.type			消息类型 => 1: 文本消息 2: 语音消息 3: 图片消息
  * @param {*} data.content	    消息内容
  * @param {*} data.page_num		当前页
  * @param {*} data.page_size
@@ -142,6 +142,34 @@ export function labelMsgApi(data) {
 export function setReadApi(data) {
 	return request({
 		url: baseApi + '/read/user',
+		method: 'POST',
+		data
+	})
+}
+
+/**
+ * 标注群聊消息
+ * @param {*} data
+ * @param {*} data.msg_id			消息id
+ * @param {*} data.is_label			是否标记
+ */
+export function labelGroupMsgApi(data) {
+	return request({
+		url: baseApi + '/label/group',
+		method: 'POST',
+		data
+	})
+}
+
+/**
+ * 批量设置群聊消息已读
+ * @param {*} data
+ * @param {*} data.msg_ids			消息id列表
+ * @param {*} data.dialog_id		对话id
+ */
+export function setGroupReadApi(data) {
+	return request({
+		url: baseApi + '/read/group',
 		method: 'POST',
 		data
 	})

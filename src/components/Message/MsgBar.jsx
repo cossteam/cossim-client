@@ -11,6 +11,7 @@ import { Multiply } from 'framework7-icons/react'
 import More from './More'
 import { ArrowUpRight } from 'framework7-icons/react'
 
+
 function MsgBar(props) {
 	// 整个底部
 	const msgbarRef = useRef(null)
@@ -19,7 +20,7 @@ function MsgBar(props) {
 	// 更多操作
 	const [showMore, setShowMore] = useState(false)
 	// 操作类型
-	const [type, setType] = useState('emoji')
+	const [type, setType] = useState('')
 	// 首次进入
 	const [isFrist, setIsFrist] = useState(true)
 	// 编辑器引擎实例
@@ -47,13 +48,34 @@ function MsgBar(props) {
 		setType(moreType)
 	}
 
+	// const get
+
 	useEffect(() => {
 		if (engine) {
 			engine.on('change', () => {
 				setShowSendBtn(!engine.isEmpty())
 			})
+
+			// 如果聚焦了输入框
+			engine.on('focus', () => {
+				setShowMore(false)
+			})
 		}
 	}, [engine])
+
+	useEffect(() => {
+		if (engine) {
+			engine.on('mention:default', () => {
+				console.log('props', props.list)
+				const arr = props.list.map((v) => ({
+					key: v.user_id,
+					name: v.nickname
+				}))
+				console.log('arr', arr)
+				return arr
+			})
+		}
+	}, [props.list])
 
 	useEffect(() => {
 		if (!isFrist && !showMore) {
@@ -69,8 +91,8 @@ function MsgBar(props) {
 			icon: <ArrowUpRight className="w-5 h-5" />
 		},
 		{
-			name: tooltipsType.COPY,
-			title: '复制',
+			name: tooltipsType.DELETE,
+			title: '删除',
 			icon: <ArrowUpRight className="w-5 h-5" />
 		}
 	]
@@ -106,6 +128,8 @@ function MsgBar(props) {
 							setEditor={setEngine}
 							className="min-h-[42px] max-h-[150px] rounded-xl border p-2 overflow-y-auto"
 							defaultValue={(props.type === sendType.EDIT && props.defaultMsg?.msg_content) || ''}
+							is_group={props?.is_group}
+							list={props?.list}
 						/>
 						{[sendType.REPLY, sendType.EDIT].includes(props.type) && (
 							<div className="bg-[#f5f5f5] mt-2 px-2 py-1 rounded relative felx justify-between items-center">
@@ -161,7 +185,9 @@ MsgBar.propTypes = {
 	setType: PropType.func,
 	onMoreSelect: PropType.func,
 	isSelect: PropType.bool,
-	select: PropType.func
+	select: PropType.func,
+	is_group: PropType.bool,
+	list: PropType.array
 }
 
 export default MsgBar

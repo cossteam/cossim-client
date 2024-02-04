@@ -4,6 +4,8 @@ import { HOST } from '@/utils/request'
 class WebSocketClient {
 	// 重连次数
 	reconnectTimes = 0
+	// 最大重连次数
+	maxReconnectTimes = 10
 
 	constructor(serverAddress) {
 		this.serverAddress = serverAddress
@@ -36,19 +38,13 @@ class WebSocketClient {
 			this.socket.addEventListener('close', (event) => {
 				this.triggerEvent('onWsClose', event)
 				console.log('WebSocket连接已关闭')
-				if (this.reconnectTimes < 3) {
-					this.reconnectTimes++
-					this.connect()
-				}
+				this.reconnect()
 			})
 
 			this.socket.addEventListener('error', (event) => {
 				this.triggerEvent('onWsError', event)
 				console.error('WebSocket错误:', event)
-				if (this.reconnectTimes < 3) {
-					this.reconnectTimes++
-					this.connect()
-				}
+				this.reconnect()
 			})
 		}
 	}
@@ -88,6 +84,18 @@ class WebSocketClient {
 	triggerEvent(eventType, event) {
 		if (this.listeners[eventType]) {
 			this.listeners[eventType].forEach((callback) => callback(event))
+		}
+	}
+
+	/**
+	 * 重连
+	 */
+	reconnect(time = 5000) {
+		if (this.reconnectTimes < this.maxReconnectTimes) {
+			setTimeout(() => {
+				this.reconnectTimes++
+				this.connect()
+			}, time)
 		}
 	}
 }
