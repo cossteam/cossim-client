@@ -131,3 +131,18 @@ export function friendApplyListApi(params) {
 		params
 	})
 }
+
+/**
+ * 设置用户消息静默通知
+ * @param {Object} data
+ * @param {String} data.user_id
+ * @param {String} data.is_silence
+ */
+export function setSilenceApi(data) {
+	return request({
+		url: `${baseApi}/silent`,
+		method: 'POST',
+		data
+	})
+}
+

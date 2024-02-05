@@ -23,20 +23,6 @@ Contacts.propTypes = {
 export default function Contacts(props) {
 	const { user } = useUserStore()
 
-	// /**
-	//  * 将联系人分组转成数组结构
-	//  * @param {*} obj
-	//  * @returns
-	//  */
-	// const groupsToArray = (obj) => {
-	// 	obj = typeof obj !== 'object' ? {} : obj
-	// 	return Object.entries(obj)
-	// 		.map(([group, users]) => {
-	// 			return users.map((user) => ({ group, ...user }))
-	// 		})
-	// 		.flat()
-	// }
-
 	/**
 	 * 将联系人数组转成分组结构
 	 * @param {*} array
@@ -44,6 +30,7 @@ export default function Contacts(props) {
 	 */
 	const arrayToGroups = (array) => {
 		array = !Array.isArray(array) ? [] : array
+		array = array.filter((v) => v.group)
 		return array.reduce((result, user) => {
 			const group = user.group
 			if (!result[group]) {

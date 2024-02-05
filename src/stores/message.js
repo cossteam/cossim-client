@@ -16,6 +16,13 @@ import {
 	setGroupReadApi
 } from '@/api/msg'
 import { addOrUpdateMsg, updateChat } from '@/helpers/messages'
+
+/**
+ * 获取用户的公钥
+ * @param {*} user_id 			用户 ID
+ * @param {*} friend_id 		好友 ID
+ * @returns
+ */
 const getPublicKey = async (user_id, friend_id) => {
 	const user = await commonService.findOneById(commonService.TABLES.HISTORY, user_id)
 	const reslut = await getPublicKeyApi({ user_id: friend_id })
@@ -62,7 +69,7 @@ const sendFriendMessage = async (type, content, options, get, set) => {
 		is_update = true,
 		replay_id = null,
 		user_id,
-		msg_read_destroy = isBurn.TRUE
+		msg_read_destroy = isBurn.FALSE
 	} = options
 	let { shareKey } = get()
 
@@ -269,11 +276,16 @@ const messageStore = (set, get) => ({
 			: await sendFriendMessage(type, content, options, get, set)
 		// 是否需要更新消息列表,删除最后一个元素，添加最新的消息
 		is_update && set((state) => ({ message: [...state.message.slice(0, -1), message] }))
+		console.log("message",message);
 		updateChat({ ...message, content: message.encrypted })
 	},
 	/**
 	 * 编辑消息
-	 *
+	 * @param {*} type			消息类型
+	 * @param {*} content		消息内容
+	 * @param {*} options		消息选项
+	 * @param {*} options.is_group	是否是群聊
+	 * @param {*} options.msg_id	消息 id
 	 */
 	editMessage: async (type = 1, content, options) => {
 		const { is_group = false } = options || {}
@@ -402,6 +414,8 @@ const messageStore = (set, get) => ({
 		try {
 			let { message, shareKey, updateShareKey } = get()
 			const lastMsg = msgs.at(-1)
+
+			if (!lastMsg) return set({ message: [] })
 
 			// TODO: 后续需要加多一个设备判断，如果是同一台设备就不需要更新
 			if (lastMsg.msg_is_self) return

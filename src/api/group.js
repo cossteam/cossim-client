@@ -174,3 +174,17 @@ export function groupDissolve(data) {
 		data
 	})
 }
+
+/**
+ * 设置群聊消息静默通知
+ * @param {Object} data
+ * @param {String} data.group_id
+ * @param {String} data.is_silence
+ */
+export function setGroupSilenceApi(data) {
+	return request({
+		url: `${relationGroup}/silent`,
+		method: 'POST',
+		data
+	})
+}

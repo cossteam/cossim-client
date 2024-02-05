@@ -16,6 +16,8 @@ export default function Editor({ setEditor, readonly, options, defaultValue, is_
 	useEffect(() => {
 		if (!editorRef.current) return
 
+		props?.setRef && props.setRef(editorRef)
+
 		const cards = [MentionComponent]
 		const plugins = [Quote, Mention]
 
@@ -61,5 +63,6 @@ Editor.propTypes = {
 	options: PropType.object,
 	defaultValue: PropType.string,
 	is_group: PropType.bool,
-	list: PropType.array
+	list: PropType.array,
+	setRef: PropType.func
 }

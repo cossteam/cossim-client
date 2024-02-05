@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { VoiceIcon, AddIcon } from '@/components/Icon/Icon'
+// import { VoiceIcon, AddIcon } from '@/components/Icon/Icon'
 import { clsx } from 'clsx'
-import { Button } from 'framework7-react'
 import PropType from 'prop-types'
 import Emojis from '@/components/Emojis/Emojis.jsx'
 // import Editor from '@/utils/editor'
@@ -10,7 +9,10 @@ import { sendType, tooltipsType, msgType } from '@/utils/constants'
 import { Multiply } from 'framework7-icons/react'
 import More from './More'
 import { ArrowUpRight } from 'framework7-icons/react'
-
+import { AudioOutline, SmileOutline, AddCircleOutline } from 'antd-mobile-icons'
+import { Button } from 'antd-mobile'
+import { useFocus } from "@reactuses/core"
+import { utils } from 'framework7'
 
 function MsgBar(props) {
 	// 整个底部
@@ -20,13 +22,17 @@ function MsgBar(props) {
 	// 更多操作
 	const [showMore, setShowMore] = useState(false)
 	// 操作类型
-	const [type, setType] = useState('')
+	const [type, setType] = useState('emoji')
 	// 首次进入
 	const [isFrist, setIsFrist] = useState(true)
 	// 编辑器引擎实例
 	const [engine, setEngine] = useState(null)
 	// 消息类型
 	const [msgtype, setMsgtype] = useState(msgType.TEXT)
+	// 输入 Ref 框元素
+	const [editorRef, setEditorRef] = useState(null)
+	// 是否聚焦
+	const [inputFocus, setInputFocus] = useFocus(editorRef)
 
 	const onEmojiSelect = ({ type, emoji }) => {
 		console.log(type, emoji)
@@ -48,8 +54,6 @@ function MsgBar(props) {
 		setType(moreType)
 	}
 
-	// const get
-
 	useEffect(() => {
 		if (engine) {
 			engine.on('change', () => {
@@ -67,21 +71,21 @@ function MsgBar(props) {
 		if (engine) {
 			engine.on('mention:default', () => {
 				console.log('props', props.list)
-				const arr = props.list.map((v) => ({
-					key: v.user_id,
-					name: v.nickname
-				}))
-				console.log('arr', arr)
+				const arr = [
+					{ key: 'all', name: '全体成员' },
+					...props.list.map((v) => ({
+						key: v.user_id,
+						name: v.nickname
+					}))
+				]
+
 				return arr
 			})
 		}
 	}, [props.list])
 
 	useEffect(() => {
-		if (!isFrist && !showMore) {
-			requestAnimationFrame(() => setTimeout(() => engine.focus(), 200))
-		}
-		isFrist && setIsFrist(false)
+		if(!showMore) utils.nextTick(() => setTimeout(() => setInputFocus(true), 200))
 	}, [showMore])
 
 	const tooltips = [
@@ -93,6 +97,11 @@ function MsgBar(props) {
 		{
 			name: tooltipsType.DELETE,
 			title: '删除',
+			icon: <ArrowUpRight className="w-5 h-5" />
+		},
+		{
+			name: tooltipsType.MARK,
+			title: '标注',
 			icon: <ArrowUpRight className="w-5 h-5" />
 		}
 	]
@@ -122,14 +131,18 @@ function MsgBar(props) {
 				ref={msgbarRef}
 			>
 				<div className="rounded-2xl w-full h-auto flex items-end gap-2 p-2">
-					<VoiceIcon className="w-9 h-9" />
-					<div className="w-full">
+					<div className="w-10 h-10 -mb-1 -mr-3">
+						<AudioOutline className="w-7 h-7" />
+					</div>
+
+					<div className="flex-1">
 						<Editor
 							setEditor={setEngine}
 							className="min-h-[42px] max-h-[150px] rounded-xl border p-2 overflow-y-auto"
 							defaultValue={(props.type === sendType.EDIT && props.defaultMsg?.msg_content) || ''}
 							is_group={props?.is_group}
 							list={props?.list}
+							setRef={setEditorRef}
 						/>
 						{[sendType.REPLY, sendType.EDIT].includes(props.type) && (
 							<div className="bg-[#f5f5f5] mt-2 px-2 py-1 rounded relative felx justify-between items-center">
@@ -146,25 +159,22 @@ function MsgBar(props) {
 						)}
 					</div>
 
-					<AddIcon
-						className={clsx('w-9 h-9', showSendBtn ? 'hidden' : 'flex')}
-						onClick={() => handlerShowMore('emoji')}
-					/>
-					<AddIcon
-						className={clsx('w-9 h-9', showSendBtn ? 'hidden' : 'flex')}
-						onClick={() => handlerShowMore('more')}
-					/>
-					<Button
-						raised
-						fill
+					<div className="w-10 h-10 -mb-1 -mr-3">
+						<SmileOutline className="w-7 h-7" onClick={() => handlerShowMore('emoji')} />
+					</div>
+					<div className={clsx('w-10 h-10 -mb-1 -mr-3', showSendBtn ? 'hidden' : 'flex')}>
+						<AddCircleOutline className="w-7 h-7" />
+					</div>
+					<div
 						className={clsx(
-							'animate__animated animate__faster whitespace-nowrap w-[80px] mb-1',
-							showSendBtn ? 'block animate__fadeInRight' : 'animate__fadeInLeft hidden'
+							'animate__animated animate__faster whitespace-nowrap h-10 -mb-1',
+							showSendBtn ? 'inline-block animate__fadeInRight' : 'animate__fadeIn hidden'
 						)}
-						onClick={send}
 					>
-						发送
-					</Button>
+						<Button color="primary" size="small" onClick={send}>
+							发送
+						</Button>
+					</div>
 				</div>
 				<div className={clsx('w-full h-[300px] overflow-y-auto bg-[#f5f5f5]')}>
 					{type === 'emoji' ? (

@@ -49,7 +49,7 @@ const TABLES = {
 	// 会话列表
 	// chats_list: `++id, &dialog_id, dialog_type, dialog_name, dialog_avatar, dialog_unread_count, last_message, sender_id, send_time, &msg_id`,
 	// 好友列表
-	friends_list: `++id, &user_id, nick_name, avatar, signature, tel, email, status, publicKey, shareKey, &dialog_id, is_black, group, msg_read_destroy`,
+	friends_list: `++id, &user_id, nick_name, avatar, signature, tel, email, status, publicKey, shareKey, &dialog_id, is_black, group, setting`,
 	// 群聊列表：	
 	// 	自增id 	| 群聊id | 群聊名称 | 群聊头像 	| 群聊人数 | 是否公开 | 群聊id | 是否禁言 | 是否管理员 | 是否群主 | 是否锁定 | 群聊备注 | 群聊类型
 	//  是否置顶 | 是否免打扰 | 是否被禁言 | 群聊公告 | 群聊公告时间 | 群聊公告发送者 | 群聊公告发送者id | 群聊公告发送者头像 | 群聊公告发送者昵称 

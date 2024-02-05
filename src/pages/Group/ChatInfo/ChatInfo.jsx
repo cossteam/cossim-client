@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { f7, Icon, List, ListItem, NavTitle, Navbar, Page } from 'framework7-react'
+import { f7, Icon, List, ListItem, NavTitle, Navbar, Page, Toggle } from 'framework7-react'
 import PropType from 'prop-types'
-import { groupInfoApi, groupMemberApi, groupQuitApi, groupDissolve } from '@/api/group'
+import { groupInfoApi, groupMemberApi, groupQuitApi, groupDissolve, setGroupSilenceApi } from '@/api/group'
 import { useUserStore } from '@/stores/user'
 
 ChatInfo.propTypes = {
@@ -16,6 +16,9 @@ export default function ChatInfo(props) {
 	const { user } = useUserStore()
 	const [identity, setIdentity] = useState(null)
 
+	// 消息免打扰
+	const [silence, setSilence] = useState(false)
+
 	// 群聊信息
 	const [groupInfo, setGroupInfo] = useState({})
 	useEffect(() => {
@@ -23,6 +26,8 @@ export default function ChatInfo(props) {
 		groupInfoApi({ group_id: GroupId }).then(({ code, data }) => {
 			console.log(data)
 			code === 200 && setGroupInfo(data)
+			const isSilence = data?.preferences?.silent_notification
+			setSilence(isSilence === 1)
 		})
 	}, [])
 
@@ -72,6 +77,23 @@ export default function ChatInfo(props) {
 				f7.dialog.close()
 			}
 		})
+	}
+
+	const onChangeChecked = async () => {
+		const isSilence = !silence
+		setSilence(isSilence)
+		try {
+			f7.dialog.preloader('请稍后...')
+			const { code } = await setGroupSilenceApi({
+				group_id: parseInt(GroupId),
+				is_silent: isSilence ? 1 : 0
+			})
+			if (code !== 200) return
+		} catch (error) {
+			f7.dialog.alert(error.message)
+		} finally {
+			f7.dialog.close()
+		}
 	}
 
 	return (
@@ -126,7 +148,15 @@ export default function ChatInfo(props) {
 					</div>
 				</ListItem>
 				{/* <ListItem link title="群二维码"></ListItem> */}
+				<ListItem link title="群公告"></ListItem>
 			</List>
+
+			<List className="m-0 mb-3 bg-white" strong dividers outline noChevron>
+				<ListItem title="消息免打扰">
+					<Toggle slot="after" onChange={onChangeChecked} checked={silence} />
+				</ListItem>
+			</List>
+
 			<List className="m-0 mb-3 bg-white" strong dividers outline>
 				<ListItem noChevron link>
 					<div

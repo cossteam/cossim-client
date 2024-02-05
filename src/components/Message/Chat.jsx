@@ -12,7 +12,6 @@ import { sendType, sendState, tooltipsType } from '@/utils/constants'
 import { Link, f7 } from 'framework7-react'
 import Contact from '@/components/Contact/Contact'
 import { $t } from '@/i18n'
-// import userService from '@/db'
 import Editor from '@/components/Editor/Editor'
 import MsgBar from '@/components/Message/MsgBar'
 import { Checkbox } from 'antd-mobile'
@@ -20,6 +19,7 @@ import { useUserStore } from '@/stores/user'
 import { ArrowLeftIcon, MoreIcon } from '@/components/Icon/Icon'
 import { useMessageStore } from '@/stores/message'
 import { useClipboard } from '@/shared/useClipboard'
+import { Toast } from 'antd-mobile'
 
 const Tooltip = ({ el, handler, msg }) => {
 	const tooltipRef = useRef(null)
@@ -194,6 +194,20 @@ export default function Chat(props) {
 	}
 
 	useEffect(() => {
+		const handler = () => {
+			chatRef.current.height = document.documentElement.clientHeight
+
+			console.log('document.documentElement.clientHeight', document.documentElement.clientHeight)
+		}
+
+		document.addEventListener('resize', handler)
+
+		return () => {
+			document.removeEventListener('resize', handler)
+		}
+	}, [])
+
+	useEffect(() => {
 		console.log('props', props)
 		init()
 	}, [props.msgList])
@@ -207,6 +221,8 @@ export default function Chat(props) {
 	 * @param {number} index 	当前长按元素的索引
 	 */
 	const handlerLongPress = (index, data) => {
+		// 如果是多选状态就不展示
+		if (isSelect) return
 		const div = document.createElement('div')
 		createRoot(div).render(<Tooltip el={msgRefs.current[index]} handler={handlerSelect} msg={data} />)
 		msgRefs.current[index].appendChild(div)
@@ -230,6 +246,7 @@ export default function Chat(props) {
 				user_id: user?.user_id,
 				replay_id: type === sendType.REPLY ? msg?.msg_id : null,
 				group_id: props?.group_id
+				// msg_read_destroy: props?.contact?.
 			})
 		}
 
@@ -309,7 +326,7 @@ export default function Chat(props) {
 		msgList.map(async (item) => {
 			success = await msgStore.deleteMessage(item, props.is_group)
 		})
-		success ? toast('删除成功') : toast('删除失败')
+		success ? Toast.show('删除成功') : Toast.show('删除失败')
 	}
 
 	// 多选
@@ -334,24 +351,32 @@ export default function Chat(props) {
 			case tooltipsType.DELETE:
 				sendDel(selectList)
 				break
+			case tooltipsType.MARK:
+				sendMark(selectList)
+				console.log('selectList', selectList)
+				break
 		}
 		setIsSelect(!isSelect)
 	}
 
 	// 标注
 	const sendMark = async (msg) => {
+		const is_array = Array.isArray(msg)
+		const list = is_array ? msg : [msg]
+		let success = true
+		let is_marked = true
 		try {
-			const is_marked = !msg?.is_marked
-
-			const success = await msgStore.markMessage(msg, is_marked, props?.is_group)
-
-			if (success) {
-				toast(is_marked ? '标注成功' : '取消标注成功')
-				setMsg({})
-				setSelectList([])
-			}
+			list.map(async (item) => {
+				is_marked = !item?.is_marked || false
+				const { code } = await msgStore.markMessage(item, is_marked, props?.is_group)
+				success = code === 200 ? true : false
+			})
+			setMsg({})
+			setSelectList([])
+			if (is_array && success) return Toast.show($t('标注成功'))
+			Toast.show(is_marked && success ? $t('标注成功') : $t('取消标注成功'))
 		} catch {
-			toast('标注失败')
+			Toast.show($t('标注失败'))
 		}
 	}
 
@@ -380,7 +405,7 @@ export default function Chat(props) {
 								href={
 									props?.is_group
 										? `/chatinfo/group/${props?.group_id}/`
-										: `/profile/${props?.contact?.user_id}/`
+										: `/profile/${props?.contact?.user_id}/?is_chat=1&dialog_id=${props?.dialog_id}`
 								}
 							>
 								<MoreIcon className="w-7 h-7" />

@@ -116,6 +116,7 @@ export class dbService {
 	 *
 	 * @param {string} table -要从中删除的表的名称。
 	 * @param {number} id -要删除的记录的 id。
+	 * @param {string} key -要删除的字段的名称。
 	 * @return {Promise} 成功删除记录时解析的承诺。
 	 */
 	async delete(table, id, key) {
@@ -136,5 +137,22 @@ export class dbService {
 	 */
 	async deleteAll(table) {
 		return this.DB[table] && (await this.DB[table].clear())
+	}
+
+	/**
+	 * 批量删除表中有关指定 ID 的所有记录。
+	 *
+	 * @param {string} table	-要从中删除记录的表的名称。
+	 * @param {number} id		-要删除的记录的 id。
+	 * @param {string} key		-要删除的字段的名称。
+	 */
+	async deleteById(table, id, key) {
+		return (
+			this.DB[table] &&
+			(await this.DB[table]
+				.where(key || this.PRIMARY_KEY)
+				.above(id)
+				.delete())
+		)
 	}
 }
