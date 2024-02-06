@@ -11,7 +11,7 @@ import { friendApplyListApi } from '@/api/relation'
 import { groupRequestListApi } from '@/api/group'
 import { useUserStore } from '@/stores/user'
 import { PhoneFill } from 'framework7-icons/react'
-import { liveUserApi } from '@/api/live'
+import { createLiveUserApi } from '@/api/live'
 import PropType from 'prop-types'
 import { useLiveStore } from '@/stores/live'
 import { f7 } from 'framework7-react'
@@ -118,13 +118,15 @@ export default function Contacts(props) {
 		getResquestList()
 	}, [props])
 
-	const liveStore = useLiveStore()
+	const { updateLiveStatus, updateLive, updateBack } = useLiveStore()
 	const callUser = async (contact) => {
-		const { code, data, msg } = await liveUserApi({ user_id: contact.user_id })
+		updateLiveStatus(14)
+		const { code, data, msg } = await createLiveUserApi({ user_id: contact.user_id })
 		code !== 200 && f7.dialog.alert(msg)
 		if (code === 200) {
-			liveStore.updateLive(data)
-			props.f7router.navigate('/call/')
+			updateLive(data)
+			// props.f7router.navigate('/call/')
+			updateBack(false)
 		}
 	}
 

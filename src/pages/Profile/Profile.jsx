@@ -215,7 +215,7 @@ export default function Profile(props) {
 			<div className="profile-avatar-block" ref={profileAvatarRef}>
 				<img src={info?.avatar} alt="" />
 			</div>
-			<div className="profile-content">
+			<div className="profile-content bg-gray-100">
 				<List strong outline dividers mediaList className="no-margin-top m-0 mb-3 bg-white">
 					<ListItem title={info?.name} text={info?.nick_name || info?.nickname}>
 						{!isChat(is_chat) && (

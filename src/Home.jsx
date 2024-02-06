@@ -11,6 +11,7 @@ import { useInitUser, useInitFriend } from '@/helpers/handler'
 import { handlerMsgType } from '@/helpers/handlerType'
 import { msgStatus, sendState, chatType } from '@/utils/constants'
 import { addOrUpdateMsg, updateChat } from '@/helpers/messages'
+import { useLiveStore } from '@/stores/live'
 
 /**
  * 异步处理消息。
@@ -136,6 +137,7 @@ const handlerGroupMessage = async (msg, user_id, type) => {
  */
 const Home = () => {
 	const { isLogin, user } = useUserStore()
+	const liveStore = useLiveStore()
 	const device = getDevice()
 
 	// const visibility = useDocumentVisibility('visible')
@@ -170,7 +172,6 @@ const Home = () => {
 
 	// 注册 cordova API
 	f7ready(() => {
-		console.log(f7, f7.device)
 		return f7.device.cordova && cordovaApp.init(f7)
 	})
 
@@ -210,6 +211,11 @@ const Home = () => {
 					break
 				case 14: // 用户来电
 				case 15: // 群聊来电
+				case 16: // 用户通话拒绝
+				case 17: // 群聊通话拒绝
+					liveStore.updateLiveStatus(data.event)
+					liveStore.updateLive(data.data)
+					console.log(data)
 					break
 			}
 		}
@@ -231,7 +237,6 @@ const Home = () => {
 	return (
 		<App {...f7params}>
 			<Views tabs className="safe-area">
-				{/* <View id="view-call" name="call" url="/call/" /> */}
 				{isLogin ? <AppComponent isLogin={isLogin} /> : <View id="view-auth" name="auth" url="/auth/" />}
 			</Views>
 		</App>
