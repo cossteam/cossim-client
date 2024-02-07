@@ -91,3 +91,32 @@ export const isBurn = {
 	/** 非阅后即焚 */
 	FALSE: 0
 }
+
+/** 通话状态 */
+export const liveStatus = {
+	/** 未通话 */
+	NOT_START: 0,
+	/** 等待中 */
+	WAITING: 1,
+	/** 已拒绝 */
+	REJECTED: 2,
+	/** 通话中 */
+	DURING: 3,
+	/** 已挂断 */
+	END: 4
+}
+
+/**
+ * 获取通话状态文字
+ * @param {*} status
+ * @returns
+ */
+export const getLiveStatusText = (status) => {
+	return {
+		[liveStatus.NOT_START]: '未通话',
+		[liveStatus.WAITING]: '等待中',
+		[liveStatus.REJECTED]: '已拒绝',
+		[liveStatus.DURING]: '通话中',
+		[liveStatus.END]: '已挂断'
+	}[status]
+}

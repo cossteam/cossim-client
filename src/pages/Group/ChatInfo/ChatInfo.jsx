@@ -83,7 +83,7 @@ export default function ChatInfo(props) {
 		const isSilence = !silence
 		setSilence(isSilence)
 		try {
-			f7.dialog.preloader('请稍后...')
+			f7.dialog.preloader('请稍候...')
 			const { code } = await setGroupSilenceApi({
 				group_id: parseInt(GroupId),
 				is_silent: isSilence ? 1 : 0

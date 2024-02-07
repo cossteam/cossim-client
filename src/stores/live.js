@@ -1,13 +1,14 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, devtools } from 'zustand/middleware'
+import { liveStatus } from '@/utils/constants'
 
 const liveStore = (set) => ({
-	liveStatus: -1, // -1->非通话状态 14->用户来电 16->用户通话拒绝 15->群聊来电 17-> 群聊通话拒绝
+	liveInfo: null, // 通话信息
+	updateLiveInfo: (liveInfo) => set({ liveInfo }),
+	liveStatus: liveStatus.NOT_START, // 通话状态
 	updateLiveStatus: (status) => set({ liveStatus: status }),
 	isBack: false, // 是否后台通话
-	updateBack: (isBack) => set({ isBack }),
-	live: null,
-	updateLive: (live) => set({ live })
+	updateBack: (isBack) => set({ isBack })
 })
 
 export const useLiveStore = create(

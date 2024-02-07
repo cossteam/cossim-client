@@ -51,7 +51,7 @@ export default function RequestList({ listData, confirm }) {
 								className="w-10 h-10 rounded-full"
 							/>
 							<span slot="title">
-								{chat?.sender_info?.user_name}
+								{chat?.sender_info?.user_name || chat?.receiver_info?.user_name}
 								{chat?.group_name ? (
 									<>
 										<span className=" text-xs text-gray-500">邀请你加入</span>

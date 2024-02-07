@@ -95,7 +95,7 @@ export default function MemberList({ f7router, type: PageType, id: GroupId }) {
 	// 邀请
 	const inviteMembers = async () => {
 		try {
-			f7.dialog.preloader('请稍后...')
+			f7.dialog.preloader('请稍候...')
 			const { code, msg } = await groupInviteApi({
 				group_id: parseInt(GroupId),
 				member: selected
@@ -112,7 +112,7 @@ export default function MemberList({ f7router, type: PageType, id: GroupId }) {
 	const removeMembers = async () => {
 		f7.dialog.confirm('移除成员', '确定移除吗？', async () => {
 			try {
-				f7.dialog.preloader('请稍后...')
+				f7.dialog.preloader('请稍候...')
 				const { code, msg } = await groupRemoveApi({
 					group_id: parseInt(GroupId),
 					member: selected

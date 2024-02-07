@@ -11,10 +11,11 @@ import { friendApplyListApi } from '@/api/relation'
 import { groupRequestListApi } from '@/api/group'
 import { useUserStore } from '@/stores/user'
 import { PhoneFill } from 'framework7-icons/react'
-import { createLiveUserApi } from '@/api/live'
+import { createLiveUserApi, joinLiveUserApi } from '@/api/live'
 import PropType from 'prop-types'
 import { useLiveStore } from '@/stores/live'
 import { f7 } from 'framework7-react'
+import { liveStatus as LIVESTATUS } from '@/utils/constants'
 
 Contacts.propTypes = {
 	f7router: PropType.object.isRequired
@@ -118,15 +119,26 @@ export default function Contacts(props) {
 		getResquestList()
 	}, [props])
 
-	const { updateLiveStatus, updateLive, updateBack } = useLiveStore()
+	const { updateLiveStatus, liveInfo, updateLiveInfo, updateBack } = useLiveStore()
 	const callUser = async (contact) => {
-		updateLiveStatus(14)
-		const { code, data, msg } = await createLiveUserApi({ user_id: contact.user_id })
-		code !== 200 && f7.dialog.alert(msg)
-		if (code === 200) {
-			updateLive(data)
-			// props.f7router.navigate('/call/')
-			updateBack(false)
+		try {
+			f7.dialog.preloader('请稍候...')
+			const { code, data, msg } = await createLiveUserApi({ user_id: contact.user_id })
+			code !== 200 && f7.dialog.alert(msg)
+			if (code === 200) {
+				updateLiveStatus(LIVESTATUS.WAITING)
+				updateLiveInfo({
+					liveInfo,
+					...data
+				})
+				updateBack(false)
+			}
+			await joinLiveUserApi({})
+			updateLiveStatus(LIVESTATUS.DURING)
+		} catch (error) {
+			f7.dialog.alert(error.message)
+		} finally {
+			f7.dialog.close()
 		}
 	}
 

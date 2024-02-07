@@ -12,6 +12,7 @@ import { handlerMsgType } from '@/helpers/handlerType'
 import { msgStatus, sendState, chatType } from '@/utils/constants'
 import { addOrUpdateMsg, updateChat } from '@/helpers/messages'
 import { useLiveStore } from '@/stores/live'
+import { liveStatus } from '@/utils/constants'
 
 /**
  * 异步处理消息。
@@ -211,11 +212,27 @@ const Home = () => {
 					break
 				case 14: // 用户来电
 				case 15: // 群聊来电
+					liveStore.updateLiveInfo({
+						event: data.event,
+						...data.data
+					})
+					liveStore.updateLiveStatus(liveStatus.WAITING)
+					break
 				case 16: // 用户通话拒绝
 				case 17: // 群聊通话拒绝
-					liveStore.updateLiveStatus(data.event)
-					liveStore.updateLive(data.data)
-					console.log(data)
+					liveStore.updateLiveInfo({
+						event: data.event,
+						...data.data
+					})
+					liveStore.updateLiveStatus(liveStatus.REJECTED)
+					break
+				case 18: // 用户通话挂断
+				case 19: // 群聊通话挂断
+					liveStore.updateLiveInfo({
+						event: data.event,
+						...data.data
+					})
+					liveStore.updateLiveStatus(liveStatus.END)
 					break
 			}
 		}
