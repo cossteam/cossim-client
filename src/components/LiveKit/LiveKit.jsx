@@ -17,7 +17,6 @@ import {
 import { Track } from 'livekit-client'
 import { liveStatus as LIVESTATUS, getLiveStatusText } from '@/utils/constants'
 import { useState } from 'react'
-import { f7 } from 'framework7-react'
 
 export default function LiveKit() {
 	const { liveStatus, updateLiveStatus, liveInfo, updateLiveInfo, isBack, updateBack } = useLiveStore()
@@ -27,28 +26,33 @@ export default function LiveKit() {
 	useEffect(() => {
 		console.log('liveStatus', liveStatus)
 		// if (liveStatus === LIVESTATUS.WAITING) {
-		//     setInterval(() => {
-
-		//     }, 1000)
+		// 	setTimer(
+		// 		setInterval(() => {
+		// 			console.log(waitingTime - 1)
+		// 			setWaitTime(waitingTime - 1)
+		// 		}, 1000)
+		// 	)
 		// } else {
-		//     clearInterval(timer)
+		// 	clearInterval(timer)
 		// }
 	}, [liveStatus])
 
 	// 加入
 	const joinLive = async () => {
-		const { code } = await joinLiveUserApi()
+		const { code } = await joinLiveUserApi({})
 		code && updateLiveStatus(LIVESTATUS.DURING)
 	}
 
 	// 拒绝
 	const rejectLive = async () => {
 		await rejectLiveUserApi()
-		updateLiveStatus(LIVESTATUS.REJECTED)
-		setTimeout(() => {
-			updateLiveStatus(LIVESTATUS.END)
-			updateLiveInfo(null)
-		}, 1000 * 10)
+		updateLiveStatus(LIVESTATUS.END)
+		updateLiveInfo(null)
+		// updateLiveStatus(LIVESTATUS.REJECTED)
+		// setTimeout(() => {
+		// 	updateLiveStatus(LIVESTATUS.END)
+		// 	updateLiveInfo(null)
+		// }, 1000 * 2)
 	}
 
 	// 挂断
@@ -60,11 +64,11 @@ export default function LiveKit() {
 
 	// onDisconnected
 	const onDisconnected = () => {
-		f7.dialog.preloader('网络异常...')
-		setTimeout(() => {
-			f7.dialog.close()
-			leaveLive()
-		}, 1000 * 3)
+		// f7.dialog.preloader('网络异常...')
+		// setTimeout(() => {
+		// 	// f7.dialog.close()
+		// 	leaveLive()
+		// }, 1000 * 3)
 	}
 
 	return (
@@ -100,7 +104,7 @@ export default function LiveKit() {
 										<ControlBar />
 									</LiveKitRoom>
 								)}
-								<div className="p-3 bg-[#111]">
+								<div className={clsx('p-3 bg-[#111]', liveStatus === LIVESTATUS.DURING && 'h-full')}>
 									<div className="mb-3 text-center">
 										{liveStatus === LIVESTATUS.WAITING
 											? `${getLiveStatusText(liveStatus)}(${waitingTime})...`
