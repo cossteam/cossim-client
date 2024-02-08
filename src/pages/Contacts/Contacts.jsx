@@ -119,7 +119,7 @@ export default function Contacts(props) {
 		getResquestList()
 	}, [props])
 
-	const { updateLiveStatus, liveInfo, updateLiveInfo, updateBack } = useLiveStore()
+	const { updateLiveStatus, liveInfo, updateLiveInfo } = useLiveStore()
 	const callUser = async (contact) => {
 		try {
 			f7.dialog.preloader('请稍候...')
@@ -128,13 +128,19 @@ export default function Contacts(props) {
 			if (code === 200) {
 				updateLiveStatus(LIVESTATUS.WAITING)
 				updateLiveInfo({
-					liveInfo,
+					...liveInfo,
 					...data
 				})
-				updateBack(false)
 			}
-			await joinLiveUserApi({})
-			updateLiveStatus(LIVESTATUS.DURING)
+			const { code: joinCode, data: joinData } = await joinLiveUserApi({})
+			if (joinCode === 200) {
+				console.log('joinData', joinData)
+				updateLiveStatus(LIVESTATUS.DURING)
+				updateLiveInfo({
+					...liveInfo,
+					...joinData
+				})
+			}
 		} catch (error) {
 			f7.dialog.alert(error.message)
 		} finally {
