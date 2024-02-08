@@ -96,5 +96,9 @@
     <edit-config target="NSPhotoLibraryAddUsageDescription" file="*-Info.plist" mode="merge">
       <string>need photo library access to save pictures there</string>
     </edit-config>
+    
+    <edit-config target="NSMicrophoneUsageDescription" file="*-Info.plist" mode="merge">
+        <string>need microphone access to record sounds</string>
+    </edit-config>
 
 </widget>

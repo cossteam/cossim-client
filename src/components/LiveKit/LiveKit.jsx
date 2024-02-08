@@ -23,6 +23,7 @@ export default function LiveKit() {
 	useEffect(() => {
 		console.log('liveStatus', liveStatus)
 		console.log('liveInfo', liveInfo)
+		liveStatus === LIVESTATUS.REJECTED && rejectLive()
 	}, [liveStatus])
 
 	// 加入
@@ -56,11 +57,7 @@ export default function LiveKit() {
 
 	// 连接断开
 	const onDisconnected = () => {
-		// f7.dialog.preloader('网络异常...')
-		// setTimeout(() => {
-		// 	// f7.dialog.close()
-		// 	leaveLive()
-		// }, 1000 * 3)
+		leaveLive()
 	}
 
 	return (
@@ -101,6 +98,9 @@ export default function LiveKit() {
 									token={liveInfo.token}
 									serverUrl={liveInfo.url}
 									onDisconnected={onDisconnected}
+									onError={(e) => {
+										console.log(e)
+									}}
 								>
 									<MyVideoConference />
 									<RoomAudioRenderer />

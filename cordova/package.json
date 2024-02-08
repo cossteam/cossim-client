@@ -22,6 +22,7 @@
 		"cordova-plugin-inappbrowser": "^6.0.0",
 		"cordova-plugin-keyboard": "^1.2.0",
 		"cordova-plugin-media": "^7.0.0",
+		"cordova-plugin-media-capture": "^5.0.0",
 		"cordova-plugin-splashscreen": "^6.0.2",
 		"cordova-plugin-statusbar": "^4.0.0"
 	},
