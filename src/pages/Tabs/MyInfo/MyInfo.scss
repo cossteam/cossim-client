@@ -1,0 +1,15 @@
+.coss_list {
+    @apply m-0 bg-bgPrimary mb-4;
+
+    .coss_item__bottom {
+        @apply mb-3;
+    }
+
+    .coss_item__icon {
+        @apply text-[20px]
+    }
+}
+
+.coss_navbar .title-large {
+    @apply bg-bgPrimary pb-3;
+}

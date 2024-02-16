@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "./variables.scss";
+
+/** 防止消息页显示底部导航栏 */
+.toolbar-hidden {
+    display: none;
+}
+
+.hidden-navbar-bg {
+
+    & .navbar-bg {
+        display: none;
+    }
+}

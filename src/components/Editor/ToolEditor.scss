@@ -1,0 +1,14 @@
+.am-engine {
+    background: rgba(0, 0, 0, 0) !important;
+    color: inherit !important;
+    font-size: inherit !important;
+
+    p {
+        word-break: break-all;
+    }
+}
+
+.aomao-editor.am-engine .data-mention-component,
+.aomao-editor.am-engine-view .data-mention-component {
+    color: #84ff18 !important;
+}

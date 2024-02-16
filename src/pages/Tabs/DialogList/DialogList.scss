@@ -1,0 +1,19 @@
+.coss_dialog_list {
+    @apply flex justify-start items-center;
+
+    .coss_dialog_list__icon {
+        @apply text-[22px] mr-[10px];
+    }
+
+    .coss_dialog_list__text {
+        @apply text-[15px] mr-2 whitespace-nowrap;
+    }
+}
+
+.coss_dialog .swipeout-content {
+    @apply relative;
+
+    .item-after {
+        @apply absolute right-[2%] top-[1%] flex flex-col items-end gap-1;
+    }
+}
