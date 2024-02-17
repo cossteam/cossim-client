@@ -13,6 +13,7 @@ import { Plus, Search, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } f
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { format } from 'timeago.js'
+import { isEqual } from 'lodash-es'
 
 import { $t } from '@/shared'
 import UserStore from '@/db/user'
@@ -28,13 +29,14 @@ const DialogList: React.FC<RouterProps> = () => {
 			const { code, data } = await MsgService.getDialogApi()
 			if (code !== 200) return
 
-			console.log('data', data)
-
 			data.forEach(async (item: any) => {
 				const dialog = await UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', item.dialog_id)
-				dialog
-					? await UserStore.update(UserStore.tables.dialogs, 'id', dialog.id, { ...dialog, item })
-					: await UserStore.add(UserStore.tables.dialogs, item)
+
+				if (!dialog) return await UserStore.add(UserStore.tables.dialogs, item)
+
+				if (!isEqual(dialog, item)) {
+					await UserStore.update(UserStore.tables.dialogs, 'dialog_id', item.dialog_id, { ...dialog, item })
+				}
 			})
 		} catch {
 			console.log('错误')
@@ -56,7 +58,7 @@ const DialogList: React.FC<RouterProps> = () => {
 	}, [dialogs])
 
 	return (
-		<Page ptr className="coss_dialog">
+		<Page ptr className="coss_dialog" onPageTabShow={getDialogList}>
 			<Navbar title="COSS" className="hidden-navbar-bg">
 				<NavRight>
 					<Link>

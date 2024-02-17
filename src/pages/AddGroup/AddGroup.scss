@@ -1,0 +1,15 @@
+.coss_card_images {
+    @apply flex flex-wrap w-full;
+
+    .coss_card_images__item {
+        @apply w-1/4 flex p-1 items-center justify-center mb-2;
+
+        .coss_card_images__item_image {
+            @apply w-12 h-12 rounded-full object-cover;
+        }
+    }
+}
+
+.coss_card_title .card-header {
+    @apply text-textTertiary;
+}

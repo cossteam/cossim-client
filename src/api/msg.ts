@@ -1,7 +1,7 @@
 import type { MessageListParams, SendMessage } from '@/types/api/msg'
 import request from '@/utils/request'
 
-class MsgService {
+class MsgServiceImpl {
 	private baseUrl: string = '/msg'
 
 	/**
@@ -53,7 +53,7 @@ class MsgService {
 	 * @param {*} data.type             消息类型
 	 * @returns
 	 */
-	sendGroupMessageApi(data:SendMessage): Promise<DataResponse> {
+	sendGroupMessageApi(data: SendMessage): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}send/group`,
 			method: 'POST',
@@ -62,4 +62,5 @@ class MsgService {
 	}
 }
 
-export default new MsgService()
+const MsgService = new MsgServiceImpl()
+export default MsgService

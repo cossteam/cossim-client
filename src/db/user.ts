@@ -6,7 +6,7 @@ import { getCookie } from '@/utils/cookie'
 /**
  ** 注意: 该数据库字段可以随意添加或者删除,这里只给出一些基础的字段,需要的请自行添加,无需更改以下字段
  */
-class UserStore extends Dexie {
+class UserStoreImpl extends Dexie {
 	dialogs!: Table<DialogsList>
 	friends!: Table<Friends>
 	groups!: Table<Groups>
@@ -28,6 +28,8 @@ class UserStore extends Dexie {
 	}
 }
 
-export default new ServiceImpl({
-	db: new UserStore(COMMON_DATA_BASE_NAME + `_${getCookie(USER_ID)}`)
+const UserStore = new ServiceImpl({
+	db: new UserStoreImpl(COMMON_DATA_BASE_NAME + `_${getCookie(USER_ID)}`)
 })
+
+export default UserStore

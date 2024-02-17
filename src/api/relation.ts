@@ -1,7 +1,7 @@
 import type { AddFriendData, FriendListParams } from '@/types/api/relation'
 import request from '@/utils/request'
 
-class RelationService {
+class RelationServiceImpl {
 	private baseUrl: string = '/relation/user'
 
 	/**
@@ -45,12 +45,14 @@ class RelationService {
 		})
 	}
 
-    groupApplyListApi(params: FriendListParams): Promise<DataResponse> {
-        return request({
-            url: `${this.baseUrl}/group_request_list`,
-            params
-        })
-    }
+	groupApplyListApi(params: FriendListParams): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/group_request_list`,
+			params
+		})
+	}
 }
 
-export default new RelationService()
+const RelationService = new RelationServiceImpl()
+
+export default RelationService

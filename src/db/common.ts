@@ -3,7 +3,7 @@ import { COMMON_DATA_BASE_NAME } from '@/shared'
 import type { UserDataBase } from '@/types/db/common-db'
 import { ServiceImpl } from '@/shared/db'
 
-class CommonStore extends Dexie {
+class CommonStoreImpl extends Dexie {
 	users!: Table<UserDataBase>
 
 	constructor(name: string, version: number = 1) {
@@ -14,6 +14,8 @@ class CommonStore extends Dexie {
 	}
 }
 
-export default new ServiceImpl({
-	db: new CommonStore(COMMON_DATA_BASE_NAME)
+const CommonStore = new ServiceImpl({
+	db: new CommonStoreImpl(COMMON_DATA_BASE_NAME)
 })
+
+export default CommonStore

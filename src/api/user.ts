@@ -9,7 +9,7 @@ import type {
 } from '@/types/api/user'
 import request from '@/utils/request'
 
-class UserService {
+class UserServiceImpl {
 	private baseUrl: string = '/user'
 
 	/**
@@ -82,7 +82,7 @@ class UserService {
 	 * @param {*} params.email
 	 * @returns
 	 */
-	searchUserApi(params: SearchUserParams): Promise<DataResponse>  {
+	searchUserApi(params: SearchUserParams): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/search`,
 			params
@@ -95,7 +95,7 @@ class UserService {
 	 * @param {string} params.user_id     	用户 邮箱 | id
 	 * @returns
 	 */
-	getUserInfoApi(params: UserInfoParams): Promise<DataResponse>  {
+	getUserInfoApi(params: UserInfoParams): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/info`,
 			method: 'get',
@@ -176,4 +176,6 @@ class UserService {
 	// }
 }
 
-export default new UserService()
+const UserService = new UserServiceImpl()
+
+export default UserService

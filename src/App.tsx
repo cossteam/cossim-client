@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { App as AppComponent, View, f7 } from 'framework7-react'
 import { Framework7Parameters } from 'framework7/types'
-// import { io, Socket } from 'socket.io-client'
 
 import routes from './router'
 import Layout from './components/Layout'
@@ -34,30 +33,26 @@ function App() {
 			viewEl.setAttribute('content', `${viewEl.getAttribute('content')}, maximum-scale=1, user-scalable=no`)
 		}
 
-		// if (hasCookie(TOKEN)) {
-		// 	const socketUrl = import.meta.env.VITE_WS_URL + `?token=${getCookie(TOKEN)}`
-		// 	const socket = io(socketUrl, {
-		// 		path: import.meta.env.VITE_BASE_WS_URL,
-		// 		transports: ['websocket'],
-		// 	})
-		// 	// 连接成功
-		// 	socket.on('connect', () => {
-		// 		console.log('Socket connected')
-		// 	})
-
-		// 	// 添加消息监听器
-		// 	socket.on('message', (data) => {
-		// 		console.log('接收到消息', data)
-		// 	})
-
-		// 	setSocket(socket)
-		// }
+		// const socketUrl = import.meta.env.VITE_WS_URL + `?token=${getCookie(TOKEN)}`
+		// const socket = io(socketUrl, {
+		// 	path: import.meta.env.VITE_BASE_WS_URL,
+		// 	transports: ['websocket']
+		// })
+		// console.log('socket', socket.io)
+		// 连接成功
+		// socket.on('open', () => {
+		// 	console.log('Socket connected')
+		// })
+		// socket.on('message', (data) => {
+		// 	console.log('接收到消息', data)
+		// })
+		// setSocket(socket)
 
 		const handlerInit = (e: any) => {
 			const data = JSON.parse(e.data)
 			switch (data.event) {
 				case 3:
-					// console.info('接收到消息：', data)
+					console.info('接收或发送消息：', data)
 					// handlerMessage(data.data, user?.user_id, chatType.PRIVATE)
 					break
 				case 4:
@@ -68,6 +63,9 @@ function App() {
 				case 7:
 					// console.info('收到好友请求或确认：', data)
 					// handlerManger(data)
+					break
+				case 12:
+					console.log('接收或发送的消息：', data)
 					break
 				case 14: // 用户来电
 				case 15: // 群聊来电
@@ -97,24 +95,15 @@ function App() {
 		}
 
 		// 连接 socket
-		SocketClient.connect()
-
-		SocketClient.addListener('onWsMessage', handlerInit)
+		if (hasCookie(TOKEN)) {
+			SocketClient.connect()
+			SocketClient.addListener('onWsMessage', handlerInit)
+		}
 
 		return () => {
 			SocketClient.removeListener('onWsMessage', handlerInit)
 		}
 	}, [])
-
-	// useEffect(() => {
-	// 	if (!socket) return
-
-	// 	console.log('socket', socket)
-
-	// 	socket.on('message', (data) => {
-	// 		console.log('接收到消息:', data)
-	// 	})
-	// }, [socket])
 
 	return (
 		<AppComponent {...f7params}>

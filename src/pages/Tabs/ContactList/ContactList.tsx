@@ -1,7 +1,7 @@
 import { List, ListGroup, ListItem, Navbar, Page, Searchbar, Subnavbar } from 'framework7-react'
-import { PersonCropCircleBadgePlus, PersonCropCircleBadgeExclam } from 'framework7-icons/react'
+import { Person2Alt, PersonBadgePlusFill, PersonBadgeMinusFill } from 'framework7-icons/react'
 
-import { $t, USER_ID } from '@/shared'
+import { $t, USER_ID, arrayToGroups } from '@/shared'
 import RelationService from '@/api/relation'
 import { getCookie } from '@/utils/cookie'
 import UserStore from '@/db/user'
@@ -10,18 +10,6 @@ import GroupService from '@/api/group'
 
 const user_id = getCookie(USER_ID) || ''
 
-const arrayToGroups = (array: any[]) => {
-	array = !Array.isArray(array) ? [] : array
-	array = array.filter((v) => v.group)
-	return array.reduce((result, user) => {
-		const group = user.group
-		if (!group) return result
-		if (!result[group]) result[group] = []
-
-		result[group].push(user)
-		return result
-	}, {})
-}
 
 const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 	const [contact, setContact] = useState<any[]>([])
@@ -86,13 +74,19 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 
 			<List contactsList noChevron dividers>
 				<ListItem link="/apply_list/" badge={applyTotal} badgeColor="red">
-					<PersonCropCircleBadgePlus slot="media" className="text-primary text-2xl" />
+					<PersonBadgePlusFill slot="media" className="text-primary text-2xl" />
 					<span slot="title" className="text-color-primary">
 						{$t('新请求')}
 					</span>
 				</ListItem>
+				<ListItem link="/apply_list/" badge={applyTotal} badgeColor="red">
+					<Person2Alt slot="media" className="text-primary text-2xl" />
+					<span slot="title" className="text-color-primary">
+						{$t('群聊')}
+					</span>
+				</ListItem>
 				<ListItem link="/groups/">
-					<PersonCropCircleBadgeExclam slot="media" className="text-red-400 text-2xl" />
+					<PersonBadgeMinusFill slot="media" className="text-red-400 text-2xl" />
 					<span slot="title" className="text-red-400">
 						{$t('黑名单')}
 					</span>
