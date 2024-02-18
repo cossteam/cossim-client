@@ -50,7 +50,8 @@ export enum TOOLTIP_TYPE {
 	DELETE = 'delete',
 	SELECT = 'select',
 	REPLY = 'reply',
-	MARK = 'mark'
+	MARK = 'mark',
+	NONE = 'none'
 }
 
 /** 平台 */

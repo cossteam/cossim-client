@@ -25,12 +25,15 @@ import UserStore from '@/db/user'
 interface ContactProps {
 	completed: (list: any) => void
 	defaults?: any[]
+	opened?: boolean
+	setOpened?: (value: boolean) => void
+	group?: boolean
 }
 
-const Contact: React.FC<ContactProps> = ({ completed, defaults }) => {
+const Contact: React.FC<ContactProps> = ({ completed, defaults, opened, setOpened }) => {
 	const [friends, setFriends] = useState<any>({})
 
-	const isChecked = (item: any, data?: any[]) => (data || defaults!).some((v) => v?.dialog_id === item?.dialog_id)
+	const isChecked = (item: any, data?: any[]) => (data || defaults!)?.some((v) => v?.dialog_id === item?.dialog_id)
 
 	const updateFriends = async () => {
 		const friends = await UserStore.findAll(UserStore.tables.friends)
@@ -43,7 +46,7 @@ const Contact: React.FC<ContactProps> = ({ completed, defaults }) => {
 			await updateFriends()
 		},
 		() => {},
-		[]
+		[opened]
 	)
 
 	const [selects, setSelects] = useState<any[]>([])
@@ -62,7 +65,9 @@ const Contact: React.FC<ContactProps> = ({ completed, defaults }) => {
 			onPopupClosed={() => {
 				setFriends([])
 				setSelects([])
+				setOpened && setOpened(false)
 			}}
+			opened={opened}
 		>
 			<View>
 				<Page className="bg-bgTertiary">

@@ -78,7 +78,7 @@ const RegisterScreen: React.FC<RouterProps> = ({ f7router }) => {
 	}
 
 	return (
-		<Page loginScreen>
+		<Page loginScreen noToolbar>
 			<Block className="fixed top-0 left-0">
 				<ChevronLeft className="text-2xl text-primary" onClick={() => f7router.back()} />
 			</Block>

@@ -1,4 +1,4 @@
-import type { MessageListParams, SendMessage } from '@/types/api/msg'
+import type { EditMessage, MessageListParams, SendMessage } from '@/types/api/msg'
 import request from '@/utils/request'
 
 class MsgServiceImpl {
@@ -56,6 +56,36 @@ class MsgServiceImpl {
 	sendGroupMessageApi(data: SendMessage): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}send/group`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 编辑用户信息
+	 * @param {*} data
+	 * @param {string} data.content		消息
+	 * @param {number} data.msg_id		消息id
+	 * @param {number} data.msg_type	消息类型
+	 */
+	editUserMessageApi(data: EditMessage): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/edit/user`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 编辑群聊消息
+	 * @param {*} data
+	 * @param {*} data.content			消息内容
+	 * @param {*} data.msg_id			消息id
+	 * @param {*} data.type				消息类型
+	 */
+	editGroupMessageApi(data: EditMessage): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/edit/group`,
 			method: 'POST',
 			data
 		})

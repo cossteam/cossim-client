@@ -12,3 +12,9 @@ export interface SendMessage {
 	replay_id?: number
 	type: number
 }
+
+export interface EditMessage {
+	msg_id: number
+	content: string
+	msg_type: number
+}

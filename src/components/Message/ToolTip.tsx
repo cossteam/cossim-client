@@ -25,9 +25,9 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 	const currentRef = useRef<HTMLLIElement | null>(null)
 
 	useClickOutside(tooltipRef, () => {
-        currentRef.current!.style.zIndex = '1'
-        setVisible(false)
-    })
+		currentRef.current!.style.zIndex = '1'
+		setVisible(false)
+	})
 
 	// 边界控制
 	useEffect(() => {
@@ -99,6 +99,10 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		}
 	]
 
+	useEffect(() => {
+		!visible && (currentRef.current!.style.zIndex = '1')
+	}, [visible])
+
 	if (!visible) return null
 
 	return (
@@ -119,21 +123,23 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 			<div className="h-auto p-4 py-5">
 				<div className="flex flex-wrap">
 					{tips.map((item, index) => (
-						<div key={item.name} className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')}>
-							<Link
-								onClick={() => {
-									setVisible(false)
-									onSelect(item.name, msgId)
-								}}
-								className="w-full"
-							>
-								<div className="flex flex-col items-center justify-center">
-									<div className="mb-[6px]">{item.icon}</div>
-									<span className="text-[0.75rem]">{item.title}</span>
-								</div>
-							</Link>
-							{index === 3 && <div className="w-full h-[1px] bg-[rgba(255,255,255,0.2)]" key={index} />}
-						</div>
+						<>
+							<div key={item.name} className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')}>
+								<Link
+									onClick={() => {
+										setVisible(false)
+										onSelect(item.name, msgId)
+									}}
+									className="w-full"
+								>
+									<div className="flex flex-col items-center justify-center">
+										<div className="mb-[6px]">{item.icon}</div>
+										<span className="text-[0.75rem]">{item.title}</span>
+									</div>
+								</Link>
+							</div>
+							{/* {index === 3 && <div className="w-full h-[1px] bg-[rgba(255,255,255,0.2)]" key={index} />} */}
+						</>
 					))}
 				</div>
 			</div>

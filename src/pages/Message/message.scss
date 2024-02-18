@@ -30,6 +30,13 @@
     }
 
 
+    .coss_message_editor {
+        @apply max-w-full;
+
+        p {
+            @apply text-ellipsis whitespace-nowrap overflow-hidden text-[0.75rem] w-[85%] text-textTertiary;
+        }
+    }
 
 }
 
