@@ -235,7 +235,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				ref={navbarRef}
 			>
 				<NavRight>
-					<Link>
+					<Link href={is_group ? `/group_info/${receiver_id}/` : `/profile/${receiver_id}/`}>
 						<Ellipsis className="w-6 h-6 mr-2" />
 					</Link>
 				</NavRight>
@@ -269,7 +269,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (
 						<ListItem key={index} className="coss_list_item" data-index={index} style={{ zIndex: 1 }}>
-							<Chat msg={item} index={index} onSelect={onSelect} />
+							<Chat msg={item} index={index} onSelect={onSelect}  />
 						</ListItem>
 					))}
 				</List>

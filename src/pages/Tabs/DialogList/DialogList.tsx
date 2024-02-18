@@ -93,7 +93,7 @@ const DialogList: React.FC<RouterProps> = () => {
 				{chats.map((item) => (
 					<ListItem
 						key={item?.dialog_id}
-						link={`/message/${item.user_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}`}
+						link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}`}
 						title={item?.dialog_name}
 						badge={item?.dialog_unread_count}
 						badgeColor="red"
