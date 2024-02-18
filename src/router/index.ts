@@ -5,9 +5,6 @@ import ContactList from '@/pages/Tabs/ContactList/ContactList'
 import MyInfo from '@/pages/Tabs/MyInfo/MyInfo'
 
 import AuthScreen from '@/pages/Auth/AuthScreen'
-// import LoginScreen from '@/pages/Auth/LoginScreen'
-// import RegisterScreen from '@/pages/Auth/RegisterScreen'
-// import Message from '@/pages/Message'
 
 import NotFound from '@/pages/NotFound'
 
@@ -77,6 +74,10 @@ const routes: Router.RouteParameters[] = [
 	{
 		path: '/add_group/',
 		asyncComponent: () => import('@/pages/AddGroup/AddGroup')
+	},
+	{
+		path: '/group_info/:group_id',
+		asyncComponent: () => import('@/pages/GroupInfo/GroupInfo')
 	},
 	{
 		path: '(.*)',
