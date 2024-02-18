@@ -94,6 +94,7 @@ service.interceptors.request.use(
 		const serverPublicKey = await getServerPublicKey()
 		// 获取客户端公钥
 		const clientKey = await getClientKeys()
+        if (!clientKey) return config
 		// 注册时请求数据需要携带 public_key
 		if (config.url === '/user/register') {
 			requestData['public_key'] = clientKey.publicKey
@@ -132,6 +133,7 @@ service.interceptors.response.use(
             await getServerPublicKey()
 			// 获取客户端密钥
 			const clientKey = await getClientKeys()
+            if (!clientKey) return responseData
 			const aesKey = await PGPUtils.rsaDecrypt(clientKey.privateKey, pgpEnv.passphrase, responseData.secret)
 			const decryptedData = await PGPUtils.aes256Decrypt(responseData.message, aesKey)
 			response.data = decryptedData

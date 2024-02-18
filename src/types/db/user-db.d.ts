@@ -211,6 +211,9 @@ export interface GroupChats {
 	other_info: any
 }
 
+/**
+ * 申请列表
+ */
 export interface ApplyList {
 	/**
 	 * 自增 id
@@ -236,4 +239,30 @@ export interface ApplyList {
 	 * 留言
 	 */
 	message: string
+}
+
+/**
+ * 客户端通讯密钥
+ */
+export interface ClientPGPKeys {
+	/**
+	 * 自增 id
+	 */
+    id?: number,
+    /**
+     * 服务端公钥
+     */
+    server_public_Key: string,
+    /**
+     * 客户端密钥
+     */
+    private_key: string,
+    /**
+     * 客户端公钥
+     */
+    public_key: string,
+    /**
+     * 撤销凭证
+     */
+    revocation_certificate: string
 }

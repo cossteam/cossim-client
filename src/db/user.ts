@@ -1,5 +1,5 @@
 import Dexie, { Table } from 'dexie'
-import type { ApplyList, DialogsList, Friends, GroupChats, Groups, PrivateChats } from '@/types/db/user-db'
+import type { ApplyList, DialogsList, Friends, GroupChats, Groups, PrivateChats, ClientPGPKeys } from '@/types/db/user-db'
 import { ServiceImpl, USER_ID, COMMON_DATA_BASE_NAME } from '@/shared'
 import { getCookie } from '@/utils/cookie'
 
@@ -11,8 +11,9 @@ class UserStoreImpl extends Dexie {
 	friends!: Table<Friends>
 	groups!: Table<Groups>
 	private_chats!: Table<PrivateChats>
-	group_chats!: Table<GroupChats>
+    group_chats!: Table<GroupChats>
 	apply_list!: Table<ApplyList>
+	client_pgp_keys!: Table<ClientPGPKeys>
 
 	constructor(name: string, version: number = 1) {
 		super(name)
@@ -23,7 +24,8 @@ class UserStoreImpl extends Dexie {
 			private_chats:
 				'++id, dialog_id, &msg_id, content, created_at, is_burn_after_reading, is_label, is_read, read_at, receiver_id, replay_id, sender_id, type',
 			group_chats: '++id, dialog_id, &msg_id',
-			apply_list: '++id'
+			apply_list: '++id',
+            client_pgp_keys: '++id, &dialog_id, server_public_Key, private_key, public_key, revocation_certificate'
 		})
 	}
 }

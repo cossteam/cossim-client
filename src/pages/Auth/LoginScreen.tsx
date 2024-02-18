@@ -96,7 +96,7 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defau
 			setCookie(USER_ID, data?.user_info?.user_id)
 			setCookie(ACCOUNT, data?.user_info?.email)
 			setCookie(TOKEN, data?.token)
-			// location.reload()
+			location.reload()
 		} catch (error) {
 			console.error('登录失败', error)
 
