@@ -123,23 +123,20 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 			<div className="h-auto p-4 py-5">
 				<div className="flex flex-wrap">
 					{tips.map((item, index) => (
-						<>
-							<div key={item.name} className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')}>
-								<Link
-									onClick={() => {
-										setVisible(false)
-										onSelect(item.name, msgId)
-									}}
-									className="w-full"
-								>
-									<div className="flex flex-col items-center justify-center">
-										<div className="mb-[6px]">{item.icon}</div>
-										<span className="text-[0.75rem]">{item.title}</span>
-									</div>
-								</Link>
-							</div>
-							{/* {index === 3 && <div className="w-full h-[1px] bg-[rgba(255,255,255,0.2)]" key={index} />} */}
-						</>
+						<div key={item.name} className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')}>
+							<Link
+								onClick={() => {
+									setVisible(false)
+									onSelect(item.name, msgId)
+								}}
+								className="w-full"
+							>
+								<div className="flex flex-col items-center justify-center">
+									<div className="mb-[6px]">{item.icon}</div>
+									<span className="text-[0.75rem]">{item.title}</span>
+								</div>
+							</Link>
+						</div>
 					))}
 				</div>
 			</div>

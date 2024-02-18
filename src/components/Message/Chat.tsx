@@ -14,9 +14,11 @@ interface ChatProps {
 	msg: PrivateChats
 	index: number
 	onSelect: (...args: any[]) => void
+	className?: string
+	isSelected?: boolean
 }
 
-const Chat: React.FC<ChatProps> = ({ msg, index, onSelect }) => {
+const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected }) => {
 	const tooltipRef = useRef<HTMLDivElement | null>(null)
 
 	const is_self = isMe(msg?.sender_id)
@@ -32,15 +34,14 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect }) => {
 	// })
 
 	const createTooltip = () => {
+		if (isSelected) return
 		const div = document.createElement('div')
 		createRoot(div).render(<ToolTip onSelect={onSelect} el={tooltipRef.current!} />)
 		tooltipRef.current!.appendChild(div)
 	}
 
 	return (
-		<div
-			className={clsx('flex animate__animated animate__fadeInUp test', is_self ? 'justify-end' : 'justify-start')}
-		>
+		<div className={clsx('flex animate__animated', is_self ? 'justify-end' : 'justify-start', className)}>
 			<div className="flex max-w-[85%]">
 				<div
 					className={clsx(

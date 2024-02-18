@@ -112,7 +112,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			msg.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		} finally {
 			set((state) => ({ messages: [...state.messages.slice(0, -1), msg] }))
-			!is_forward && updateDatabaseMessage(tableName, msg.msg_id, msg)
+			!is_forward && (await updateDatabaseMessage(tableName, msg.msg_id, msg))
 		}
 	},
 	editMessage: async (msg: any, content: string) => {
@@ -142,7 +142,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			set((state) => ({
 				messages: state.messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
 			}))
-			updateDatabaseMessage(tableName, msg.msg_id, msg, true)
+			await updateDatabaseMessage(tableName, msg.msg_id, msg, true)
 		}
 	},
 	markMessage: async () => {},
