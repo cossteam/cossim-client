@@ -99,3 +99,13 @@ export enum ApplyStatus {
 // 	/** 被邀请者 */
 // 	INVITE_RECEIVER = 4
 // }
+
+/** 群聊成员列表类型 */
+export enum MemberListType {
+	/** 非本群成员 */
+	NOTMEMBER = 'not_member',
+	/** 本群成员 */
+	MEMBER = 'member',
+	/** 本群成员（仅展示） */
+	MEMBERSHOW = 'member_show'
+}

@@ -9,7 +9,7 @@ class RelationServiceImpl {
 	 *
 	 * @param {FriendListParams} params.user_id
 	 */
-	getFriendListApi(params: FriendListParams): Promise<DataResponse> {
+	getFriendListApi(params?: FriendListParams): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/friend_list`,
 			params

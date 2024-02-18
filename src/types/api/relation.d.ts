@@ -1,6 +1,6 @@
 
 export interface FriendListParams {
-    user_id: string
+    user_id?: string
 }
 
 export interface AddFriendData {

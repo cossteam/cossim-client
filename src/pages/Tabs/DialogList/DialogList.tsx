@@ -35,7 +35,7 @@ const DialogList: React.FC<RouterProps> = () => {
 				if (!dialog) return await UserStore.add(UserStore.tables.dialogs, item)
 
 				if (!isEqual(dialog, item)) {
-					await UserStore.update(UserStore.tables.dialogs, 'dialog_id', item.dialog_id, { ...dialog, item })
+					await UserStore.update(UserStore.tables.dialogs, 'dialog_id', item.dialog_id, { ...dialog, ...item })
 				}
 			})
 		} catch {

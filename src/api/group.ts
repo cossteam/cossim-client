@@ -13,6 +13,7 @@ class GroupServiceImpl {
 	groupRequestListApi(params: groupListParams): Promise<DataResponse> {
 		return request({
 			url: `${this.baseGroupUrl}/request_list`,
+			method: 'GET',
 			params
 		})
 	}
@@ -34,173 +35,160 @@ class GroupServiceImpl {
 		})
 	}
 
-	// /**
-	//  * 加入群聊
-	//  * @param {*} data
-	//  * @param {*} data.group_id
-	//  * @returns
-	//  */
-	// export function joinGroupApi(data) {
-	// 	return request({
-	// 		url: relationGroup + '/join',
-	// 		method: 'POST',
-	// 		data
-	// 	})
-	// }
+	/**
+	 * 加入群聊
+	 * @param {*} data
+	 * @param {*} data.group_id
+	 * @returns
+	 */
+    joinGroupApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/join',
+			method: 'POST',
+			data
+		})
+	}
 
-	// /**
-	//  * 邀请加入群聊
-	//  * @param {*} data
-	//  * @param {String} data.group_id
-	//  * @param {Array} data.member
-	//  * @returns
-	//  */
-	// export function groupInviteMemberApi(data) {
-	// 	return request({
-	// 		url: relationGroup + '/invite',
-	// 		method: 'POST',
-	// 		data
-	// 	})
-	// }
+	/**
+	 * 邀请加入群聊
+	 * @param {*} data
+	 * @param {String} data.group_id
+	 * @param {Array} data.member
+	 * @returns
+	 */
+	groupInviteMemberApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/invite',
+			method: 'POST',
+			data
+		})
+	}
 
-	// /**
-	//  * 获取群申请列表
-	//  * @param {*} params
-	//  * @returns
-	//  */
-	// export function groupRequestListApi(params) {
-	// 	return request({
-	// 		url: relationGroup + '/request_list',
-	// 		method: 'GET',
-	// 		params
-	// 	})
-	// }
+	/**
+	 * 管理加入群聊
+	 * @param {*} data
+	 * @returns
+	 */
+	confirmAddGroupApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/manage_join',
+			method: 'POST',
+			data
+		})
+	}
 
-	// /**
-	//  * 管理加入群聊
-	//  * @param {*} data
-	//  * @returns
-	//  */
-	// export function confirmAddGroupApi(data) {
-	// 	return request({
-	// 		url: relationGroup + '/manage_join',
-	// 		method: 'POST',
-	// 		data
-	// 	})
-	// }
+	/**
+	 * 获取群聊列表
+	 * @param {*} param
+	 * @returns
+	 */
+	groupListApi(param: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/list',
+			method: 'GET',
+			params: param
+		})
+	}
 
-	// /**
-	//  * 获取群聊列表
-	//  * @param {*} param
-	//  * @returns
-	//  */
-	// export function groupListApi(param) {
-	// 	return request({
-	// 		url: relationGroup + '/list',
-	// 		method: 'GET',
-	// 		params: param
-	// 	})
-	// }
+	/**
+	 * 获取群聊信息
+	 * @param {*} param
+	 * @param {*} param.group_id
+	 * @returns
+	 */
+	groupInfoApi(param: any): Promise<DataResponse> {
+		return request({
+			url: this.baseUrl + '/info',
+			method: 'GET',
+			params: param
+		})
+	}
 
-	// /**
-	//  * 获取群聊信息
-	//  * @param {*} param
-	//  * @param {*} param.group_id
-	//  * @returns
-	//  */
-	// export function groupInfoApi(param) {
-	// 	return request({
-	// 		url: group + '/info',
-	// 		method: 'GET',
-	// 		params: param
-	// 	})
-	// }
+	/**
+	 * 获取群成员列表
+	 * @param {*} param
+	 * @param {*} param.group_id
+	 * @returns
+	 */
+	groupMemberApi(param: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/member',
+			method: 'GET',
+			params: param
+		})
+	}
 
-	// /**
-	//  * 获取群成员列表
-	//  * @param {*} param
-	//  * @param {*} param.group_id
-	//  * @returns
-	//  */
-	// export function groupMemberApi(param) {
-	// 	return request({
-	// 		url: relationGroup + '/member',
-	// 		method: 'GET',
-	// 		params: param
-	// 	})
-	// }
+	/**
+	 * 邀请加入群聊
+	 * @param {*} data
+	 * @param {*} data.group_id
+	 * @param {*} data.member
+	 * @returns
+	 */
+	groupInviteApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/invite',
+			method: 'POST',
+			data
+		})
+	}
 
-	// /**
-	//  * 邀请加入群聊
-	//  * @param {*} data
-	//  * @param {*} data.group_id
-	//  * @param {*} data.member
-	//  * @returns
-	//  */
-	// export function groupInviteApi(data) {
-	// 	return request({
-	// 		url: relationGroup + '/invite',
-	// 		method: 'POST',
-	// 		data
-	// 	})
-	// }
+	/**
+	 * 将用户从群聊移除
+	 * @param {*} data
+	 * @param {*} data.group_id
+	 * @param {*} data.member
+	 * @returns
+	 */
+	groupRemoveApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/admin/manage/remove',
+			method: 'POST',
+			data
+		})
+	}
 
-	// /**
-	//  * 将用户从群聊移除
-	//  * @param {*} data
-	//  * @param {*} data.group_id
-	//  * @param {*} data.member
-	//  * @returns
-	//  */
-	// export function groupRemoveApi(data) {
-	// 	return request({
-	// 		url: relationGroup + '/admin/manage/remove',
-	// 		method: 'POST',
-	// 		data
-	// 	})
-	// }
+	/**
+	 * 退出群聊
+	 * @param {*} data
+	 * @param {*} data.group_id
+	 * @returns
+	 */
+	groupQuitApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/quit',
+			method: 'POST',
+			data
+		})
+	}
 
-	// /**
-	//  * 退出群聊
-	//  * @param {*} data
-	//  * @param {*} data.group_id
-	//  * @returns
-	//  */
-	// export function groupQuitApi(data) {
-	// 	return request({
-	// 		url: relationGroup + '/quit',
-	// 		method: 'POST',
-	// 		data
-	// 	})
-	// }
+	/**
+	 * 解散群聊
+	 * @param {*} data
+	 * @param {*} data.gid
+	 * @returns
+	 */
+	groupDissolve(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseUrl + '/delete',
+			method: 'POST',
+			data
+		})
+	}
 
-	// /**
-	//  * 解散群聊
-	//  * @param {*} data
-	//  * @param {*} data.gid
-	//  * @returns
-	//  */
-	// export function groupDissolve(data) {
-	// 	return request({
-	// 		url: group + '/delete',
-	// 		method: 'POST',
-	// 		data
-	// 	})
-	// }
-
-	// /**
-	//  * 设置群聊消息静默通知
-	//  * @param {Object} data
-	//  * @param {String} data.group_id
-	//  * @param {String} data.is_silence
-	//  */
-	// export function setGroupSilenceApi(data) {
-	// 	return request({
-	// 		url: `${relationGroup}/silent`,
-	// 		method: 'POST',
-	// 		data
-	// 	})
-	// }
+	/**
+	 * 设置群聊消息静默通知
+	 * @param {Object} data
+	 * @param {String} data.group_id
+	 * @param {String} data.is_silence
+	 */
+	setGroupSilenceApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + `/silent`,
+			method: 'POST',
+			data
+		})
+	}
 }
 
 const GroupService = new GroupServiceImpl()
