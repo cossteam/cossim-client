@@ -34,6 +34,15 @@ export const markMessage = async () => {}
 
 export const readMessage = async () => {}
 
+/**
+ * 更新数据库中的消息。
+ *
+ * @param {string} tableName -存储消息的表的名称。
+ * @param {number} msg_id -要更新的消息的 ID。
+ * @param {any} msg -更新的消息对象。
+ * @param {boolean} update -指示是否更新现有消息或添加新消息。默认为 false。
+ * @return {Promise<void>} -当消息更新或成功添加时解析的承诺。
+ */
 export const updateDatabaseMessage = async (tableName: string, msg_id: number, msg: any, update: boolean = false) => {
 	try {
 		const result = await UserStore.findOneById(tableName, 'msg_id', msg_id)

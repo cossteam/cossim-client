@@ -60,7 +60,7 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 
 	return (
 		<Page ptr onPageTabShow={onPageTabShow}>
-			<Navbar title={$t('联系人')} className="hidden-navbar-bg">
+			<Navbar title={$t('联系人')} className="hidden-navbar-bg bg-bgPrimary">
 				<Subnavbar inner={false}>
 					<Searchbar
 						searchContainer=".contacts-list"

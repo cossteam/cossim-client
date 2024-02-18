@@ -59,7 +59,7 @@ const DialogList: React.FC<RouterProps> = () => {
 
 	return (
 		<Page ptr className="coss_dialog" onPageTabShow={getDialogList}>
-			<Navbar title="COSS" className="hidden-navbar-bg">
+			<Navbar title="COSS" className="hidden-navbar-bg bg-bgPrimary">
 				<NavRight>
 					<Link>
 						<Search className="w-6 h-6" />
@@ -89,7 +89,7 @@ const DialogList: React.FC<RouterProps> = () => {
 				</List>
 			</Popover>
 
-			<List contactsList noChevron dividers mediaList>
+			<List contactsList noChevron mediaList className="mb-24">
 				{chats.map((item) => (
 					<ListItem
 						key={item?.dialog_id}

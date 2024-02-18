@@ -21,6 +21,7 @@ interface MessageStore {
 	receiver_id: string
 	dialog_id: number
 	userInfo: any
+	copyMessage: (msg_id:number | string) => void
 	updateMessage: (msg: any) => Promise<void>
 	deleteMessage: () => Promise<void>
 	sendMessage: (type: MESSAGE_TYPE, content: string, replay_id?: number) => Promise<void>
@@ -39,11 +40,22 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	receiver_id: '',
 	dialog_id: 0,
 	userInfo: null,
+	copyMessage: (msg_id:number | string) => {
+
+	},
 	updateMessage: async (msg: PrivateChats) => {
 		const { messages } = get()
 		set({ messages: [...messages, msg] })
 	},
 	deleteMessage: async () => {},
+	/**
+	 * 发送消息并处理发送过程，包括更新本地消息状态和数据库。
+	 *
+	 * @param {MESSAGE_TYPE} type -消息的类型
+	 * @param {string} content -消息的内容
+	 * @param {number} [replay_id] -正在回复的消息的ID，可选
+	 * @return {Promise<void>}
+	 */
 	sendMessage: async (type: MESSAGE_TYPE, content: string, replay_id?: number) => {
 		const { is_group, messages, receiver_id, dialog_id, tableName } = get()
 		const msg: PrivateChats = {
@@ -70,9 +82,10 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 				: await MsgService.sendUserMessageApi(params)
 
 			msg.msg_send_state = code === 200 ? MESSAGE_SEND.SEND_SUCCESS : MESSAGE_SEND.SEND_FAILED
-			msg.msg_id = data?.meg_id || Date.now()
+			msg.msg_id = data?.msg_id || Date.now()
 		} catch (error) {
 			console.error('发送消息失败', error)
+			msg.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		} finally {
 			set((state) => ({ messages: [...state.messages.slice(0, -1), msg] }))
 			updateDatabaseMessage(tableName, msg.msg_id, msg)
@@ -81,6 +94,14 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	editMessage: async () => {},
 	markMessage: async () => {},
 	readMessage: async () => {},
+	/**
+	 * 初始化消息的函数。
+	 *
+	 * @param {boolean} is_group -指示对话框是否是一个组
+	 * @param {number}dialog_id -对话框的ID
+	 * @param {string}receiver_id -消息接收者的id
+	 * @return {Promise<void>} 消息初始化时解析的 Promise
+	 */
 	initMessage: async (is_group: boolean, dialog_id: number, receiver_id: string) => {
 		const { shareKey } = get()
 		const tableName = is_group ? UserStore.tables.group_chats : UserStore.tables.private_chats

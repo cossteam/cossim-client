@@ -86,6 +86,12 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 	const onSelect = (type: TOOLTIP_TYPE, msg_id: number) => {
 		console.log('type', type, msg_id)
+
+		switch (type) {
+			case TOOLTIP_TYPE.COPY:
+				msgStore.copyMessage(msg_id)
+				break
+		}
 	}
 
 	// 表情/更多切换
@@ -213,8 +219,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					</div>
 
 					<div className={clsx('w-full flex items-end', msgType !== MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden')}>
-						<div className={clsx('flex-1 bg-bgSecondary py-2 rounded pl-2')}>
-							<ToolEditor className="px-4" ref={editorRef} />
+						<div className={clsx('flex-1 rounded pl-2')}>
+							<ToolEditor className="px-4 bg-bgSecondary py-2 rounded" ref={editorRef} />
 						</div>
 						<div className="flex items-center px-2 ">
 							<Link onClick={() => showMore('emojis')}>
