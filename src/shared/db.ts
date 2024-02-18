@@ -27,7 +27,7 @@ export class ServiceImpl implements ServiceMixin {
 	 * @param {string} value -要搜索的值
 	 * @return 解析为找到的记录的承诺
 	 */
-	async findOneById(tableName: string, key: string = this.defaultKey, value: string) {
+	async findOneById(tableName: string, key: string = this.defaultKey, value: string | number) {
 		return await this.db.table(tableName).get({ [key]: value })
 	}
 
@@ -84,7 +84,7 @@ export class ServiceImpl implements ServiceMixin {
 	 * @param {any} data -更新后的数据
 	 * @return  解析为修改后的数据的承诺
 	 */
-	async update(table: string, key: string = this.defaultKey, value: string, data: any) {
+	async update(table: string, key: string = this.defaultKey, value: string | number, data: any) {
 		return await this.db.table(table).where(key).equals(value).modify(data)
 	}
 
@@ -96,7 +96,7 @@ export class ServiceImpl implements ServiceMixin {
 	 * @param {string} value -用于删除的值
 	 * @return 删除记录时解析的承诺
 	 */
-	async delete(table: string, key: string = this.defaultKey, value: string) {
+	async delete(table: string, key: string = this.defaultKey, value: string | number) {
 		return await this.db.table(table).where(key).equals(value).delete()
 	}
 

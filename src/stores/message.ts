@@ -4,6 +4,7 @@ import UserStore from '@/db/user'
 import type { PrivateChats } from '@/types/db/user-db'
 import MsgService from '@/api/msg'
 import { getCookie } from '@/utils/cookie'
+import { updateDatabaseMessage } from '@/shared'
 
 const user_id = getCookie(USER_ID) || ''
 
@@ -44,7 +45,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	},
 	deleteMessage: async () => {},
 	sendMessage: async (type: MESSAGE_TYPE, content: string, replay_id?: number) => {
-		const { is_group, messages, receiver_id, dialog_id } = get()
+		const { is_group, messages, receiver_id, dialog_id, tableName } = get()
 		const msg: PrivateChats = {
 			msg_id: Date.now(),
 			sender_id: user_id,
@@ -74,9 +75,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			console.error('发送消息失败', error)
 		} finally {
 			set((state) => ({ messages: [...state.messages.slice(0, -1), msg] }))
+			updateDatabaseMessage(tableName, msg.msg_id, msg)
 		}
-
-		console.log('messages', messages)
 	},
 	editMessage: async () => {},
 	markMessage: async () => {},
