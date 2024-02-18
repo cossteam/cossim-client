@@ -70,10 +70,11 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		// console.log('data', data)
 	}
 
+	// 当前提示选择的消息类型
 	const [selectType, setSelectType] = useState<TOOLTIP_TYPE>()
 	const onSelect = async (type: TOOLTIP_TYPE, msg_id: number) => {
 		const msg = messages.find((v) => v.msg_id === msg_id)
-		setSelectMsgs([msg])
+		type !== TOOLTIP_TYPE.SELECT && setSelectMsgs([msg])
 		setSelectType(type)
 
 		switch (type) {
@@ -94,7 +95,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				})
 				break
 			case TOOLTIP_TYPE.SELECT:
-				// selectEvent.select(msg)
+				// setMultipleChoice(true)
 				break
 			case TOOLTIP_TYPE.REPLY:
 				// selectEvent.reply(msg)
@@ -130,8 +131,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			try {
 				list.forEach((v) => {
 					const is_group = v?.group_id ? true : false
-					msgs.forEach(async (item) => {
-						await msgStore.sendMessage(msgType, item?.content, {
+					msgs.forEach((item) => {
+						msgStore.sendMessage(msgType, item?.content, {
 							is_group,
 							receiver_id: v?.user_id,
 							dialog_id: v?.dialog_id,
@@ -145,17 +146,40 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			}
 		},
 		edit: () => {},
-		delete: async () => {},
+		delete: async () => {
+			try {
+				f7.dialog.confirm($t('确认删除消息？'), () => {
+					selectMsgs.forEach(async (v) => await msgStore.deleteMessage(v?.msg_id))
+					toast('删除成功')
+					selectEvent.clear()
+				})
+			} catch {
+				toast('删除失败')
+			}
+		},
 		select: async () => {},
 		reply: async () => {},
-		mark: async () => {}
+		mark: async () => {},
+		clear: () => {
+			setSelectType(TOOLTIP_TYPE.NONE)
+			setSelect([])
+			setSelectMsgs([])
+		}
+	}
+
+	const onSelectChange = (e: any, msg: any) => {
+		const checked = e.target.checked || false
+		checked
+			? setSelectMsgs([...selectMsgs, msg])
+			: setSelectMsgs(selectMsgs.filter((v) => v?.msg_id !== msg?.msg_id))
 	}
 
 	// 转发逻辑
 	useAsyncEffect(
 		async () => {
 			if (!select.length) return
-			await selectEvent.forward(select, selectMsgs)
+			selectEvent.forward(select, selectMsgs)
+			selectEvent.clear()
 		},
 		() => {},
 		[select]
@@ -235,9 +259,13 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				ref={navbarRef}
 			>
 				<NavRight>
-					<Link href={is_group ? `/group_info/${receiver_id}/` : `/profile/${receiver_id}/`}>
-						<Ellipsis className="w-6 h-6 mr-2" />
-					</Link>
+					{selectType === TOOLTIP_TYPE.SELECT ? (
+						<Link onClick={() => setSelectType(TOOLTIP_TYPE.NONE)}>{$t('取消')}</Link>
+					) : (
+						<Link href={is_group ? `/group_info/${receiver_id}/` : `/profile/${receiver_id}/`}>
+							<Ellipsis className="w-6 h-6 mr-2" />
+						</Link>
+					)}
 				</NavRight>
 				<Subnavbar className="coss_message_subnavbar" ref={subnavbarRef}>
 					<Segmented>
@@ -268,8 +296,21 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			<Block className="my-0 px-0 pt-5" ref={BlockRef}>
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (
-						<ListItem key={index} className="coss_list_item" data-index={index} style={{ zIndex: 1 }}>
-							<Chat msg={item} index={index} onSelect={onSelect}  />
+						<ListItem
+							key={index}
+							className="coss_list_item"
+							data-index={index}
+							style={{ zIndex: 1 }}
+							checkbox={selectType === TOOLTIP_TYPE.SELECT}
+							onChange={(e) => onSelectChange(e, item)}
+						>
+							<Chat
+								msg={item}
+								index={index}
+								onSelect={onSelect}
+								className={selectType !== TOOLTIP_TYPE.SELECT ? 'animate__fadeInUp' : ''}
+								isSelected={selectType === TOOLTIP_TYPE.SELECT}
+							/>
 						</ListItem>
 					))}
 				</List>
@@ -282,58 +323,84 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				ref={toolbarRef}
 			>
 				<div className="w-full rounded-2xl flex items-end relative h-full py-2 transition-all duration-300 ease-in">
-					<div className={clsx('flex-1 px-2 flex', msgType === MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden')}>
-						<Link onClick={() => setMsgType(MESSAGE_TYPE.TEXT)}>
-							<Xmark className="text-3xl text-gray-500 animate__animated animate__zoomIn" />
-						</Link>
-						<Button fill className="w-full h-9 mx-2 animate__animated animate__zoomIn" round>
-							{$t('长按说话')}
-						</Button>
-						<Link onClick={() => showMore('more')}>
-							<PlusCircle className="text-4xl text-gray-500 mr-2" />
-						</Link>
+					<div className={clsx('w-full', selectType === TOOLTIP_TYPE.SELECT ? 'flex' : 'hidden')}>
+						<div className="w-full flex bg-bgPrimary">
+							<Link
+								className="flex flex-col flex-1 items-center justify-center"
+								onClick={() => setShowSelect(true)}
+							>
+								<ArrowRightCircleFill className="text-xl mb-1" />
+								<span className="text-[0.75rem]">{$t('转发')}</span>
+							</Link>
+							<Link
+								className="flex flex-col flex-1 items-center justify-center"
+								onClick={selectEvent.delete}
+							>
+								<ArrowRightCircleFill className="text-xl mb-1" />
+								<span className="text-[0.75rem]">{$t('删除')}</span>
+							</Link>
+						</div>
 					</div>
 
-					<div className={clsx('w-full flex items-end', msgType !== MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden')}>
-						<div className={clsx('flex-1 rounded pl-2 overflow-hidden')}>
-							<div className="w-full py-2 bg-bgSecondary rounded">
-								<ToolEditor className="px-4" ref={editorRef} />
-							</div>
-							{selectType === TOOLTIP_TYPE.EDIT && (
-								<div className="mt-1 bg-bgTertiary relative flex justify-between">
-									<ToolEditor
-										className="px-2 py-1 coss_message_editor"
-										defaultValue={selectMsgs[0]?.content}
-									/>
-									<Link
-										className="pr-2"
-										onClick={() => {
-											setSelectType(TOOLTIP_TYPE.NONE)
-											editorRef.current?.engine.setValue('')
-										}}
-									>
-										<XmarkCircle className="text-textTertiary" />
-									</Link>
-								</div>
-							)}
-						</div>
-						<div className="flex items-center px-2 ">
-							<Link onClick={() => showMore('emojis')}>
-								<FaceSmiling className="text-4xl text-gray-500 mr-2" />
+					<div className={clsx('w-full', selectType !== TOOLTIP_TYPE.SELECT ? 'flex' : 'hidden')}>
+						<div className={clsx('flex-1 px-2 flex', msgType === MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden')}>
+							<Link onClick={() => setMsgType(MESSAGE_TYPE.TEXT)}>
+								<Xmark className="text-3xl text-gray-500 animate__animated animate__zoomIn" />
 							</Link>
+							<Button fill className="w-full h-9 mx-2 animate__animated animate__zoomIn" round>
+								{$t('长按说话')}
+							</Button>
 							<Link onClick={() => showMore('more')}>
 								<PlusCircle className="text-4xl text-gray-500 mr-2" />
 							</Link>
+						</div>
 
-							{showBtn ? (
-								<Link onClick={sendMessage}>
-									<ArrowRightCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
-								</Link>
-							) : (
-								<Link onClick={() => setMsgType(MESSAGE_TYPE.AUDIO)}>
-									<MicCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
-								</Link>
+						<div
+							className={clsx(
+								'w-full flex items-end',
+								msgType !== MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden'
 							)}
+						>
+							<div className={clsx('flex-1 rounded pl-2 overflow-hidden')}>
+								<div className="w-full py-2 bg-bgSecondary rounded">
+									<ToolEditor className="px-4" ref={editorRef} />
+								</div>
+								{selectType === TOOLTIP_TYPE.EDIT && (
+									<div className="mt-1 bg-bgTertiary relative flex justify-between">
+										<ToolEditor
+											className="px-2 py-1 coss_message_editor"
+											defaultValue={selectMsgs[0]?.content}
+										/>
+										<Link
+											className="pr-2"
+											onClick={() => {
+												setSelectType(TOOLTIP_TYPE.NONE)
+												editorRef.current?.engine.setValue('')
+											}}
+										>
+											<XmarkCircle className="text-textTertiary" />
+										</Link>
+									</div>
+								)}
+							</div>
+							<div className="flex items-center px-2 ">
+								<Link onClick={() => showMore('emojis')}>
+									<FaceSmiling className="text-4xl text-gray-500 mr-2" />
+								</Link>
+								<Link onClick={() => showMore('more')}>
+									<PlusCircle className="text-4xl text-gray-500 mr-2" />
+								</Link>
+
+								{showBtn ? (
+									<Link onClick={sendMessage}>
+										<ArrowRightCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
+									</Link>
+								) : (
+									<Link onClick={() => setMsgType(MESSAGE_TYPE.AUDIO)}>
+										<MicCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
+									</Link>
+								)}
+							</div>
 						</div>
 					</div>
 				</div>
