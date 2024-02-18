@@ -54,15 +54,22 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defau
 		return pass
 	}
 
+    // import { cloneDeep } from 'lodash-es'
+    // console.dir(cloneDeep(decryptedData));
 	const submit = async () => {
 		try {
 			if (!valid()) return
 
 			// TODO： 后续希望传入一个唯一设备 id 给后端，后端那边判断是否新设备
 			const { code, data, msg } = await UserService.loginApi(fromData)
+            console.dir(data);
+            
 			if (code !== 200) return f7.dialog.alert(msg)
 
 			const user_id = data?.user_info?.user_id
+
+            console.log("user_id",user_id);
+            
 
 			const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 			if (!user) {
@@ -86,12 +93,10 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defau
 					user_info: data?.user_info
 				})
 			}
-
 			setCookie(USER_ID, data?.user_info?.user_id)
 			setCookie(ACCOUNT, data?.user_info?.email)
 			setCookie(TOKEN, data?.token)
-
-			location.reload()
+			// location.reload()
 		} catch (error) {
 			console.error('登录失败', error)
 
