@@ -1,32 +1,31 @@
 import { Ellipsis } from 'framework7-icons/react'
-import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Segmented, Subnavbar } from 'framework7-react'
+import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Segmented, Subnavbar, f7 } from 'framework7-react'
 import { useRef, useState } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
-// import { $ } from 'dom7'
-// import { createRoot } from 'react-dom/client'
 import {
 	FaceSmiling,
 	PlusCircle,
 	EllipsesBubbleFill,
 	ArrowRightCircleFill,
 	MicCircleFill,
-	Xmark
+	Xmark,
+	XmarkCircle
 } from 'framework7-icons/react'
 import { Keyboard } from '@capacitor/keyboard'
+import { useClipboard } from '@reactuses/core'
 
 import './message.scss'
 // import MsgService from '@/api/msg'
 // import UserStore from '@/db/user'
 import { useMessageStore } from '@/stores/message'
-import { $t, PLATFORM, TOOLTIP_TYPE, MESSAGE_TYPE } from '@/shared'
+import { $t, PLATFORM, TOOLTIP_TYPE, MESSAGE_TYPE, moveCursorToEnd } from '@/shared'
 import Chat from '@/components/Message/Chat'
 // import ToolTip from '@/components/Message/ToolTip'
 import ToolEditor, { ToolEditorMethods } from '@/components/Editor/ToolEditor'
 import { platform } from '@/utils'
 import clsx from 'clsx'
-// import { getCookie } from '@/utils/cookie'
-
-// const user_id = getCookie(USER_ID) || ''
+import { useToast } from '@/hooks/useToast'
+import Contact from '@/components/Contact/Contact'
 
 /**
  * 滚动元素到底部
@@ -71,28 +70,96 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		// console.log('data', data)
 	}
 
-	const onPageAfterIn = () => {
-		// const onSelect = (type: TOOLTIP_TYPE, msg_id: number) => {
-		// 	console.log('type', type, msg_id)
-		// }
-		// console.log("$(`.taphold`)",$(`.taphold`));
-		// $(`.taphold`).on('taphold', (e) => {
-		// 	console.log("taphold", e);
-		// 	const div = document.createElement('div')
-		// 	createRoot(div).render(<ToolTip onSelect={onSelect} el={e.target as HTMLElement} />)
-		// 	;(e.target as HTMLElement)!.appendChild(div)
-		// })
-	}
-
-	const onSelect = (type: TOOLTIP_TYPE, msg_id: number) => {
-		console.log('type', type, msg_id)
+	const [selectType, setSelectType] = useState<TOOLTIP_TYPE>()
+	const onSelect = async (type: TOOLTIP_TYPE, msg_id: number) => {
+		const msg = messages.find((v) => v.msg_id === msg_id)
+		setSelectMsgs([msg])
+		setSelectType(type)
 
 		switch (type) {
 			case TOOLTIP_TYPE.COPY:
-				msgStore.copyMessage(msg_id)
+				await selectEvent.copy(msg?.content || '')
+				break
+			case TOOLTIP_TYPE.FORWARD:
+				setShowSelect(true)
+				break
+			case TOOLTIP_TYPE.EDIT:
+				editorRef.current?.engine.setValue(msg?.content || '')
+				editorRef.current?.focus()
+				moveCursorToEnd(editorRef.current!.el)
+				break
+			case TOOLTIP_TYPE.DELETE:
+				f7.dialog.confirm($t('确认删除消息？'), () => {
+					msgStore.deleteMessage(msg_id)
+				})
+				break
+			case TOOLTIP_TYPE.SELECT:
+				// selectEvent.select(msg)
+				break
+			case TOOLTIP_TYPE.REPLY:
+				// selectEvent.reply(msg)
+				break
+			case TOOLTIP_TYPE.MARK:
+				// selectEvent.mark(msg)
 				break
 		}
 	}
+
+	// 吐司
+	const { toast } = useToast()
+	// 复制
+	const [, copy] = useClipboard()
+	// 是否是多选
+	const [showSelect, setShowSelect] = useState<boolean>(false)
+	// 多选的选择列表
+	const [select, setSelect] = useState<any[]>([])
+	// 选中的消息列表
+	const [selectMsgs, setSelectMsgs] = useState<any[]>([])
+
+	// 集中处理提示选择事件
+	const selectEvent = {
+		copy: async (text: string) => {
+			try {
+				await copy(text)
+				toast($t('复制成功'))
+			} catch (error) {
+				toast($t('复制失败'))
+			}
+		},
+		forward: async (list: any[], msgs: any[]) => {
+			try {
+				list.forEach((v) => {
+					const is_group = v?.group_id ? true : false
+					msgs.forEach(async (item) => {
+						await msgStore.sendMessage(msgType, item?.content, {
+							is_group,
+							receiver_id: v?.user_id,
+							dialog_id: v?.dialog_id,
+							is_forward: v?.dialog_id !== dialog_id
+						})
+					})
+				})
+				toast('转发成功')
+			} catch {
+				toast('转发失败')
+			}
+		},
+		edit: () => {},
+		delete: async () => {},
+		select: async () => {},
+		reply: async () => {},
+		mark: async () => {}
+	}
+
+	// 转发逻辑
+	useAsyncEffect(
+		async () => {
+			if (!select.length) return
+			await selectEvent.forward(select, selectMsgs)
+		},
+		() => {},
+		[select]
+	)
 
 	// 表情/更多切换
 	const [moreType, setMoreType] = useState<MoreType>('')
@@ -101,6 +168,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		setMoreType(type)
 	}
 
+	// 键盘和元素滚动
 	const [showBtn, setShowBtn] = useState<boolean>(false)
 	const [msgType, setMsgType] = useState<number>(MESSAGE_TYPE.TEXT)
 	useAsyncEffect(
@@ -118,18 +186,22 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			if (platformName !== PLATFORM.WEB) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
 					console.log('keyboard will show with height:', info.keyboardHeight)
+					alert('keyboard will show with height:' + info.keyboardHeight)
 				})
 
 				Keyboard.addListener('keyboardDidShow', (info) => {
 					console.log('keyboard did show with height:', info.keyboardHeight)
+					alert('keyboard did show with height:' + info.keyboardHeight)
 				})
 
 				Keyboard.addListener('keyboardWillHide', () => {
 					console.log('keyboard will hide')
+					alert('keyboard will hide')
 				})
 
 				Keyboard.addListener('keyboardDidHide', () => {
 					console.log('keyboard did hide')
+					alert('keyboard did hide')
 				})
 			}
 
@@ -144,12 +216,16 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		const engine = editorRef.current!.engine
 		const content = engine.model.toValue()
 		engine.setValue('')
-		await msgStore.sendMessage(msgType, content)
+		selectType === TOOLTIP_TYPE.EDIT
+			? msgStore.editMessage(selectMsgs[0], content)
+			: msgStore.sendMessage(msgType, content)
+		editorRef.current!.focus()
+		setSelectType(TOOLTIP_TYPE.NONE)
 	}
 
 	// const [activeStrongButton, setActiveStrongButton] = useState<number>(0)
 	return (
-		<Page noToolbar className="coss_message" onPageAfterIn={onPageAfterIn} onPageInit={onPageInit} ref={pageRef}>
+		<Page noToolbar className="coss_message" onPageInit={onPageInit} ref={pageRef}>
 			<Navbar
 				title="好友"
 				subtitle="[在线]"
@@ -219,8 +295,27 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					</div>
 
 					<div className={clsx('w-full flex items-end', msgType !== MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden')}>
-						<div className={clsx('flex-1 rounded pl-2')}>
-							<ToolEditor className="px-4 bg-bgSecondary py-2 rounded" ref={editorRef} />
+						<div className={clsx('flex-1 rounded pl-2 overflow-hidden')}>
+							<div className="w-full py-2 bg-bgSecondary rounded">
+								<ToolEditor className="px-4" ref={editorRef} />
+							</div>
+							{selectType === TOOLTIP_TYPE.EDIT && (
+								<div className="mt-1 bg-bgTertiary relative flex justify-between">
+									<ToolEditor
+										className="px-2 py-1 coss_message_editor"
+										defaultValue={selectMsgs[0]?.content}
+									/>
+									<Link
+										className="pr-2"
+										onClick={() => {
+											setSelectType(TOOLTIP_TYPE.NONE)
+											editorRef.current?.engine.setValue('')
+										}}
+									>
+										<XmarkCircle className="text-textTertiary" />
+									</Link>
+								</div>
+							)}
 						</div>
 						<div className="flex items-center px-2 ">
 							<Link onClick={() => showMore('emojis')}>
@@ -244,6 +339,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				</div>
 				{moreType && <div className={clsx('w-full h-[300px] animate__animated animate__fadeInUp')}></div>}
 			</div>
+
+			<Contact completed={setSelect} opened={showSelect} setOpened={setShowSelect} group />
 		</Page>
 	)
 }

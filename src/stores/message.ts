@@ -8,9 +8,13 @@ import { updateDatabaseMessage } from '@/shared'
 
 const user_id = getCookie(USER_ID) || ''
 
-// interface Options {
-// 	replay_id?: string
-// }
+interface Options {
+	replay_id?: number
+	is_group?: boolean
+	receiver_id?: string
+	dialog_id?: number
+	is_forward?: boolean
+}
 
 interface MessageStore {
 	messages: PrivateChats[]
@@ -21,11 +25,10 @@ interface MessageStore {
 	receiver_id: string
 	dialog_id: number
 	userInfo: any
-	copyMessage: (msg_id:number | string) => void
 	updateMessage: (msg: any) => Promise<void>
-	deleteMessage: () => Promise<void>
-	sendMessage: (type: MESSAGE_TYPE, content: string, replay_id?: number) => Promise<void>
-	editMessage: () => Promise<void>
+	deleteMessage: (msg_id: number) => Promise<void>
+	sendMessage: (type: MESSAGE_TYPE, content: string, options?: Options) => Promise<void>
+	editMessage: (msg: any, content: string) => Promise<void>
 	markMessage: () => Promise<void>
 	readMessage: () => Promise<void>
 	initMessage: (is_group: boolean, dialog_id: number, receiver_id: string) => Promise<void>
@@ -40,14 +43,19 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	receiver_id: '',
 	dialog_id: 0,
 	userInfo: null,
-	copyMessage: (msg_id:number | string) => {
-
-	},
 	updateMessage: async (msg: PrivateChats) => {
 		const { messages } = get()
 		set({ messages: [...messages, msg] })
 	},
-	deleteMessage: async () => {},
+	deleteMessage: async (msg_id: number) => {
+		const { tableName, messages } = get()
+		try {
+			set({ messages: messages.filter((item) => item.msg_id !== msg_id) })
+			await UserStore.delete(tableName, 'msg_id', msg_id)
+		} catch (error) {
+			console.log('删除消息失败', error)
+		}
+	},
 	/**
 	 * 发送消息并处理发送过程，包括更新本地消息状态和数据库。
 	 *
@@ -56,19 +64,29 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	 * @param {number} [replay_id] -正在回复的消息的ID，可选
 	 * @return {Promise<void>}
 	 */
-	sendMessage: async (type: MESSAGE_TYPE, content: string, replay_id?: number) => {
-		const { is_group, messages, receiver_id, dialog_id, tableName } = get()
+	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
+		const { messages, receiver_id, dialog_id } = get()
+
+		// 判断是否是群聊
+		let { is_group, tableName } = get()
+		if (options?.is_group) {
+			is_group = options?.is_group
+			tableName = is_group ? UserStore.tables.group_chats : UserStore.tables.private_chats
+		}
+
+		const { is_forward = false } = options
+
 		const msg: PrivateChats = {
 			msg_id: Date.now(),
 			sender_id: user_id,
-			receiver_id,
+			receiver_id: options?.receiver_id || receiver_id,
 			content,
 			type,
-			replay_id: replay_id ?? 0,
+			replay_id: options?.replay_id ?? 0,
 			is_read: MESSAGE_READ.READ,
 			read_at: Date.now(),
 			created_at: Date.now(),
-			dialog_id,
+			dialog_id: options?.dialog_id || dialog_id,
 			is_label: MESSAGE_MARK.NOT_MARK,
 			is_burn_after_reading: 0,
 			msg_send_state: MESSAGE_SEND.SENDING
@@ -76,7 +94,13 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		set({ messages: [...messages, msg] })
 
 		try {
-			const params = { type, content, receiver_id, dialog_id, replay_id }
+			const params = {
+				type,
+				content,
+				receiver_id: msg.receiver_id,
+				dialog_id: msg.dialog_id,
+				replay_id: msg.replay_id
+			}
 			const { code, data } = is_group
 				? await MsgService.sendGroupMessageApi(params)
 				: await MsgService.sendUserMessageApi(params)
@@ -88,10 +112,39 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			msg.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		} finally {
 			set((state) => ({ messages: [...state.messages.slice(0, -1), msg] }))
-			updateDatabaseMessage(tableName, msg.msg_id, msg)
+			!is_forward && updateDatabaseMessage(tableName, msg.msg_id, msg)
 		}
 	},
-	editMessage: async () => {},
+	editMessage: async (msg: any, content: string) => {
+		const { is_group, messages, tableName } = get()
+
+		// 首次更新内容和发送状态
+		msg.content = content
+		msg.msg_send_state = MESSAGE_SEND.SENDING
+		set({
+			messages: messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
+		})
+
+		try {
+			const params = {
+				msg_type: msg?.type,
+				content,
+				msg_id: msg?.msg_id
+			}
+			const { code } = is_group
+				? await MsgService.editGroupMessageApi(params)
+				: await MsgService.editUserMessageApi(params)
+
+			msg.msg_send_state = code === 200 ? MESSAGE_SEND.SEND_SUCCESS : MESSAGE_SEND.SEND_FAILED
+		} catch (error) {
+			msg.msg_send_state = MESSAGE_SEND.SEND_FAILED
+		} finally {
+			set((state) => ({
+				messages: state.messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
+			}))
+			updateDatabaseMessage(tableName, msg.msg_id, msg, true)
+		}
+	},
 	markMessage: async () => {},
 	readMessage: async () => {},
 	/**

@@ -5,7 +5,7 @@ import { APP_NAME } from '@/shared'
 
 const AuthScreen: React.FC<RouterProps> = ({ f7router }) => {
 	return (
-		<Page>
+		<Page noToolbar>
 			<Block className="flex justify-center h-3/5 pt-10">
 				<h1 className="text-3xl font-semibold">{APP_NAME}</h1>
 			</Block>

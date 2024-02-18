@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
 import './ToolEditor.scss'
+import { useFocus } from '@reactuses/core'
 
 interface ToolEditorProps {
 	className?: string
@@ -17,11 +18,13 @@ interface ToolEditorProps {
 export interface ToolEditorMethods {
 	engine: Engine
 	el: HTMLDivElement
+	focus: () => void
 }
 
 const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorProps> = (props, ref) => {
 	const editorRef = useRef<HTMLDivElement | null>(null)
 	const [engine, setEngine] = useState<Engine>()
+	const [, setEditorFocus] = useFocus(editorRef, true)
 
 	useEffect(() => {
 		if (!editorRef.current) return
@@ -45,14 +48,19 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 			...props?.options
 		})
 
-		if (props.defaultValue) engine.setValue(props.defaultValue)
-
 		setEngine(engine)
 	}, [])
 
+	useEffect(() => {
+		if (engine && props.defaultValue) {
+			engine.setValue(props.defaultValue)
+		}
+	}, [engine, props.defaultValue])
+
 	useImperativeHandle(ref, () => ({
 		engine: engine!,
-		el: editorRef.current!
+		el: editorRef.current!,
+		focus: () => setEditorFocus(true)
 	}))
 
 	return (
