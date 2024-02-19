@@ -2,46 +2,13 @@ import { useState, useEffect } from 'react'
 import { App as AppComponent, View, f7 } from 'framework7-react'
 import { Framework7Parameters } from 'framework7/types'
 
+import "@/utils/notification"
 import routes from './router'
 import Layout from './components/Layout'
 import { $t, TOKEN, SocketClient, handlerUserMessageSocket, handlerGroupMessageSocket, handlerRequestSocket, RID } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 
-import { LocalNotifications, ScheduleOptions, ScheduleResult } from "@capacitor/local-notifications"
-
 function App() {
-
-    // 本地通知测试
-    useEffect(() => {
-        (async () => {
-            try {
-                let permissionStatus = await LocalNotifications.checkPermissions()
-                window.localStorage.setItem("permissionStatus", JSON.stringify(permissionStatus))
-                if (permissionStatus.display !== "granted" ) {
-                    console.log('本地通知权限未开启，请求权限');
-                    permissionStatus = await LocalNotifications.requestPermissions()
-                    if (permissionStatus.display !== "granted") {
-                        console.log('本地通知权限未开启，请求权限失败');
-                        return;
-                    }
-                }
-                const notification: ScheduleOptions = {
-                    notifications: [
-                        {
-                            title: '这是一个本地通知!',
-                            body: '这是一个示例通知。',
-                            id: 1
-                            // schedule: { at: new Date(Date.now() + 1000 * 5) } // 5 秒后触发
-                        }
-                    ]
-                };
-                const scheduleResult: ScheduleResult = await LocalNotifications.schedule(notification)
-                console.log('本地通知已发送', scheduleResult);
-            } catch (error) {
-                console.log('本地通知发送失败', error);
-            }
-        })()
-    }, [])
     
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
