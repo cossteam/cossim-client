@@ -4,6 +4,7 @@ import { Link, List, ListItem, NavRight, Navbar, Page, Searchbar, Subnavbar, f7 
 import { useEffect, useMemo, useState } from "react";
 import GroupService from '@/api/group'
 import RelationService from '@/api/relation'
+import "./MemberList.scss"
 
 interface MemberListProps {
     group_id: string
@@ -148,7 +149,7 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 				</Subnavbar>
 			</Navbar>
 			{PageType === MemberListType.NOTMEMBER && (
-				<List contactsList noChevron dividers>
+				<List contactsList noChevron dividers className="member-list">
 					{excludeFriends.map((member, index) => (
 						<ListItem
 							key={index}
@@ -164,7 +165,7 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 				</List>
 			)}
 			{PageType === MemberListType.MEMBER && (
-				<List contactsList noChevron dividers>
+				<List contactsList noChevron dividers className="member-list">
 					{excludeMembers.map((member: any, index) => (
 						<ListItem
 							key={index}
@@ -180,7 +181,7 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 				</List>
 			)}
 			{PageType === MemberListType.MEMBERSHOW && (
-				<List contactsList noChevron dividers>
+				<List contactsList noChevron dividers className="member-list">
 					{members.map((member: any, index) => (
 						<ListItem key={index} media={member.avatar} title={member.nickname} footer={member.email}>
 							<div slot="after" className="text-sm">

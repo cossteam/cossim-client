@@ -126,7 +126,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 								</div>
 							)}
 						</div>
-						{members.length > 23 && (
+						{(members.length > (0)) && (
 							<div className="mb-1">
 								<span
 									className="text-sm text-gray-500"
