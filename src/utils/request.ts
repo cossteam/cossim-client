@@ -1,6 +1,6 @@
 import axios from 'axios'
-import type { InternalAxiosRequestConfig, AxiosResponse } from 'axios'
-import { getCookie } from './cookie'
+import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import { getCookie, removeAllCookie } from './cookie'
 import { TOKEN, RESPONSE_CODE } from '@/shared'
 import PGPUtils from '@/utils/pgp'
 import { f7 } from 'framework7-react'
@@ -65,9 +65,9 @@ const getClientKeys = async () => {
 	try {
 		const clientKey = JSON.parse(window.localStorage.getItem('PGPKEYSCLIENT')!)
 		if (!clientKey) {
-            f7.dialog.close()
-            f7.dialog.alert('数据丢失，请找回账号...')
-            return null
+			f7.dialog.close()
+			f7.dialog.alert('数据丢失，请找回账号...')
+			return null
 		}
 		return clientKey
 	} catch (error) {
@@ -94,7 +94,7 @@ service.interceptors.request.use(
 		const serverPublicKey = await getServerPublicKey()
 		// 获取客户端公钥
 		const clientKey = await getClientKeys()
-        if (!clientKey) return config
+		if (!clientKey) return config
 		// 注册时请求数据需要携带 public_key
 		if (config.url === '/user/register') {
 			requestData['public_key'] = clientKey.publicKey
@@ -107,7 +107,7 @@ service.interceptors.request.use(
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		return config
 	},
-	(error: Error) => Promise.reject(error)
+	(error: AxiosError) => Promise.reject(error)
 )
 
 // 响应拦截器
@@ -130,10 +130,10 @@ service.interceptors.response.use(
 			const responseData = response.data
 			if (!responseData?.secret) return responseData
 			// 获取服务端公钥
-            await getServerPublicKey()
+			await getServerPublicKey()
 			// 获取客户端密钥
 			const clientKey = await getClientKeys()
-            if (!clientKey) return responseData
+			if (!clientKey) return responseData
 			const aesKey = await PGPUtils.rsaDecrypt(clientKey.privateKey, pgpEnv.passphrase, responseData.secret)
 			const decryptedData = await PGPUtils.aes256Decrypt(responseData.message, aesKey)
 			response.data = decryptedData
@@ -145,7 +145,20 @@ service.interceptors.response.use(
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		return response.data
 	},
-	(error: Error) => Promise.reject(error)
+	(error: AxiosError) => {
+		if (error.response) {
+			if (error.response.status === 401) {
+				f7.dialog.close()
+				f7.dialog.alert('登录已过期，请重新登录', '登录过期', () => {
+					// 清除 token 及 用户信息
+					removeAllCookie()
+					location.reload()
+					return false
+				})
+			}
+		}
+		return Promise.reject(error)
+	}
 )
 
 export default service
