@@ -13,6 +13,7 @@ class Socket {
 	// 最大重连次数
 	private maxReconnectTimes = 999999999999
 	private static instance: Socket | null
+	private static timer: NodeJS.Timeout | null
 
 	constructor(url: string) {
 		this.serverAddress = url
@@ -73,7 +74,7 @@ class Socket {
 	}
 
 	// 添加监听器
-	addListener(eventType: string, callback: (e:any) => void) {
+	addListener(eventType: string, callback: (e: any) => void) {
 		if (!this.listeners[eventType]) {
 			this.listeners[eventType] = []
 		}
@@ -81,7 +82,7 @@ class Socket {
 	}
 
 	// 移除监听器
-	removeListener(eventType: string, callback: (e:any) => void) {
+	removeListener(eventType: string, callback: (e: any) => void) {
 		if (this.listeners[eventType]) {
 			this.listeners[eventType] = this.listeners[eventType].filter((cb: any) => cb !== callback)
 		}
@@ -99,7 +100,8 @@ class Socket {
 	 */
 	reconnect(time = 5000) {
 		if (this.reconnectTimes < this.maxReconnectTimes) {
-			setTimeout(() => {
+			Socket.timer && clearTimeout(Socket.timer)
+			Socket.timer = setTimeout(() => {
 				this.reconnectTimes++
 				this.connect()
 			}, time)
