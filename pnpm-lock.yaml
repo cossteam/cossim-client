@@ -29,6 +29,9 @@ dependencies:
   '@capacitor/keyboard':
     specifier: ^5.0.8
     version: 5.0.8(@capacitor/core@5.7.0)
+  '@capacitor/local-notifications':
+    specifier: ^5.0.7
+    version: 5.0.7(@capacitor/core@5.7.0)
   '@ionic/storage':
     specifier: ^4.0.0
     version: 4.0.0
@@ -495,6 +498,14 @@ packages:
 
   /@capacitor/keyboard@5.0.8(@capacitor/core@5.7.0):
     resolution: {integrity: sha512-XYyBzGlzjgLPqyPVdu5McGLYV6+G2efVR4I3l5cF1B27M6U/oFqv9CQU74WNG08nee28bfccboNpv6eWCLYn1A==}
+    peerDependencies:
+      '@capacitor/core': ^5.0.0
+    dependencies:
+      '@capacitor/core': 5.7.0
+    dev: false
+
+  /@capacitor/local-notifications@5.0.7(@capacitor/core@5.7.0):
+    resolution: {integrity: sha512-Q16sAv9B55qrXRBgjsom3UAXQ9J5I9HxOToYtQ6jvM3237DphotvVSNriX2AGeXLi5nHkmNv2ZsFu17wTrRcpA==}
     peerDependencies:
       '@capacitor/core': ^5.0.0
     dependencies:
