@@ -1,4 +1,4 @@
-import type { EditMessage, MessageListParams, SendMessage } from '@/types/api/msg'
+import type { EditMessage, LabelMessage, MessageListParams, SendGroupMessage, SendMessage } from '@/types/api/msg'
 import request from '@/utils/request'
 
 class MsgServiceImpl {
@@ -53,9 +53,9 @@ class MsgServiceImpl {
 	 * @param {*} data.type             消息类型
 	 * @returns
 	 */
-	sendGroupMessageApi(data: SendMessage): Promise<DataResponse> {
+	sendGroupMessageApi(data: SendGroupMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}send/group`,
+			url: `${this.baseUrl}/send/group`,
 			method: 'POST',
 			data
 		})
@@ -86,6 +86,34 @@ class MsgServiceImpl {
 	editGroupMessageApi(data: EditMessage): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/edit/group`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 标注私聊消息
+	 * @param {*} data
+	 * @param {*} data.msg_id			消息id
+	 * @param {*} data.is_label			是否标记
+	 */
+	labelUserMessageApi(data: LabelMessage): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/label/user`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 标注群聊消息
+	 * @param {*} data
+	 * @param {*} data.msg_id			消息id
+	 * @param {*} data.is_label			是否标记
+	 */
+	labelGroupMessageApi(data: LabelMessage): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/label/group`,
 			method: 'POST',
 			data
 		})

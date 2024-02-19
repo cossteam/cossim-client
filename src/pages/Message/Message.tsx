@@ -1,6 +1,6 @@
 import { Ellipsis } from 'framework7-icons/react'
 import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Segmented, Subnavbar, f7 } from 'framework7-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
 import {
 	FaceSmiling,
@@ -15,12 +15,9 @@ import { Keyboard } from '@capacitor/keyboard'
 import { useClipboard } from '@reactuses/core'
 
 import './message.scss'
-// import MsgService from '@/api/msg'
-// import UserStore from '@/db/user'
 import { useMessageStore } from '@/stores/message'
-import { $t, PLATFORM, TOOLTIP_TYPE, MESSAGE_TYPE, moveCursorToEnd } from '@/shared'
+import { $t, PLATFORM, TOOLTIP_TYPE, MESSAGE_TYPE, moveCursorToEnd, isMe } from '@/shared'
 import Chat from '@/components/Message/Chat'
-// import ToolTip from '@/components/Message/ToolTip'
 import ToolEditor, { ToolEditorMethods } from '@/components/Editor/ToolEditor'
 import { platform } from '@/utils'
 import clsx from 'clsx'
@@ -71,7 +68,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	}
 
 	// 当前提示选择的消息类型
-	const [selectType, setSelectType] = useState<TOOLTIP_TYPE>()
+	const [selectType, setSelectType] = useState<TOOLTIP_TYPE>(TOOLTIP_TYPE.NONE)
 	const onSelect = async (type: TOOLTIP_TYPE, msg_id: number) => {
 		const msg = messages.find((v) => v.msg_id === msg_id)
 		type !== TOOLTIP_TYPE.SELECT && setSelectMsgs([msg])
@@ -94,14 +91,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					msgStore.deleteMessage(msg_id)
 				})
 				break
-			case TOOLTIP_TYPE.SELECT:
-				// setMultipleChoice(true)
-				break
-			case TOOLTIP_TYPE.REPLY:
-				// selectEvent.reply(msg)
-				break
 			case TOOLTIP_TYPE.MARK:
-				// selectEvent.mark(msg)
+				selectEvent.mark()
 				break
 		}
 	}
@@ -145,7 +136,6 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				toast('转发失败')
 			}
 		},
-		edit: () => {},
 		delete: async () => {
 			try {
 				f7.dialog.confirm($t('确认删除消息？'), () => {
@@ -157,9 +147,16 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				toast('删除失败')
 			}
 		},
-		select: async () => {},
-		reply: async () => {},
-		mark: async () => {},
+		// select: async () => {},
+		// reply: async () => {},
+		mark: async () => {
+			const isMark = await msgStore.markMessage(selectMsgs[0])
+			if (isMark) {
+				toast(selectMsgs[0]?.is_mark ? $t('取消标记成功') : $t('标记成功'))
+			} else {
+				toast(selectMsgs[0]?.is_mark ? $t('取消标记失败') : $t('标记失败'))
+			}
+		},
 		clear: () => {
 			setSelectType(TOOLTIP_TYPE.NONE)
 			setSelect([])
@@ -202,30 +199,33 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			contentRef.current = el
 
 			await msgStore.initMessage(is_group, dialog_id, receiver_id)
+
 			// 滚动到最底部
-			scroll(el!)
+			setTimeout(() => {
+				scroll(el!)
+			}, 0)
 
 			// 手机端监听键盘
 			const platformName = await platform()
 			if (platformName !== PLATFORM.WEB) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
 					console.log('keyboard will show with height:', info.keyboardHeight)
-					alert('keyboard will show with height:' + info.keyboardHeight)
+					// alert('keyboard will show with height:' + info.keyboardHeight)
 				})
 
 				Keyboard.addListener('keyboardDidShow', (info) => {
 					console.log('keyboard did show with height:', info.keyboardHeight)
-					alert('keyboard did show with height:' + info.keyboardHeight)
+					// alert('keyboard did show with height:' + info.keyboardHeight)
 				})
 
 				Keyboard.addListener('keyboardWillHide', () => {
 					console.log('keyboard will hide')
-					alert('keyboard will hide')
+					// alert('keyboard will hide')
 				})
 
 				Keyboard.addListener('keyboardDidHide', () => {
 					console.log('keyboard did hide')
-					alert('keyboard did hide')
+					// alert('keyboard did hide')
 				})
 			}
 
@@ -237,15 +237,33 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	)
 
 	const sendMessage = async () => {
+		const isEnd = isScrollEnd()
 		const engine = editorRef.current!.engine
 		const content = engine.model.toValue()
 		engine.setValue('')
 		selectType === TOOLTIP_TYPE.EDIT
 			? msgStore.editMessage(selectMsgs[0], content)
-			: msgStore.sendMessage(msgType, content)
+			: msgStore.sendMessage(msgType, content, { replay_id: isReply() ? selectMsgs[0]?.msg_id : 0 })
 		editorRef.current!.focus()
 		setSelectType(TOOLTIP_TYPE.NONE)
+		setTimeout(() => scroll(contentRef.current!, isEnd ? true : false), 100)
 	}
+
+	// 滚动情况
+	useEffect(() => {
+		if (!messages.length) return
+		if (isScrollEnd() && !isMe(messages.at(-1)?.sender_id || '')) scroll(contentRef.current!)
+	}, [messages])
+
+	// 辅助函数
+	const isSelect = () => selectType === TOOLTIP_TYPE.SELECT
+	const isReply = () => selectType === TOOLTIP_TYPE.REPLY
+	const isEdit = () => selectType === TOOLTIP_TYPE.EDIT
+	const replyMessage = (msg_id: number) => msgStore.all_meesages.find((v) => v?.msg_id === msg_id)
+
+	// 判断是否滚动到底部
+	const isScrollEnd = () =>
+		contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - 100
 
 	// const [activeStrongButton, setActiveStrongButton] = useState<number>(0)
 	return (
@@ -259,8 +277,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				ref={navbarRef}
 			>
 				<NavRight>
-					{selectType === TOOLTIP_TYPE.SELECT ? (
-						<Link onClick={() => setSelectType(TOOLTIP_TYPE.NONE)}>{$t('取消')}</Link>
+					{isSelect() ? (
+						<Link onClick={selectEvent.clear}>{$t('取消')}</Link>
 					) : (
 						<Link href={is_group ? `/group_info/${receiver_id}/` : `/profile/${receiver_id}/`}>
 							<Ellipsis className="w-6 h-6 mr-2" />
@@ -301,15 +319,16 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 							className="coss_list_item"
 							data-index={index}
 							style={{ zIndex: 1 }}
-							checkbox={selectType === TOOLTIP_TYPE.SELECT}
+							checkbox={isSelect()}
 							onChange={(e) => onSelectChange(e, item)}
 						>
 							<Chat
 								msg={item}
 								index={index}
 								onSelect={onSelect}
-								className={selectType !== TOOLTIP_TYPE.SELECT ? 'animate__fadeInUp' : ''}
-								isSelected={selectType === TOOLTIP_TYPE.SELECT}
+								className={!isSelect() ? 'animate__fadeInUp' : ''}
+								isSelected={isSelect()}
+								reply={item.replay_id ? replyMessage(item.replay_id) : null}
 							/>
 						</ListItem>
 					))}
@@ -323,7 +342,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				ref={toolbarRef}
 			>
 				<div className="w-full rounded-2xl flex items-end relative h-full py-2 transition-all duration-300 ease-in">
-					<div className={clsx('w-full', selectType === TOOLTIP_TYPE.SELECT ? 'flex' : 'hidden')}>
+					<div className={clsx('w-full', isSelect() ? 'flex' : 'hidden')}>
 						<div className="w-full flex bg-bgPrimary">
 							<Link
 								className="flex flex-col flex-1 items-center justify-center"
@@ -342,7 +361,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 						</div>
 					</div>
 
-					<div className={clsx('w-full', selectType !== TOOLTIP_TYPE.SELECT ? 'flex' : 'hidden')}>
+					<div className={clsx('w-full', !isSelect() ? 'flex' : 'hidden')}>
 						<div className={clsx('flex-1 px-2 flex', msgType === MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden')}>
 							<Link onClick={() => setMsgType(MESSAGE_TYPE.TEXT)}>
 								<Xmark className="text-3xl text-gray-500 animate__animated animate__zoomIn" />
@@ -365,7 +384,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								<div className="w-full py-2 bg-bgSecondary rounded">
 									<ToolEditor className="px-4" ref={editorRef} />
 								</div>
-								{selectType === TOOLTIP_TYPE.EDIT && (
+								{(isReply() || isEdit()) && (
 									<div className="mt-1 bg-bgTertiary relative flex justify-between">
 										<ToolEditor
 											className="px-2 py-1 coss_message_editor"
