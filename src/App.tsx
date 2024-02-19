@@ -34,7 +34,7 @@ function App() {
 
 		const handlerInit = (e: any) => {
 			const data = JSON.parse(e.data)
-			console.log('接收到 sokect 通知：', data)
+			console.log('接收到所有 sokect 通知：', data)
 
 			switch (data.event) {
 				case 1:
