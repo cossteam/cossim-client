@@ -266,3 +266,8 @@ export interface ClientPGPKeys {
      */
     revocation_certificate: string
 }
+
+
+export interface Messages {
+	[key:string]: any
+}

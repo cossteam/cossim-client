@@ -4,7 +4,7 @@ import { Framework7Parameters } from 'framework7/types'
 
 import routes from './router'
 import Layout from './components/Layout'
-import { $t, TOKEN, SocketClient, handlerUserMessageSocket, handlerGroupMessageSocket, handlerRequestSocket, RID } from '@/shared'
+import { $t, TOKEN, SocketClient, handlerRequestSocket, RID, handlerMessageSocket } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 
 import { LocalNotifications, ScheduleOptions, ScheduleResult } from "@capacitor/local-notifications"
@@ -73,13 +73,13 @@ function App() {
 
 			switch (data.event) {
 				case 1:
+					console.log("链接成功", data);
+					
 					setCookie(RID, data.rid)
 					break
 				case 3:
-					handlerUserMessageSocket(data)
-					break
 				case 4:
-					handlerGroupMessageSocket(data)
+					handlerMessageSocket(data)
 					break
 				case 6:
 				case 7:

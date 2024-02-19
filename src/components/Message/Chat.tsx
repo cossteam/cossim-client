@@ -45,8 +45,8 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 					)}
 				>
 					<img
-						src="https://picsum.photos/200/300"
-						alt="avatar"
+						src={msg?.sender_info?.avatar}
+						alt={msg?.sender_info?.nickname}
 						className="w-full h-full rounded-full object-cover"
 					/>
 				</div>
@@ -67,6 +67,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							)}
 							data-id={msg?.msg_id}
 							data-index={index}
+							data-label={msg?.is_label}
 							ref={tooltipRef}
 						>
 							<ToolEditor
@@ -92,7 +93,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							) : (
 								<Gobackward />
 							))}
-						{msg?.replay_id !== 0 && <BookmarkFill className="text-primary" />}
+						{msg?.is_label !== 0 && <BookmarkFill className="text-primary" />}
 					</div>
 
 					{/* 回复消息 */}

@@ -2,7 +2,7 @@ import { useClickOutside } from '@reactuses/core'
 import clsx from 'clsx'
 import { Link } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
-import { TOOLTIP_TYPE } from '@/shared'
+import { $t, TOOLTIP_TYPE } from '@/shared'
 import { ArrowUpRight } from 'framework7-icons/react'
 
 interface ToolTipProps {
@@ -35,8 +35,10 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 
 		const lis = document.querySelectorAll('li.coss_list_item')
 
-		const { id = 0, index = 0 } = el.dataset
+		const { id = 0, index = 0, label = 0 } = el.dataset
 		setMsgId(Number(id))
+		
+		setTips([...tips.slice(0,-1), { ...tips.at(-1), title: $t(Number(label) === 0 ? '标注' : '取消标注') }])
 
 		const currentEl = lis[Number(index)] as HTMLLIElement
 		currentRef.current = currentEl
@@ -61,7 +63,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		}
 	}, [el])
 
-	const tips = [
+	const [tips, setTips] = useState<any[]>([
 		{
 			name: TOOLTIP_TYPE.COPY,
 			title: '复制',
@@ -97,7 +99,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 			title: '标注',
 			icon: <ArrowUpRight className="tooltip__icon" />
 		}
-	]
+	])
 
 	useEffect(() => {
 		!visible && (currentRef.current!.style.zIndex = '1')

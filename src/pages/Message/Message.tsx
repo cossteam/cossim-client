@@ -72,14 +72,14 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 	// 当前提示选择的消息类型
 	const [selectType, setSelectType] = useState<TOOLTIP_TYPE>(TOOLTIP_TYPE.NONE)
-	const onSelect = async (type: TOOLTIP_TYPE, msg_id: number) => {
-		const msg = messages.find((v) => v.msg_id === msg_id)
+	const onSelect = (type: TOOLTIP_TYPE, msg_id: number) => {
+		const msg = msgStore.all_meesages.find((v) => v.msg_id === msg_id)
 		type !== TOOLTIP_TYPE.SELECT && setSelectMsgs([msg])
 		setSelectType(type)
 
 		switch (type) {
 			case TOOLTIP_TYPE.COPY:
-				await selectEvent.copy(msg?.content || '')
+				selectEvent.copy(msg?.content || '')
 				break
 			case TOOLTIP_TYPE.FORWARD:
 				setShowSelect(true)
@@ -95,7 +95,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				})
 				break
 			case TOOLTIP_TYPE.MARK:
-				selectEvent.mark()
+				selectEvent.mark(msg)
 				break
 		}
 	}
@@ -115,7 +115,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const selectEvent = {
 		copy: async (text: string) => {
 			try {
-				await copy(text)
+				const doc = new DOMParser().parseFromString(text, 'text/html')
+				const txt = doc.body.textContent
+				await copy(txt ?? '')
 				toast($t('复制成功'))
 			} catch (error) {
 				toast($t('复制失败'))
@@ -150,15 +152,21 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				toast('删除失败')
 			}
 		},
-		// select: async () => {},
-		// reply: async () => {},
-		mark: async () => {
-			const isMark = await msgStore.markMessage(selectMsgs[0])
+		mark: async (msg:any) => {
+
+			// if (!selectMsgs[0] || !selectMsgs[0]?.msg_id)  {
+			// 	$t('标记失败')
+			// 	return
+			// }
+
+			const isMark = await msgStore.markMessage(msg)
+
 			if (isMark) {
-				toast(selectMsgs[0]?.is_mark ? $t('取消标记成功') : $t('标记成功'))
+				toast(msg?.is_mark ? $t('取消标记成功') : $t('标记成功'))
 			} else {
-				toast(selectMsgs[0]?.is_mark ? $t('取消标记失败') : $t('标记失败'))
+				toast(msg?.is_mark ? $t('取消标记失败') : $t('标记失败'))
 			}
+			selectEvent.clear()
 		},
 		clear: () => {
 			setSelectType(TOOLTIP_TYPE.NONE)
@@ -233,8 +241,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				})
 			}
 
-			console.log("userInfo",userInfo)
-			
+			console.log('userInfo', userInfo)
+
 			// 查询用户信息
 			// const list = await UserStore.findOneAllById(t)
 
@@ -244,7 +252,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			engine.on('mention:default', () => {
 				// console.log('props', props.list)
 				const arr = [
-					{ key: 'all', name: '全体成员' },
+					{ key: 'all', name: '全体成员' }
 					// ...props.list.map((v) => ({
 					// 	key: v.user_id,
 					// 	name: v.nickname

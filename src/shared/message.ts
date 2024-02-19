@@ -40,20 +40,20 @@ export const readMessage = async () => {}
  * 更新数据库中的消息。
  *
  * @param {string} tableName -存储消息的表的名称。
- * @param {number} msg_id -要更新的消息的 ID。
+ * @param {string} uid -要更新的消息的 ID。
  * @param {any} msg -更新的消息对象。
  * @param {boolean} update -指示是否更新现有消息或添加新消息。默认为 false。
  * @return {Promise<void>} -当消息更新或成功添加时解析的承诺。
  */
-export const updateDatabaseMessage = async (tableName: string, msg_id: number, msg: any, update: boolean = false) => {
+export const updateDatabaseMessage = async (tableName: string, uid: string, msg: any, update: boolean = false) => {
 	try {
-		const result = await UserStore.findOneById(tableName, 'msg_id', msg_id)
+		const result = await UserStore.findOneById(tableName, 'uid', uid)
 
 		// 添加消息
 		if (!result) return await UserStore.add(tableName, msg)
 
 		// 更新消息
-		if (update) return await UserStore.update(tableName, 'msg_id', msg_id, { ...result, ...msg })
+		if (update) return await UserStore.update(tableName, 'uid', uid, { ...result, ...msg })
 	} catch (error) {
 		console.log('添加或修改消息错误', error)
 	}
