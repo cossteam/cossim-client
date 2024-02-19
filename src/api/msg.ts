@@ -1,4 +1,4 @@
-import type { EditMessage, LabelMessage, MessageListParams, SendGroupMessage, SendMessage } from '@/types/api/msg'
+import type { EditMessage, LabelMessage, MessageListParams, ReadMessage, SendGroupMessage, SendMessage } from '@/types/api/msg'
 import request from '@/utils/request'
 
 class MsgServiceImpl {
@@ -114,6 +114,34 @@ class MsgServiceImpl {
 	labelGroupMessageApi(data: LabelMessage): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/label/group`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 批量设置群聊消息已读
+	 * @param {*} data
+	 * @param {*} data.msg_ids			消息id列表
+	 * @param {*} data.dialog_id		对话id
+	 */
+	readGroupMessageApi(data: ReadMessage): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/read/group`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 批量设置私聊消息已读
+	 * @param {*} data
+	 * @param {*} data.msg_ids			消息id列表
+	 * @param {*} data.dialog_id		对话id
+	 */
+	readUserMessageApi(data: ReadMessage): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/read/user`,
 			method: 'POST',
 			data
 		})

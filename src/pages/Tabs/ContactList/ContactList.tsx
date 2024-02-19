@@ -10,7 +10,6 @@ import GroupService from '@/api/group'
 
 const user_id = getCookie(USER_ID) || ''
 
-
 const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 	const [contact, setContact] = useState<any[]>([])
 	const [applyTotal, setApplyTotal] = useState<number>(0)
@@ -24,10 +23,10 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 	const updateApplyTotal = async () => {
 		// 获取申请列表
 		const group = await GroupService.groupRequestListApi({ user_id })
-        const friend = await RelationService.friendApplyListApi({ user_id })
-        const applyList: any[] = []
-        group.data && applyList.push(...group.data)
-        friend.data && applyList.push(...friend.data)
+		const friend = await RelationService.friendApplyListApi({ user_id })
+		const applyList: any[] = []
+		group.data && applyList.push(...group.data)
+		friend.data && applyList.push(...friend.data)
 		const len = applyList.filter(
 			(v) => v?.status === 0 && (v?.sender_id || v?.receiver_info?.user_id) !== user_id
 		).length
@@ -53,6 +52,25 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 						: await UserStore.add(UserStore.tables.friends, { ...item, group: key })
 				})
 			})
+
+			// 获取群聊消息
+			// GroupService.groupListApi({})
+			// 	.then(({ data }) => {
+			// 		Object.entries(data).forEach(([key, value]) => {
+			// 			;(value as any[]).forEach(async (item) => {
+			// 				const friend = friends?.find((v) => v.user_id === item.user_id)
+			// 				friend
+			// 					? await UserStore.update(UserStore.tables.friends, 'user_id', item.user_id, {
+			// 							...friend,
+			// 							...item
+			// 						})
+			// 					: await UserStore.add(UserStore.tables.friends, { ...item, group: key })
+			// 			})
+			// 		})
+			// 	})
+			// 	.catch((error) => {
+			// 		console.log('获取群聊信息失败', error)
+			// 	})
 		} catch (error) {
 			console.error('获取好友列表出错', error)
 		} finally {

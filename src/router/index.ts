@@ -5,7 +5,7 @@ import ContactList from '@/pages/Tabs/ContactList/ContactList'
 import MyInfo from '@/pages/Tabs/MyInfo/MyInfo'
 
 import AuthScreen from '@/pages/Auth/AuthScreen'
-import Message from '@/pages/Message/Message'
+// import Message from '@/pages/Message/Message'
 
 import NotFound from '@/pages/NotFound'
 
@@ -46,9 +46,7 @@ const routes: Router.RouteParameters[] = [
 	},
 	{
 		path: '/message/:id/:dialog_id/',
-		// asyncComponent: () => import('@/pages/Message/Message')
-		component: Message,
-		keepAlive: true
+		asyncComponent: () => import('@/pages/Message/Message')
 	},
 	{
 		path: '/user_info/:user_id/',
