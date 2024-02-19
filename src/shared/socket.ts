@@ -35,9 +35,11 @@ class Socket {
 			this.socket.addEventListener('open', (event) => {
 				this.triggerEvent('onWsOpen', event)
 				console.log('WebSocket连接已建立')
+				
 			})
 
 			this.socket.addEventListener('message', (event) => {
+
 				this.triggerEvent('onWsMessage', event)
 			})
 

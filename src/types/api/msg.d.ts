@@ -34,3 +34,8 @@ export interface LabelMessage {
 	msg_id: number
 	is_label: number
 }
+
+export interface ReadMessage {
+	msg_ids: number[]
+	dialog_id: number
+}

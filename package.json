@@ -11,7 +11,9 @@
     "format": "prettier --write src/",
     "build:android": "npm run build && npx cap sync",
     "build:ios": "npm run build && npx cap sync",
-    "test": "vitest"
+    "test": "vitest",
+    "ionic:build": "npm run build",
+    "ionic:serve": "npm run dev"
   },
   "dependencies": {
     "@aomao/engine": "^2.10.25",

@@ -4,8 +4,8 @@ import { Framework7Parameters } from 'framework7/types'
 
 import routes from './router'
 import Layout from './components/Layout'
-import { $t, TOKEN, SocketClient } from '@/shared'
-import { hasCookie } from '@/utils/cookie'
+import { $t, TOKEN, SocketClient, handlerUserMessageSocket, handlerGroupMessageSocket, handlerRequestSocket, RID } from '@/shared'
+import { hasCookie, setCookie } from '@/utils/cookie'
 
 import { LocalNotifications, ScheduleOptions, ScheduleResult } from "@capacitor/local-notifications"
 
@@ -59,7 +59,6 @@ function App() {
 			tapHold: true
 		}
 	})
-	// const [socket, setSocket] = useState<Socket>()
 
 	// 修复手机上的视口比例
 	useEffect(() => {
@@ -68,36 +67,23 @@ function App() {
 			viewEl.setAttribute('content', `${viewEl.getAttribute('content')}, maximum-scale=1, user-scalable=no`)
 		}
 
-		// const socketUrl = import.meta.env.VITE_WS_URL + `?token=${getCookie(TOKEN)}`
-		// const socket = io(socketUrl, {
-		// 	path: import.meta.env.VITE_BASE_WS_URL,
-		// 	transports: ['websocket']
-		// })
-		// console.log('socket', socket.io)
-		// 连接成功
-		// socket.on('open', () => {
-		// 	console.log('Socket connected')
-		// })
-		// socket.on('message', (data) => {
-		// 	console.log('接收到消息', data)
-		// })
-		// setSocket(socket)
-
 		const handlerInit = (e: any) => {
 			const data = JSON.parse(e.data)
+			console.log('接收到 sokect 通知：', data)
+
 			switch (data.event) {
+				case 1:
+					setCookie(RID, data.rid)
+					break
 				case 3:
-					console.info('接收或发送消息：', data)
-					// handlerMessage(data.data, user?.user_id, chatType.PRIVATE)
+					handlerUserMessageSocket(data)
 					break
 				case 4:
-					// handlerGroupMessage(data)
-					// handlerMessage(data.data, user?.user_id, chatType.GROUP)
+					handlerGroupMessageSocket(data)
 					break
 				case 6:
 				case 7:
-					// console.info('收到好友请求或确认：', data)
-					// handlerManger(data)
+					handlerRequestSocket(data)
 					break
 				case 12:
 					console.log('接收或发送的消息：', data)

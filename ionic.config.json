@@ -1,0 +1,7 @@
+{
+  "name": "coss",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}

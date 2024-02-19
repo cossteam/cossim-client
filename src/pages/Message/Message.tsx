@@ -52,7 +52,10 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const receiver_id = f7route.params.id as string
 	const dialog_id = Number(f7route.params.dialog_id as string)
 
-	const { messages, ...msgStore } = useMessageStore()
+	// 成员列表
+	// const [members, setMembers] = useState<any[]>([])
+
+	const { messages, userInfo, ...msgStore } = useMessageStore()
 
 	// 在进入页面前设置内容高度
 	const onPageInit = async () => {
@@ -164,6 +167,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		}
 	}
 
+	// 多选时选择的消息
 	const onSelectChange = (e: any, msg: any) => {
 		const checked = e.target.checked || false
 		checked
@@ -229,8 +233,26 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				})
 			}
 
+			console.log("userInfo",userInfo)
+			
+			// 查询用户信息
+			// const list = await UserStore.findOneAllById(t)
+
 			const engine = editorRef.current!.engine
 			engine.on('change', () => setShowBtn(!engine.isEmpty()))
+			// @ 功能
+			engine.on('mention:default', () => {
+				// console.log('props', props.list)
+				const arr = [
+					{ key: 'all', name: '全体成员' },
+					// ...props.list.map((v) => ({
+					// 	key: v.user_id,
+					// 	name: v.nickname
+					// }))
+				]
+
+				return arr
+			})
 		},
 		() => {},
 		[]
@@ -269,7 +291,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	return (
 		<Page noToolbar className="coss_message" onPageInit={onPageInit} ref={pageRef}>
 			<Navbar
-				title="好友"
+				title={userInfo?.nickname || userInfo?.name}
 				subtitle="[在线]"
 				backLink
 				outline={false}
@@ -337,7 +359,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 			<div
 				className={clsx(
-					'sticky bg-bgPrimary bottom-0 w-full h-auto z-[99] flex flex-col justify-center items-center overflow-hidden transition-all duration-300'
+					'sticky bg-bgPrimary bottom-0 w-full h-auto z-[99] flex flex-col justify-center items-center transition-all duration-300'
 				)}
 				ref={toolbarRef}
 			>
@@ -380,7 +402,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								msgType !== MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden'
 							)}
 						>
-							<div className={clsx('flex-1 rounded pl-2 overflow-hidden')}>
+							<div className={clsx('flex-1 rounded pl-2')}>
 								<div className="w-full py-2 bg-bgSecondary rounded">
 									<ToolEditor className="px-4" ref={editorRef} />
 								</div>

@@ -10,3 +10,5 @@ export const TOKEN = '__TOKEN__'
 export const ACCOUNT = '__ACCOUNT__'
 /** 设备id */
 export const DEVICE_ID = '__DEVICE_ID__'
+/** Rid */
+export const RID = '__RID__'

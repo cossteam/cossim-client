@@ -1,6 +1,8 @@
 import UserStore from '@/db/user'
 import { getCookie } from '@/utils/cookie'
 import { USER_ID } from './constanrs'
+import UserService from '@/api/user'
+import { isEqual } from 'lodash-es'
 
 interface CommonOptions {
 	tableName: string
@@ -64,3 +66,24 @@ export const updateDatabaseMessage = async (tableName: string, msg_id: number, m
  * @returns {boolean}
  */
 export const isMe = (user_id: string): boolean => user_id === getCookie(USER_ID) || false
+
+/**
+ * 获取远程的用户信息
+ * @param {string} user_id
+ * @returns
+ */
+export const dillServerInfo = async (user_id: string, userInfo: any) => {
+	let result = null
+	try {
+		const { data } = await UserService.getUserInfoApi({ user_id })
+		// 如果本地和远程服务器上的地址不一样就需要更新
+		if (isEqual(data, userInfo)) {
+			await UserStore.update(UserStore.tables.users, 'user_id', user_id, data)
+			result = data
+		}
+	} catch (error) {
+		console.log('获取用户信息失败', error)
+		return null
+	}
+	return result
+}
