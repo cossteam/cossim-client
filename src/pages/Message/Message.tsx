@@ -210,22 +210,22 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			if (platformName !== PLATFORM.WEB) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
 					console.log('keyboard will show with height:', info.keyboardHeight)
-					alert('keyboard will show with height:' + info.keyboardHeight)
+					// alert('keyboard will show with height:' + info.keyboardHeight)
 				})
 
 				Keyboard.addListener('keyboardDidShow', (info) => {
 					console.log('keyboard did show with height:', info.keyboardHeight)
-					alert('keyboard did show with height:' + info.keyboardHeight)
+					// alert('keyboard did show with height:' + info.keyboardHeight)
 				})
 
 				Keyboard.addListener('keyboardWillHide', () => {
 					console.log('keyboard will hide')
-					alert('keyboard will hide')
+					// alert('keyboard will hide')
 				})
 
 				Keyboard.addListener('keyboardDidHide', () => {
 					console.log('keyboard did hide')
-					alert('keyboard did hide')
+					// alert('keyboard did hide')
 				})
 			}
 
