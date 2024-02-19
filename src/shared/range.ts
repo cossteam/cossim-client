@@ -1,3 +1,9 @@
+/**
+ * 将光标移动到给定 HTML 元素的末尾。
+ *
+ * @param {HTMLDivElement | null} el -将光标移动到末尾的 HTML 元素
+ * @return {无效}
+ */
 export const moveCursorToEnd = (el: HTMLDivElement | null) => {
     if (!el) return
 	if (typeof window.getSelection != 'undefined' && typeof document.createRange != 'undefined') {

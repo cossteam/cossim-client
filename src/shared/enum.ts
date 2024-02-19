@@ -44,13 +44,21 @@ export enum MESSAGE_MARK {
 
 /** 提示类型 */
 export enum TOOLTIP_TYPE {
+	/** 复制 */
 	COPY = 'copy',
+	/** 转发 */
 	FORWARD = 'forward',
+	/** 编辑 */
 	EDIT = 'edit',
+	/** 删除 */
 	DELETE = 'delete',
+	/** 多选 */
 	SELECT = 'select',
+	/** 回复 */
 	REPLY = 'reply',
+	/** 标记 */
 	MARK = 'mark',
+	/** 无操作 */
 	NONE = 'none'
 }
 

@@ -11,10 +11,26 @@ export interface SendMessage {
 	receiver_id: string
 	replay_id?: number
 	type: number
+	dialog_id: number
+}
+
+export interface SendGroupMessage {
+	at_all_user?: number
+	at_users?: string
+	content: string
+	dialog_id: number
+	is_burn_after_reading?: number
+	replay_id?: number
+	type: number
 }
 
 export interface EditMessage {
 	msg_id: number
 	content: string
 	msg_type: number
+}
+
+export interface LabelMessage {
+	msg_id: number
+	is_label: number
 }

@@ -14,6 +14,8 @@ interface Options {
 	receiver_id?: string
 	dialog_id?: number
 	is_forward?: boolean
+	at_all_user?: number
+	at_users?: string[]
 }
 
 interface MessageStore {
@@ -29,7 +31,7 @@ interface MessageStore {
 	deleteMessage: (msg_id: number) => Promise<void>
 	sendMessage: (type: MESSAGE_TYPE, content: string, options?: Options) => Promise<void>
 	editMessage: (msg: any, content: string) => Promise<void>
-	markMessage: () => Promise<void>
+	markMessage: (msg: PrivateChats) => Promise<boolean>
 	readMessage: () => Promise<void>
 	initMessage: (is_group: boolean, dialog_id: number, receiver_id: string) => Promise<void>
 }
@@ -94,13 +96,22 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		set({ messages: [...messages, msg] })
 
 		try {
-			const params = {
+			const params: any = {
 				type,
 				content,
-				receiver_id: msg.receiver_id,
 				dialog_id: msg.dialog_id,
-				replay_id: msg.replay_id
+				replay_id: msg.replay_id,
+				is_burn_after_reading: 0
 			}
+
+			if (is_group) {
+				params['at_all_user'] = options?.at_all_user || 0
+				params['at_users'] = options?.at_users || []
+				params['group_id'] = Number(msg.receiver_id)
+			} else {
+				params['receiver_id'] = msg.receiver_id
+			}
+
 			const { code, data } = is_group
 				? await MsgService.sendGroupMessageApi(params)
 				: await MsgService.sendUserMessageApi(params)
@@ -115,7 +126,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			!is_forward && (await updateDatabaseMessage(tableName, msg.msg_id, msg))
 		}
 	},
-	editMessage: async (msg: any, content: string) => {
+	editMessage: async (msg: PrivateChats, content: string) => {
 		const { is_group, messages, tableName } = get()
 
 		// 首次更新内容和发送状态
@@ -145,7 +156,28 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			await updateDatabaseMessage(tableName, msg.msg_id, msg, true)
 		}
 	},
-	markMessage: async () => {},
+	markMessage: async (msg: PrivateChats) => {
+		const { is_group, messages, tableName } = get()
+		try {
+			const params = {
+				msg_id: msg?.msg_id,
+				is_label: msg?.is_label === MESSAGE_MARK.MARK ? MESSAGE_MARK.NOT_MARK : MESSAGE_MARK.MARK
+			}
+			const { code } = is_group
+				? await MsgService.labelGroupMessageApi(params)
+				: await MsgService.labelUserMessageApi(params)
+
+			if (code === 200) {
+				msg.is_label = params.is_label
+				set({ messages: messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item)) })
+				await updateDatabaseMessage(tableName, msg.msg_id, msg, true)
+			}
+		} catch (error) {
+			console.error('标记消息失败:', error)
+			return false
+		}
+		return true
+	},
 	readMessage: async () => {},
 	/**
 	 * 初始化消息的函数。
@@ -165,6 +197,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		})
 		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', receiver_id)
 
-		set({ messages, tableName, is_group, receiver_id, dialog_id, userInfo })
+		set({ messages, tableName, is_group, receiver_id, dialog_id, userInfo, all_meesages: messages })
 	}
 }))
