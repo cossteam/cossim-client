@@ -24,6 +24,7 @@ import clsx from 'clsx'
 import { useToast } from '@/hooks/useToast'
 import Contact from '@/components/Contact/Contact'
 import Emojis from '@/components/Emojis/Emojis'
+import GroupService from '@/api/group'
 
 /**
  * 滚动元素到底部
@@ -54,7 +55,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const dialog_id = Number(f7route.params.dialog_id as string)
 	const dialog_name = f7route.query.dialog_name
 
-	const { messages, userInfo, ...msgStore } = useMessageStore()
+	const { messages, ...msgStore } = useMessageStore()
 
 	// 在进入页面前设置内容高度
 	const onPageInit = async () => {
@@ -191,13 +192,15 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const showMore = (type: MoreType) => {
 		if (type === moreType) return setMoreType('')
 		setMoreType(type)
+		// 滚动到最底部
+		setTimeout(() => scroll(contentRef.current!, true), 0)
 	}
 
 	// 键盘和元素滚动
 	const [showBtn, setShowBtn] = useState<boolean>(false)
 	const [msgType, setMsgType] = useState<number>(MESSAGE_TYPE.TEXT)
 	// 键盘弹起
-
+	const [keyboardHeight, setKeyboardHeight] = useState<number>(300)
 	useAsyncEffect(
 		async () => {
 			if (!pageRef.current.el) return
@@ -207,51 +210,60 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			await msgStore.initMessage(is_group, dialog_id, receiver_id)
 
 			// 滚动到最底部
-			setTimeout(() => {
-				scroll(el!)
-			}, 100)
+			setTimeout(() => scroll(el!), 50)
 
 			// 手机端监听键盘
 			const platformName = await platform()
 			if (platformName !== PLATFORM.WEB) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
 					console.log('keyboard will show with height:', info.keyboardHeight)
-					// alert('keyboard will show with height:' + info.keyboardHeight)
+					setMoreType('')
+					scroll(contentRef.current!, true)
+					setKeyboardHeight(info.keyboardHeight)
+
+					// 添加输入框
+					toolbarRef.current?.classList.add('keyboard-show')
+					toolbarRef.current!.dataset.height = info.keyboardHeight.toString()
 				})
 
 				Keyboard.addListener('keyboardDidShow', (info) => {
 					console.log('keyboard did show with height:', info.keyboardHeight)
-					// alert('keyboard did show with height:' + info.keyboardHeight)
 				})
 
 				Keyboard.addListener('keyboardWillHide', () => {
 					console.log('keyboard will hide')
-					// alert('keyboard will hide')
+					toolbarRef.current?.classList.remove('keyboard-show')
 				})
 
 				Keyboard.addListener('keyboardDidHide', () => {
 					console.log('keyboard did hide')
-					// alert('keyboard did hide')
+					toolbarRef.current?.classList.remove('keyboard-show')
 				})
 			}
 
-			console.log('userInfo', userInfo)
-
-			// 查询用户信息
-			// const list = await UserStore.findOneAllById(t)
+			let members: any = []
+			try {
+				const { data } = await GroupService.groupMemberApi({ group_id: Number(receiver_id) })
+				members = data
+			} catch (error) {
+				members = []
+			}
 
 			const engine = editorRef.current!.engine
+
 			engine.on('change', () => setShowBtn(!engine.isEmpty()))
 			// @ 功能
 			engine.on('mention:default', () => {
-				// console.log('props', props.list)
-				const arr = [
-					{ key: 'all', name: '全体成员' }
-					// ...props.list.map((v) => ({
-					// 	key: v.user_id,
-					// 	name: v.nickname
-					// }))
-				]
+				const newMembers = members.map((v: any) => {
+					return {
+						key: v.user_id,
+						name: v.nickname
+					}
+				})
+
+				console.log('newMembers', newMembers)
+
+				const arr = [{ key: 'all', name: '全体成员' }, ...newMembers]
 
 				return arr
 			})
@@ -342,7 +354,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					{messages.map((item, index) => (
 						<ListItem
 							key={index}
-							className="coss_list_item"
+							className="coss_list_item animate__animated  animate__fadeInUp"
 							data-index={index}
 							style={{ zIndex: 1 }}
 							checkbox={isSelect() && !item?.tips_msg_id}
@@ -352,7 +364,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								msg={item}
 								index={index}
 								onSelect={onSelect}
-								className={!isSelect() ? 'animate__fadeInUp' : ''}
+								// className={!isSelect() ? 'animate__fadeInUp' : ''}
 								isSelected={isSelect()}
 								reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
 							/>
@@ -408,13 +420,14 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 						>
 							<div className={clsx('flex-1 rounded pl-2 max-w-[calc(100%-150px)]')}>
 								<div className="py-2 bg-bgSecondary rounded w-full">
-									<ToolEditor className="px-4" ref={editorRef} />
+									<ToolEditor className="px-4" ref={editorRef} is_group={is_group} />
 								</div>
 								{(isReply() || isEdit()) && (
 									<div className="mt-1 bg-bgTertiary relative flex justify-between">
 										<ToolEditor
 											className="px-2 py-1 coss_message_editor"
 											defaultValue={selectMsgs[0]?.content}
+											is_group={is_group}
 										/>
 										<Link
 											className="pr-2"
@@ -450,7 +463,10 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					</div>
 				</div>
 				{moreType && (
-					<div className={clsx('w-full h-[300px] animate__animated animate__fadeInUp')}>
+					<div
+						className={clsx('w-full animate__animated overflow-y-auto')}
+						style={{ height: keyboardHeight + 'px' }}
+					>
 						{moreType === 'emojis' ? <Emojis /> : <div></div>}
 					</div>
 				)}

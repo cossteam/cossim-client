@@ -85,3 +85,13 @@
         @apply text-ellipsis overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1 max-w-[300px];
     }
 }
+
+.keyboard-show {
+    transform: translateY(-50%);
+    transition: transform 0.3s;
+}
+
+.keyboard-hide  {
+    transform: translateY(0%);
+    transition: transform 0.3s;
+}

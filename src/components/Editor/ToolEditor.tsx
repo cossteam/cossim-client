@@ -12,6 +12,7 @@ interface ToolEditorProps {
 	readonly?: boolean
 	options?: EngineOptions
 	defaultValue?: string
+	is_group?: boolean
 }
 
 // 暴露给父组件的方法类型
@@ -19,18 +20,22 @@ export interface ToolEditorMethods {
 	engine: Engine
 	el: HTMLDivElement
 	focus: () => void
+	isFocus: boolean
 }
 
 const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorProps> = (props, ref) => {
 	const editorRef = useRef<HTMLDivElement | null>(null)
 	const [engine, setEngine] = useState<Engine>()
 	const [, setEditorFocus] = useFocus(editorRef, true)
+	const [isFocus, setIsFocus] = useState(false)
 
 	useEffect(() => {
 		if (!editorRef.current) return
 
-		const cards = [MentionComponent]
-		const plugins = [Mention]
+		// console.log('props.is_group', props.is_group)
+
+		const cards = props.is_group || props.readonly ? [MentionComponent] : []
+		const plugins = props.is_group || props.readonly ? [Mention] : []
 
 		// 实例化引擎
 		const engine = new Engine(editorRef.current, {
@@ -60,11 +65,17 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 	useImperativeHandle(ref, () => ({
 		engine: engine!,
 		el: editorRef.current!,
-		focus: () => setEditorFocus(true)
+		focus: () => setEditorFocus(true),
+		isFocus
 	}))
 
 	return (
-		<div className={clsx('w-full max-h-[150px]  overflow-y-auto text-[1rem]', props.className)} ref={editorRef} />
+		<div
+			className={clsx('w-full max-h-[150px]  overflow-y-auto text-[1rem]', props.className)}
+			ref={editorRef}
+			onFocus={() => setIsFocus(true)}
+			onBlur={() => setIsFocus(false)}
+		/>
 	)
 }
 
