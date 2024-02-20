@@ -11,7 +11,15 @@ export enum MESSAGE_TYPE {
 	/** 音频 */
 	AUDIO = 2,
 	/** 图片 */
-	IMAGE = 3
+	IMAGE = 3,
+	/** 标注消息 */
+	LABEL = 4,
+	/** 置顶消息 */
+	STICKER = 5,
+	/** 文件 */
+	FILE = 6,
+	/** 待办 */
+	TODO = 7
 }
 
 /** 消息阅读状态 */

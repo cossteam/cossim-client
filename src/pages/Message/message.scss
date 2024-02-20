@@ -73,6 +73,12 @@
             }
         }
     }
+}
 
+.reply_editor {
+    @apply text-ellipsis whitespace-nowrap overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1;
 
+    p {
+        @apply text-ellipsis whitespace-nowrap overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1;
+    }
 }

@@ -27,7 +27,7 @@ class UserStoreImpl extends Dexie {
 			group_chats: '++id, dialog_id, &msg_id',
 			apply_list: '++id',
             client_pgp_keys: '++id, &dialog_id, server_public_Key, private_key, public_key, revocation_certificate',
-			messages: '++id, dialog_id, msg_id, &uid'
+			messages: '++id, dialog_id, msg_id, &uid, pid'
 		})
 	}
 }

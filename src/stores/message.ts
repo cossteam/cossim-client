@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE, USER_ID, initMessage } from '@/shared'
+import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE, USER_ID, addMarkMessage, initMessage } from '@/shared'
 import UserStore from '@/db/user'
 import type { PrivateChats } from '@/types/db/user-db'
 import MsgService from '@/api/msg'
@@ -7,8 +7,7 @@ import { getCookie } from '@/utils/cookie'
 import { updateDatabaseMessage } from '@/shared'
 import CommonStore from '@/db/common'
 import { v4 as uuidv4 } from 'uuid'
-// import CommonStore from '@/db/common'
-// import GroupService from '@/api/group'
+import { isEqual, omitBy, isEmpty } from 'lodash-es'
 
 const user_id = getCookie(USER_ID) || ''
 
@@ -41,6 +40,7 @@ interface MessageStore {
 	markMessage: (msg: PrivateChats) => Promise<boolean>
 	readMessage: (msgs: PrivateChats[]) => Promise<void>
 	initMessage: (is_group: boolean, dialog_id: number, receiver_id: string) => Promise<void>
+	updateMessages: (msgs: PrivateChats[]) => Promise<void>
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -76,6 +76,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	 * @return {Promise<void>}
 	 */
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
+		console.log('发送消息')
+
 		const { messages, receiver_id, dialog_id, myInfo } = get()
 
 		// 判断是否是群聊
@@ -109,7 +111,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			at_all_user: options?.at_all_user || 0,
 			at_users: options?.at_users || [],
 			group_id: is_group ? Number(options?.receiver_id || receiver_id) : 0,
-			uid: uuidv4()
+			uid: uuidv4(),
+			is_tips: false
 		}
 		set({ messages: [...messages, msg] })
 
@@ -187,8 +190,11 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 			if (code === 200) {
 				msg.is_label = params.is_label
-				set({ messages: messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item)) })
+				const newMessage = messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
 				await updateDatabaseMessage(tableName, msg.uid, msg, true)
+				const tipsMessage = await addMarkMessage(tableName, msg, msg.is_label)
+				newMessage.push(tipsMessage as any)
+				set({ messages: newMessage })
 			}
 		} catch (error) {
 			console.error('标记消息失败:', error)
@@ -224,7 +230,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	 * @param {boolean} is_group -指示对话框是否是一个组
 	 * @param {number}dialog_id -对话框的ID
 	 * @param {string}receiver_id -消息接收者的id
-	 * @return {Promise<void>} 消息初始化时解析的 Promise
+	 * @return  消息初始化时解析的 Promise
 	 */
 	initMessage: async (is_group: boolean, dialog_id: number, receiver_id: string) => {
 		const { shareKey, readMessage } = get()
@@ -241,6 +247,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 		// 当前会话的信息，如果是私聊就是好友信息，如果是群聊就是群信息
 		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', receiver_id)
+		
+		// TODO: 获取好友信息
+
 
 		// 自己的信息
 		const myInfo = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
@@ -249,5 +258,19 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 		// 设置已读
 		readMessage(messages)
+	},
+	updateMessages: async (msgs) => {
+		try {
+			const { messages } = get()
+			// @ts-ignore
+			const differences = omitBy(messages, (value, key) => isEqual(value, msgs[key]))
+
+			if (isEmpty(differences)) return
+			console.log("Object.values(differences)",Object.values(differences));
+			
+			set({ messages: [...messages, ...Object.values(differences)] })
+		} catch (error) {
+			console.error('更新消息失败', error)
+		}
 	}
 }))

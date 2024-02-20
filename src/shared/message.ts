@@ -3,6 +3,9 @@ import { getCookie } from '@/utils/cookie'
 import { USER_ID } from './constanrs'
 import UserService from '@/api/user'
 import { isEqual } from 'lodash-es'
+import { v4 as uuidv4 } from 'uuid'
+import { PrivateChats } from '@/types/db/user-db'
+import { MESSAGE_TYPE } from '.'
 
 interface CommonOptions {
 	tableName: string
@@ -43,9 +46,14 @@ export const readMessage = async () => {}
  * @param {string} uid -要更新的消息的 ID。
  * @param {any} msg -更新的消息对象。
  * @param {boolean} update -指示是否更新现有消息或添加新消息。默认为 false。
- * @return {Promise<void>} -当消息更新或成功添加时解析的承诺。
+ * @return
  */
-export const updateDatabaseMessage = async (tableName: string, uid: string, msg: any, update: boolean = false) => {
+export const updateDatabaseMessage = async (
+	tableName: string,
+	uid: string,
+	msg: PrivateChats,
+	update: boolean = false
+) => {
 	try {
 		const result = await UserStore.findOneById(tableName, 'uid', uid)
 
@@ -57,6 +65,32 @@ export const updateDatabaseMessage = async (tableName: string, uid: string, msg:
 	} catch (error) {
 		console.log('添加或修改消息错误', error)
 	}
+}
+
+export const addMarkMessage = async (tableName: string, msg: PrivateChats, is_label: number) => {
+	try {
+		const doc = new DOMParser().parseFromString(msg.content, 'text/html')
+		const txt = doc.body.textContent
+
+		const marks = {
+			tips_msg_id: msg.msg_id,
+			content: txt,
+			dialog_id: msg.dialog_id,
+			pid: msg.uid,
+			uid: uuidv4(),
+			is_label: is_label,
+			sender_info: msg.sender_info,
+			sender_id: msg.sender_id,
+			type: MESSAGE_TYPE.LABEL,
+		}
+
+		await UserStore.add(tableName, marks)
+
+		return marks
+	} catch (error) {
+		console.log('添加或修改消息错误', error)
+	}
+	return null
 }
 
 /**

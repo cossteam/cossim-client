@@ -11,7 +11,7 @@ class Socket {
 	// 重连次数
 	private reconnectTimes = 0
 	// 最大重连次数
-	private maxReconnectTimes = 999999999999
+	private maxReconnectTimes = 9
 	private static instance: Socket | null
 	private static timer: NodeJS.Timeout | null
 

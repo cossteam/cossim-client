@@ -1,18 +1,26 @@
 import { getCookie } from '@/utils/cookie'
-import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, RID } from '.'
+import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, USER_ID } from '.'
 import UserStore from '@/db/user'
-import { v4 as  uuidv4 }  from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
+
+const user_id = getCookie(USER_ID) || ''
 
 /**
  * 处理私聊接收的 socket 的消息
  * @param {*} data  socket 消息
  */
-export const handlerMessageSocket = async (data: any) => {
+export const handlerMessageSocket = async (data: any, updateMessage: (msg:any)=> void) => {
 	try {
+		console.log('data', data)
+
 		// 如果是当前设备就不需要继续操作了
-		if (getCookie(RID) === data.rid) return
+		// if (Number(getCookie(RID)) === data.rid) return
 
 		const message = data.data
+
+		// 如果就收到的消息是自己发的
+		if (user_id === message.sender_id) return
+
 		const msg = {
 			dialog_id: message?.dialog_id,
 			content: message?.content,
@@ -31,11 +39,12 @@ export const handlerMessageSocket = async (data: any) => {
 			at_all_user: message?.at_all_user || [],
 			at_users: message?.at_users || [],
 			group_id: message?.group_id,
-            uid:  uuidv4() 
+			uid: uuidv4(),
+			is_tips: false
 		}
 
+		updateMessage(msg)
 		await UserStore.add(UserStore.tables.messages, msg)
-
 	} catch (error) {
 		console.log('处理失败')
 	}

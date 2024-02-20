@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { Link } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
 import { $t, TOOLTIP_TYPE } from '@/shared'
-import { ArrowUpRight } from 'framework7-icons/react'
+import { ArrowUpRight, SquareOnSquare } from 'framework7-icons/react'
 
 interface ToolTipProps {
 	el: HTMLElement
@@ -67,7 +67,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		{
 			name: TOOLTIP_TYPE.COPY,
 			title: '复制',
-			icon: <ArrowUpRight className="tooltip__icon" />
+			icon: <SquareOnSquare className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.FORWARD,

@@ -7,9 +7,12 @@ import routes from './router'
 import Layout from './components/Layout'
 import { $t, TOKEN, SocketClient, handlerRequestSocket, RID, handlerMessageSocket } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
+import { useMessageStore } from './stores/message'
 
 function App() {
     
+	const { updateMessage } = useMessageStore()
+
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
 		theme: 'ios',
@@ -46,15 +49,16 @@ function App() {
 					break
 				case 3:
 				case 4:
-					handlerMessageSocket(data)
+				case 12:
+					handlerMessageSocket(data, updateMessage)
 					break
 				case 6:
 				case 7:
 					handlerRequestSocket(data)
 					break
-				case 12:
-					console.log('接收或发送的消息：', data)
-					break
+				// case 12:
+				// 	console.log('接收或发送的消息：', data)
+				// 	break
 				case 14: // 用户来电
 				case 15: // 群聊来电
 					// liveStore.updateLiveInfo({
