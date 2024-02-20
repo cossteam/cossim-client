@@ -6,10 +6,9 @@ import { CallStatus } from '@/shared'
 import { useEffect } from 'react'
 
 const Call: React.FC<RouterProps> = ({ f7router }) => {
-	const { callInfo, status, call, reject, accept, hangup } = useCallStore()
+	const { callInfo, status, reject, accept, hangup } = useCallStore()
 
 	useEffect(() => {
-		console.log(status)
 		console.log(callInfo)
 		// if (status === CallStatus.IDLE) {
 		//     call()
@@ -18,7 +17,7 @@ const Call: React.FC<RouterProps> = ({ f7router }) => {
 
 	return (
 		<Page noNavbar noToolbar>
-			Call
+			{status}
 			{status === CallStatus.CONNECTED && (
 				<>
 					<Button
@@ -46,7 +45,7 @@ const Call: React.FC<RouterProps> = ({ f7router }) => {
 					</Button>
 				</>
 			)}
-			{status === CallStatus.CONNECTED && (
+			{[CallStatus.CALLING, CallStatus.CONNECTED].includes(status) && (
 				<Button
 					raised
 					fill

@@ -8,6 +8,7 @@ import UserStore from '@/db/user'
 import UserService from '@/api/user'
 import './Profile.scss'
 import { useCallStore } from '@/stores/call'
+// import { useCallStore } from '@/stores/call'
 
 const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const user_id = f7route.params.user_id as string
@@ -42,11 +43,11 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	)
 
 	// 呼叫
-	// const { call } = useCallStore()
+	const { call } = useCallStore()
 	const callUser = async () => {
-		// call(userInfo, () => {
-		// 	f7router.navigate('/call/')
-		// })
+		call({ userInfo }, () => {
+			f7router.navigate('/call/')
+		})
 	}
 
 	return (

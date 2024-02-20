@@ -39,7 +39,7 @@ function App() {
 		}
 	})
 
-	const { updateStatus } = useCallStore()
+	const { callInfo, updateCallInfo, updateStatus } = useCallStore()
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -68,15 +68,14 @@ function App() {
 				case 7:
 					handlerRequestSocket(data)
 					break
-				// case 12:
-				// 	console.log('接收或发送的消息：', data)
-				// 	break
 				case CallEvent.UserCallReqEvent:
 				case CallEvent.GroupCallReqEvent:
+					updateCallInfo({ ...callInfo, evrntInfo: data })
 					updateStatus(CallStatus.CALLING)
 					break
 				case CallEvent.UserCallRejectEvent:
 				case CallEvent.GroupCallRejectEvent:
+					updateCallInfo({ ...callInfo, evrntInfo: data })
 					updateStatus(CallStatus.REJECTED)
 					setTimeout(() => {
 						updateStatus(CallStatus.IDLE)
@@ -84,6 +83,7 @@ function App() {
 					break
 				case CallEvent.UserCallHangupEvent:
 				case CallEvent.GroupCallHangupEvent:
+					updateCallInfo({ ...callInfo, evrntInfo: data })
 					updateStatus(CallStatus.DISCONNECTED)
 					setTimeout(() => {
 						updateStatus(CallStatus.IDLE)
