@@ -10,6 +10,7 @@ import { validEmail } from '@/utils/validate'
 import './Auth.scss'
 import { setCookie } from '@/utils/cookie'
 import CommonStore from '@/db/common'
+import { Device } from '@capacitor/device'
 
 interface LoginScreenProps {
 	defaultData?: RegisterData
@@ -54,22 +55,23 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defau
 		return pass
 	}
 
-    // import { cloneDeep } from 'lodash-es'
-    // console.dir(cloneDeep(decryptedData));
+	// import { cloneDeep } from 'lodash-es'
+	// console.dir(cloneDeep(decryptedData));
 	const submit = async () => {
 		try {
 			if (!valid()) return
 
+			const { identifier: driver_id } = await Device.getId()
+
 			// TODO： 后续希望传入一个唯一设备 id 给后端，后端那边判断是否新设备
-			const { code, data, msg } = await UserService.loginApi(fromData)
-            console.dir(data);
-            
+			const { code, data, msg } = await UserService.loginApi({ ...fromData, driver_id })
+			console.dir(data)
+
 			if (code !== 200) return f7.dialog.alert(msg)
 
 			const user_id = data?.user_info?.user_id
 
-            console.log("user_id",user_id);
-            
+			console.log('user_id', user_id)
 
 			const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 			if (!user) {

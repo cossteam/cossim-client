@@ -25,6 +25,8 @@
     "@capacitor/ios": "^5.7.0",
     "@capacitor/keyboard": "^5.0.8",
     "@capacitor/local-notifications": "^5.0.7",
+    "@emoji-mart/data": "^1.1.2",
+    "@emoji-mart/react": "^1.1.1",
     "@ionic/storage": "^4.0.0",
     "@reactuses/core": "^5.0.0",
     "@types/lodash-es": "^4.17.12",

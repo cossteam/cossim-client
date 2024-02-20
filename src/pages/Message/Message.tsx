@@ -23,6 +23,7 @@ import { platform } from '@/utils'
 import clsx from 'clsx'
 import { useToast } from '@/hooks/useToast'
 import Contact from '@/components/Contact/Contact'
+import Emojis from '@/components/Emojis/Emojis'
 
 /**
  * 滚动元素到底部
@@ -195,6 +196,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	// 键盘和元素滚动
 	const [showBtn, setShowBtn] = useState<boolean>(false)
 	const [msgType, setMsgType] = useState<number>(MESSAGE_TYPE.TEXT)
+	// 键盘弹起
+
 	useAsyncEffect(
 		async () => {
 			if (!pageRef.current.el) return
@@ -308,7 +311,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 						</Link>
 					)}
 				</NavRight>
-				<Subnavbar className="coss_message_subnavbar" ref={subnavbarRef}>
+				<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
 					<Segmented>
 						<Button active>
 							<EllipsesBubbleFill slot="iconF7" className="mr-2" />
@@ -446,7 +449,11 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 						</div>
 					</div>
 				</div>
-				{moreType && <div className={clsx('w-full h-[300px] animate__animated animate__fadeInUp')}></div>}
+				{moreType && (
+					<div className={clsx('w-full h-[300px] animate__animated animate__fadeInUp')}>
+						{moreType === 'emojis' ? <Emojis /> : <div></div>}
+					</div>
+				)}
 			</div>
 
 			<Contact completed={setSelect} opened={showSelect} setOpened={setShowSelect} group />
