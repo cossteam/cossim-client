@@ -5,8 +5,9 @@ import { Framework7Parameters } from 'framework7/types'
 import "@/utils/notification"
 import routes from './router'
 import Layout from './components/Layout'
-import { $t, TOKEN, SocketClient, handlerUserMessageSocket, handlerGroupMessageSocket, handlerRequestSocket, RID } from '@/shared'
+import { $t, TOKEN, SocketClient, handlerUserMessageSocket, handlerGroupMessageSocket, handlerRequestSocket, RID, CallEvent, CallStatus } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
+import { useCallStore } from '@/stores/call'
 
 function App() {
     
@@ -27,18 +28,21 @@ function App() {
 		}
 	})
 
-	// 修复手机上的视口比例
-	useEffect(() => {
+    const { updateStatus } = useCallStore()
+    
+    useEffect(() => {
+        // 修复手机上的视口比例
 		if ((f7.device.ios || f7.device.android) && f7.device.standalone) {
 			const viewEl = document.querySelector('meta[name="viewport"]') as HTMLMetaElement
 			viewEl.setAttribute('content', `${viewEl.getAttribute('content')}, maximum-scale=1, user-scalable=no`)
-		}
-
+        }
+        
+        // 事件处理
 		const handlerInit = (e: any) => {
 			const data = JSON.parse(e.data)
+            const event = data.event
 			console.log('接收到所有 sokect 通知：', data)
-
-			switch (data.event) {
+			switch (event) {
 				case 1:
 					setCookie(RID, data.rid)
 					break
@@ -55,29 +59,23 @@ function App() {
 				case 12:
 					console.log('接收或发送的消息：', data)
 					break
-				case 14: // 用户来电
-				case 15: // 群聊来电
-					// liveStore.updateLiveInfo({
-					// 	event: data.event,
-					// 	...data.data
-					// })
-					// liveStore.updateLiveStatus(liveStatus.WAITING)
+				case CallEvent.UserCallReqEvent:
+                case CallEvent.GroupCallReqEvent:
+                    updateStatus(CallStatus.CALLING)
 					break
-				case 16: // 用户通话拒绝
-				case 17: // 群聊通话拒绝
-					// liveStore.updateLiveInfo({
-					// 	event: data.event,
-					// 	...data.data
-					// })
-					// liveStore.updateLiveStatus(liveStatus.REJECTED)
+				case CallEvent.UserCallRejectEvent:
+				case CallEvent.GroupCallRejectEvent:
+                    updateStatus(CallStatus.REJECTED)
+                    setTimeout(() => {
+                        updateStatus(CallStatus.IDLE)
+                    }, 3000)
 					break
-				case 18: // 用户通话挂断
-				case 19: // 群聊通话挂断
-					// liveStore.updateLiveInfo({
-					// 	event: data.event,
-					// 	...data.data
-					// })
-					// liveStore.updateLiveStatus(liveStatus.END)
+				case CallEvent.UserCallHangupEvent:
+				case CallEvent.GroupCallHangupEvent:
+                    updateStatus(CallStatus.DISCONNECTED)
+                    setTimeout(() => {
+                        updateStatus(CallStatus.IDLE)
+                    }, 3000)
 					break
 			}
 		}

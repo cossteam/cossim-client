@@ -117,3 +117,45 @@ export enum MemberListType {
 	/** 本群成员（仅展示） */
 	MEMBERSHOW = 'member_show'
 }
+
+/** 通话状态 WebSocket 推送事件 */
+export enum CallEvent {
+	/** 用户通话呼叫请求事件 */
+	UserCallReqEvent = 14,
+	/** 群聊通话呼叫请求事件 */
+	GroupCallReqEvent = 15,
+	/** 用户通话呼叫拒绝事件 */
+	UserCallRejectEvent = 16,
+	/** 群聊通话呼叫拒绝事件 */
+	GroupCallRejectEvent = 17,
+	/** 用户通话挂断事件 */
+	UserCallHangupEvent = 18,
+	/** 群聊通话挂断事件 */
+	GroupCallHangupEvent = 19
+}
+
+export enum CallStatus {
+	/** 空闲（呼叫方） */
+	IDLE = 0,
+	/** 通话中（接收方） */
+	IN_CALL = 1,
+	/** 正在呼叫中（呼叫方、接收方） */
+	CALLING = 2,
+	/** 正在通话中（呼叫方、接收方） */
+	CONNECTED = 3,
+	/** 呼叫失败（呼叫方） */
+	FAILED = 4,
+	/** 呼叫被拒绝（接收方） */
+	REJECTED = 5,
+	/** 呼叫被取消（呼叫方） */
+	CANCELLED = 6,
+	/** 通话结束（呼叫方、接收方） */
+	DISCONNECTED = 7
+}
+
+export enum CallType {
+	/** 视频通话 */
+	VIDEO = 1,
+	/** 音频通话 */
+	AUDIO = 2
+}

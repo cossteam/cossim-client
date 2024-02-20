@@ -1,4 +1,5 @@
 import { ListChannelsResult, LocalNotifications, ScheduleOptions, ScheduleResult } from '@capacitor/local-notifications'
+import { Device } from '@capacitor/device'
 
 export enum LocalNotificationType {
 	/** 系统消息通知 */
@@ -9,21 +10,39 @@ export enum LocalNotificationType {
 	CALL = 2
 }
 
+export enum Platform {
+	/** Android */
+	ANDROID = 'android',
+	/** iOS */
+	IOS = 'ios',
+	/** web */
+	WEB = 'web'
+}
+
 export default async function localNotification(title: string, body: string, type: LocalNotificationType) {
+	// 获取平台
+	const platform = (await Device.getInfo()).platform
+	if (platform === Platform.WEB) {
+		console.log('本地通知不支持 web')
+		return
+	}
 	try {
 		// 获取通知通道（类别）
 		const listChannels: ListChannelsResult = await LocalNotifications.listChannels()
 		console.log(listChannels)
+		// 获取权限状态
 		let permissionStatus = await LocalNotifications.checkPermissions()
 		window.localStorage.setItem('permissionStatus', JSON.stringify(permissionStatus))
 		if (permissionStatus.display !== 'granted') {
 			console.error('本地通知权限未开启，请求权限')
+			// 请求权限
 			permissionStatus = await LocalNotifications.requestPermissions()
 			if (permissionStatus.display !== 'granted') {
 				console.error('本地通知权限未开启，请求权限失败')
 				return
 			}
 		}
+		// 创建通知
 		const notification: ScheduleOptions = {
 			notifications: [
 				{
@@ -34,6 +53,7 @@ export default async function localNotification(title: string, body: string, typ
 				}
 			]
 		}
+		// 发送通知
 		const scheduleResult: ScheduleResult = await LocalNotifications.schedule(notification)
 		console.log('本地通知已发送', scheduleResult)
 	} catch (error) {
@@ -41,4 +61,4 @@ export default async function localNotification(title: string, body: string, typ
 	}
 }
 
-localNotification('这是一个本地通知!', '这是一个示例通知。', LocalNotificationType.MESSAGE)
+// localNotification('这是一个本地通知!', '这是一个示例通知。', LocalNotificationType.MESSAGE)
