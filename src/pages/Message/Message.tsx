@@ -1,4 +1,4 @@
-import { Ellipsis } from 'framework7-icons/react'
+import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
 import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Segmented, Subnavbar, f7 } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
@@ -51,9 +51,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const is_group = f7route.query.is_group === 'true'
 	const receiver_id = f7route.params.id as string
 	const dialog_id = Number(f7route.params.dialog_id as string)
-
-	// 成员列表
-	// const [members, setMembers] = useState<any[]>([])
+	const dialog_name = f7route.query.dialog_name
 
 	const { messages, userInfo, ...msgStore } = useMessageStore()
 
@@ -72,14 +70,16 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 	// 当前提示选择的消息类型
 	const [selectType, setSelectType] = useState<TOOLTIP_TYPE>(TOOLTIP_TYPE.NONE)
-	const onSelect = async (type: TOOLTIP_TYPE, msg_id: number) => {
+	const onSelect = (type: TOOLTIP_TYPE, msg_id: number) => {
 		const msg = messages.find((v) => v.msg_id === msg_id)
 		type !== TOOLTIP_TYPE.SELECT && setSelectMsgs([msg])
 		setSelectType(type)
 
+		console.log('msg', msg, messages, msgStore.all_meesages, msg_id)
+
 		switch (type) {
 			case TOOLTIP_TYPE.COPY:
-				await selectEvent.copy(msg?.content || '')
+				selectEvent.copy(msg?.content || '')
 				break
 			case TOOLTIP_TYPE.FORWARD:
 				setShowSelect(true)
@@ -95,7 +95,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				})
 				break
 			case TOOLTIP_TYPE.MARK:
-				selectEvent.mark()
+				msg && selectEvent.mark(msg)
 				break
 		}
 	}
@@ -115,7 +115,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const selectEvent = {
 		copy: async (text: string) => {
 			try {
-				await copy(text)
+				const doc = new DOMParser().parseFromString(text, 'text/html')
+				const txt = doc.body.textContent
+				await copy(txt ?? '')
 				toast($t('复制成功'))
 			} catch (error) {
 				toast($t('复制失败'))
@@ -150,14 +152,11 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				toast('删除失败')
 			}
 		},
-		// select: async () => {},
-		// reply: async () => {},
-		mark: async () => {
-			const isMark = await msgStore.markMessage(selectMsgs[0])
-			if (isMark) {
-				toast(selectMsgs[0]?.is_mark ? $t('取消标记成功') : $t('标记成功'))
-			} else {
-				toast(selectMsgs[0]?.is_mark ? $t('取消标记失败') : $t('标记失败'))
+		mark: async (msg: any) => {
+			await msgStore.markMessage(msg)
+			selectEvent.clear()
+			if (isScrollEnd()) {
+				setTimeout(() => scroll(contentRef.current!, true), 100)
 			}
 		},
 		clear: () => {
@@ -207,7 +206,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			// 滚动到最底部
 			setTimeout(() => {
 				scroll(el!)
-			}, 0)
+			}, 100)
 
 			// 手机端监听键盘
 			const platformName = await platform()
@@ -233,8 +232,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				})
 			}
 
-			console.log("userInfo",userInfo)
-			
+			console.log('userInfo', userInfo)
+
 			// 查询用户信息
 			// const list = await UserStore.findOneAllById(t)
 
@@ -244,7 +243,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			engine.on('mention:default', () => {
 				// console.log('props', props.list)
 				const arr = [
-					{ key: 'all', name: '全体成员' },
+					{ key: 'all', name: '全体成员' }
 					// ...props.list.map((v) => ({
 					// 	key: v.user_id,
 					// 	name: v.nickname
@@ -274,7 +273,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	// 滚动情况
 	useEffect(() => {
 		if (!messages.length) return
-		if (isScrollEnd() && !isMe(messages.at(-1)?.sender_id || '')) scroll(contentRef.current!)
+		if (isScrollEnd() && !isMe(messages.at(-1)?.sender_id || '')) {
+			setTimeout(() => scroll(contentRef.current!, true), 100)
+		}
 	}, [messages])
 
 	// 辅助函数
@@ -291,7 +292,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	return (
 		<Page noToolbar className="coss_message" onPageInit={onPageInit} ref={pageRef}>
 			<Navbar
-				title={userInfo?.nickname || userInfo?.name}
+				title={dialog_name}
 				subtitle="[在线]"
 				backLink
 				outline={false}
@@ -341,7 +342,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 							className="coss_list_item"
 							data-index={index}
 							style={{ zIndex: 1 }}
-							checkbox={isSelect()}
+							checkbox={isSelect() && !item?.tips_msg_id}
 							onChange={(e) => onSelectChange(e, item)}
 						>
 							<Chat
@@ -350,7 +351,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								onSelect={onSelect}
 								className={!isSelect() ? 'animate__fadeInUp' : ''}
 								isSelected={isSelect()}
-								reply={item.replay_id ? replyMessage(item.replay_id) : null}
+								reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
 							/>
 						</ListItem>
 					))}
@@ -370,14 +371,14 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								className="flex flex-col flex-1 items-center justify-center"
 								onClick={() => setShowSelect(true)}
 							>
-								<ArrowRightCircleFill className="text-xl mb-1" />
+								<ArrowUpRight className="text-xl mb-1" />
 								<span className="text-[0.75rem]">{$t('转发')}</span>
 							</Link>
 							<Link
 								className="flex flex-col flex-1 items-center justify-center"
 								onClick={selectEvent.delete}
 							>
-								<ArrowRightCircleFill className="text-xl mb-1" />
+								<Trash className="text-xl mb-1" />
 								<span className="text-[0.75rem]">{$t('删除')}</span>
 							</Link>
 						</div>
@@ -402,8 +403,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								msgType !== MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden'
 							)}
 						>
-							<div className={clsx('flex-1 rounded pl-2')}>
-								<div className="w-full py-2 bg-bgSecondary rounded">
+							<div className={clsx('flex-1 rounded pl-2 max-w-[calc(100%-150px)]')}>
+								<div className="py-2 bg-bgSecondary rounded w-full">
 									<ToolEditor className="px-4" ref={editorRef} />
 								</div>
 								{(isReply() || isEdit()) && (
@@ -424,7 +425,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 									</div>
 								)}
 							</div>
-							<div className="flex items-center px-2 ">
+							<div className="flex items-center px-2 w-[150px]">
 								<Link onClick={() => showMore('emojis')}>
 									<FaceSmiling className="text-4xl text-gray-500 mr-2" />
 								</Link>

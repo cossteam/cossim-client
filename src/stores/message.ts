@@ -1,12 +1,13 @@
 import { create } from 'zustand'
-import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE, USER_ID, initMessage } from '@/shared'
+import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE, USER_ID, addMarkMessage, initMessage } from '@/shared'
 import UserStore from '@/db/user'
 import type { PrivateChats } from '@/types/db/user-db'
 import MsgService from '@/api/msg'
 import { getCookie } from '@/utils/cookie'
 import { updateDatabaseMessage } from '@/shared'
-// import CommonStore from '@/db/common'
-// import GroupService from '@/api/group'
+import CommonStore from '@/db/common'
+import { v4 as uuidv4 } from 'uuid'
+import { isEqual, omitBy, isEmpty } from 'lodash-es'
 
 const user_id = getCookie(USER_ID) || ''
 
@@ -18,6 +19,7 @@ interface Options {
 	is_forward?: boolean
 	at_all_user?: number
 	at_users?: string[]
+	is_burn_after_reading?: number
 }
 
 interface MessageStore {
@@ -30,6 +32,7 @@ interface MessageStore {
 	dialog_id: number
 	userInfo: any
 	members: any[]
+	myInfo: any
 	updateMessage: (msg: any) => Promise<void>
 	deleteMessage: (msg_id: number) => Promise<void>
 	sendMessage: (type: MESSAGE_TYPE, content: string, options?: Options) => Promise<void>
@@ -37,6 +40,7 @@ interface MessageStore {
 	markMessage: (msg: PrivateChats) => Promise<boolean>
 	readMessage: (msgs: PrivateChats[]) => Promise<void>
 	initMessage: (is_group: boolean, dialog_id: number, receiver_id: string) => Promise<void>
+	updateMessages: (msgs: PrivateChats[]) => Promise<void>
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -49,6 +53,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	dialog_id: 0,
 	userInfo: null,
 	members: [],
+	myInfo: null,
 	updateMessage: async (msg: PrivateChats) => {
 		const { messages } = get()
 		set({ messages: [...messages, msg] })
@@ -71,7 +76,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	 * @return {Promise<void>}
 	 */
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
-		const { messages, receiver_id, dialog_id } = get()
+		console.log('发送消息')
+
+		const { messages, receiver_id, dialog_id, myInfo } = get()
 
 		// 判断是否是群聊
 		let { is_group, tableName } = get()
@@ -82,20 +89,30 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 		const { is_forward = false } = options
 
-		const msg: PrivateChats = {
-			msg_id: Date.now(),
-			sender_id: user_id,
-			receiver_id: options?.receiver_id || receiver_id,
+		const msg: any = {
+			dialog_id: options?.dialog_id ?? dialog_id,
 			content,
-			type,
-			replay_id: options?.replay_id ?? 0,
-			is_read: MESSAGE_READ.READ,
-			read_at: Date.now(),
-			created_at: Date.now(),
-			dialog_id: options?.dialog_id || dialog_id,
+			create_at: Date.now(),
+			is_burn_after_reading: options?.is_burn_after_reading ?? 0,
 			is_label: MESSAGE_MARK.NOT_MARK,
-			is_burn_after_reading: 0,
-			msg_send_state: MESSAGE_SEND.SENDING
+			is_read: MESSAGE_READ.READ,
+			msg_id: Date.now(),
+			msg_send_state: MESSAGE_SEND.SENDING,
+			receiver: options?.receiver_id ?? receiver_id,
+			read_at: Date.now(),
+			reply_id: options?.replay_id ?? 0,
+			sender_id: user_id,
+			type,
+			sender_info: {
+				avatar: myInfo?.user_info?.avatar,
+				nickname: myInfo?.user_info?.nickname,
+				user_id
+			},
+			at_all_user: options?.at_all_user || 0,
+			at_users: options?.at_users || [],
+			group_id: is_group ? Number(options?.receiver_id || receiver_id) : 0,
+			uid: uuidv4(),
+			is_tips: false
 		}
 		set({ messages: [...messages, msg] })
 
@@ -104,16 +121,16 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 				type,
 				content,
 				dialog_id: msg.dialog_id,
-				replay_id: msg.replay_id,
+				replay_id: msg.reply_id,
 				is_burn_after_reading: 0
 			}
 
 			if (is_group) {
 				params['at_all_user'] = options?.at_all_user || 0
 				params['at_users'] = options?.at_users || []
-				params['group_id'] = Number(msg.receiver_id)
+				params['group_id'] = msg.group_id
 			} else {
-				params['receiver_id'] = msg.receiver_id
+				params['receiver_id'] = msg.receiver
 			}
 
 			const { code, data } = is_group
@@ -127,7 +144,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			msg.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		} finally {
 			set((state) => ({ messages: [...state.messages.slice(0, -1), msg] }))
-			!is_forward && (await updateDatabaseMessage(tableName, msg.msg_id, msg))
+			!is_forward && (await updateDatabaseMessage(tableName, msg.uid, msg))
 		}
 	},
 	editMessage: async (msg: PrivateChats, content: string) => {
@@ -157,7 +174,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			set((state) => ({
 				messages: state.messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
 			}))
-			await updateDatabaseMessage(tableName, msg.msg_id, msg, true)
+			await updateDatabaseMessage(tableName, msg.uid, msg, true)
 		}
 	},
 	markMessage: async (msg: PrivateChats) => {
@@ -173,8 +190,11 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 			if (code === 200) {
 				msg.is_label = params.is_label
-				set({ messages: messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item)) })
-				await updateDatabaseMessage(tableName, msg.msg_id, msg, true)
+				const newMessage = messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
+				await updateDatabaseMessage(tableName, msg.uid, msg, true)
+				const tipsMessage = await addMarkMessage(tableName, msg, msg.is_label)
+				newMessage.push(tipsMessage as any)
+				set({ messages: newMessage })
 			}
 		} catch (error) {
 			console.error('标记消息失败:', error)
@@ -200,7 +220,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		// 更新本地数据库
 		if (code === 200) {
 			unReadMsgs.map((item) => {
-				updateDatabaseMessage(tableName, item.msg_id, { ...item, is_read: MESSAGE_READ.READ }, true)
+				updateDatabaseMessage(tableName, item.uid, { ...item, is_read: MESSAGE_READ.READ }, true)
 			})
 		}
 	},
@@ -210,40 +230,47 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	 * @param {boolean} is_group -指示对话框是否是一个组
 	 * @param {number}dialog_id -对话框的ID
 	 * @param {string}receiver_id -消息接收者的id
-	 * @return {Promise<void>} 消息初始化时解析的 Promise
+	 * @return  消息初始化时解析的 Promise
 	 */
 	initMessage: async (is_group: boolean, dialog_id: number, receiver_id: string) => {
 		const { shareKey, readMessage } = get()
-		const tableName = is_group ? UserStore.tables.group_chats : UserStore.tables.private_chats
+
+		// TODO: 移除
+		// const tableName = is_group ? UserStore.tables.group_chats : UserStore.tables.private_chats
+		const tableName = UserStore.tables.messages
+
 		const messages = await initMessage({
 			tableName,
 			dialog_id,
 			shareKey
 		})
+
+		// 当前会话的信息，如果是私聊就是好友信息，如果是群聊就是群信息
 		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', receiver_id)
+		
+		// TODO: 获取好友信息
 
-		// let userInfo: any
-		// 获取群成员
-		// const members: any[] = []
-		// if (is_group) {
-			// userInfo = await UserStore.findOneById(UserStore.tables.groups, 'group_id', Number(receiver_id))
 
-		// 	const { data } = await GroupService.groupInfoApi({ group_id: Number(receiver_id) })
-		// 	console.log('data', data)
-		// 	userInfo = data
-		// 	// const group = await CommonStore.findOneById(CommonStore.tables.groups, 'group_id', dialog_id)
-		// } else {
-		// 	userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', receiver_id)
-		// 	const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-		// 	members.push(userInfo, user?.user_info)
+		// 自己的信息
+		const myInfo = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 
-		// 	// 获取远程的信息，如果有更改则更新本地
-		// 	dillServerInfo(receiver_id, userInfo).then((res) => res && members.splice(0, 1, res))
-		// }
-
-		set({ messages, tableName, is_group, receiver_id, dialog_id, all_meesages: messages, userInfo })
+		set({ messages, tableName, is_group, receiver_id, dialog_id, all_meesages: messages, userInfo, myInfo })
 
 		// 设置已读
 		readMessage(messages)
+	},
+	updateMessages: async (msgs) => {
+		try {
+			const { messages } = get()
+			// @ts-ignore
+			const differences = omitBy(messages, (value, key) => isEqual(value, msgs[key]))
+
+			if (isEmpty(differences)) return
+			console.log("Object.values(differences)",Object.values(differences));
+			
+			set({ messages: [...messages, ...Object.values(differences)] })
+		} catch (error) {
+			console.error('更新消息失败', error)
+		}
 	}
 }))

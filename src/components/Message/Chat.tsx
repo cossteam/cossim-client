@@ -1,15 +1,14 @@
 import type { PrivateChats } from '@/types/db/user-db'
 import clsx from 'clsx'
-import { Exclamationmark, Gobackward, Checkmark2, BookmarkFill } from 'framework7-icons/react'
+import { Exclamationmark, Gobackward, Checkmark2, Flag } from 'framework7-icons/react'
 import { format } from 'timeago.js'
 import { useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { isMe, MESSAGE_SEND } from '@/shared'
+import { $t, isMe, MESSAGE_SEND, MESSAGE_TYPE } from '@/shared'
 import ToolEditor from '@/components/Editor/ToolEditor'
 import ToolTip from './ToolTip'
 import LongPressButton from '@/components/LongPressButton/LongPressButton'
-import { Link } from 'framework7-react'
 
 interface ChatProps {
 	msg: PrivateChats
@@ -32,6 +31,16 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 		tooltipRef.current!.appendChild(div)
 	}
 
+	if (msg?.type === MESSAGE_TYPE.LABEL) {
+		return (
+			<div className="max-w-[70%] w-fit bg-gray-200 px-2 py-[2px] text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap text-[0.75rem] rounded mx-auto text-center animate__animated animate__fadeIn animate__fadeInUp cursor-pointer active:bg-opacity-50">
+				{is_self ? $t('我') : $t(msg?.sender_info?.nickname)}&nbsp;
+				{msg?.is_label !== 0 ? $t('标注了') : $t('取消标注')}&nbsp;
+				{`"${msg?.content}"`}
+			</div>
+		)
+	}
+
 	return (
 		<div
 			className={clsx('flex animate__animated', is_self ? 'justify-end' : 'justify-start', className)}
@@ -45,8 +54,8 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 					)}
 				>
 					<img
-						src="https://picsum.photos/200/300"
-						alt="avatar"
+						src={msg?.sender_info?.avatar}
+						alt={msg?.sender_info?.nickname}
 						className="w-full h-full rounded-full object-cover"
 					/>
 				</div>
@@ -57,6 +66,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 					)}
 				>
 					<div className="mb-1 text-[0.85rem]"></div>
+
 					<LongPressButton callback={() => createTooltip()}>
 						<div
 							className={clsx(
@@ -67,11 +77,12 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							)}
 							data-id={msg?.msg_id}
 							data-index={index}
+							data-label={msg?.is_label}
 							ref={tooltipRef}
 						>
 							<ToolEditor
 								readonly
-								className="select-none"
+								className="select-none text-[1rem]"
 								defaultValue={msg?.content}
 								data-id={msg?.msg_id}
 								data-index={index}
@@ -92,20 +103,20 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							) : (
 								<Gobackward />
 							))}
-						{msg?.replay_id !== 0 && <BookmarkFill className="text-primary" />}
+						{msg?.is_label !== 0 && <Flag className="text-primary ml-[2px]" />}
 					</div>
 
 					{/* 回复消息 */}
 					{reply && (
-						<Link
+						<div
 							className={clsx(
-								'mt-2 px-2 bg-gray-200 rounded text-[0.75rem]',
+								'mt-2 px-2 bg-gray-200 max-w-[50%] rounded text-[0.75rem] flex items-center text-gray-500 text-ellipsis line-clamp-1 overflow-hidden break-all active:bg-opacity-50"',
 								is_self ? 'text-right' : 'text-left'
 							)}
-							href={`#msg_${reply?.msg_id}`}
 						>
-							<ToolEditor readonly className="select-none" defaultValue={reply?.content} />
-						</Link>
+							<div className="whitespace-nowrap text-[0.75rem] w-fit text-textTertiary">{reply?.sender_info?.nickname}:</div>
+							<ToolEditor readonly className="reply_editor" defaultValue={reply?.content} />
+						</div>
 					)}
 				</div>
 			</div>
