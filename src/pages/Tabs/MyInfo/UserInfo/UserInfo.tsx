@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { f7, Page, Navbar, List, ListItem, Button, Block } from 'framework7-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useClipboard } from '@reactuses/core'
@@ -28,7 +28,9 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 		f7.dialog.confirm($t('退出登录'), $t('确定要退出登录吗？'), async () => {
 			try {
 				f7.dialog.preloader($t('正在退出...'))
-				await UserService.logoutApi()
+				await UserService.logoutApi({
+					login_number: userInfo?.login_number
+				})
 			} catch (error) {
 				f7.dialog.alert($t('退出登录失败'))
 			} finally {

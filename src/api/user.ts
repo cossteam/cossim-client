@@ -141,10 +141,11 @@ class UserServiceImpl {
 	 * 退出登录
 	 * @returns
 	 */
-	logoutApi() {
+	logoutApi(data: any) {
 		return request({
 			url: `${this.baseUrl}/logout`,
-			method: 'POST'
+			method: 'POST',
+			data
 		})
 	}
 
