@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { Link } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
 import { $t, TOOLTIP_TYPE } from '@/shared'
-import { ArrowUpRight, SquareOnSquare } from 'framework7-icons/react'
+import { ArrowUpRight, SquareOnSquare, Trash, Flag, SquarePencil, BubbleLeftBubbleRight,TextAlignleft } from 'framework7-icons/react'
 
 interface ToolTipProps {
 	el: HTMLElement
@@ -37,8 +37,8 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 
 		const { id = 0, index = 0, label = 0 } = el.dataset
 		setMsgId(Number(id))
-		
-		setTips([...tips.slice(0,-1), { ...tips.at(-1), title: $t(Number(label) === 0 ? '标注' : '取消标注') }])
+
+		setTips([...tips.slice(0, -1), { ...tips.at(-1), title: $t(Number(label) === 0 ? '标注' : '取消标注') }])
 
 		const currentEl = lis[Number(index)] as HTMLLIElement
 		currentRef.current = currentEl
@@ -77,27 +77,27 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		{
 			name: TOOLTIP_TYPE.EDIT,
 			title: '编辑',
-			icon: <ArrowUpRight className="tooltip__icon" />
+			icon: <SquarePencil className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.DELETE,
 			title: '删除',
-			icon: <ArrowUpRight className="tooltip__icon" />
+			icon: <Trash className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.SELECT,
 			title: '多选',
-			icon: <ArrowUpRight className="tooltip__icon" />
+			icon: <TextAlignleft className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.REPLY,
 			title: '回复',
-			icon: <ArrowUpRight className="tooltip__icon" />
+			icon: <BubbleLeftBubbleRight className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.MARK,
 			title: '标注',
-			icon: <ArrowUpRight className="tooltip__icon" />
+			icon: <Flag className="tooltip__icon" />
 		}
 	])
 

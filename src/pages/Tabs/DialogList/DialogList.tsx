@@ -19,6 +19,7 @@ import { $t } from '@/shared'
 import UserStore from '@/db/user'
 import MsgService from '@/api/msg'
 import './DialogList.scss'
+import ToolEditor from '@/components/Editor/ToolEditor'
 
 const DialogList: React.FC<RouterProps> = () => {
 	const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
@@ -108,7 +109,8 @@ const DialogList: React.FC<RouterProps> = () => {
 							className="w-12 h-12 rounded-full object-cover"
 						/>
 						<div slot="text" className="max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
-							{item?.last_message?.content}
+							{/* {item?.last_message?.content} */}
+							<ToolEditor defaultValue={item?.last_message?.content} readonly/>
 						</div>
 						<SwipeoutActions right>
 							<SwipeoutButton close overswipe color="blue">

@@ -1,4 +1,4 @@
-import { Ellipsis } from 'framework7-icons/react'
+import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
 import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Segmented, Subnavbar, f7 } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
@@ -95,8 +95,6 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				})
 				break
 			case TOOLTIP_TYPE.MARK:
-				console.log('msg', msg)
-
 				msg && selectEvent.mark(msg)
 				break
 		}
@@ -208,7 +206,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			// 滚动到最底部
 			setTimeout(() => {
 				scroll(el!)
-			}, 0)
+			}, 100)
 
 			// 手机端监听键盘
 			const platformName = await platform()
@@ -373,14 +371,14 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								className="flex flex-col flex-1 items-center justify-center"
 								onClick={() => setShowSelect(true)}
 							>
-								<ArrowRightCircleFill className="text-xl mb-1" />
+								<ArrowUpRight className="text-xl mb-1" />
 								<span className="text-[0.75rem]">{$t('转发')}</span>
 							</Link>
 							<Link
 								className="flex flex-col flex-1 items-center justify-center"
 								onClick={selectEvent.delete}
 							>
-								<ArrowRightCircleFill className="text-xl mb-1" />
+								<Trash className="text-xl mb-1" />
 								<span className="text-[0.75rem]">{$t('删除')}</span>
 							</Link>
 						</div>

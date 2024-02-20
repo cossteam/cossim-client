@@ -1,6 +1,6 @@
 import type { PrivateChats } from '@/types/db/user-db'
 import clsx from 'clsx'
-import { Exclamationmark, Gobackward, Checkmark2, Bookmark } from 'framework7-icons/react'
+import { Exclamationmark, Gobackward, Checkmark2, Flag } from 'framework7-icons/react'
 import { format } from 'timeago.js'
 import { useRef } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -103,7 +103,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							) : (
 								<Gobackward />
 							))}
-						{msg?.is_label !== 0 && <Bookmark className="text-primary" />}
+						{msg?.is_label !== 0 && <Flag className="text-primary ml-[2px]" />}
 					</div>
 
 					{/* 回复消息 */}
@@ -114,7 +114,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 								is_self ? 'text-right' : 'text-left'
 							)}
 						>
-							<div className="whitespace-nowrap">{reply?.sender_info?.nickname}</div>
+							<div className="whitespace-nowrap text-[0.75rem] w-fit text-textTertiary">{reply?.sender_info?.nickname}:</div>
 							<ToolEditor readonly className="reply_editor" defaultValue={reply?.content} />
 						</div>
 					)}
