@@ -143,22 +143,18 @@ export enum CallEvent {
 }
 
 export enum CallStatus {
-	/** 空闲（呼叫方） */
+	/** 空闲 */
 	IDLE = 0,
-	/** 通话中（接收方） */
-	IN_CALL = 1,
-	/** 正在呼叫中（呼叫方、接收方） */
-	CALLING = 2,
-	/** 正在通话中（呼叫方、接收方） */
-	CONNECTED = 3,
-	/** 呼叫失败（呼叫方） */
-	FAILED = 4,
-	/** 呼叫被拒绝（接收方） */
-	REJECTED = 5,
-	/** 呼叫被取消（呼叫方） */
-	CANCELLED = 6,
-	/** 通话结束（呼叫方、接收方） */
-	DISCONNECTED = 7
+	/** 占线 */
+	BUSY = 1,
+	/** 等待 */
+	WAITING = 2,
+	/** 拒绝 */
+	REFUSE = 3,
+	/** 通话中 */
+	CALLING = 4,
+	/** 挂断 */
+	HANGUP = 5
 }
 
 export enum CallType {

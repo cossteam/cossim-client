@@ -36,7 +36,7 @@ export function createLiveGroupApi(data: any) {
  * @param data
  * @returns
  */
-export function joinLiveUserApi(data: any) {
+export function joinLiveUserApi(data?: any) {
 	return request({
 		url: liveUser + '/join',
 		method: 'POST',
@@ -49,7 +49,7 @@ export function joinLiveUserApi(data: any) {
  * @param data
  * @returns
  */
-export function joinLiveGroupApi(data: any) {
+export function joinLiveGroupApi(data?: any) {
 	return request({
 		url: liveGroup + '/join',
 		method: 'POST',

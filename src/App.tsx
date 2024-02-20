@@ -70,21 +70,24 @@ function App() {
 					break
 				case CallEvent.UserCallReqEvent:
 				case CallEvent.GroupCallReqEvent:
+					// 来电
 					updateCallInfo({ ...callInfo, evrntInfo: data })
-					updateStatus(CallStatus.CALLING)
+					updateStatus(CallStatus.WAITING)
 					break
 				case CallEvent.UserCallRejectEvent:
 				case CallEvent.GroupCallRejectEvent:
+					// 拒绝
 					updateCallInfo({ ...callInfo, evrntInfo: data })
-					updateStatus(CallStatus.REJECTED)
+					updateStatus(CallStatus.REFUSE)
 					setTimeout(() => {
 						updateStatus(CallStatus.IDLE)
 					}, 3000)
 					break
 				case CallEvent.UserCallHangupEvent:
 				case CallEvent.GroupCallHangupEvent:
+					// 挂断
 					updateCallInfo({ ...callInfo, evrntInfo: data })
-					updateStatus(CallStatus.DISCONNECTED)
+					updateStatus(CallStatus.HANGUP)
 					setTimeout(() => {
 						updateStatus(CallStatus.IDLE)
 					}, 3000)
