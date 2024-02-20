@@ -85,6 +85,10 @@ const routes: Router.RouteParameters[] = [
 		asyncComponent: () => import('@/pages/GroupInfo/MemberList')
 	},
 	{
+		path: '/call/',
+		asyncComponent: () => import('@/pages/Call/Call')
+	},
+	{
 		path: '(.*)',
 		component: NotFound
 	}

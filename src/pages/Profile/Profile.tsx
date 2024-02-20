@@ -7,8 +7,9 @@ import { $t } from '@/shared'
 import UserStore from '@/db/user'
 import UserService from '@/api/user'
 import './Profile.scss'
+import { useCallStore } from '@/stores/call'
 
-const Profile: React.FC<RouterProps> = ({ f7route }) => {
+const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const user_id = f7route.params.user_id as string
 
 	const pageRef = useRef<{ el: HTMLDivElement | null }>({ el: null })
@@ -40,6 +41,14 @@ const Profile: React.FC<RouterProps> = ({ f7route }) => {
 		[]
 	)
 
+	// 呼叫
+	// const { call } = useCallStore()
+	const callUser = async () => {
+		// call(userInfo, () => {
+		// 	f7router.navigate('/call/')
+		// })
+	}
+
 	return (
 		<Page ref={pageRef} className="profile-page bg-bgTertiary" noToolbar onPageInit={onPageInit}>
 			<Navbar title={$t('用户信息')} backLink className="bg-bgPrimary hidden-navbar-bg" />
@@ -52,10 +61,10 @@ const Profile: React.FC<RouterProps> = ({ f7route }) => {
 						<div slot="after" className="profile-actions-links">
 							<Link
 								iconF7="chat_bubble_fill"
-								href={`/chats/${f7route.params.id}/?dialog_id=${userInfo?.dialog_id}`}
+								// href={`/chats/${f7route.params.id}/?dialog_id=${userInfo?.dialog_id}`}
 							/>
 							<Link iconF7="camera_fill" />
-							<Link iconF7="phone_fill" />
+							<Link iconF7="phone_fill" onClick={callUser} />
 						</div>
 					</ListItem>
 					<ListItem subtitle={userInfo?.signature} text={userInfo?.email} />
