@@ -26,14 +26,16 @@ import Contact from '@/components/Contact/Contact'
 import Emojis from '@/components/Emojis/Emojis'
 import GroupService from '@/api/group'
 
+
+
 /**
  * 滚动元素到底部
  *
- * @param el			滚动元素
+ * @param element		滚动元素
  * @param isSmooth		是否平滑滚动
  */
-const scroll = (el: HTMLElement, isSmooth: boolean = false) => {
-	el.scrollTo({ top: el.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
+const scroll = (element: HTMLElement, isSmooth: boolean = false) => {
+	element.scrollTo({ top: element.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
 }
 
 type MoreType = 'emojis' | 'more' | ''
@@ -216,28 +218,49 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			const platformName = await platform()
 			if (platformName !== PLATFORM.WEB) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
-					console.log('keyboard will show with height:', info.keyboardHeight)
-					setMoreType('')
-					scroll(contentRef.current!, true)
-					setKeyboardHeight(info.keyboardHeight)
 
-					// 添加输入框
-					toolbarRef.current?.classList.add('keyboard-show')
-					toolbarRef.current!.dataset.height = info.keyboardHeight.toString()
+					console.log('keyboard did show with keyboardWillShow:', info.keyboardHeight)
+					// setMoreType('')
+					// isScrollEnd(info.keyboardHeight) &&  setTimeout(()=>scroll(contentRef.current!, true),100)
+					// setKeyboardHeight(info.keyboardHeight)
+
+					// // 添加输入框
+					// toolbarRef.current?.classList.add('keyboard-show')
+					// toolbarRef.current!.dataset.height = info.keyboardHeight + 'px'
+					// 设置页面高度
+					// document.body.style.height = `calc(100vh - ${info.keyboardHeight}px)`
 				})
 
 				Keyboard.addListener('keyboardDidShow', (info) => {
 					console.log('keyboard did show with height:', info.keyboardHeight)
+					setMoreType('')
+					isScrollEnd(info.keyboardHeight) &&  setTimeout(()=>scroll(contentRef.current!, true),100)
+					setKeyboardHeight(info.keyboardHeight)
+
+					// 添加输入框
+					// toolbarRef.current?.classList.add('keyboard-show')
+					// toolbarRef.current!.dataset.height = info.keyboardHeight + 'px'
+					// toolbarRef.current!.style.transform = `translateY(${info.keyboardHeight}px)`
+					// document.body.style.height = `calc(100vh - ${info.keyboardHeight}px)`
+					toolbarRef.current!.style.transform = `translateY(${info.keyboardHeight}px)`
+					// pageRef.current!.el!.style.height = document.body.style.height
 				})
 
 				Keyboard.addListener('keyboardWillHide', () => {
 					console.log('keyboard will hide')
-					toolbarRef.current?.classList.remove('keyboard-show')
+					// toolbarRef.current?.classList.remove('keyboard-show')
+					// 设置页面高度
+					// document.body.style.height = `100vh`
 				})
 
 				Keyboard.addListener('keyboardDidHide', () => {
 					console.log('keyboard did hide')
-					toolbarRef.current?.classList.remove('keyboard-show')
+					// toolbarRef.current?.classList.remove('keyboard-show')
+					// document.body.style.height = `100vh`
+					toolbarRef.current!.style.transform = `translateY(0px)`
+					// document.body.style.height = `100vh`
+					// toolbarRef.current!.style.transform = `translateY(0px)`
+					// pageRef.current!.el!.style.height = document.body.style.height
 				})
 			}
 
@@ -300,12 +323,12 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const replyMessage = (msg_id: number) => msgStore.all_meesages.find((v) => v?.msg_id === msg_id)
 
 	// 判断是否滚动到底部
-	const isScrollEnd = () =>
-		contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - 100
+	const isScrollEnd = (setp:number = 100) =>
+		contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - setp
 
 	// const [activeStrongButton, setActiveStrongButton] = useState<number>(0)
 	return (
-		<Page noToolbar className="coss_message" onPageInit={onPageInit} ref={pageRef}>
+		<Page noToolbar className="coss_message transition-all" onPageInit={onPageInit} ref={pageRef}>
 			<Navbar
 				title={dialog_name}
 				subtitle="[在线]"

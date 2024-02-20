@@ -3,6 +3,11 @@
 @tailwind utilities;
 @import "./variables.scss";
 
+body {
+    transition: all 0.3s ease-in;
+    background: #f36;
+}
+
 /** 防止消息页显示底部导航栏 */
 .toolbar-hidden {
     display: none;

@@ -87,11 +87,12 @@
 }
 
 .keyboard-show {
-    transform: translateY(-50%);
+    // transform: translateY(-50%);
     transition: transform 0.3s;
+    // transform: translateY(-attr(data-height));
 }
 
 .keyboard-hide  {
-    transform: translateY(0%);
+    transform: translateY(317px);
     transition: transform 0.3s;
 }
