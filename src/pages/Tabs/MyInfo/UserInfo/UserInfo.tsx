@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { f7, Page, Navbar, List, ListItem, Button, Block } from 'framework7-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useClipboard } from '@reactuses/core'

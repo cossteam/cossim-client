@@ -18,7 +18,7 @@ const Call: React.FC<RouterProps> = ({ f7router }) => {
 	return (
 		<Page noNavbar noToolbar>
 			{status}
-			{status === CallStatus.CONNECTED && (
+			{status === CallStatus.WAITING && (
 				<>
 					<Button
 						raised
@@ -45,7 +45,7 @@ const Call: React.FC<RouterProps> = ({ f7router }) => {
 					</Button>
 				</>
 			)}
-			{[CallStatus.CALLING, CallStatus.CONNECTED].includes(status) && (
+			{[CallStatus.CALLING, CallStatus.CALLING].includes(status) && (
 				<Button
 					raised
 					fill

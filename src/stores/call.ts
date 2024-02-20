@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { CallStatus, CallType } from '@/shared'
-import { createLiveUserApi, createLiveGroupApi } from '@/api/call'
+import { createLiveUserApi, createLiveGroupApi, joinLiveUserApi, joinLiveGroupApi } from '@/api/call'
 
 // interface CreateRoomParams {
 // 	user_id: 0
@@ -51,7 +51,7 @@ interface CallStore {
 
 export const useCallStore = create<CallStore>((set) => ({
 	callInfo: null,
-	status: CallStatus.DISCONNECTED,
+	status: CallStatus.IDLE,
 	type: CallType.AUDIO,
 	enablesVideo: true,
 	updateCallInfo: (callInfo: any) => {
@@ -68,44 +68,47 @@ export const useCallStore = create<CallStore>((set) => ({
 	},
 	call: async (callInfo, callback?: () => void) => {
 		set({ callInfo })
-		set({ status: CallStatus.CALLING })
-		callback && callback()
-		set({ status: CallStatus.CONNECTED })
-		const isUser = callInfo?.userInfo?.user_id
-		const callApi = isUser ? createLiveUserApi : createLiveGroupApi
-		const createRoomParams = {
-			[isUser ? 'user_id' : 'group_id']: isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
+		set({ status: CallStatus.WAITING })
+
+		try {
+			// 回调
+			callback && callback()
+			// 创建通话
+			const isUser = callInfo?.userInfo?.user_id
+			const callApi = isUser ? createLiveUserApi : createLiveGroupApi
+			const createRoomParams = {
+				[isUser ? 'user_id' : 'group_id']: isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
+			}
+			!isUser && (createRoomParams['member'] = callInfo?.groupInfo?.member || [])
+			// createRoomParams['option'] = {
+			// 	audio_enabled: true,
+			// 	codec: 'vp8',
+			// 	frame_rate: 0,
+			// 	resolution: '1280x720',
+			// 	video_enabled: true
+			// }
+			await callApi(createRoomParams)
+			// 加入通话
+			isUser ? await joinLiveUserApi({}) : await joinLiveGroupApi({})
+		} catch (error) {
+			console.log(error)
+			// 修改状态
+			set({ status: CallStatus.IDLE })
 		}
-		!isUser && (createRoomParams['member'] = callInfo?.groupInfo?.member || [])
-		// createRoomParams['option'] = {
-		// 	audio_enabled: true,
-		// 	codec: 'vp8',
-		// 	frame_rate: 0,
-		// 	resolution: '1280x720',
-		// 	video_enabled: true
-		// }
-		await callApi(createRoomParams)
-		// try {
-		// } catch (error) {}
-		// 创建通话
-		// ...创建成功
-		// ...创建失败
-		// 加入通话
-		// 接收到 ws 推送 set({ status: CallStatus.CONNECTED })
 	},
 	reject: (callback?: () => void) => {
-		set({ status: CallStatus.REJECTED })
+		set({ status: CallStatus.REFUSE })
 		callback && callback()
 		setTimeout(() => {
 			set({ status: CallStatus.IDLE })
 		})
 	},
 	accept: (callback?: () => void) => {
-		set({ status: CallStatus.CONNECTED })
+		set({ status: CallStatus.CALLING })
 		callback && callback()
 	},
 	hangup: (callback?: () => void) => {
-		set({ status: CallStatus.DISCONNECTED })
+		set({ status: CallStatus.HANGUP })
 		callback && callback()
 		setTimeout(() => {
 			set({ status: CallStatus.IDLE })
