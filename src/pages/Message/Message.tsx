@@ -1,7 +1,7 @@
 import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
 import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Segmented, Subnavbar, f7 } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
-import { useAsyncEffect } from '@reactuses/core'
+import { useAsyncEffect, useClickOutside } from '@reactuses/core'
 import {
 	FaceSmiling,
 	PlusCircle,
@@ -25,8 +25,6 @@ import { useToast } from '@/hooks/useToast'
 import Contact from '@/components/Contact/Contact'
 import Emojis from '@/components/Emojis/Emojis'
 import GroupService from '@/api/group'
-
-
 
 /**
  * 滚动元素到底部
@@ -192,8 +190,11 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	// 表情/更多切换
 	const [moreType, setMoreType] = useState<MoreType>('')
 	const showMore = (type: MoreType) => {
-		if (type === moreType) return setMoreType('')
+		if (type === moreType) {
+			return closeToolBar()
+		}
 		setMoreType(type)
+		setToolbarBottom(0)
 		// 滚动到最底部
 		setTimeout(() => scroll(contentRef.current!, true), 0)
 	}
@@ -203,6 +204,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const [msgType, setMsgType] = useState<number>(MESSAGE_TYPE.TEXT)
 	// 键盘弹起
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(300)
+	// 控制工具栏的显示
+	useClickOutside(toolbarRef, () => closeToolBar())
+
 	useAsyncEffect(
 		async () => {
 			if (!pageRef.current.el) return
@@ -212,37 +216,41 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			await msgStore.initMessage(is_group, dialog_id, receiver_id)
 
 			// 滚动到最底部
-			setTimeout(() => scroll(el!), 50)
+			// setTimeout(() => scroll(el!), 0)
+
+			requestAnimationFrame(() => {
+				// 滚动到最底部
+				setTimeout(() => scroll(contentRef.current!), 0)
+			})
 
 			// 手机端监听键盘
 			const platformName = await platform()
 			if (platformName !== PLATFORM.WEB) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
-
 					console.log('keyboard did show with keyboardWillShow:', info.keyboardHeight)
-					// setMoreType('')
-					// isScrollEnd(info.keyboardHeight) &&  setTimeout(()=>scroll(contentRef.current!, true),100)
-					// setKeyboardHeight(info.keyboardHeight)
-
+					setMoreType('')
+					isScrollEnd() &&  setTimeout(()=>scroll(contentRef.current!, true),100)
+					setKeyboardHeight(info.keyboardHeight)
 					// // 添加输入框
 					// toolbarRef.current?.classList.add('keyboard-show')
 					// toolbarRef.current!.dataset.height = info.keyboardHeight + 'px'
 					// 设置页面高度
 					// document.body.style.height = `calc(100vh - ${info.keyboardHeight}px)`
+					setToolbarBottom(0)
 				})
 
 				Keyboard.addListener('keyboardDidShow', (info) => {
 					console.log('keyboard did show with height:', info.keyboardHeight)
 					setMoreType('')
-					isScrollEnd(info.keyboardHeight) &&  setTimeout(()=>scroll(contentRef.current!, true),100)
-					setKeyboardHeight(info.keyboardHeight)
+					// isScrollEnd(info.keyboardHeight) &&  setTimeout(()=>scroll(contentRef.current!, true),100)
+					// setKeyboardHeight(info.keyboardHeight)
 
 					// 添加输入框
 					// toolbarRef.current?.classList.add('keyboard-show')
 					// toolbarRef.current!.dataset.height = info.keyboardHeight + 'px'
 					// toolbarRef.current!.style.transform = `translateY(${info.keyboardHeight}px)`
 					// document.body.style.height = `calc(100vh - ${info.keyboardHeight}px)`
-					toolbarRef.current!.style.transform = `translateY(${info.keyboardHeight}px)`
+					// toolbarRef.current!.style.transform = `translateY(${info.keyboardHeight}px)`
 					// pageRef.current!.el!.style.height = document.body.style.height
 				})
 
@@ -255,9 +263,10 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 				Keyboard.addListener('keyboardDidHide', () => {
 					console.log('keyboard did hide')
+					setToolbarBottom(-keyboardHeight)
 					// toolbarRef.current?.classList.remove('keyboard-show')
 					// document.body.style.height = `100vh`
-					toolbarRef.current!.style.transform = `translateY(0px)`
+					// toolbarRef.current!.style.transform = `translateY(0px)`
 					// document.body.style.height = `100vh`
 					// toolbarRef.current!.style.transform = `translateY(0px)`
 					// pageRef.current!.el!.style.height = document.body.style.height
@@ -321,9 +330,14 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const isReply = () => selectType === TOOLTIP_TYPE.REPLY
 	const isEdit = () => selectType === TOOLTIP_TYPE.EDIT
 	const replyMessage = (msg_id: number) => msgStore.all_meesages.find((v) => v?.msg_id === msg_id)
+	const setToolbarBottom = (bottom: number) => (toolbarRef.current!.style.bottom = bottom + 'px')
+	const closeToolBar = () => {
+		setMoreType('')
+		setToolbarBottom(-keyboardHeight)
+	}
 
 	// 判断是否滚动到底部
-	const isScrollEnd = (setp:number = 100) =>
+	const isScrollEnd = (setp: number = 100) =>
 		contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - setp
 
 	// const [activeStrongButton, setActiveStrongButton] = useState<number>(0)
@@ -372,7 +386,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				</Subnavbar>
 			</Navbar>
 
-			<Block className="my-0 px-0 pt-5" ref={BlockRef}>
+			<Block className="my-0 px-0 pt-5 pb-16" ref={BlockRef}>
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (
 						<ListItem
@@ -398,9 +412,10 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 			<div
 				className={clsx(
-					'sticky bg-bgPrimary bottom-0 w-full h-auto z-[99] flex flex-col justify-center items-center transition-all duration-300'
+					'fixed bg-bgPrimary bottom-0 w-full h-auto z-[99] flex flex-col justify-center items-center transition-all duration-500 ease-linear'
 				)}
 				ref={toolbarRef}
+				style={{ bottom: -keyboardHeight + 'px' }}
 			>
 				<div className="w-full rounded-2xl flex items-end relative h-full py-2 transition-all duration-300 ease-in">
 					<div className={clsx('w-full', isSelect() ? 'flex' : 'hidden')}>
@@ -443,7 +458,12 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 						>
 							<div className={clsx('flex-1 rounded pl-2 max-w-[calc(100%-150px)]')}>
 								<div className="py-2 bg-bgSecondary rounded w-full">
-									<ToolEditor className="px-4" ref={editorRef} is_group={is_group} />
+									<ToolEditor
+										className="px-4"
+										ref={editorRef}
+										is_group={is_group}
+										focus={() => closeToolBar()}
+									/>
 								</div>
 								{(isReply() || isEdit()) && (
 									<div className="mt-1 bg-bgTertiary relative flex justify-between">
@@ -451,6 +471,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 											className="px-2 py-1 coss_message_editor"
 											defaultValue={selectMsgs[0]?.content}
 											is_group={is_group}
+											focus={() => closeToolBar()}
 										/>
 										<Link
 											className="pr-2"
@@ -477,7 +498,12 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 										<ArrowRightCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
 									</Link>
 								) : (
-									<Link onClick={() => setMsgType(MESSAGE_TYPE.AUDIO)}>
+									<Link
+										onClick={() => {
+											closeToolBar()
+											setMsgType(MESSAGE_TYPE.AUDIO)
+										}}
+									>
 										<MicCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
 									</Link>
 								)}
@@ -485,14 +511,14 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 						</div>
 					</div>
 				</div>
-				{moreType && (
-					<div
-						className={clsx('w-full animate__animated overflow-y-auto')}
-						style={{ height: keyboardHeight + 'px' }}
-					>
-						{moreType === 'emojis' ? <Emojis /> : <div></div>}
-					</div>
-				)}
+				{/* {moreType && ( */}
+				<div
+					className={clsx('w-full animate__animated overflow-hidden')}
+					style={{ height: keyboardHeight + 'px' }}
+				>
+					{moreType === 'emojis' ? <Emojis /> : <div></div>}
+				</div>
+				{/* )} */}
 			</div>
 
 			<Contact completed={setSelect} opened={showSelect} setOpened={setShowSelect} group />

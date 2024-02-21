@@ -13,6 +13,8 @@ interface ToolEditorProps {
 	options?: EngineOptions
 	defaultValue?: string
 	is_group?: boolean
+	focus?: () => void
+	blur?: () => void
 }
 
 // 暴露给父组件的方法类型
@@ -20,14 +22,14 @@ export interface ToolEditorMethods {
 	engine: Engine
 	el: HTMLDivElement
 	focus: () => void
-	isFocus: boolean
+	// isFocus: boolean
 }
 
 const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorProps> = (props, ref) => {
 	const editorRef = useRef<HTMLDivElement | null>(null)
 	const [engine, setEngine] = useState<Engine>()
 	const [, setEditorFocus] = useFocus(editorRef, true)
-	const [isFocus, setIsFocus] = useState(false)
+	// const [isFocus, setIsFocus] = useState(false)
 
 	useEffect(() => {
 		if (!editorRef.current) return
@@ -65,16 +67,16 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 	useImperativeHandle(ref, () => ({
 		engine: engine!,
 		el: editorRef.current!,
-		focus: () => setEditorFocus(true),
-		isFocus
+		focus: () => setEditorFocus(true)
+		// isFocus
 	}))
 
 	return (
 		<div
 			className={clsx('w-full max-h-[150px]  overflow-y-auto text-[1rem]', props.className)}
 			ref={editorRef}
-			onFocus={() => setIsFocus(true)}
-			onBlur={() => setIsFocus(false)}
+			onFocus={props.focus}
+			onBlur={props.blur}
 		/>
 	)
 }

@@ -3,10 +3,10 @@
 @tailwind utilities;
 @import "./variables.scss";
 
-body {
-    transition: all 0.3s ease-in;
-    background: #f36;
-}
+// body {
+//     transition: all 0.3s ease-in;
+//     background: #f36;
+// }
 
 /** 防止消息页显示底部导航栏 */
 .toolbar-hidden {
@@ -17,5 +17,13 @@ body {
 
     & .navbar-bg {
         display: none;
+    }
+}
+
+.read_editor {
+    @apply text-ellipsis overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1 max-w-[300px];
+
+    p {
+        @apply text-ellipsis overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1 max-w-[300px];
     }
 }
