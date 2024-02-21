@@ -82,14 +82,14 @@ export default function Login({ disabled, defaultData }) {
 			if (!fromData.password.trim()) return setPasswordError(errorList.passwordEmpty)
 
 			// 判断是否是新设备
-			const valid = await validDeviceInfo(fromData)
-			if (valid) return setOpened(true)
+			// const valid = await validDeviceInfo(fromData)
+			// if (valid) return setOpened(true)
 			// f7.dialog.alert(errorList.deviceError)
 
 			// loading
 			setLoading(true)
 			// 登录
-			let decryptedData = await loginApi(fromData)
+			let decryptedData = await loginApi({ ...fromData, driver_id: '11' })
 
 			// 无论登录成功与否都需要关闭 loading
 			if (decryptedData) setLoading(false)
