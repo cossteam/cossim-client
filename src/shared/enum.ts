@@ -157,6 +157,23 @@ export enum CallStatus {
 	HANGUP = 5
 }
 
+export function getStatusDescription(status: CallStatus) {
+	switch (status) {
+		case CallStatus.IDLE:
+			return '空闲中'
+		case CallStatus.BUSY:
+			return '占线中'
+		case CallStatus.WAITING:
+			return '等待中'
+		case CallStatus.REFUSE:
+			return '已拒绝'
+		case CallStatus.CALLING:
+			return '通话中'
+		case CallStatus.HANGUP:
+			return '已挂断'
+	}
+}
+
 export enum CallType {
 	/** 视频通话 */
 	VIDEO = 1,

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage, devtools } from 'zustand/middleware'
 import { CallStatus, CallType } from '@/shared'
-import { createLiveUserApi, createLiveGroupApi, joinLiveUserApi, joinLiveGroupApi } from '@/api/call'
+import CallService from '@/api/call'
 
 // interface CreateRoomParams {
 // 	user_id: 0
@@ -33,23 +34,16 @@ interface CallStore {
 	/** 使能通话视频 */
 	updateEnablesVideo: (enablesVideo: boolean) => void
 	/** 呼叫（呼叫方） */
-	call: (
-		callInfo: {
-			userInfo?: any
-			groupInfo?: any
-			eventInfo?: any
-		},
-		callback?: () => void
-	) => void
+	call: (callInfo: { userInfo?: any; groupInfo?: any; eventInfo?: any }) => Promise<void>
 	/** 拒绝（接收方） */
-	reject: (callback?: () => void) => void
+	reject: () => Promise<void>
 	/** 接通（接收方） */
-	accept: (callback?: () => void) => void
+	accept: () => Promise<void>
 	/** 挂断（呼叫方、接收方） */
-	hangup: (callback?: () => void) => void
+	hangup: () => Promise<void>
 }
 
-export const useCallStore = create<CallStore>((set) => ({
+export const callStore = (set: any, get: any): CallStore => ({
 	callInfo: null,
 	status: CallStatus.IDLE,
 	type: CallType.AUDIO,
@@ -66,16 +60,12 @@ export const useCallStore = create<CallStore>((set) => ({
 	updateEnablesVideo: (enablesVideo: boolean) => {
 		set({ enablesVideo })
 	},
-	call: async (callInfo, callback?: () => void) => {
-		set({ callInfo })
-		set({ status: CallStatus.WAITING })
-
+	call: async (callInfo) => {
 		try {
-			// 回调
-			callback && callback()
+			set({ callInfo })
+			set({ status: CallStatus.WAITING })
 			// 创建通话
 			const isUser = callInfo?.userInfo?.user_id
-			const callApi = isUser ? createLiveUserApi : createLiveGroupApi
 			const createRoomParams = {
 				[isUser ? 'user_id' : 'group_id']: isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
 			}
@@ -87,31 +77,103 @@ export const useCallStore = create<CallStore>((set) => ({
 			// 	resolution: '1280x720',
 			// 	video_enabled: true
 			// }
-			await callApi(createRoomParams)
+			const createResp = isUser
+				? await CallService.createLiveUserApi(createRoomParams)
+				: await CallService.createLiveGroupApi(createRoomParams)
+			if (createResp.code !== 200) {
+				createResp.code === 400 && set({ status: CallStatus.CALLING })
+				return Promise.reject({
+					...createResp,
+					message: createResp.msg
+				})
+			}
 			// 加入通话
-			isUser ? await joinLiveUserApi({}) : await joinLiveGroupApi({})
+			const joinResp = isUser ? await CallService.joinLiveUserApi({}) : await CallService.joinLiveGroupApi({})
+			if (joinResp.code !== 200) {
+				return Promise.reject({
+					...joinResp,
+					message: joinResp.msg
+				})
+			}
+			set({ callInfo: { ...callInfo, wsInfo: joinResp.data } }) // 更新通话信息
+			set({ status: CallStatus.CALLING })
+			return Promise.resolve(joinResp.data)
 		} catch (error) {
-			console.log(error)
-			// 修改状态
-			set({ status: CallStatus.IDLE })
+			return Promise.reject(error)
 		}
 	},
-	reject: (callback?: () => void) => {
-		set({ status: CallStatus.REFUSE })
-		callback && callback()
-		setTimeout(() => {
-			set({ status: CallStatus.IDLE })
-		})
+	reject: async () => {
+		try {
+			const { callInfo } = get()
+			const isUser = callInfo?.userInfo?.user_id
+			console.log(isUser)
+			const rejectResp = isUser ? await CallService.rejectLiveUserApi() : await CallService.rejectLiveGroupApi()
+			if (rejectResp.code !== 200) {
+				return Promise.reject({
+					...rejectResp,
+					message: rejectResp.msg
+				})
+			}
+			set({ status: CallStatus.REFUSE })
+			return Promise.resolve()
+		} catch (error: any) {
+			return Promise.resolve(error)
+		} finally {
+			setTimeout(() => {
+				set({ callInfo: null })
+				set({ status: CallStatus.IDLE })
+			}, 2000)
+		}
 	},
-	accept: (callback?: () => void) => {
-		set({ status: CallStatus.CALLING })
-		callback && callback()
+	accept: async () => {
+		try {
+			const { callInfo } = get()
+			const isUser = callInfo?.userInfo?.user_id
+			console.log(isUser)
+			const joinResp = isUser ? await CallService.joinLiveUserApi({}) : await CallService.joinLiveGroupApi({})
+			if (joinResp.code !== 200) {
+				return Promise.reject({
+					...joinResp,
+					message: joinResp.msg
+				})
+			}
+			set({ callInfo: { ...callInfo, wsInfo: joinResp.data } }) // 更新通话信息
+			set({ status: CallStatus.CALLING })
+			return Promise.resolve(joinResp.data)
+		} catch (error: any) {
+			return Promise.resolve(error)
+		}
 	},
-	hangup: (callback?: () => void) => {
-		set({ status: CallStatus.HANGUP })
-		callback && callback()
-		setTimeout(() => {
-			set({ status: CallStatus.IDLE })
-		})
+	hangup: async () => {
+		try {
+			const { callInfo } = get()
+			const isUser = callInfo?.userInfo?.user_id
+			console.log(isUser)
+			const leaveResp = isUser ? await CallService.leaveLiveUserApi() : await CallService.leaveLiveGroupApi()
+			if (leaveResp.code !== 200) {
+				return Promise.reject({
+					...leaveResp,
+					message: leaveResp.msg
+				})
+			}
+			set({ status: CallStatus.HANGUP })
+			return Promise.resolve()
+		} catch (error: any) {
+			return Promise.resolve(error)
+		} finally {
+			setTimeout(() => {
+				set({ callInfo: null })
+				set({ status: CallStatus.IDLE })
+			}, 2000)
+		}
 	}
-}))
+})
+
+export const useCallStore = create(
+	devtools(
+		persist(callStore, {
+			name: 'callStore-storage',
+			storage: createJSONStorage(() => localStorage)
+		})
+	)
+)

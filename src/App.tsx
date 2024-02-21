@@ -39,7 +39,7 @@ function App() {
 		}
 	})
 
-	const { callInfo, updateCallInfo, updateStatus } = useCallStore()
+	const { status: callStatus, callInfo, updateCallInfo, updateStatus } = useCallStore()
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -71,26 +71,64 @@ function App() {
 				case CallEvent.UserCallReqEvent:
 				case CallEvent.GroupCallReqEvent:
 					// 来电
-					updateCallInfo({ ...callInfo, evrntInfo: data })
-					updateStatus(CallStatus.WAITING)
+					{
+						const newCallInfo = { ...callInfo, evrntInfo: data }
+						console.log('来电', data)
+
+						if (event === CallEvent.UserCallReqEvent) {
+							newCallInfo['userInfo'] = {
+								user_id: data?.data?.sender_id
+							}
+						} else {
+							newCallInfo['groupInfo'] = {
+								group_id: data?.data?.sender_id
+							}
+						}
+						updateCallInfo(newCallInfo)
+						updateStatus(CallStatus.WAITING)
+					}
 					break
 				case CallEvent.UserCallRejectEvent:
 				case CallEvent.GroupCallRejectEvent:
 					// 拒绝
-					updateCallInfo({ ...callInfo, evrntInfo: data })
-					updateStatus(CallStatus.REFUSE)
-					setTimeout(() => {
-						updateStatus(CallStatus.IDLE)
-					}, 3000)
+					{
+						const newCallInfo = { ...callInfo, evrntInfo: data }
+						if (event === CallEvent.UserCallReqEvent) {
+							newCallInfo['userInfo'] = {
+								user_id: data?.data?.sender_id
+							}
+						} else {
+							newCallInfo['groupInfo'] = {
+								group_id: data?.data?.sender_id
+							}
+						}
+						updateCallInfo(newCallInfo)
+						updateStatus(CallStatus.REFUSE)
+						setTimeout(() => {
+							updateStatus(CallStatus.IDLE)
+						}, 3000)
+					}
 					break
 				case CallEvent.UserCallHangupEvent:
 				case CallEvent.GroupCallHangupEvent:
 					// 挂断
-					updateCallInfo({ ...callInfo, evrntInfo: data })
-					updateStatus(CallStatus.HANGUP)
-					setTimeout(() => {
-						updateStatus(CallStatus.IDLE)
-					}, 3000)
+					{
+						const newCallInfo = { ...callInfo, evrntInfo: data }
+						if (event === CallEvent.UserCallReqEvent) {
+							newCallInfo['userInfo'] = {
+								user_id: data?.data?.sender_id
+							}
+						} else {
+							newCallInfo['groupInfo'] = {
+								group_id: data?.data?.sender_id
+							}
+						}
+						updateCallInfo(newCallInfo)
+						updateStatus(CallStatus.HANGUP)
+						setTimeout(() => {
+							updateStatus(CallStatus.IDLE)
+						}, 3000)
+					}
 					break
 			}
 		}
@@ -108,7 +146,14 @@ function App() {
 
 	return (
 		<AppComponent {...f7params}>
-			{hasCookie(TOKEN) ? <Layout /> : <View url="/auth/" id="view-auth" name="auth" />}
+			{hasCookie(TOKEN) ? (
+				<>
+					{callStatus !== CallStatus.IDLE && <View url="/call/" id="view-call" name="call" />}
+					<Layout />
+				</>
+			) : (
+				<View url="/auth/" id="view-auth" name="auth" />
+			)}
 		</AppComponent>
 	)
 }

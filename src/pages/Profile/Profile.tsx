@@ -1,4 +1,4 @@
-import { Link, List, ListButton, ListItem, Navbar, Page, Toggle } from 'framework7-react'
+import { Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react'
 import { useRef, useState } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
 import { isEqual } from 'lodash-es'
@@ -10,7 +10,7 @@ import './Profile.scss'
 import { useCallStore } from '@/stores/call'
 // import { useCallStore } from '@/stores/call'
 
-const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
+const Profile: React.FC<RouterProps> = ({ f7route }) => {
 	const user_id = f7route.params.user_id as string
 
 	const pageRef = useRef<{ el: HTMLDivElement | null }>({ el: null })
@@ -45,9 +45,15 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	// 呼叫
 	const { call } = useCallStore()
 	const callUser = async () => {
-		call({ userInfo }, () => {
-			f7router.navigate('/call/')
-		})
+		try {
+			f7.dialog.preloader($t('呼叫中...'))
+			await call({ userInfo })
+		} catch (error: any) {
+			f7.dialog.alert($t(error?.message || '呼叫失败...'))
+		} finally {
+			// f7router.navigate('/call/')
+			f7.dialog.close()
+		}
 	}
 
 	return (
