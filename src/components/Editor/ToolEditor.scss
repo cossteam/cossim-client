@@ -11,6 +11,10 @@
     }
 }
 
+[data-placeholder]:focus {
+    content: none;
+}
+
 // .aomao-editor.am-engine .data-mention-component,
 // .aomao-editor.am-engine-view .data-mention-component {
 //     color: #84ff18 !important;

@@ -1,0 +1,32 @@
+.custom-editor {
+    padding: 0 0.5rem;
+    font-size: 1rem;
+
+    &[data-placeholder]:empty:before {
+        content: attr(data-placeholder);
+        color: gray;
+        font-size: 14px;
+    }
+
+    &[data-placeholder]:focus {
+        content: none;
+    }
+
+    &:focus-visible {
+        outline: none;
+    }
+
+    img {
+        float: left;
+    }
+}
+
+.tooltips {
+    position: fixed;
+    z-index: 99999;
+    background: var(--coss-primary-background);
+    color: var(--coss-text-primary);
+    top: 50%;
+    width: 300px;
+    height: 40px;
+}
