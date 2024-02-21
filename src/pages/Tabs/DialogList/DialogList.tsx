@@ -110,7 +110,7 @@ const DialogList: React.FC<RouterProps> = () => {
 						/>
 						<div slot="text" className="max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
 							{/* {item?.last_message?.content} */}
-							<ToolEditor defaultValue={item?.last_message?.content} readonly/>
+							<ToolEditor defaultValue={item?.last_message?.content} readonly className='read_editor'/>
 						</div>
 						<SwipeoutActions right>
 							<SwipeoutButton close overswipe color="blue">

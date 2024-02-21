@@ -4,21 +4,12 @@ import './Emojis.scss'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 
-const Emojis = () => {
-	// const [showImgEmojis, setShowImgEmojis] = useState(false)
-	// const [width, setWidth] = useState<number>(375)
+interface EmojisProps {
+	onSelectEmojis: (emojis: any) => void
+}
 
-	// // const onClickEmoji = (type, emoji) => {
-	// // 	onEmojiSelect({
-	// // 		type,
-	// // 		emoji
-	// // 	})
-	// // }
+const Emojis: React.FC<EmojisProps> = (props) => {
 
-	// useEffect(() => {
-	// 	const width = window.innerWidth
-	// 	setWidth(width)
-	// }, [])
 
 	return (
 		<div className="emojis" onClick={(e) => e.stopPropagation()}>
@@ -26,7 +17,7 @@ const Emojis = () => {
 				<div className="w-full" onClick={(e) => e.stopPropagation()}>
 					<Picker
 						data={data}
-						onEmojiSelect={console.log}
+						onEmojiSelect={(emojis:any)=>props.onSelectEmojis(emojis)}
 						dynamicWidth={true}
 						locale="zh"
 						previewPosition="none"

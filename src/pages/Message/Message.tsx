@@ -1,7 +1,7 @@
 import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
 import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Segmented, Subnavbar, f7 } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
-import { useAsyncEffect } from '@reactuses/core'
+import { useAsyncEffect, useClickOutside } from '@reactuses/core'
 import {
 	FaceSmiling,
 	PlusCircle,
@@ -16,9 +16,16 @@ import { useClipboard } from '@reactuses/core'
 
 import './message.scss'
 import { useMessageStore } from '@/stores/message'
-import { $t, PLATFORM, TOOLTIP_TYPE, MESSAGE_TYPE, moveCursorToEnd, isMe } from '@/shared'
+import {
+	$t,
+	PLATFORM,
+	TOOLTIP_TYPE,
+	MESSAGE_TYPE,
+	isMe
+	// insertElement
+} from '@/shared'
 import Chat from '@/components/Message/Chat'
-import ToolEditor, { ToolEditorMethods } from '@/components/Editor/ToolEditor'
+// import ToolEditor } from '@/components/Editor/ToolEditor'
 import { platform } from '@/utils'
 import clsx from 'clsx'
 import { useToast } from '@/hooks/useToast'
@@ -26,7 +33,7 @@ import Contact from '@/components/Contact/Contact'
 import Emojis from '@/components/Emojis/Emojis'
 import GroupService from '@/api/group'
 
-
+import ToolEditor, { ToolEditorMethods as TT } from '@/Editor'
 
 /**
  * 滚动元素到底部
@@ -43,7 +50,7 @@ type MoreType = 'emojis' | 'more' | ''
 const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
 	const contentRef = useRef<HTMLElement | null>(null)
-	const editorRef = useRef<ToolEditorMethods>(null)
+	const editorRef = useRef<TT>(null)
 
 	// 主要用于计算内容区域高度
 	const navbarRef = useRef<{ el: HTMLDivElement | null }>({ el: null })
@@ -79,8 +86,6 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		type !== TOOLTIP_TYPE.SELECT && setSelectMsgs([msg])
 		setSelectType(type)
 
-		console.log('msg', msg, messages, msgStore.all_meesages, msg_id)
-
 		switch (type) {
 			case TOOLTIP_TYPE.COPY:
 				selectEvent.copy(msg?.content || '')
@@ -89,9 +94,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				setShowSelect(true)
 				break
 			case TOOLTIP_TYPE.EDIT:
-				editorRef.current?.engine.setValue(msg?.content || '')
-				editorRef.current?.focus()
-				moveCursorToEnd(editorRef.current!.el)
+				// editorRef.current?.engine.setValue(msg?.content || '')
+				editorRef.current?.engine.insertElement(msg?.content || '', { isFocus: true })
+				// editorRef.current?.focus()
 				break
 			case TOOLTIP_TYPE.DELETE:
 				f7.dialog.confirm($t('确认删除消息？'), () => {
@@ -169,7 +174,6 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			setSelectMsgs([])
 		}
 	}
-
 	// 多选时选择的消息
 	const onSelectChange = (e: any, msg: any) => {
 		const checked = e.target.checked || false
@@ -177,7 +181,6 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			? setSelectMsgs([...selectMsgs, msg])
 			: setSelectMsgs(selectMsgs.filter((v) => v?.msg_id !== msg?.msg_id))
 	}
-
 	// 转发逻辑
 	useAsyncEffect(
 		async () => {
@@ -191,11 +194,29 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 	// 表情/更多切换
 	const [moreType, setMoreType] = useState<MoreType>('')
+	const moreRef = useRef<HTMLDivElement | null>(null)
 	const showMore = (type: MoreType) => {
-		if (type === moreType) return setMoreType('')
+		console.log('type', type)
+		const isWeb = platformName === 'web'
+		const isEnd = isScrollEnd()
+
+		if (type === moreType && isWeb) {
+			setMoreType('')
+			setToolbarBottom(-keyboardHeight)
+			isWeb && (BlockRef.current.el!.style.paddingBottom = 56 + 'px')
+			return
+		}
+		!isWeb ? Keyboard?.hide() : setToolbarBottom(0)
+
 		setMoreType(type)
+
 		// 滚动到最底部
-		setTimeout(() => scroll(contentRef.current!, true), 0)
+		BlockRef.current.el!.style.paddingBottom = keyboardHeight + 56 + 'px'
+
+		requestAnimationFrame(() => {
+			console.log('isScrollEnd()', isScrollEnd())
+			isEnd && scroll(contentRef.current!, true)
+		})
 	}
 
 	// 键盘和元素滚动
@@ -203,6 +224,13 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const [msgType, setMsgType] = useState<number>(MESSAGE_TYPE.TEXT)
 	// 键盘弹起
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(300)
+	// 控制工具栏的显示
+	useClickOutside(toolbarRef, () => closeToolBar())
+	// 设备信息
+	const [platformName, setPlatformName] = useState<string>('web')
+	// 键盘显示
+	// const [keyboardShow, setKeyboardShow] = useState<boolean>(false)
+
 	useAsyncEffect(
 		async () => {
 			if (!pageRef.current.el) return
@@ -211,56 +239,37 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 			await msgStore.initMessage(is_group, dialog_id, receiver_id)
 
-			// 滚动到最底部
-			setTimeout(() => scroll(el!), 50)
+			requestAnimationFrame(() => {
+				// 滚动到最底部
+				setTimeout(() => scroll(contentRef.current!), 0)
+			})
 
 			// 手机端监听键盘
 			const platformName = await platform()
+			setPlatformName(platformName)
 			if (platformName !== PLATFORM.WEB) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
-
-					console.log('keyboard did show with keyboardWillShow:', info.keyboardHeight)
-					// setMoreType('')
-					// isScrollEnd(info.keyboardHeight) &&  setTimeout(()=>scroll(contentRef.current!, true),100)
-					// setKeyboardHeight(info.keyboardHeight)
-
-					// // 添加输入框
-					// toolbarRef.current?.classList.add('keyboard-show')
-					// toolbarRef.current!.dataset.height = info.keyboardHeight + 'px'
-					// 设置页面高度
-					// document.body.style.height = `calc(100vh - ${info.keyboardHeight}px)`
-				})
-
-				Keyboard.addListener('keyboardDidShow', (info) => {
-					console.log('keyboard did show with height:', info.keyboardHeight)
+					setKeyboardHeight(info.keyboardHeight - 15)
 					setMoreType('')
-					isScrollEnd(info.keyboardHeight) &&  setTimeout(()=>scroll(contentRef.current!, true),100)
-					setKeyboardHeight(info.keyboardHeight)
-
-					// 添加输入框
-					// toolbarRef.current?.classList.add('keyboard-show')
-					// toolbarRef.current!.dataset.height = info.keyboardHeight + 'px'
-					// toolbarRef.current!.style.transform = `translateY(${info.keyboardHeight}px)`
-					// document.body.style.height = `calc(100vh - ${info.keyboardHeight}px)`
-					toolbarRef.current!.style.transform = `translateY(${info.keyboardHeight}px)`
-					// pageRef.current!.el!.style.height = document.body.style.height
+					setToolbarBottom(-keyboardHeight)
+					requestAnimationFrame(() => {
+						Keyboard.show()
+					})
 				})
-
-				Keyboard.addListener('keyboardWillHide', () => {
-					console.log('keyboard will hide')
-					// toolbarRef.current?.classList.remove('keyboard-show')
-					// 设置页面高度
-					// document.body.style.height = `100vh`
+				Keyboard.addListener('keyboardDidShow', () => {
+					setToolbarBottom(-keyboardHeight)
 				})
-
 				Keyboard.addListener('keyboardDidHide', () => {
-					console.log('keyboard did hide')
-					// toolbarRef.current?.classList.remove('keyboard-show')
-					// document.body.style.height = `100vh`
-					toolbarRef.current!.style.transform = `translateY(0px)`
-					// document.body.style.height = `100vh`
-					// toolbarRef.current!.style.transform = `translateY(0px)`
-					// pageRef.current!.el!.style.height = document.body.style.height
+					if (!moreType) {
+						requestAnimationFrame(() => {
+							setTimeout(() => {
+								setToolbarBottom(0)
+							}, 0)
+						})
+					} else {
+						setToolbarBottom(0)
+					}
+					BlockRef.current.el!.style.paddingBottom = 56 + 'px'
 				})
 			}
 
@@ -274,7 +283,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 			const engine = editorRef.current!.engine
 
-			engine.on('change', () => setShowBtn(!engine.isEmpty()))
+			engine.on('input', () => setShowBtn(!engine.isEmpty()))
 			// @ 功能
 			engine.on('mention:default', () => {
 				const newMembers = members.map((v: any) => {
@@ -298,8 +307,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const sendMessage = async () => {
 		const isEnd = isScrollEnd()
 		const engine = editorRef.current!.engine
-		const content = engine.model.toValue()
-		engine.setValue('')
+		const content = engine.toValue()
+		engine.clear()
 		selectType === TOOLTIP_TYPE.EDIT
 			? msgStore.editMessage(selectMsgs[0], content)
 			: msgStore.sendMessage(msgType, content, { replay_id: isReply() ? selectMsgs[0]?.msg_id : 0 })
@@ -316,17 +325,44 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		}
 	}, [messages])
 
+	// 选择表情
+	const onSelectEmojis = (emojis: any) => {
+		// insertElement(emojis.native)
+		editorRef.current!.engine.insertElement(emojis.native)
+		// const img = `<img src="https://cdn.framework7.io/placeholder/nature-1000x600-3.jpg" />`
+		// const script = `<script>console.log("注入");</script>`
+		// editorRef.current!.engine.range.insertElement(script,'script')
+	}
+
 	// 辅助函数
 	const isSelect = () => selectType === TOOLTIP_TYPE.SELECT
 	const isReply = () => selectType === TOOLTIP_TYPE.REPLY
 	const isEdit = () => selectType === TOOLTIP_TYPE.EDIT
 	const replyMessage = (msg_id: number) => msgStore.all_meesages.find((v) => v?.msg_id === msg_id)
+	const setToolbarBottom = (bottom: number) => (toolbarRef.current!.style.bottom = bottom + 'px')
+	// const setMoreTop = (top: number) => (moreRef.current!.style.top = top + 'px')
+
+	// 关闭更多功能
+	const closeToolBar = () => {
+		setMoreType('')
+		platformName === 'web' && setToolbarBottom(-keyboardHeight)
+	}
+
+	//  键盘显示
+	// const focus = () => {
+	// 	// setKeyboardShow(true)
+	// 	//  closeToolBar()
+	// }
+
+	// 键盘隐藏
+	// const blur = () => {
+	// 	// setKeyboardShow(false)
+	// }
 
 	// 判断是否滚动到底部
-	const isScrollEnd = (setp:number = 100) =>
+	const isScrollEnd = (setp: number = 100) =>
 		contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - setp
 
-	// const [activeStrongButton, setActiveStrongButton] = useState<number>(0)
 	return (
 		<Page noToolbar className="coss_message transition-all" onPageInit={onPageInit} ref={pageRef}>
 			<Navbar
@@ -372,7 +408,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				</Subnavbar>
 			</Navbar>
 
-			<Block className="my-0 px-0 pt-5" ref={BlockRef}>
+			<Block className="my-0 px-0 pt-5 pb-16" ref={BlockRef}>
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (
 						<ListItem
@@ -398,101 +434,124 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 			<div
 				className={clsx(
-					'sticky bg-bgPrimary bottom-0 w-full h-auto z-[99] flex flex-col justify-center items-center transition-all duration-300'
+					'fixed bg-bgPrimary bottom-0 w-full h-auto z-[99]  transition-all duration-300 ease-in'
 				)}
 				ref={toolbarRef}
+				style={{ bottom: -keyboardHeight + 'px' }}
 			>
-				<div className="w-full rounded-2xl flex items-end relative h-full py-2 transition-all duration-300 ease-in">
-					<div className={clsx('w-full', isSelect() ? 'flex' : 'hidden')}>
-						<div className="w-full flex bg-bgPrimary">
-							<Link
-								className="flex flex-col flex-1 items-center justify-center"
-								onClick={() => setShowSelect(true)}
-							>
-								<ArrowUpRight className="text-xl mb-1" />
-								<span className="text-[0.75rem]">{$t('转发')}</span>
-							</Link>
-							<Link
-								className="flex flex-col flex-1 items-center justify-center"
-								onClick={selectEvent.delete}
-							>
-								<Trash className="text-xl mb-1" />
-								<span className="text-[0.75rem]">{$t('删除')}</span>
-							</Link>
-						</div>
-					</div>
-
-					<div className={clsx('w-full', !isSelect() ? 'flex' : 'hidden')}>
-						<div className={clsx('flex-1 px-2 flex', msgType === MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden')}>
-							<Link onClick={() => setMsgType(MESSAGE_TYPE.TEXT)}>
-								<Xmark className="text-3xl text-gray-500 animate__animated animate__zoomIn" />
-							</Link>
-							<Button fill className="w-full h-9 mx-2 animate__animated animate__zoomIn" round>
-								{$t('长按说话')}
-							</Button>
-							<Link onClick={() => showMore('more')}>
-								<PlusCircle className="text-4xl text-gray-500 mr-2" />
-							</Link>
-						</div>
-
-						<div
-							className={clsx(
-								'w-full flex items-end',
-								msgType !== MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden'
-							)}
-						>
-							<div className={clsx('flex-1 rounded pl-2 max-w-[calc(100%-150px)]')}>
-								<div className="py-2 bg-bgSecondary rounded w-full">
-									<ToolEditor className="px-4" ref={editorRef} is_group={is_group} />
-								</div>
-								{(isReply() || isEdit()) && (
-									<div className="mt-1 bg-bgTertiary relative flex justify-between">
-										<ToolEditor
-											className="px-2 py-1 coss_message_editor"
-											defaultValue={selectMsgs[0]?.content}
-											is_group={is_group}
-										/>
-										<Link
-											className="pr-2"
-											onClick={() => {
-												setSelectType(TOOLTIP_TYPE.NONE)
-												editorRef.current?.engine.setValue('')
-											}}
-										>
-											<XmarkCircle className="text-textTertiary" />
-										</Link>
-									</div>
-								)}
-							</div>
-							<div className="flex items-center px-2 w-[150px]">
-								<Link onClick={() => showMore('emojis')}>
-									<FaceSmiling className="text-4xl text-gray-500 mr-2" />
+				<div className="flex flex-col justify-center items-center">
+					<div className="w-full rounded-2xl flex items-end relative h-full py-2 transition-all duration-300 ease-in">
+						<div className={clsx('w-full', isSelect() ? 'flex' : 'hidden')}>
+							<div className="w-full flex bg-bgPrimary">
+								<Link
+									className="flex flex-col flex-1 items-center justify-center"
+									onClick={() => setShowSelect(true)}
+								>
+									<ArrowUpRight className="text-xl mb-1" />
+									<span className="text-[0.75rem]">{$t('转发')}</span>
 								</Link>
+								<Link
+									className="flex flex-col flex-1 items-center justify-center"
+									onClick={selectEvent.delete}
+								>
+									<Trash className="text-xl mb-1" />
+									<span className="text-[0.75rem]">{$t('删除')}</span>
+								</Link>
+							</div>
+						</div>
+
+						<div className={clsx('w-full', !isSelect() ? 'flex' : 'hidden')}>
+							<div
+								className={clsx('flex-1 px-2 flex', msgType === MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden')}
+							>
+								<Link onClick={() => setMsgType(MESSAGE_TYPE.TEXT)}>
+									<Xmark className="text-3xl text-gray-500 animate__animated animate__zoomIn" />
+								</Link>
+								<Button fill className="w-full h-9 mx-2 animate__animated animate__zoomIn" round>
+									{$t('长按说话')}
+								</Button>
 								<Link onClick={() => showMore('more')}>
 									<PlusCircle className="text-4xl text-gray-500 mr-2" />
 								</Link>
+							</div>
 
-								{showBtn ? (
-									<Link onClick={sendMessage}>
-										<ArrowRightCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
-									</Link>
-								) : (
-									<Link onClick={() => setMsgType(MESSAGE_TYPE.AUDIO)}>
-										<MicCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
-									</Link>
+							<div
+								className={clsx(
+									'w-full flex items-end',
+									msgType !== MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden'
 								)}
+							>
+								<div className={clsx('flex-1 rounded pl-2 max-w-[calc(100%-150px)]')}>
+									<div className="py-2 bg-bgSecondary rounded w-full">
+										{/* <ToolEditor
+											className="px-4"
+											ref={editorRef}
+											is_group={is_group}
+											focus={focus}
+											blur={blur}
+										/> */}
+										<ToolEditor ref={editorRef} readonly={false}/>
+									</div>
+									{(isReply() || isEdit()) && (
+										<div className="mt-1 bg-bgTertiary relative flex justify-between">
+											{/* <ToolEditor
+												className="px-2 py-1 coss_message_editor"
+												defaultValue={selectMsgs[0]?.content}
+												is_group={is_group}
+												focus={focus}
+												blur={blur}
+											/> */}
+
+											<ToolEditor initValue={selectMsgs[0]?.content} />
+											<Link
+												className="pr-2"
+												onClick={() => {
+													setSelectType(TOOLTIP_TYPE.NONE)
+													// editorRef.current?.engine.setValue('')
+													editorRef.current?.engine.clear()
+												}}
+											>
+												<XmarkCircle className="text-textTertiary" />
+											</Link>
+										</div>
+									)}
+								</div>
+								<div className="flex items-center px-2 w-[150px]">
+									<Link onClick={() => showMore('emojis')}>
+										<FaceSmiling className="text-4xl text-gray-500 mr-2" />
+									</Link>
+									<Link onClick={() => showMore('more')}>
+										<PlusCircle className="text-4xl text-gray-500 mr-2" />
+									</Link>
+
+									{showBtn ? (
+										<Link onClick={sendMessage}>
+											<ArrowRightCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
+										</Link>
+									) : (
+										<Link
+											onClick={() => {
+												closeToolBar()
+												setMsgType(MESSAGE_TYPE.AUDIO)
+											}}
+										>
+											<MicCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
+										</Link>
+									)}
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-				{moreType && (
+					{/* {moreType && ( */}
 					<div
-						className={clsx('w-full animate__animated overflow-y-auto')}
+						className={clsx('w-full animate__animated overflow-hidden')}
 						style={{ height: keyboardHeight + 'px' }}
+						ref={moreRef}
 					>
-						{moreType === 'emojis' ? <Emojis /> : <div></div>}
+						{moreType === 'emojis' ? <Emojis onSelectEmojis={onSelectEmojis} /> : <div></div>}
 					</div>
-				)}
+					{/* )} */}
+				</div>
 			</div>
 
 			<Contact completed={setSelect} opened={showSelect} setOpened={setShowSelect} group />

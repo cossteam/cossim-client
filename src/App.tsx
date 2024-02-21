@@ -11,16 +11,17 @@ import {
 	SocketClient,
 	handlerRequestSocket,
 	RID,
-	CallEvent,
 	CallStatus,
-	handlerMessageSocket
+	handlerMessageSocket,
+	SocketEvent,
+	handlerLabelSocket
 } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 import { useCallStore } from '@/stores/call'
 import { useMessageStore } from './stores/message'
 
 function App() {
-	const { updateMessage } = useMessageStore()
+	const msgStore = useMessageStore()
 
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
@@ -54,22 +55,20 @@ function App() {
 			const event = data.event
 			console.log('接收到所有 sokect 通知：', data)
 			switch (event) {
-				case 1:
-					console.log('链接成功', data)
-
+				case SocketEvent.OnlineEvent:
 					setCookie(RID, data.rid)
 					break
-				case 3:
-				case 4:
-				case 12:
-					handlerMessageSocket(data, updateMessage)
+				case SocketEvent.PrivateChatsEvent:
+				case SocketEvent.GroupChatsEvent:
+				case SocketEvent.SelfChatsEvent:
+					handlerMessageSocket(data, msgStore.updateMessage)
 					break
-				case 6:
-				case 7:
+				case SocketEvent.ApplyListEvent:
+				case SocketEvent.ApplyAcceptEvent:
 					handlerRequestSocket(data)
 					break
-				case CallEvent.UserCallReqEvent:
-				case CallEvent.GroupCallReqEvent:
+				case SocketEvent.UserCallReqEvent:
+				case SocketEvent.GroupCallReqEvent:
 					// 来电
 					{
 						const newCallInfo = { ...callInfo, evrntInfo: data }
@@ -88,8 +87,8 @@ function App() {
 						updateStatus(CallStatus.WAITING)
 					}
 					break
-				case CallEvent.UserCallRejectEvent:
-				case CallEvent.GroupCallRejectEvent:
+				case SocketEvent.UserCallRejectEvent:
+				case SocketEvent.GroupCallRejectEvent:
 					// 拒绝
 					{
 						const newCallInfo = { ...callInfo, evrntInfo: data }
@@ -109,8 +108,8 @@ function App() {
 						}, 3000)
 					}
 					break
-				case CallEvent.UserCallHangupEvent:
-				case CallEvent.GroupCallHangupEvent:
+				case SocketEvent.UserCallHangupEvent:
+				case SocketEvent.GroupCallHangupEvent:
 					// 挂断
 					{
 						const newCallInfo = { ...callInfo, evrntInfo: data }
@@ -129,6 +128,10 @@ function App() {
 							updateStatus(CallStatus.IDLE)
 						}, 3000)
 					}
+					break
+				case SocketEvent.MessageLabelEvent:
+					console.log('消息标注信息',data)
+					handlerLabelSocket(data,msgStore)
 					break
 			}
 		}

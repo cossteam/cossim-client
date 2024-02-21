@@ -19,7 +19,7 @@ interface ChatProps {
 	reply?: any
 }
 
-const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected, reply}) => {
+const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected, reply }) => {
 	const tooltipRef = useRef<HTMLDivElement | null>(null)
 
 	const is_self = isMe(msg?.sender_id)
@@ -34,7 +34,10 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 	if (msg?.type === MESSAGE_TYPE.LABEL) {
 		return (
 			<div className="max-w-[70%] w-fit bg-gray-200 px-2 py-[2px] text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap text-[0.75rem] rounded mx-auto text-center cursor-pointer active:bg-opacity-50">
-				{is_self ? $t('我') : $t(msg?.sender_info?.nickname)}&nbsp;
+				{isMe(msg?.label_id || msg?.sender_id)
+					? $t('我')
+					: $t(msg?.sender_info?.nickname || msg?.sender_info?.name)}
+				&nbsp;
 				{msg?.is_label !== 0 ? $t('标注了') : $t('取消标注')}&nbsp;
 				{`"${msg?.content}"`}
 			</div>
@@ -42,10 +45,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 	}
 
 	return (
-		<div
-			className={clsx('flex', is_self ? 'justify-end' : 'justify-start', className)}
-			id={`msg_${msg?.msg_id}`}
-		>
+		<div className={clsx('flex', is_self ? 'justify-end' : 'justify-start', className)} id={`msg_${msg?.msg_id}`}>
 			<div className="flex max-w-[85%]">
 				<div
 					className={clsx(

@@ -22,7 +22,7 @@ interface Options {
 	is_burn_after_reading?: number
 }
 
-interface MessageStore {
+export interface MessageStore {
 	messages: PrivateChats[]
 	all_meesages: PrivateChats[]
 	shareKey: Uint8Array | null
@@ -209,10 +209,12 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 		if (!msg_ids.length) return
 
-		const { is_group, dialog_id, tableName } = get()
+		const { is_group, dialog_id, tableName, receiver_id } = get()
 
-		const params = { msg_ids, dialog_id }
+		const params: any = { msg_ids, dialog_id }
 
+		if(!is_group) params['group_id'] = Number(receiver_id)
+		
 		const { code } = is_group
 			? await MsgService.readGroupMessageApi(params)
 			: await MsgService.readUserMessageApi(params)

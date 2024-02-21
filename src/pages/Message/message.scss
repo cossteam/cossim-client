@@ -79,10 +79,10 @@
 }
 
 .reply_editor {
-    @apply text-ellipsis overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1 max-w-[300px];
+    @apply text-ellipsis overflow-hidden w-fit text-textTertiary line-clamp-1 max-w-[70%];
 
     p {
-        @apply text-ellipsis overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1 max-w-[300px];
+        @apply text-ellipsis overflow-hidden w-fit text-textTertiary line-clamp-1 max-w-[70%];
     }
 }
 

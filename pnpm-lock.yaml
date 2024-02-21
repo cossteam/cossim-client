@@ -74,6 +74,9 @@ dependencies:
   dom7:
     specifier: ^4.0.6
     version: 4.0.6
+  dompurify:
+    specifier: ^3.0.9
+    version: 3.0.9
   framework7:
     specifier: ^8.3.0
     version: 8.3.0
@@ -124,6 +127,9 @@ devDependencies:
   '@capacitor/cli':
     specifier: ^5.7.0
     version: 5.7.0
+  '@types/dompurify':
+    specifier: ^3.0.5
+    version: 3.0.5
   '@types/js-cookie':
     specifier: ^3.0.6
     version: 3.0.6
@@ -1252,6 +1258,12 @@ packages:
       '@types/node': 20.11.17
     dev: false
 
+  /@types/dompurify@3.0.5:
+    resolution: {integrity: sha512-1Wg0g3BtQF7sSb27fJQAKck1HECM6zV1EB66j8JH9i3LCjYabJa0FSdiSgsD5K/RbrsR0SiraKacLB+T8ZVYAg==}
+    dependencies:
+      '@types/trusted-types': 2.0.7
+    dev: true
+
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
     dev: true
@@ -1310,6 +1322,10 @@ packages:
 
   /@types/slice-ansi@4.0.0:
     resolution: {integrity: sha512-+OpjSaq85gvlZAYINyzKpLeiFkSC4EsC6IIiT6v6TLSU5k5U83fHGj9Lel8oKEXM0HqgrMVCjXPDPVICtxF7EQ==}
+    dev: true
+
+  /@types/trusted-types@2.0.7:
+    resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
     dev: true
 
   /@types/uuid@9.0.8:
@@ -2122,6 +2138,10 @@ packages:
     resolution: {integrity: sha512-emjdpPLhpNubapLFdjNL9tP06Sr+GZkrIHEXLWvOGsytACUrkbeIdjO5g77m00BrHTznnlcNqgmn7pCN192TBA==}
     dependencies:
       ssr-window: 4.0.2
+    dev: false
+
+  /dompurify@3.0.9:
+    resolution: {integrity: sha512-uyb4NDIvQ3hRn6NiC+SIFaP4mJ/MdXlvtunaqK9Bn6dD3RuB/1S/gasEjDHD8eiaqdSael2vBv+hOs7Y+jhYOQ==}
     dev: false
 
   /eastasianwidth@0.2.0:

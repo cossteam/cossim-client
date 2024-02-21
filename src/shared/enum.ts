@@ -180,3 +180,33 @@ export enum CallType {
 	/** 音频通话 */
 	AUDIO = 2
 }
+
+/** Socket 事件 */
+export enum SocketEvent {
+	/** 上线事件 */
+	OnlineEvent = 1,
+	/** 接收私聊消息 */
+	PrivateChatsEvent = 3,
+	/** 接收群聊消息 */
+	GroupChatsEvent = 4,
+	/** 接收到自己发送的消息 */
+	SelfChatsEvent = 12,
+	/** 接收好友申请 */
+	ApplyListEvent = 6,
+	/** 接收好友同意或拒绝 */
+	ApplyAcceptEvent = 7,
+	/** 用户通话呼叫请求事件 */
+	UserCallReqEvent = 14,
+	/** 群聊通话呼叫请求事件 */
+	GroupCallReqEvent = 15,
+	/** 用户通话呼叫拒绝事件 */
+	UserCallRejectEvent = 16,
+	/** 群聊通话呼叫拒绝事件 */
+	GroupCallRejectEvent = 17,
+	/** 用户通话挂断事件 */
+	UserCallHangupEvent = 18,
+	/** 群聊通话挂断事件 */
+	GroupCallHangupEvent = 19,
+	/** 接收到消息标注信息 */
+	MessageLabelEvent = 23
+}

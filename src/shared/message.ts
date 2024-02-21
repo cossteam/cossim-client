@@ -71,9 +71,10 @@ export const addMarkMessage = async (tableName: string, msg: PrivateChats, is_la
 	try {
 		const doc = new DOMParser().parseFromString(msg.content, 'text/html')
 		const txt = doc.body.textContent
+		const user_id = getCookie(USER_ID) || ''
 
 		const marks = {
-			tips_msg_id: msg.msg_id,
+			tips_msg_id: msg.id,
 			content: txt,
 			dialog_id: msg.dialog_id,
 			pid: msg.uid,
@@ -82,6 +83,7 @@ export const addMarkMessage = async (tableName: string, msg: PrivateChats, is_la
 			sender_info: msg.sender_info,
 			sender_id: msg.sender_id,
 			type: MESSAGE_TYPE.LABEL,
+			label_id: user_id
 		}
 
 		await UserStore.add(tableName, marks)

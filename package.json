@@ -39,6 +39,7 @@
     "dexie": "^3.2.5",
     "dexie-react-hooks": "^1.1.7",
     "dom7": "^4.0.6",
+    "dompurify": "^3.0.9",
     "framework7": "^8.3.0",
     "framework7-icons": "^5.0.5",
     "framework7-react": "^8.3.0",
@@ -57,6 +58,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^5.7.0",
+    "@types/dompurify": "^3.0.5",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20.11.17",
     "@types/react": "^18.2.55",

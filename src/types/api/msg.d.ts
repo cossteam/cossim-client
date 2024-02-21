@@ -39,3 +39,5 @@ export interface ReadMessage {
 	msg_ids: number[]
 	dialog_id: number
 }
+
+export type ReadGroupMessage = { group_id: number } & ReadMessage
