@@ -2,8 +2,8 @@ import { CapacitorConfig } from '@capacitor/cli'
 import { KeyboardResize, KeyboardStyle } from '@capacitor/keyboard'
 
 const config: CapacitorConfig = {
-	appId: 'com.example.app',
-	appName: 'coss',
+	appId: 'com.hitosea.coss',
+	appName: 'COSS',
 	webDir: 'dist',
 	server: {
 		androidScheme: 'https'

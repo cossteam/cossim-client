@@ -1,4 +1,4 @@
-package com.example.app;
+package com.hitosea.coss;
 
 import com.getcapacitor.BridgeActivity;
 
