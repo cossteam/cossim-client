@@ -11,8 +11,6 @@ class CallServiceImpl {
 	 * @returns
 	 */
 	createLiveUserApi(data?: any): Promise<DataResponse> {
-		console.log(this)
-
 		return request({
 			url: this.liveUser + '/create',
 			method: 'POST',
