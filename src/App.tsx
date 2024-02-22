@@ -74,7 +74,7 @@ function App() {
 						const newCallInfo = { ...callInfo, evrntInfo: data }
 						console.log('来电', data)
 
-						if (event === CallEvent.UserCallReqEvent) {
+						if (event === SocketEvent.UserCallReqEvent) {
 							newCallInfo['userInfo'] = {
 								user_id: data?.data?.sender_id
 							}
@@ -92,7 +92,7 @@ function App() {
 					// 拒绝
 					{
 						const newCallInfo = { ...callInfo, evrntInfo: data }
-						if (event === CallEvent.UserCallReqEvent) {
+						if (event === SocketEvent.UserCallReqEvent) {
 							newCallInfo['userInfo'] = {
 								user_id: data?.data?.sender_id
 							}
@@ -113,7 +113,7 @@ function App() {
 					// 挂断
 					{
 						const newCallInfo = { ...callInfo, evrntInfo: data }
-						if (event === CallEvent.UserCallReqEvent) {
+						if (event === SocketEvent.UserCallReqEvent) {
 							newCallInfo['userInfo'] = {
 								user_id: data?.data?.sender_id
 							}
@@ -130,8 +130,8 @@ function App() {
 					}
 					break
 				case SocketEvent.MessageLabelEvent:
-					console.log('消息标注信息',data)
-					handlerLabelSocket(data,msgStore)
+					console.log('消息标注信息', data)
+					handlerLabelSocket(data, msgStore)
 					break
 			}
 		}

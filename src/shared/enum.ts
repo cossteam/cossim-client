@@ -126,22 +126,6 @@ export enum MemberListType {
 	MEMBERSHOW = 'member_show'
 }
 
-/** 通话状态 WebSocket 推送事件 */
-export enum CallEvent {
-	/** 用户通话呼叫请求事件 */
-	UserCallReqEvent = 14,
-	/** 群聊通话呼叫请求事件 */
-	GroupCallReqEvent = 15,
-	/** 用户通话呼叫拒绝事件 */
-	UserCallRejectEvent = 16,
-	/** 群聊通话呼叫拒绝事件 */
-	GroupCallRejectEvent = 17,
-	/** 用户通话挂断事件 */
-	UserCallHangupEvent = 18,
-	/** 群聊通话挂断事件 */
-	GroupCallHangupEvent = 19
-}
-
 export enum CallStatus {
 	/** 空闲 */
 	IDLE = 0,
