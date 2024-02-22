@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.xm.coss" version="1.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <feature name="StatusBar">
+        <param name="android-package" value="org.apache.cordova.statusbar.StatusBar" />
+        <param name="onload" value="true" />
+    </feature>
+    <feature name="File">
+        <param name="android-package" value="org.apache.cordova.file.FileUtils" />
+        <param name="onload" value="true" />
+    </feature>
+    <allow-navigation href="cdvfile:*" />
+    <feature name="InAppBrowser">
+        <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser" />
+    </feature>
+    <feature name="Device">
+        <param name="android-package" value="org.apache.cordova.device.Device" />
+    </feature>
+    <feature name="Media">
+        <param name="android-package" value="org.apache.cordova.media.AudioHandler" />
+    </feature>
+    <feature name="Keyboard">
+        <param name="android-package" onload="true" value="org.apache.cordova.labs.keyboard.Keyboard" />
+    </feature>
+    <name>COSS</name>
+    <description>Sample Apache Cordova App</description>
+    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
+        Apache Cordova Team
+    </author>
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-navigation href="*" />
+    <splash density="land-hdpi" src="res/screen/android/drawable-hdpi/screen.png" />
+    <splash density="land-mdpi" src="res/screen/android/drawable-mdpi/screen.png" />
+    <splash density="land-xhdpi" src="res/screen/android/drawable-xhdpi/screen.png" />
+    <splash density="land-xxhdpi" src="res/screen/android/drawable-xxhdpi/screen.png" />
+    <splash density="land-xxxhdpi" src="res/screen/android/drawable-xxxhdpi/screen.png" />
+    <splash density="port-hdpi" src="res/screen/android/drawable-hdpi/screen.png" />
+    <splash density="port-mdpi" src="res/screen/android/drawable-mdpi/screen.png" />
+    <splash density="port-xhdpi" src="res/screen/android/drawable-xhdpi/screen.png" />
+    <splash density="port-xxhdpi" src="res/screen/android/drawable-xxhdpi/screen.png" />
+    <splash density="port-xxxhdpi" src="res/screen/android/drawable-xxxhdpi/screen.png" />
+    <icon density="ldpi" src="res/icon/android/mipmap-ldpi/ic_launcher.png" />
+    <icon density="mdpi" src="res/icon/android/mipmap-mdpi/ic_launcher.png" />
+    <icon density="hdpi" src="res/icon/android/mipmap-hdpi/ic_launcher.png" />
+    <icon density="xhdpi" src="res/icon/android/mipmap-xhdpi/ic_launcher.png" />
+    <icon density="xxhdpi" src="res/icon/android/mipmap-xxhdpi/ic_launcher.png" />
+    <icon density="xxxhdpi" src="res/icon/android/mipmap-xxxhdpi/ic_launcher.png" />
+    <edit-config file="AndroidManifest.xml" mode="merge" target="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
+        <activity android:usesCleartextTraffic="true" />
+    </edit-config>
+    <preference name="loglevel" value="DEBUG" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="BackupWebStorage" value="local" />
+    <preference name="AutoHideSplashScreen" value="false" />
+    <preference name="ShowSplashScreenSpinner" value="false" />
+    <preference name="SplashScreenDelay" value="0" />
+    <preference name="Suppresses3DTouchGesture" value="true" />
+    <preference name="Allow3DTouchLinkPreview" value="false" />
+    <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
+    <preference name="AllowInlineMediaPlayback" value="true" />
+    <preference name="android-minSdkVersion" value="22" />
+    <preference name="SplashMaintainAspectRatio" value="true" />
+    <preference name="scheme" value="http" />
+</widget>

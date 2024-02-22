@@ -1,0 +1,31 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-statusbar": {
+      "PACKAGE_NAME": "com.xm.coss"
+    },
+    "cordova-plugin-keyboard": {
+      "PACKAGE_NAME": "com.xm.coss"
+    },
+    "cordova-plugin-file": {
+      "ANDROIDX_WEBKIT_VERSION": "1.4.0",
+      "PACKAGE_NAME": "com.xm.coss"
+    },
+    "cordova-plugin-inappbrowser": {
+      "PACKAGE_NAME": "com.xm.coss"
+    },
+    "cordova-plugin-device": {
+      "PACKAGE_NAME": "com.xm.coss"
+    },
+    "cordova-plugin-media": {
+      "PACKAGE_NAME": "com.xm.coss"
+    }
+  },
+  "dependent_plugins": {}
+}
