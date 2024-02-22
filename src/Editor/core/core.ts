@@ -29,10 +29,6 @@ class Editor {
 
 		if (options?.initValue) {
             this.insertElement(options.initValue,{ render: true })
-			// 使用 DOMPurify 清理除了特定属性之外的其他内容
-			// const cleanedHtml = DOMPurify.sanitize(options.initValue)
-			// 将保留的属性添加回元素
-			// this.el.innerHTML = cleanedHtml
 		}
 
 		this.el.contentEditable = options?.readonly ? 'false' : 'true'
@@ -89,8 +85,6 @@ class Editor {
 	}
 
 	isEmpty() {
-		console.log('!!this.el.textContent', !!this.el.textContent)
-
 		return !this.el.textContent?.trim()
 	}
 

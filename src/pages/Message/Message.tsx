@@ -502,7 +502,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 												blur={blur}
 											/> */}
 
-											<ToolEditor initValue={selectMsgs[0]?.content} />
+											<ToolEditor initValue={selectMsgs[0]?.content}  className="px-2 py-1 read-editor-1"/>
 											<Link
 												className="pr-2"
 												onClick={() => {
