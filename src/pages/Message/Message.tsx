@@ -33,7 +33,7 @@ import Contact from '@/components/Contact/Contact'
 import Emojis from '@/components/Emojis/Emojis'
 // import GroupService from '@/api/group'
 
-import ToolEditor, { ToolEditorMethods as TT } from '@/Editor'
+import ToolEditor, { EventType, ToolEditorMethods as TT } from '@/Editor'
 
 /**
  * 滚动元素到底部
@@ -204,19 +204,22 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		if (type === moreType && isWeb) {
 			setMoreType('')
 			setToolbarBottom(keyboardHeight)
-			// isWeb && (BlockRef.current.el!.style.paddingBottom = 56 + 'px')
+			// setTimeout(() => {
+			BlockRef.current.el!.style.transitionDuration = '0.3s'
+			isWeb && (BlockRef.current.el!.style.paddingBottom = 56 + 'px')
+			// }, 300)
 			return
 		}
 		!isWeb ? Keyboard?.hide() : setToolbarBottom(0)
 
 		setMoreType(type)
 
-		// 滚动到最底部
-		// BlockRef.current.el!.style.paddingBottom = keyboardHeight + 56 + 'px'
-
+		BlockRef.current.el!.style.transitionDuration = '0s'
+		BlockRef.current.el!.style.paddingBottom = keyboardHeight + 56 + 'px'
 		requestAnimationFrame(() => {
-			console.log('isScrollEnd()', isScrollEnd())
+			// setTimeout(()=>{
 			isEnd && scroll(contentRef.current!, true)
+			// },300)
 		})
 	}
 
@@ -252,25 +255,25 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				Keyboard.addListener('keyboardWillShow', (info) => {
 					setKeyboardHeight(info.keyboardHeight - 15)
 					setMoreType('')
-					setToolbarBottom(-keyboardHeight)
-					requestAnimationFrame(() => {
-						Keyboard.show()
-					})
+					setToolbarBottom(keyboardHeight)
+					// requestAnimationFrame(() => {
+					// 	Keyboard.show()
+					// })
 				})
-				Keyboard.addListener('keyboardDidShow', () => {
-					setToolbarBottom(-keyboardHeight)
-				})
+				// Keyboard.addListener('keyboardDidShow', () => {
+				// 	setToolbarBottom(keyboardHeight)
+				// })
 				Keyboard.addListener('keyboardDidHide', () => {
-					if (!moreType) {
-						requestAnimationFrame(() => {
-							setTimeout(() => {
-								setToolbarBottom(0)
-							}, 0)
-						})
-					} else {
-						setToolbarBottom(0)
-					}
-					BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+					// if (!moreType) {
+					// 	requestAnimationFrame(() => {
+					// 		setTimeout(() => {
+					// 			setToolbarBottom(0)
+					// 		}, 0)
+					// 	})
+					// } else {
+					// 	setToolbarBottom(0)
+					// }
+					// BlockRef.current.el!.style.paddingBottom = 56 + 'px'
 				})
 			}
 
@@ -283,8 +286,28 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			// }
 
 			const engine = editorRef.current!.engine
+			// engine.el.contentEditable = 'false'
+			engine.on(EventType.CHANGE, () => setShowBtn(!engine.isEmpty()))
+			engine.on(EventType.FOCUS, () => {
+				// if (!moreType) {
+				// 	moreRef.current!.style.display = 'none'
+				// }
+				BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+				closeToolBar()
+				// platformName !== 'web' && Keyboard?.hide()
+				// setTimeout(() => {
+				// 	moreRef.current!.style.display = 'block'
+				// }, 100)
+				requestAnimationFrame(() => {
+					engine.el.contentEditable = 'true'
+					setTimeout(() => engine.focus(), 300)
+				})
+			})
 
-			engine.on('change', () => setShowBtn(!engine.isEmpty()))
+			// engine.on('click', () => {
+			// 	console.log('点击事件')
+			// })
+
 			// @ 功能
 			// engine.on('mention:default', () => {
 			// 	const newMembers = members.map((v: any) => {
@@ -317,6 +340,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		setSelectType(TOOLTIP_TYPE.NONE)
 		setTimeout(() => scroll(contentRef.current!, isEnd ? true : false), 100)
 		setMoreType('')
+		engine.el.contentEditable = 'true'
+		engine.focus()
 	}
 
 	// 滚动情况
@@ -329,19 +354,15 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 	// 选择表情
 	const onSelectEmojis = (emojis: any) => {
-		// insertElement(emojis.native)
-		editorRef.current!.engine.insertElement(emojis.native)
-		// const img = `<img src="https://cdn.framework7.io/placeholder/nature-1000x600-3.jpg" />`
-		// const script = `<script>console.log("注入");</script>`
-		// editorRef.current!.engine.range.insertElement(script,'script')
+		editorRef.current!.engine.insertElement(emojis.native, { isFocus: false })
 	}
 
 	const focus = async () => {
-		closeToolBar()
-		platformName === 'web' && Keyboard?.hide()
-		requestAnimationFrame(() => {
-			editorRef.current!.focus()
-		})
+		// closeToolBar()
+		// platformName !== 'web' && Keyboard?.hide()
+		// requestAnimationFrame(() => {
+		// 	editorRef.current!.focus()
+		// })
 	}
 	const blur = async () => {}
 
@@ -408,7 +429,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				</Subnavbar>
 			</Navbar>
 
-			<Block className="my-0 px-0 pt-5 pb-16" ref={BlockRef}>
+			<Block className="my-0 px-0 pt-5 pb-16 transition-all duration-300 ease-linear" ref={BlockRef}>
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (
 						<ListItem
@@ -555,7 +576,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					</div>
 					{/* {moreType && ( */}
 					<div
-						className={clsx('w-full animate__animated overflow-hidden')}
+						className={clsx('w-full overflow-hidden transition-all duration-200 ease-linear')}
 						style={{ height: keyboardHeight + 'px' }}
 						ref={moreRef}
 					>

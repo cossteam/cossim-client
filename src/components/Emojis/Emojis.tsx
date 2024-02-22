@@ -9,18 +9,19 @@ interface EmojisProps {
 }
 
 const Emojis: React.FC<EmojisProps> = (props) => {
-
-
 	return (
 		<div className="emojis" onClick={(e) => e.stopPropagation()}>
 			<div className="bg-[#f5f5f5]">
-				<div className="w-full" onClick={(e) => e.stopPropagation()}>
+				<div className="w-full text-[1rem]" onClick={(e) => e.stopPropagation()}>
 					<Picker
 						data={data}
 						onEmojiSelect={(emojis:any)=>props.onSelectEmojis(emojis)}
 						dynamicWidth={true}
 						locale="zh"
 						previewPosition="none"
+						searchPosition="none"
+						emojiSize="30"
+						emojiButtonSize="48"
 					/>
 				</div>
 			</div>

@@ -1,5 +1,6 @@
 import ElementEventListeners from './event'
 import CustomRange from './range'
+import { EventType } from '../shared'
 
 import DOMPurify from 'dompurify'
 
@@ -12,9 +13,10 @@ export interface EditorOptions {
 }
 
 class Editor {
-	private el!: HTMLDivElement
+	public el!: HTMLDivElement
 	private eventListeners!: ElementEventListeners
-	public range: CustomRange
+	private range: CustomRange
+	private isFocus: boolean = false
 
 	constructor(el: HTMLDivElement, options?: EditorOptions) {
 		if (!el) throw new Error('el is required')
@@ -33,8 +35,12 @@ class Editor {
 		this.el.contentEditable = options?.readonly ? 'false' : 'true'
 		this.el.classList.add('custom-editor')
 
+		// 特殊配置
+		if (!options?.readonly) {
+			this.el.contentEditable = 'false'
+		}
 
-		// @ 
+		// @
 		// this.on('input', (e) => {
 		// 	if (e.data === '@') {
 		// 		const rect = this.el.getBoundingClientRect()
@@ -51,10 +57,18 @@ class Editor {
 		// })
 
 		// 监听
-		this.eventListeners.addCustomEventListener('change')
-		this.on('input', () => {
-			this.eventListeners.triggerCustomEvent('change')
+		this.eventListeners.addCustomEventListener(EventType.CHANGE)
+		this.eventListeners.addCustomEventListener(EventType.FOCUS)
+
+		this.on('input', () => this.eventListeners.triggerCustomEvent(EventType.CHANGE))
+		this.on('focus', () => {
+			if (this.isFocus) return
+			this.eventListeners.triggerCustomEvent(EventType.FOCUS)
 		})
+		this.on('click', () => {
+			this.eventListeners.triggerCustomEvent(EventType.FOCUS)
+		})
+		this.on('blur',()=> this.el.contentEditable = 'false')
 
 		// 处理粘贴
 		this.on('paste', (e: ClipboardEvent) => {
@@ -82,10 +96,12 @@ class Editor {
 	 * @param { boolean } isFocus - 插入元素后是否聚焦
 	 */
 	insertElement(html: string, options?: { tagName?: string; isFocus?: boolean; render?: boolean }) {
+		this.isFocus = true
 		options?.render
 			? (this.el.innerHTML = DOMPurify.sanitize(html))
 			: this.range.insertElement(html, options?.tagName, options?.isFocus)
-		this.eventListeners.triggerCustomEvent('change')
+		this.isFocus = false
+		this.eventListeners.triggerCustomEvent(EventType.CHANGE)
 	}
 
 	focus() {

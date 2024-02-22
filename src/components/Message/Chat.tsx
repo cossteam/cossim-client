@@ -71,7 +71,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 					<LongPressButton callback={() => createTooltip()}>
 						<div
 							className={clsx(
-								'rounded-lg relative px-4 py-2 break-all mb-1 select-none',
+								'rounded-lg relative py-2 break-all mb-1 select-none',
 								is_self
 									? 'bg-primary text-white  after:left-full after:border-l-primary rounded-tr-none '
 									: 'bg-bgPrimary after:right-full after:border-r-white rounded-tl-none '
