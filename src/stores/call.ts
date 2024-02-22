@@ -21,6 +21,7 @@ interface CallStore {
 	callInfo: any
 	/** 通话状态 */
 	status: CallStatus
+	waitingTime: Date | null
 	/** 通话类型 */
 	type: CallType
 	/** 是否启用视频通话 */
@@ -29,6 +30,10 @@ interface CallStore {
 	updateCallInfo: (callInfo: any) => void
 	/** 更新通话状态 */
 	updateStatus: (status: CallStatus) => void
+	/** 处理超时 */
+	handlerTimeout: () => void
+	/** 更新等待通话时间 */
+	updateWaitingTime: (waitingTime: Date) => void
 	/** 更新通话类型 */
 	updateType: (type: CallType) => void
 	/** 使能通话视频 */
@@ -46,6 +51,7 @@ interface CallStore {
 export const callStore = (set: any, get: any): CallStore => ({
 	callInfo: null,
 	status: CallStatus.IDLE,
+	waitingTime: null,
 	type: CallType.AUDIO,
 	enablesVideo: true,
 	updateCallInfo: (callInfo: any) => {
@@ -53,6 +59,18 @@ export const callStore = (set: any, get: any): CallStore => ({
 	},
 	updateStatus: (status: CallStatus) => {
 		set({ status })
+	},
+	handlerTimeout: () => {
+		set({
+			callInfo: null,
+			status: CallStatus.IDLE,
+			waitingTime: null,
+			type: CallType.AUDIO,
+			enablesVideo: true
+		})
+	},
+	updateWaitingTime: (waitingTime: Date) => {
+		set({ waitingTime })
 	},
 	updateType: (type: CallType) => {
 		set({ type })
