@@ -31,7 +31,7 @@ import clsx from 'clsx'
 import { useToast } from '@/hooks/useToast'
 import Contact from '@/components/Contact/Contact'
 import Emojis from '@/components/Emojis/Emojis'
-import GroupService from '@/api/group'
+// import GroupService from '@/api/group'
 
 import ToolEditor, { ToolEditorMethods as TT } from '@/Editor'
 
@@ -85,6 +85,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		const msg = messages.find((v) => v.msg_id === msg_id)
 		type !== TOOLTIP_TYPE.SELECT && setSelectMsgs([msg])
 		setSelectType(type)
+
+		console.log('提示选择', msg_id, type)
 
 		switch (type) {
 			case TOOLTIP_TYPE.COPY:
@@ -196,14 +198,13 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const [moreType, setMoreType] = useState<MoreType>('')
 	const moreRef = useRef<HTMLDivElement | null>(null)
 	const showMore = (type: MoreType) => {
-		console.log('type', type)
 		const isWeb = platformName === 'web'
 		const isEnd = isScrollEnd()
 
 		if (type === moreType && isWeb) {
 			setMoreType('')
-			setToolbarBottom(-keyboardHeight)
-			isWeb && (BlockRef.current.el!.style.paddingBottom = 56 + 'px')
+			setToolbarBottom(keyboardHeight)
+			// isWeb && (BlockRef.current.el!.style.paddingBottom = 56 + 'px')
 			return
 		}
 		!isWeb ? Keyboard?.hide() : setToolbarBottom(0)
@@ -211,7 +212,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		setMoreType(type)
 
 		// 滚动到最底部
-		BlockRef.current.el!.style.paddingBottom = keyboardHeight + 56 + 'px'
+		// BlockRef.current.el!.style.paddingBottom = keyboardHeight + 56 + 'px'
 
 		requestAnimationFrame(() => {
 			console.log('isScrollEnd()', isScrollEnd())
@@ -273,32 +274,32 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				})
 			}
 
-			let members: any = []
-			try {
-				const { data } = await GroupService.groupMemberApi({ group_id: Number(receiver_id) })
-				members = data
-			} catch (error) {
-				members = []
-			}
+			// let members: any = []
+			// try {
+			// 	const { data } = await GroupService.groupMemberApi({ group_id: Number(receiver_id) })
+			// 	members = data
+			// } catch (error) {
+			// 	members = []
+			// }
 
 			const engine = editorRef.current!.engine
 
-			engine.on('input', () => setShowBtn(!engine.isEmpty()))
+			engine.on('change', () => setShowBtn(!engine.isEmpty()))
 			// @ 功能
-			engine.on('mention:default', () => {
-				const newMembers = members.map((v: any) => {
-					return {
-						key: v.user_id,
-						name: v.nickname
-					}
-				})
+			// engine.on('mention:default', () => {
+			// 	const newMembers = members.map((v: any) => {
+			// 		return {
+			// 			key: v.user_id,
+			// 			name: v.nickname
+			// 		}
+			// 	})
 
-				console.log('newMembers', newMembers)
+			// 	console.log('newMembers', newMembers)
 
-				const arr = [{ key: 'all', name: '全体成员' }, ...newMembers]
+			// 	const arr = [{ key: 'all', name: '全体成员' }, ...newMembers]
 
-				return arr
-			})
+			// 	return arr
+			// })
 		},
 		() => {},
 		[]
@@ -315,6 +316,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		editorRef.current!.focus()
 		setSelectType(TOOLTIP_TYPE.NONE)
 		setTimeout(() => scroll(contentRef.current!, isEnd ? true : false), 100)
+		setMoreType('')
 	}
 
 	// 滚动情况
@@ -334,30 +336,28 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		// editorRef.current!.engine.range.insertElement(script,'script')
 	}
 
+	const focus = async () => {
+		closeToolBar()
+		platformName === 'web' && Keyboard?.hide()
+		requestAnimationFrame(() => {
+			editorRef.current!.focus()
+		})
+	}
+	const blur = async () => {}
+
 	// 辅助函数
 	const isSelect = () => selectType === TOOLTIP_TYPE.SELECT
 	const isReply = () => selectType === TOOLTIP_TYPE.REPLY
 	const isEdit = () => selectType === TOOLTIP_TYPE.EDIT
 	const replyMessage = (msg_id: number) => msgStore.all_meesages.find((v) => v?.msg_id === msg_id)
-	const setToolbarBottom = (bottom: number) => (toolbarRef.current!.style.bottom = bottom + 'px')
+	const setToolbarBottom = (bottom: number) => (toolbarRef.current!.style.transform = `translateY(${bottom}px)`)
 	// const setMoreTop = (top: number) => (moreRef.current!.style.top = top + 'px')
 
 	// 关闭更多功能
 	const closeToolBar = () => {
 		setMoreType('')
-		platformName === 'web' && setToolbarBottom(-keyboardHeight)
+		platformName === 'web' && setToolbarBottom(keyboardHeight)
 	}
-
-	//  键盘显示
-	// const focus = () => {
-	// 	// setKeyboardShow(true)
-	// 	//  closeToolBar()
-	// }
-
-	// 键盘隐藏
-	// const blur = () => {
-	// 	// setKeyboardShow(false)
-	// }
 
 	// 判断是否滚动到底部
 	const isScrollEnd = (setp: number = 100) =>
@@ -437,7 +437,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					'fixed bg-bgPrimary bottom-0 w-full h-auto z-[99]  transition-all duration-300 ease-in'
 				)}
 				ref={toolbarRef}
-				style={{ bottom: -keyboardHeight + 'px' }}
+				style={{ transform: `translateY(${keyboardHeight}px)` }}
 			>
 				<div className="flex flex-col justify-center items-center">
 					<div className="w-full rounded-2xl flex items-end relative h-full py-2 transition-all duration-300 ease-in">
@@ -490,7 +490,13 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 											focus={focus}
 											blur={blur}
 										/> */}
-										<ToolEditor ref={editorRef} readonly={false}/>
+										<ToolEditor
+											ref={editorRef}
+											readonly={false}
+											focus={focus}
+											blur={blur}
+											className="max-h-[150px]  overflow-y-auto"
+										/>
 									</div>
 									{(isReply() || isEdit()) && (
 										<div className="mt-1 bg-bgTertiary relative flex justify-between">
@@ -502,7 +508,12 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 												blur={blur}
 											/> */}
 
-											<ToolEditor initValue={selectMsgs[0]?.content}  className="px-2 py-1 read-editor-1"/>
+											<ToolEditor
+												initValue={selectMsgs[0]?.content}
+												className="px-2 py-1 read-editor-1"
+												focus={focus}
+												blur={blur}
+											/>
 											<Link
 												className="pr-2"
 												onClick={() => {

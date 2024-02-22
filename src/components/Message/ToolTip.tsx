@@ -1,9 +1,18 @@
 import { useClickOutside } from '@reactuses/core'
 import clsx from 'clsx'
 import { Link } from 'framework7-react'
-import { useEffect, useRef, useState } from 'react'
+import { RefObject, useEffect, useRef, useState } from 'react'
 import { $t, TOOLTIP_TYPE } from '@/shared'
-import { ArrowUpRight, SquareOnSquare, Trash, Flag, SquarePencil, BubbleLeftBubbleRight,TextAlignleft } from 'framework7-icons/react'
+import {
+	ArrowUpRight,
+	SquareOnSquare,
+	Trash,
+	Flag,
+	SquarePencil,
+	BubbleLeftBubbleRight,
+	TextAlignleft
+} from 'framework7-icons/react'
+import { createRoot } from 'react-dom/client'
 
 interface ToolTipProps {
 	el: HTMLElement
@@ -29,6 +38,13 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		setVisible(false)
 	})
 
+	const divRef = useRef<HTMLDivElement | null>(null)
+	useClickOutside(divRef, () => {
+		divRef.current?.remove()
+	})
+
+	const [show, setShow] = useState<boolean>(true)
+
 	// 边界控制
 	useEffect(() => {
 		if (!el) return
@@ -48,6 +64,35 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		const tooltipEl = tooltipRef.current!
 		const elRect = el.getBoundingClientRect()
 
+		// 如果消息已经超出屏幕范围，不显示
+		if (
+			elRect.top < tooltipEl.offsetHeight + 156 &&
+			elRect.height + tooltipEl.offsetHeight > document.documentElement.clientHeight
+		) {
+			setShow(false)
+			divRef.current = document.createElement('div')
+			divRef.current.style.position = 'fixed'
+			divRef.current.style.zIndex = '9999999'
+			divRef.current.style.height = 'auto'
+			divRef.current.style.top = '40%'
+			divRef.current.style.minHeight = '100px'
+			divRef.current.style.width = '400px'
+			createRoot(divRef.current).render(
+				<ToolTipView
+					tooltipRef={tooltipRef}
+					triangleRef={triangleRef}
+					tips={tips}
+					onSelect={onSelect}
+					setVisible={() => divRef.current?.remove()}
+					msgId={Number(id)}
+					top={top}
+					className="text-[1rem]"
+				/>
+			)
+			document.body.appendChild(divRef.current)
+
+			return
+		}
 		// 控制上边界
 		elRect.top < tooltipEl.offsetHeight + 156 ? setTop(true) : setTop(false)
 
@@ -105,13 +150,49 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		!visible && (currentRef.current!.style.zIndex = '1')
 	}, [visible])
 
-	if (!visible) return null
+	if (!visible || !show) return null
 
+	return (
+		<ToolTipView
+			tooltipRef={tooltipRef}
+			triangleRef={triangleRef}
+			tips={tips}
+			onSelect={onSelect}
+			setVisible={setVisible}
+			msgId={msgId}
+			top={top}
+			className="absolute"
+		/>
+	)
+}
+
+interface ToolTipViewProps {
+	tooltipRef: RefObject<HTMLDivElement>
+	triangleRef: RefObject<HTMLDivElement>
+	tips: any[]
+	onSelect: (type: TOOLTIP_TYPE, msg_id: number) => void
+	setVisible: (visible: boolean) => void
+	msgId: number
+	className?: string
+	top: boolean
+}
+
+const ToolTipView: React.FC<ToolTipViewProps> = ({
+	tooltipRef,
+	triangleRef,
+	tips,
+	onSelect,
+	setVisible,
+	msgId,
+	className,
+	top
+}) => {
 	return (
 		<div
 			className={clsx(
-				'absolute w-[220px] bg-black text-white rounded z-[9999] m-auto left-0 right-0 animate__animated  animate__faster animate__fadeIn',
-				top ? 'top-[calc(100%+10px)] bottom-auto ' : 'bottom-[calc(100%+10px)] top-auto'
+				'w-[250px] bg-black text-white rounded z-[9999] m-auto left-0 right-0 animate__animated  animate__faster animate__fadeIn',
+				top ? 'top-[calc(100%+10px)] bottom-auto ' : 'bottom-[calc(100%+10px)] top-auto',
+				className
 			)}
 			ref={tooltipRef}
 		>

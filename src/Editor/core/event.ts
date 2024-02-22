@@ -40,9 +40,11 @@ class EventListenerMap {
  */
 class ElementEventListeners {
 	private events: Map<string, Map<string, EventListenerMap>>
+	private customEvents: Map<string, Event>
 
 	constructor(private element: HTMLElement) {
 		this.events = new Map()
+		this.customEvents = new Map()
 	}
 
 	/**
@@ -119,6 +121,50 @@ class ElementEventListeners {
 			if (elementMap.size === 0) {
 				this.events.delete(elementId)
 			}
+		}
+	}
+
+	/**
+	 * 自定义监听器
+	 *
+	 * @param {string} eventType - 事件类型
+	 * @param {EventHandler} eventHandler -要删除的事件处理函数
+	 * @param {any} options - 回调函数
+	 * @return
+	 */
+	addCustomEventListener(eventType: string, eventHandler?: EventHandler, options: any = {}) {
+		const customEvent = new Event(eventType, {
+			bubbles: true, // 是否冒泡
+			cancelable: true, // 是否可取消
+			...options
+		})
+
+		const defaultEventHandler = () => null
+		this.addEventListener(eventType, eventHandler ?? defaultEventHandler)
+		this.customEvents.set(eventType, customEvent)
+	}
+
+	/**
+	 * 删除自定义监听器
+	 *
+	 * @param {string} eventType - 事件类型
+	 * @param {EventHandler} eventHandler -要删除的事件处理函数
+	 * @return {void}
+	 */
+	removeCustomEventListener(eventType: string, eventHandler: EventHandler) {
+		this.removeEventListener(eventType, eventHandler)
+	}
+
+	/**
+	 * 触发自定义事件
+	 *
+	 * @param {Event} customEvent - 自定义事件
+	 * @return
+	 */
+	triggerCustomEvent(name: string) {
+		const customEvent = this.customEvents.get(name)
+		if (customEvent) {
+			this.element.dispatchEvent(customEvent)
 		}
 	}
 }

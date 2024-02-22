@@ -11,8 +11,8 @@ interface ToolEditorProps {
 	// options?: EngineOptions
 	// defaultValue?: string
 	// is_group?: boolean
-	// focus?: () => void
-	// blur?: () => void
+	focus?: () => void
+	blur?: () => void
 	initValue?: string
 }
 
@@ -55,7 +55,7 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 	}))
 
 	return (
-		<div className={clsx('w-full max-h-[150px]  overflow-y-auto text-[1rem]', props.className)} ref={EditorRef} />
+		<div className={clsx('w-full text-[1rem]', props.className)} ref={EditorRef} onFocus={props.focus} onBlur={props.blur}/>
 	)
 }
 

@@ -8,13 +8,13 @@ export interface EditorOptions {
 	maxHieght?: string
 	readonly?: boolean
 	initValue?: string
+	change?: (value: string) => void
 }
 
 class Editor {
 	private el!: HTMLDivElement
 	private eventListeners!: ElementEventListeners
 	public range: CustomRange
-	private isChange!: boolean
 
 	constructor(el: HTMLDivElement, options?: EditorOptions) {
 		if (!el) throw new Error('el is required')
@@ -28,12 +28,13 @@ class Editor {
 		this.el.style.maxHeight = options?.maxHieght ?? 'auto'
 
 		if (options?.initValue) {
-            this.insertElement(options.initValue,{ render: true })
+			this.insertElement(options.initValue, { render: true })
 		}
-
 		this.el.contentEditable = options?.readonly ? 'false' : 'true'
 		this.el.classList.add('custom-editor')
 
+
+		// @ 
 		// this.on('input', (e) => {
 		// 	if (e.data === '@') {
 		// 		const rect = this.el.getBoundingClientRect()
@@ -49,8 +50,27 @@ class Editor {
 		// 	}
 		// })
 
+		// 监听
+		this.eventListeners.addCustomEventListener('change')
 		this.on('input', () => {
-			if (this.isEmpty()) this.isChange = false
+			this.eventListeners.triggerCustomEvent('change')
+		})
+
+		// 处理粘贴
+		this.on('paste', (e: ClipboardEvent) => {
+			// @ts-ignore
+			if (!e.clipboardData || !window?.clipboardData) return
+
+			const getData = (dataType: string) => e.clipboardData?.getData(dataType) || null
+
+			// 如果是粘贴文本
+			if (getData('text/plain')) {
+				e.preventDefault()
+				const text = getData('text/plain')
+				const html = DOMPurify.sanitize(text as string)
+				this.insertElement(html)
+				return
+			}
 		})
 	}
 
@@ -62,10 +82,10 @@ class Editor {
 	 * @param { boolean } isFocus - 插入元素后是否聚焦
 	 */
 	insertElement(html: string, options?: { tagName?: string; isFocus?: boolean; render?: boolean }) {
-		this.isChange = true
 		options?.render
 			? (this.el.innerHTML = DOMPurify.sanitize(html))
 			: this.range.insertElement(html, options?.tagName, options?.isFocus)
+		this.eventListeners.triggerCustomEvent('change')
 	}
 
 	focus() {
@@ -85,7 +105,7 @@ class Editor {
 	}
 
 	isEmpty() {
-		return !this.el.textContent?.trim()
+		return !this.el.textContent?.trim() && !this.el.innerHTML
 	}
 
 	on(envet: string, callback: (event: any) => void) {

@@ -17,7 +17,9 @@
     }
 
     img {
-        float: left;
+        display: inline-block;
+        object-fit: cover;
+        border-radius: 4px;
     }
 }
 
