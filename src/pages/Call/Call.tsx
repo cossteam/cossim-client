@@ -2,15 +2,20 @@ import { useEffect, useState } from 'react'
 import { Page } from 'framework7-react'
 
 import '@livekit/components-styles'
-// import { Track } from 'livekit-client'
-// import { GridLayout, ParticipantTile, useTracks } from '@livekit/components-react'
-// import { ControlBar, RoomAudioRenderer } from '@livekit/components-react'
-import { LiveKitRoom } from '@livekit/components-react'
+import {
+	ControlBar,
+	GridLayout,
+	LiveKitRoom,
+	ParticipantTile,
+	RoomAudioRenderer,
+	useTracks
+} from '@livekit/components-react'
 
 import { PhoneFill } from 'framework7-icons/react'
 import './Call.scss'
 import { useCallStore } from '@/stores/call'
 import { CallStatus, getStatusDescription } from '@/shared'
+import { Track } from 'livekit-client'
 
 const Call: React.FC<RouterProps> = ({ f7router }) => {
 	const { callInfo, status, reject, accept, hangup } = useCallStore()
@@ -46,20 +51,19 @@ const Call: React.FC<RouterProps> = ({ f7router }) => {
 						token={callInfo.wsInfo.token}
 						serverUrl={callInfo.wsInfo.url}
 						audio={true}
-						video={true}
+						video={false}
 						// screen={true}
 						onError={(e) => {
 							console.log(e)
 						}}
 					>
-						{/* <AudioTrack trackRef={trackRef} /> */}
-						{/* <MyVideoConference /> */}
-						{/* <RoomAudioRenderer /> */}
-						{/* <ControlBar /> */}
+						<MyVideoConference />
+						<RoomAudioRenderer />
+						<ControlBar />
 					</LiveKitRoom>
 				)}
 			</div>
-			<span className="absolute top-[20%] left-1/2 -translate-x-1/2">{getStatusDescription(status)}</span>
+			{/* <span className="absolute top-[20%] left-1/2 -translate-x-1/2">{getStatusDescription(status)}</span> */}
 			<div className="absolute bottom-10 w-full flex flex-row justify-evenly items-center">
 				{status === CallStatus.WAITING && (
 					<>
@@ -95,19 +99,19 @@ const Call: React.FC<RouterProps> = ({ f7router }) => {
 	)
 }
 
-// function MyVideoConference() {
-// 	const tracks = useTracks(
-// 		[
-// 			{ source: Track.Source.Camera, withPlaceholder: true },
-// 			{ source: Track.Source.ScreenShare, withPlaceholder: false }
-// 		],
-// 		{ onlySubscribed: false }
-// 	)
-// 	return (
-// 		<GridLayout tracks={tracks} style={{ height: 'calc(100% - var(--lk-control-bar-height))' }}>
-// 			<ParticipantTile />
-// 		</GridLayout>
-// 	)
-// }
+function MyVideoConference() {
+	const tracks = useTracks(
+		[
+			{ source: Track.Source.Camera, withPlaceholder: true },
+			{ source: Track.Source.ScreenShare, withPlaceholder: false }
+		],
+		{ onlySubscribed: false }
+	)
+	return (
+		<GridLayout tracks={tracks} style={{ height: 'calc(100% - var(--lk-control-bar-height))' }}>
+			<ParticipantTile />
+		</GridLayout>
+	)
+}
 
 export default Call
