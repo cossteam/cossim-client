@@ -1,55 +1,63 @@
+import { useEffect, useState } from 'react'
 import { Page } from 'framework7-react'
 
-// import '@livekit/components-styles'
-// import { Room, VideoPresets } from 'livekit-client'
+import '@livekit/components-styles'
+// import { Track } from 'livekit-client'
+// import { GridLayout, ParticipantTile, useTracks } from '@livekit/components-react'
+// import { ControlBar, RoomAudioRenderer } from '@livekit/components-react'
+import { LiveKitRoom } from '@livekit/components-react'
 
+import { PhoneFill } from 'framework7-icons/react'
 import './Call.scss'
 import { useCallStore } from '@/stores/call'
 import { CallStatus, getStatusDescription } from '@/shared'
-// import { useEffect } from 'react'
-import { PhoneFill } from 'framework7-icons/react'
-import { LiveKitRoom } from '@livekit/components-react'
 
 const Call: React.FC<RouterProps> = ({ f7router }) => {
 	const { callInfo, status, reject, accept, hangup } = useCallStore()
 	const roomReady = status === CallStatus.CALLING && callInfo?.wsInfo
 
-	// useEffect(() => {
-	// 	;(async () => {
-	// 		console.log('通话状态', getStatusDescription(status), callInfo?.wsInfo)
-	// 		if (status !== CallStatus.CALLING || !callInfo?.wsInfo) return
-	// 		// 创建房间
-	// 		const room = new Room({
-	// 			adaptiveStream: true,
-	// 			dynacast: true,
-	// 			videoCaptureDefaults: {
-	// 				resolution: VideoPresets.h720.resolution
-	// 			}
-	// 		})
-	// 		room.prepareConnection(callInfo.wsInfo.url, callInfo.wsInfo.token)
-	// 		// 连接到房间
-	// 		await room.connect(callInfo.wsInfo.url, callInfo.wsInfo.token)
-	// 		console.log('连接到房间', room.name)
-	// 		// 启用摄像头和麦克风
-	// 		await room.localParticipant.enableCameraAndMicrophone()
-	// 	})()
-	// }, [status, callInfo?.wsInfo])
+	const [worker, setWorker] = useState<Worker | null>(null)
+	useEffect(() => {
+		;(async () => {
+			console.log('通话状态', getStatusDescription(status), callInfo?.wsInfo)
+			if (status === CallStatus.WAITING && callInfo?.wsInfo) {
+				// if (!worker) {
+				// 	const worker = new Worker(new URL('./worker/timer.ts', import.meta.url))
+				// 	worker.postMessage({ duration: 6000 })
+				// 	worker.onmessage = () => handlerTimeout()
+				// 	setWorker(worker)
+				// }
+			}
+		})()
+		return () => {
+			if (worker) {
+				worker.terminate()
+				setWorker(null)
+			}
+		}
+	}, [status, callInfo?.wsInfo])
 
 	return (
 		<Page className="bg-bgPrimary flex flex-col justify-center items-center">
 			<div className="h-full overflow-y-scroll">
 				{roomReady && (
 					<LiveKitRoom
+						style={{ height: '100%' }}
 						token={callInfo.wsInfo.token}
 						serverUrl={callInfo.wsInfo.url}
 						audio={true}
 						video={true}
-						connect={true}
+						// screen={true}
+						onError={(e) => {
+							console.log(e)
+						}}
 					>
 						{/* <AudioTrack trackRef={trackRef} /> */}
+						{/* <MyVideoConference /> */}
+						{/* <RoomAudioRenderer /> */}
+						{/* <ControlBar /> */}
 					</LiveKitRoom>
 				)}
-				{/* <div className="h-[2000px]">123</div> */}
 			</div>
 			<span className="absolute top-[20%] left-1/2 -translate-x-1/2">{getStatusDescription(status)}</span>
 			<div className="absolute bottom-10 w-full flex flex-row justify-evenly items-center">
@@ -86,5 +94,20 @@ const Call: React.FC<RouterProps> = ({ f7router }) => {
 		</Page>
 	)
 }
+
+// function MyVideoConference() {
+// 	const tracks = useTracks(
+// 		[
+// 			{ source: Track.Source.Camera, withPlaceholder: true },
+// 			{ source: Track.Source.ScreenShare, withPlaceholder: false }
+// 		],
+// 		{ onlySubscribed: false }
+// 	)
+// 	return (
+// 		<GridLayout tracks={tracks} style={{ height: 'calc(100% - var(--lk-control-bar-height))' }}>
+// 			<ParticipantTile />
+// 		</GridLayout>
+// 	)
+// }
 
 export default Call
