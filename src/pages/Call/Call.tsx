@@ -51,7 +51,7 @@ const Call: React.FC<RouterProps> = ({ f7router }) => {
 						token={callInfo.wsInfo.token}
 						serverUrl={callInfo.wsInfo.url}
 						audio={true}
-						video={false}
+						video={true}
 						// screen={true}
 						onError={(e) => {
 							console.log(e)
