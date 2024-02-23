@@ -8,6 +8,7 @@ import {
 	LiveKitRoom,
 	ParticipantTile,
 	RoomAudioRenderer,
+	StartAudio,
 	useTracks
 } from '@livekit/components-react'
 
@@ -17,7 +18,7 @@ import { useCallStore } from '@/stores/call'
 import { CallStatus, getStatusDescription } from '@/shared'
 import { Track } from 'livekit-client'
 
-const Call: React.FC<RouterProps> = ({ f7router }) => {
+const Call: React.FC<RouterProps> = () => {
 	const { callInfo, status, reject, accept, hangup } = useCallStore()
 	const roomReady = status === CallStatus.CALLING && callInfo?.wsInfo
 
@@ -42,57 +43,49 @@ const Call: React.FC<RouterProps> = ({ f7router }) => {
 		}
 	}, [status, callInfo?.wsInfo])
 
+	const roomDisconnect = () => {
+		console.log('通话断开', getStatusDescription(status))
+		hangup()
+	}
+
+	const roomError = (err: any) => {
+		console.log('通话出现异常：', status, err)
+		status === CallStatus.WAITING && reject()
+	}
+
 	return (
 		<Page className="bg-bgPrimary flex flex-col justify-center items-center">
-			<div className="h-full overflow-y-scroll">
-				{roomReady && (
-					<LiveKitRoom
-						style={{ height: '100%' }}
-						token={callInfo.wsInfo.token}
-						serverUrl={callInfo.wsInfo.url}
-						audio={true}
-						video={true}
-						// screen={true}
-						onError={(e) => {
-							console.log(e)
-						}}
-					>
-						<MyVideoConference />
-						<RoomAudioRenderer />
-						<ControlBar />
-					</LiveKitRoom>
-				)}
-			</div>
-			{/* <span className="absolute top-[20%] left-1/2 -translate-x-1/2">{getStatusDescription(status)}</span> */}
+			{roomReady && (
+				<LiveKitRoom
+					data-lk-theme="default"
+					token={callInfo.wsInfo.token}
+					serverUrl={callInfo.wsInfo.url}
+					audio={true}
+					video={true}
+					screen={false}
+					onDisconnected={roomDisconnect}
+					onError={roomError}
+				>
+					<MyVideoConference />
+					<RoomAudioRenderer />
+					<StartAudio label="单击以允许音频播放" />
+					<ControlBar />
+				</LiveKitRoom>
+			)}
 			<div className="absolute bottom-10 w-full flex flex-row justify-evenly items-center">
 				{status === CallStatus.WAITING && (
 					<>
 						{/* 拒绝 */}
 						<PhoneFill
 							className="size-[45px] box-content p-2 rounded-full bg-gray-100 text-red-500"
-							onClick={async () => {
-								await reject()
-								f7router.back()
-							}}
+							onClick={reject}
 						/>
 						{/* 接通 */}
 						<PhoneFill
 							className="size-[45px] box-content p-2 rounded-full bg-gray-100 text-green-500"
-							onClick={async () => {
-								await accept()
-							}}
+							onClick={accept}
 						/>
 					</>
-				)}
-				{[CallStatus.CALLING].includes(status) && (
-					// 挂断
-					<PhoneFill
-						className="size-[45px] box-content p-2 rounded-full bg-gray-100 text-red-500"
-						onClick={async () => {
-							await hangup()
-							f7router.back()
-						}}
-					/>
 				)}
 			</div>
 		</Page>
