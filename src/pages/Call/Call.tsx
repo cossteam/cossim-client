@@ -55,6 +55,10 @@ const Call: React.FC<RouterProps> = () => {
 	}, [status, callInfo?.wsInfo])
 
 	const [errCount, setErrCount] = useState(0)
+	const onConnected = () => {
+		console.log('通话连接成功', getStatusDescription(status))
+		setErrCount(0)
+	}
 	const roomDisconnect = () => {
 		console.log('通话断开', getStatusDescription(status))
 		// errCount >= 222 && hangup()
@@ -78,15 +82,18 @@ const Call: React.FC<RouterProps> = () => {
 					audio={true}
 					video={false}
 					screen={false}
+					onConnected={onConnected}
 					onDisconnected={roomDisconnect}
 					onError={roomError}
 				>
 					<MyVideoConference />
 					<RoomAudioRenderer />
 					<ControlBar />
-					<div className="p-2 fixed top-1/2 left-1/2 translate-y-[-50%] translate-x-[-50%] text-center bg-white text-red-500">
-						<div>网络异常,重试中(3/{errCount})...</div>
-					</div>
+					{errCount > 0 && (
+						<div className="p-2 fixed top-1/2 left-1/2 translate-y-[-50%] translate-x-[-50%] text-center bg-white text-red-500">
+							<div>网络异常,重试中(3/{errCount})...</div>
+						</div>
+					)}
 					<div className="p-2 box-border">
 						<DisconnectButton onClick={hangup}>挂断</DisconnectButton>
 					</div>
