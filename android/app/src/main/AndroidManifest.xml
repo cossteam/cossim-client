@@ -47,6 +47,8 @@
     <!-- 相机 -->
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.IMAGE_CAPTURE" />
+    <!--如需使用人脸识别，还要添加：摄相头权限，拍照需要用到 -->
+    <uses-permission android:name="android.permission.CAMERA" />
     <!--连接网络权限，用于执行云端语音能力 -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <!--获取手机录音机使用权限，听写、识别、语义理解需要用到此权限 -->
@@ -59,8 +61,6 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <!--读取手机信息权限 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <!--读取联系人权限，上传联系人需要用到此权限 -->
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
     <!--外存储写权限，构建语法需要用到此权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
@@ -75,6 +75,4 @@
     <!--定位信息是敏感信息，可通过Setting.setLocationEnable(false)关闭定位请求 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
         tools:ignore="CoarseFineLocation" />
-    <!--如需使用人脸识别，还要添加：摄相头权限，拍照需要用到 -->
-    <uses-permission android:name="android.permission.CAMERA" />
 </manifest>
