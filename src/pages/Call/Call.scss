@@ -1,4 +1,9 @@
 .page-content {
 	width: 100%;
 	position: relative;
+	.lk-control-bar {
+		.lk-disconnect-button {
+			display: none;
+		}
+	}
 }

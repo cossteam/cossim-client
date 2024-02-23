@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Page } from 'framework7-react'
+import { Page, f7 } from 'framework7-react'
 
 import '@livekit/components-styles'
 import {
 	ControlBar,
+	DisconnectButton,
 	GridLayout,
 	LiveKitRoom,
 	ParticipantTile,
 	RoomAudioRenderer,
-	StartAudio,
 	useTracks
 } from '@livekit/components-react'
 
@@ -19,7 +19,7 @@ import { CallStatus, getStatusDescription } from '@/shared'
 import { Track } from 'livekit-client'
 
 const Call: React.FC<RouterProps> = () => {
-	const { callInfo, status, reject, accept, hangup } = useCallStore()
+	const { callInfo, status, handlerTimeout, reject, accept, hangup } = useCallStore()
 	const roomReady = status === CallStatus.CALLING && callInfo?.wsInfo
 
 	const [worker, setWorker] = useState<Worker | null>(null)
@@ -27,12 +27,23 @@ const Call: React.FC<RouterProps> = () => {
 		;(async () => {
 			console.log('通话状态', getStatusDescription(status), callInfo?.wsInfo)
 			if (status === CallStatus.WAITING && callInfo?.wsInfo) {
-				// if (!worker) {
-				// 	const worker = new Worker(new URL('./worker/timer.ts', import.meta.url))
-				// 	worker.postMessage({ duration: 6000 })
-				// 	worker.onmessage = () => handlerTimeout()
-				// 	setWorker(worker)
-				// }
+				if (!worker) {
+					const worker = new Worker(new URL('./worker/timer.ts', import.meta.url))
+					worker.postMessage({ duration: 3 })
+					worker.onmessage = () => {
+						f7.dialog.alert('通话已超时，请重新发起通话！', () => {
+							handlerTimeout()
+							f7.dialog.close()
+						})
+					}
+					setWorker(worker)
+				}
+			}
+			if (status === CallStatus.CALLING && !callInfo?.wsInfo) {
+				f7.dialog.alert('通话信息异常，请重新发起通话！', () => {
+					hangup()
+					f7.dialog.close()
+				})
 			}
 		})()
 		return () => {
@@ -43,36 +54,46 @@ const Call: React.FC<RouterProps> = () => {
 		}
 	}, [status, callInfo?.wsInfo])
 
+	const [errCount, setErrCount] = useState(0)
 	const roomDisconnect = () => {
 		console.log('通话断开', getStatusDescription(status))
-		hangup()
+		// errCount >= 222 && hangup()
+		errCount >= 3 && hangup()
 	}
 
 	const roomError = (err: any) => {
-		console.log('通话出现异常：', status, err)
+		setErrCount(errCount + 1)
+		console.log('通话出现异常：', getStatusDescription(status), err)
 		status === CallStatus.WAITING && reject()
 	}
 
 	return (
-		<Page className="bg-bgPrimary flex flex-col justify-center items-center">
+		<Page className="bg-bgPrimary bg-zinc-900 z-[999] flex flex-col justify-center items-center">
 			{roomReady && (
 				<LiveKitRoom
 					data-lk-theme="default"
+					style={{ height: '100%', backgroundColor: 'black' }}
 					token={callInfo.wsInfo.token}
 					serverUrl={callInfo.wsInfo.url}
 					audio={true}
-					video={true}
+					video={false}
 					screen={false}
 					onDisconnected={roomDisconnect}
 					onError={roomError}
 				>
 					<MyVideoConference />
 					<RoomAudioRenderer />
-					<StartAudio label="单击以允许音频播放" />
 					<ControlBar />
+					<div className="p-2 fixed top-1/2 left-1/2 translate-y-[-50%] translate-x-[-50%] text-center bg-white text-red-500">
+						<div>网络异常,重试中(3/{errCount})...</div>
+					</div>
+					<div className="p-2 box-border">
+						<DisconnectButton onClick={hangup}>挂断</DisconnectButton>
+					</div>
 				</LiveKitRoom>
 			)}
 			<div className="absolute bottom-10 w-full flex flex-row justify-evenly items-center">
+				{/* <div className="text-center">等待时间：60s</div> */}
 				{status === CallStatus.WAITING && (
 					<>
 						{/* 拒绝 */}
