@@ -20,15 +20,24 @@ import UserStore from '@/db/user'
 import MsgService from '@/api/msg'
 import './DialogList.scss'
 import ToolEditor from '@/components/Editor/ToolEditor'
+import { useStateStore } from '@/stores/state'
 
 const DialogList: React.FC<RouterProps> = () => {
 	const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
 	const [chats, setChats] = useState<any[]>(dialogs)
 
+	const { is_chat_update, updateChat } = useStateStore()
+
 	const getDialogList = async () => {
 		try {
 			const { code, data } = await MsgService.getDialogApi()
 			if (code !== 200) return
+
+			if (data.length !== dialogs.length) {
+				await UserStore.clear(UserStore.tables.dialogs)
+				await UserStore.bulkAdd(UserStore.tables.dialogs, data)
+				return
+			}
 
 			data.forEach(async (item: any) => {
 				const dialog = await UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', item.dialog_id)
@@ -36,7 +45,10 @@ const DialogList: React.FC<RouterProps> = () => {
 				if (!dialog) return await UserStore.add(UserStore.tables.dialogs, item)
 
 				if (!isEqual(dialog, item)) {
-					await UserStore.update(UserStore.tables.dialogs, 'dialog_id', item.dialog_id, { ...dialog, ...item })
+					await UserStore.update(UserStore.tables.dialogs, 'dialog_id', item.dialog_id, {
+						...dialog,
+						...item
+					})
 				}
 			})
 		} catch {
@@ -45,8 +57,11 @@ const DialogList: React.FC<RouterProps> = () => {
 	}
 
 	useEffect(() => {
-		getDialogList()
-	}, [])
+		if (is_chat_update) {
+			getDialogList()
+			updateChat(false)
+		}
+	}, [is_chat_update])
 
 	useEffect(() => {
 		if (!dialogs.length) return
@@ -110,7 +125,7 @@ const DialogList: React.FC<RouterProps> = () => {
 						/>
 						<div slot="text" className="max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
 							{/* {item?.last_message?.content} */}
-							<ToolEditor defaultValue={item?.last_message?.content} readonly className='read_editor'/>
+							<ToolEditor defaultValue={item?.last_message?.content} readonly className="read_editor" />
 						</div>
 						<SwipeoutActions right>
 							<SwipeoutButton close overswipe color="blue">

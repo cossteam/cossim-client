@@ -3,6 +3,8 @@ import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE, USER_ID } from 
 import UserStore from '@/db/user'
 import { v4 as uuidv4 } from 'uuid'
 import { MessageStore } from '@/stores/message'
+import CommonStore from '@/db/common'
+import { StateStore } from '@/stores/state'
 
 const user_id = getCookie(USER_ID) || ''
 
@@ -10,17 +12,13 @@ const user_id = getCookie(USER_ID) || ''
  * 处理私聊接收的 socket 的消息
  * @param {*} data  socket 消息
  */
-export const handlerMessageSocket = async (data: any, updateMessage: (msg: any) => void) => {
+export const handlerMessageSocket = async (data: any, updateMessage: (msg: any) => void, stateStore: StateStore) => {
 	try {
-		console.log('data', data)
-
-		// 如果是当前设备就不需要继续操作了
-		// if (Number(getCookie(RID)) === data.rid) return
-
 		const message = data.data
+		const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 
-		//  TODO: 后续还要判断是否同一设备 id
-		if (user_id === message.sender_id) return
+		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
+		if (user_id === message.sender_id && data.driverId === user?.device_id) return
 
 		const msg = {
 			dialog_id: message?.dialog_id,
@@ -46,6 +44,21 @@ export const handlerMessageSocket = async (data: any, updateMessage: (msg: any) 
 
 		updateMessage(msg)
 		await UserStore.add(UserStore.tables.messages, msg)
+
+		// 更新会话列表
+		const chat = await UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', message?.dialog_id)
+		chat
+			? await UserStore.update(UserStore.tables.dialogs, 'dialog_id', msg.dialog_id, {
+					...chat,
+					last_message: {
+						...chat.last_message,
+						content: msg.content,
+						msg_id: msg.msg_id,
+						send_time: msg.create_at,
+						sender_id: msg.sender_id
+					}
+				})
+			: stateStore.updateChat(true)
 	} catch (error) {
 		console.log('处理失败')
 	}
@@ -58,8 +71,22 @@ export const handlerMessageSocket = async (data: any, updateMessage: (msg: any) 
 export const handlerRequestSocket = (data: any) => {
 	try {
 		console.log('处理好友请求', data)
+		// TODO: 存储对方的公钥信息
+
 	} catch (error) {
 		console.log('处理好友请求失败')
+	}
+}
+
+/**
+ * 收到同意或拒绝好友请求
+ * @param {*} data  socket 消息
+ */
+export const handlerRequestResultSocket = (data: any) => {
+	try {
+		console.log('处理好友请求结果', data)
+	} catch (error) {
+		console.log('处理好友请求结果失败')
 	}
 }
 

@@ -41,6 +41,7 @@ export interface MessageStore {
 	readMessage: (msgs: PrivateChats[]) => Promise<void>
 	initMessage: (is_group: boolean, dialog_id: number, receiver_id: string) => Promise<void>
 	updateMessages: (msgs: PrivateChats[]) => Promise<void>
+	clearMessages: () => Promise<void>
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -76,9 +77,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	 * @return {Promise<void>}
 	 */
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
-		console.log('发送消息')
-
 		const { messages, receiver_id, dialog_id, myInfo } = get()
+
+		let error_message = ''
 
 		// 判断是否是群聊
 		let { is_group, tableName } = get()
@@ -133,18 +134,38 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 				params['receiver_id'] = msg.receiver
 			}
 
-			const { code, data } = is_group
-				? await MsgService.sendGroupMessageApi(params)
-				: await MsgService.sendUserMessageApi(params)
+			const {
+				code,
+				data,
+				msg: err
+			} = is_group ? await MsgService.sendGroupMessageApi(params) : await MsgService.sendUserMessageApi(params)
 
 			msg.msg_send_state = code === 200 ? MESSAGE_SEND.SEND_SUCCESS : MESSAGE_SEND.SEND_FAILED
 			msg.msg_id = data?.msg_id || Date.now()
+
+			// 如果有错误信息
+			if (code !== 200) error_message = err
 		} catch (error) {
 			console.error('发送消息失败', error)
 			msg.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		} finally {
-			set((state) => ({ messages: [...state.messages.slice(0, -1), msg] }))
+			const msgs: any[] = []
+			msgs.push(msg)
 			!is_forward && (await updateDatabaseMessage(tableName, msg.uid, msg))
+
+			if (error_message) {
+				msgs.push({
+					dialog_id: msg.dialog_id,
+					msg_id: null,
+					is_tips: true,
+					content: error_message,
+					type: MESSAGE_TYPE.ERROR,
+					uid: uuidv4()
+				})
+				!is_forward && (await updateDatabaseMessage(tableName, msgs[1].uid, msgs[1]))
+			}
+
+			set((state) => ({ messages: [...state.messages.slice(0, -1), ...msgs] }))
 		}
 	},
 	editMessage: async (msg: PrivateChats, content: string) => {
@@ -213,8 +234,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 		const params: any = { msg_ids, dialog_id }
 
-		if(!is_group) params['group_id'] = Number(receiver_id)
-		
+		if (!is_group) params['group_id'] = Number(receiver_id)
+
 		const { code } = is_group
 			? await MsgService.readGroupMessageApi(params)
 			: await MsgService.readUserMessageApi(params)
@@ -249,9 +270,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 		// 当前会话的信息，如果是私聊就是好友信息，如果是群聊就是群信息
 		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', receiver_id)
-		
-		// TODO: 获取好友信息
 
+		// TODO: 获取好友信息
 
 		// 自己的信息
 		const myInfo = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
@@ -268,11 +288,14 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			const differences = omitBy(messages, (value, key) => isEqual(value, msgs[key]))
 
 			if (isEmpty(differences)) return
-			console.log("Object.values(differences)",Object.values(differences));
-			
+			console.log('Object.values(differences)', Object.values(differences))
+
 			set({ messages: [...messages, ...Object.values(differences)] })
 		} catch (error) {
 			console.error('更新消息失败', error)
 		}
+	},
+	clearMessages: async () => {
+		set({ messages: [], all_meesages: [] })
 	}
 }))

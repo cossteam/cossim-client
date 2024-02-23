@@ -19,7 +19,9 @@ export enum MESSAGE_TYPE {
 	/** 文件 */
 	FILE = 6,
 	/** 待办 */
-	TODO = 7
+	TODO = 7,
+	/** 错误信息 */
+	ERROR = 8
 }
 
 /** 消息阅读状态 */
@@ -100,6 +102,14 @@ export enum ApplyStatus {
 	INVITE_SENDER = 3,
 	/** 被邀请者 */
 	INVITE_RECEIVER = 4
+}
+
+/** 管理申请状态 */
+export enum MangageApplyStatus {
+	/** 拒绝 */
+	REFUSE = 0,
+	/** 同意 */
+	ACCEPT = 1
 }
 
 /** 群聊管理列表状态管理 */
@@ -192,5 +202,49 @@ export enum SocketEvent {
 	/** 群聊通话挂断事件 */
 	GroupCallHangupEvent = 19,
 	/** 接收到消息标注信息 */
-	MessageLabelEvent = 23
+	MessageLabelEvent = 23,
+	/** 推送好友在线状态 */
+	FriendOnlineEvent = 24,
+	/** 推送好友离线状态 */
+	FriendOfflineEvent = 25
+}
+
+/** 消息是否阅后即焚 */
+export enum MessageBurnAfterRead {
+	/** 否 */
+	NO = 0,
+	/** 是 */
+	YES = 1
+}
+
+/** 消息是否免打扰 */
+export enum MessageNoDisturb {
+	/** 否 */
+	NO = 0,
+	/** 是 */
+	YES = 1
+}
+
+/** 好友关系 */
+export enum RelationStatus {
+	/** 已删除 */
+	NOT = 0,
+	/** 正常 */
+	YES = 1,
+	/** 黑名单 */
+	BLACK = 2
+}
+
+/** 群聊请求状态 */
+export enum GroupApplyStatus {
+	/** 等待验证 */
+	WAIT = 0,
+	/** 已通过 */
+	PASS = 1,
+	/** 已拒绝 */
+	REFUSE = 2,
+	/** 邀请发送者 */
+	INVITE_SENDER = 3,
+	/** 邀请接收者 */
+	INVITE_RECEIVER = 4
 }

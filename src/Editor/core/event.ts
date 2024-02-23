@@ -15,7 +15,7 @@ class EventListenerMap {
 	 * 将事件处理程序添加到侦听器列表中。
 	 *
 	 * @param {EventHandler} handler -要添加的事件处理程序
-	 * @return {无效}
+	 * @return
 	 */
 	delete(handler: EventHandler): void {
 		this.listeners.delete(handler)

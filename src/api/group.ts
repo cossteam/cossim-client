@@ -189,6 +189,39 @@ class GroupServiceImpl {
 			data
 		})
 	}
+
+	/**
+	 * 管理进群请求
+	 * 
+	 * @param {*} data
+	 * @param {*} data.group_id
+	 * @param {*} data.action 
+	 * @param {*} data.id 
+	 */
+	manageGroupRequestApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/admin/manage/join',
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 管理群聊申请
+	 * 
+	 * @param {*} data
+	 * @param {*} data.group_id
+	 * @param {*} data.action 
+	 * @param {*} data.id
+	 */
+	manageGroupApplyApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/manage_join',
+			method: 'POST',
+			data
+		})
+	}
+
 }
 
 const GroupService = new GroupServiceImpl()

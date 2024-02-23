@@ -45,6 +45,14 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 		)
 	}
 
+	if (msg?.type === MESSAGE_TYPE.ERROR) {
+		return (
+			<div className="max-w-[70%] w-fit bg-gray-200 px-2 py-[2px] flex items-center text-red-500 overflow-hidden text-ellipsis whitespace-nowrap text-[0.75rem] rounded mx-auto text-center cursor-pointer active:bg-opacity-50">
+				{msg?.content}
+			</div>
+		)
+	}
+
 	return (
 		<div className={clsx('flex', is_self ? 'justify-end' : 'justify-start', className)} id={`msg_${msg?.msg_id}`}>
 			<div className="flex max-w-[85%]">

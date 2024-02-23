@@ -1,11 +1,11 @@
 import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
-import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Segmented, Subnavbar, f7 } from 'framework7-react'
+import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
 import { useAsyncEffect, useClickOutside } from '@reactuses/core'
 import {
 	FaceSmiling,
 	PlusCircle,
-	EllipsesBubbleFill,
+	// EllipsesBubbleFill,
 	ArrowRightCircleFill,
 	MicCircleFill,
 	Xmark,
@@ -16,17 +16,10 @@ import { useClipboard } from '@reactuses/core'
 
 import './message.scss'
 import { useMessageStore } from '@/stores/message'
-import {
-	$t,
-	PLATFORM,
-	TOOLTIP_TYPE,
-	MESSAGE_TYPE,
-	isMe
-	// insertElement
-} from '@/shared'
+import { $t, TOOLTIP_TYPE, MESSAGE_TYPE, isMe } from '@/shared'
 import Chat from '@/components/Message/Chat'
 // import ToolEditor } from '@/components/Editor/ToolEditor'
-import { platform } from '@/utils'
+import { isWebDevice, platform } from '@/utils'
 import clsx from 'clsx'
 import { useToast } from '@/hooks/useToast'
 import Contact from '@/components/Contact/Contact'
@@ -34,6 +27,7 @@ import Emojis from '@/components/Emojis/Emojis'
 // import GroupService from '@/api/group'
 
 import ToolEditor, { EventType, ToolEditorMethods as TT } from '@/Editor'
+import { useStateStore } from '@/stores/state'
 
 /**
  * 滚动元素到底部
@@ -64,12 +58,13 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const dialog_id = Number(f7route.params.dialog_id as string)
 	const dialog_name = f7route.query.dialog_name
 
+	const { updateChat } = useStateStore()
 	const { messages, ...msgStore } = useMessageStore()
 
 	// 在进入页面前设置内容高度
 	const onPageInit = async () => {
 		const navbarHeight = navbarRef.current.el!.offsetHeight || 56
-		const subnavbarHeight = subnavbarRef.current.el!.offsetHeight || 45
+		const subnavbarHeight = subnavbarRef.current.el?.offsetHeight || 45
 		const toolbarHeight = toolbarRef.current!.offsetHeight || 56
 
 		const totalHeight = navbarHeight + subnavbarHeight + toolbarHeight
@@ -96,9 +91,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				setShowSelect(true)
 				break
 			case TOOLTIP_TYPE.EDIT:
-				// editorRef.current?.engine.setValue(msg?.content || '')
 				editorRef.current?.engine.insertElement(msg?.content || '', { isFocus: true })
-				// editorRef.current?.focus()
 				break
 			case TOOLTIP_TYPE.DELETE:
 				f7.dialog.confirm($t('确认删除消息？'), () => {
@@ -198,7 +191,6 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const [moreType, setMoreType] = useState<MoreType>('')
 	const moreRef = useRef<HTMLDivElement | null>(null)
 	const showMore = (type: MoreType) => {
-		const isWeb = platformName === 'web'
 		const isEnd = isScrollEnd()
 
 		if (type === moreType && isWeb) {
@@ -235,23 +227,29 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	// 键盘显示
 	// const [keyboardShow, setKeyboardShow] = useState<boolean>(false)
 
+	const [isWeb, setIsWeb] = useState<boolean>(true)
+
 	useAsyncEffect(
 		async () => {
 			if (!pageRef.current.el) return
 			const el = pageRef.current.el.querySelector('.page-content') as HTMLElement
+
 			contentRef.current = el
 
 			await msgStore.initMessage(is_group, dialog_id, receiver_id)
 
 			requestAnimationFrame(() => {
 				// 滚动到最底部
-				setTimeout(() => scroll(contentRef.current!), 0)
+				setTimeout(() => scroll(el), 0)
 			})
+
+			setIsWeb(await isWebDevice())
 
 			// 手机端监听键盘
 			const platformName = await platform()
 			setPlatformName(platformName)
-			if (platformName !== PLATFORM.WEB) {
+
+			if (!isWeb) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
 					setKeyboardHeight(info.keyboardHeight - 15)
 					setMoreType('')
@@ -286,27 +284,20 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			// }
 
 			const engine = editorRef.current!.engine
-			// engine.el.contentEditable = 'false'
 			engine.on(EventType.CHANGE, () => setShowBtn(!engine.isEmpty()))
 			engine.on(EventType.FOCUS, () => {
-				// if (!moreType) {
-				// 	moreRef.current!.style.display = 'none'
-				// }
 				BlockRef.current.el!.style.paddingBottom = 56 + 'px'
 				closeToolBar()
-				// platformName !== 'web' && Keyboard?.hide()
-				// setTimeout(() => {
-				// 	moreRef.current!.style.display = 'block'
-				// }, 100)
 				requestAnimationFrame(() => {
-					engine.el.contentEditable = 'true'
-					setTimeout(() => engine.focus(), 300)
+					engine.readonly = false
+					if (!moreType) {
+						setTimeout(() => engine.focus(), 300)
+					} else {
+						setTimeout(() => engine.focus(), 0)
+						return
+					}
 				})
 			})
-
-			// engine.on('click', () => {
-			// 	console.log('点击事件')
-			// })
 
 			// @ 功能
 			// engine.on('mention:default', () => {
@@ -340,7 +331,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		setSelectType(TOOLTIP_TYPE.NONE)
 		setTimeout(() => scroll(contentRef.current!, isEnd ? true : false), 100)
 		setMoreType('')
-		engine.el.contentEditable = 'true'
+		engine.readonly = false
 		engine.focus()
 	}
 
@@ -357,22 +348,13 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		editorRef.current!.engine.insertElement(emojis.native, { isFocus: false })
 	}
 
-	const focus = async () => {
-		// closeToolBar()
-		// platformName !== 'web' && Keyboard?.hide()
-		// requestAnimationFrame(() => {
-		// 	editorRef.current!.focus()
-		// })
-	}
-	const blur = async () => {}
-
 	// 辅助函数
 	const isSelect = () => selectType === TOOLTIP_TYPE.SELECT
 	const isReply = () => selectType === TOOLTIP_TYPE.REPLY
 	const isEdit = () => selectType === TOOLTIP_TYPE.EDIT
 	const replyMessage = (msg_id: number) => msgStore.all_meesages.find((v) => v?.msg_id === msg_id)
 	const setToolbarBottom = (bottom: number) => (toolbarRef.current!.style.transform = `translateY(${bottom}px)`)
-	// const setMoreTop = (top: number) => (moreRef.current!.style.top = top + 'px')
+	// const isWeb = () => platformName === 'web'
 
 	// 关闭更多功能
 	const closeToolBar = () => {
@@ -381,11 +363,21 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	}
 
 	// 判断是否滚动到底部
-	const isScrollEnd = (setp: number = 100) =>
-		contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - setp
+	const isScrollEnd = (setp: number = 100) => {
+		if (!contentRef.current) return false
+		return (
+			contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - setp
+		)
+	}
 
 	return (
-		<Page noToolbar className="coss_message transition-all" onPageInit={onPageInit} ref={pageRef}>
+		<Page
+			noToolbar
+			className="coss_message transition-all"
+			onPageInit={onPageInit}
+			ref={pageRef}
+			onPageBeforeOut={() => updateChat(true)}
+		>
 			<Navbar
 				title={dialog_name}
 				subtitle="[在线]"
@@ -398,35 +390,20 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					{isSelect() ? (
 						<Link onClick={selectEvent.clear}>{$t('取消')}</Link>
 					) : (
-						<Link href={is_group ? `/group_info/${receiver_id}/` : `/profile/${receiver_id}/`}>
+						<Link
+							href={
+								is_group ? `/group_info/${receiver_id}/` : `/profile/${receiver_id}/?from_page=message`
+							}
+						>
 							<Ellipsis className="w-6 h-6 mr-2" />
 						</Link>
 					)}
 				</NavRight>
-				<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
-					<Segmented>
-						<Button active>
-							<EllipsesBubbleFill slot="iconF7" className="mr-2" />
-							{$t('消息')}
-						</Button>
-						<Button>
-							<EllipsesBubbleFill slot="iconF7" className="mr-2" />
-							{$t('图片')}
-						</Button>
-						<Button>
-							<EllipsesBubbleFill slot="iconF7" className="mr-2" />
-							{$t('文件')}
-						</Button>
-						<Button>
-							<EllipsesBubbleFill slot="iconF7" className="mr-2" />
-							{$t('链接')}
-						</Button>
-						<Button>
-							<EllipsesBubbleFill slot="iconF7" className="mr-2" />
-							{$t('标注')}
-						</Button>
-					</Segmented>
-				</Subnavbar>
+				{is_group && (
+					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
+						1111
+					</Subnavbar>
+				)}
 			</Navbar>
 
 			<Block className="my-0 px-0 pt-5 pb-16 transition-all duration-300 ease-linear" ref={BlockRef}>
@@ -452,7 +429,6 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					))}
 				</List>
 			</Block>
-
 			<div
 				className={clsx(
 					'fixed bg-bgPrimary bottom-0 w-full h-auto z-[99]  transition-all duration-300 ease-in'
@@ -514,8 +490,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 										<ToolEditor
 											ref={editorRef}
 											readonly={false}
-											focus={focus}
-											blur={blur}
+											// focus={focus}
+											// blur={blur}
 											className="max-h-[150px]  overflow-y-auto"
 										/>
 									</div>
@@ -532,8 +508,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 											<ToolEditor
 												initValue={selectMsgs[0]?.content}
 												className="px-2 py-1 read-editor-1"
-												focus={focus}
-												blur={blur}
+												// focus={focus}
+												// blur={blur}
 											/>
 											<Link
 												className="pr-2"

@@ -18,6 +18,14 @@ class Editor {
 	private range: CustomRange
 	private isFocus: boolean = false
 
+	get readonly() {
+		return this.el.contentEditable === 'false'
+	}
+
+	set readonly(v: boolean) {
+		this.el.contentEditable = v ? 'false' : 'true'
+	}
+
 	constructor(el: HTMLDivElement, options?: EditorOptions) {
 		if (!el) throw new Error('el is required')
 		this.el = el
@@ -32,12 +40,12 @@ class Editor {
 		if (options?.initValue) {
 			this.insertElement(options.initValue, { render: true })
 		}
-		this.el.contentEditable = options?.readonly ? 'false' : 'true'
 		this.el.classList.add('custom-editor')
+		this.readonly = options?.readonly ?? false
 
 		// 特殊配置
 		if (!options?.readonly) {
-			this.el.contentEditable = 'false'
+			this.readonly = false
 		}
 
 		// @
@@ -68,7 +76,7 @@ class Editor {
 		this.on('click', () => {
 			this.eventListeners.triggerCustomEvent(EventType.FOCUS)
 		})
-		this.on('blur',()=> this.el.contentEditable = 'false')
+		this.on('blur', () => (this.el.contentEditable = 'false'))
 
 		// 处理粘贴
 		this.on('paste', (e: ClipboardEvent) => {

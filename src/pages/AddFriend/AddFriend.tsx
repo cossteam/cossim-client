@@ -18,7 +18,7 @@ const AddFriend: React.FC<RouterProps> = ({ f7router }) => {
 			// 先查找本地好友列表，查看是否是自己好友
 			const user = await UserStore.findOneById(UserStore.tables.friends, 'email', keyWord)
 			if (user) {
-				f7router.navigate(`/profile/${user.user_id}`)
+				f7router.navigate(`/profile/${user.user_id}/`)
 				return
 			}
 

@@ -7,7 +7,11 @@
     /** 动画时长 */
     --animate-duration: 0.3s;
 
+
+
     .page-content {
+        // padding-top: calc(var(--f7-page-navbar-offset, 0px) + var(--f7-page-toolbar-top-offset, 0px) + var(--f7-page-subnavbar-offset, 0px) + var(--f7-page-searchbar-offset, 0px) + var(--f7-page-content-extra-padding-top, 0px));
+        // padding-top: 88px;
 
         &::-webkit-scrollbar {
             display: none;
@@ -92,7 +96,7 @@
     // transform: translateY(-attr(data-height));
 }
 
-.keyboard-hide  {
+.keyboard-hide {
     transform: translateY(317px);
     transition: transform 0.3s;
 }

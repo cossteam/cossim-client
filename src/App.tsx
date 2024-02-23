@@ -14,14 +14,17 @@ import {
 	CallStatus,
 	handlerMessageSocket,
 	SocketEvent,
-	handlerLabelSocket
+	handlerLabelSocket,
+	handlerRequestResultSocket
 } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 import { useCallStore } from '@/stores/call'
 import { useMessageStore } from './stores/message'
+import { useStateStore } from '@/stores/state'
 
 function App() {
 	const msgStore = useMessageStore()
+	const stateStore = useStateStore()
 
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
@@ -61,11 +64,13 @@ function App() {
 				case SocketEvent.PrivateChatsEvent:
 				case SocketEvent.GroupChatsEvent:
 				case SocketEvent.SelfChatsEvent:
-					handlerMessageSocket(data, msgStore.updateMessage)
+					handlerMessageSocket(data, msgStore.updateMessage, stateStore)
 					break
 				case SocketEvent.ApplyListEvent:
-				case SocketEvent.ApplyAcceptEvent:
 					handlerRequestSocket(data)
+					break
+				case SocketEvent.ApplyAcceptEvent:
+					handlerRequestResultSocket(data)
 					break
 				case SocketEvent.UserCallReqEvent:
 				case SocketEvent.GroupCallReqEvent:

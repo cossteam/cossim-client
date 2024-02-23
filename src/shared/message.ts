@@ -57,6 +57,10 @@ export const updateDatabaseMessage = async (
 	try {
 		const result = await UserStore.findOneById(tableName, 'uid', uid)
 
+
+		console.log("result",result);
+		
+
 		// 添加消息
 		if (!result) return await UserStore.add(tableName, msg)
 
@@ -123,3 +127,11 @@ export const dillServerInfo = async (user_id: string, userInfo: any) => {
 	}
 	return result
 }
+
+
+/**
+ * 更新会话
+ * 
+ * @param {string} user_id
+ * @returns
+ */

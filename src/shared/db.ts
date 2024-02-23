@@ -100,6 +100,7 @@ export class ServiceImpl implements ServiceMixin {
 		return await this.db.table(table).where(key).equals(value).delete()
 	}
 
+
 	/**
 	 * 清除数据库中指定的表。
 	 *
