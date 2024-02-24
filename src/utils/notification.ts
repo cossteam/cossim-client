@@ -19,7 +19,7 @@ export enum Platform {
 	WEB = 'web'
 }
 
-export default async function localNotification(title: string, body: string, type: LocalNotificationType) {
+export default async function localNotification(type: LocalNotificationType, title: string, body: string) {
 	// 获取平台
 	const platform = (await Device.getInfo()).platform
 	if (platform === Platform.WEB) {
@@ -61,4 +61,4 @@ export default async function localNotification(title: string, body: string, typ
 	}
 }
 
-// localNotification('这是一个本地通知!', '这是一个示例通知。', LocalNotificationType.MESSAGE)
+// localNotification(LocalNotificationType.MESSAGE, '这是一个本地通知!', '这是一个示例通知。')
