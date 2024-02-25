@@ -41,7 +41,7 @@ class GroupServiceImpl {
 	 * @param {*} data.group_id
 	 * @returns
 	 */
-    joinGroupApi(data: any): Promise<DataResponse> {
+	joinGroupApi(data: any): Promise<DataResponse> {
 		return request({
 			url: this.baseGroupUrl + '/join',
 			method: 'POST',
@@ -191,14 +191,14 @@ class GroupServiceImpl {
 	}
 
 	/**
-	 * 管理进群请求
-	 * 
+	 * 管理员管理进群请求
+	 *
 	 * @param {*} data
 	 * @param {*} data.group_id
-	 * @param {*} data.action 
-	 * @param {*} data.id 
+	 * @param {*} data.action
+	 * @param {*} data.id
 	 */
-	manageGroupRequestApi(data: any): Promise<DataResponse> {
+	manageGroupRequestAdminApi(data: any): Promise<DataResponse> {
 		return request({
 			url: this.baseGroupUrl + '/admin/manage/join',
 			method: 'POST',
@@ -207,11 +207,27 @@ class GroupServiceImpl {
 	}
 
 	/**
-	 * 管理群聊申请
-	 * 
+	 * 用户管理进群请求
+	 *
 	 * @param {*} data
 	 * @param {*} data.group_id
-	 * @param {*} data.action 
+	 * @param {*} data.action
+	 * @param {*} data.id
+	 */
+	manageGroupRequestApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/manage_join',
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 管理群聊申请
+	 *
+	 * @param {*} data
+	 * @param {*} data.group_id
+	 * @param {*} data.action
 	 * @param {*} data.id
 	 */
 	manageGroupApplyApi(data: any): Promise<DataResponse> {
@@ -221,7 +237,6 @@ class GroupServiceImpl {
 			data
 		})
 	}
-
 }
 
 const GroupService = new GroupServiceImpl()

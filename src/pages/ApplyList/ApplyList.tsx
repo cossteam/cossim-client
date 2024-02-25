@@ -89,12 +89,22 @@ const ApplyList = () => {
 				e2e_public_key = 'test'
 			}
 
-			const { code } =
+			const { code, msg } =
 				type === ApplyType.FRIEND
 					? await RelationService.manageFriendApplyApi({ request_id: item.id, action, e2e_public_key })
-					: await GroupService.manageGroupRequestApi({ group_id: item.group_id, action, e2e_public_key })
+					: item?.status === ApplyStatus.INVITE_RECEIVER // 是否是被邀请者
+						? await GroupService.manageGroupRequestApi({
+								group_id: item.group_id,
+								action,
+								id: item.id
+							})
+						: await GroupService.manageGroupRequestAdminApi({
+								group_id: item.group_id,
+								action,
+								id: item.id
+							})
 
-			if (code !== 200) return f7.dialog.alert($t('处理好友请求失败'))
+			if (code !== 200) return f7.dialog.alert($t(msg))
 
 			// 更新本地数据
 			await UserStore.update(UserStore.tables.apply_list, 'id', item.id, {
@@ -115,28 +125,37 @@ const ApplyList = () => {
 		}
 	}
 
-	// 获取好友请状态码文字
-	const getFriendStatusText = (status: ApplyStatus) => {
-		const friend_status = {
-			0: '等待验证', // 操作
-			1: '已通过',
-			2: '已拒绝',
-			3: '已发送', // 等待中对方验证
-			4: '已接收' // 操作
-		}
-		return friend_status[status]
-	}
-
-	// 获取群申请状态码文字
-	const getGroupStatusText = (status: GroupApplyStatus) => {
+	// 获取申请状态码文字
+	const getStatusText = (status: GroupApplyStatus) => {
+		// const friend_status = {
+		// 	0: '申请中',
+		// 	1: '已同意',
+		// 	2: '已拒绝'
+		// }
 		const group_status = {
-			0: '等待验证', // 操作
+			0: '待验证', // 操作
 			1: '已通过',
 			2: '已拒绝',
-			3: '邀请发送者', // 等待中对方验证
+			3: '待验证', // 邀请发送者
 			4: '邀请接收者' // 操作
 		}
 		return group_status[status]
+	}
+
+	// 是否可操作
+	const isOperate = ({ status }: any) => {
+		if (type === ApplyType.FRIEND) {
+			// 好友
+			return status === ApplyStatus.PENDING
+		} else {
+			// 群
+			return status === ApplyStatus.PENDING || status === ApplyStatus.INVITE_RECEIVER
+		}
+	}
+
+	// 是否邀请者
+	const isRreceiver = ({ status, sender_info }: any) => {
+		return type === ApplyType.FRIEND ? sender_info.user_id === user_id : status === ApplyStatus.INVITE_SENDER
 	}
 
 	return (
@@ -165,31 +184,86 @@ const ApplyList = () => {
 			</Navbar>
 
 			<List strongIos className="mt-0" mediaList>
-				{applyList.map((item, index) => (
-					<ListItem key={index} title={item?.remark || $t('对方没有留言')}>
-						<div slot="media" className="w-12 h-12">
-							<img
-								src={item?.receiver_info?.user_avatar}
-								alt=""
-								className="w-full h-full object-cover rounded-full"
-							/>
-						</div>
-						{/* 区分好友申请和群申请 */}
-						{type === ApplyType.FRIEND ? (
-							<>
-								<span slot="text">
-									<span>{item?.receiver_info?.user_name}</span>
-								</span>
-								<div slot="content" className="pr-2"></div>
-							</>
-						) : (
-							<>
-								<span slot="text">$t('群聊')</span>
-								<div slot="content" className="pr-2"></div>
-							</>
-						)}
-					</ListItem>
-				))}
+				{applyList.map((item, index) =>
+					// 区分好友申请和群申请
+					type === ApplyType.FRIEND ? (
+						// 好友
+						<ListItem key={index} text={$t(item?.remark || '对方没有留言')}>
+							<div slot="media" className="w-12 h-12">
+								<img
+									src={item?.receiver_info?.user_avatar}
+									alt={$t(item?.receiver_info?.user_name)}
+									className="w-full h-full object-cover rounded-full"
+								/>
+							</div>
+							<div slot="title">
+								<span>{$t(item?.receiver_info?.user_name)}</span>
+							</div>
+							<div slot="content" className="pr-2 flex">
+								{!isOperate(item) ? (
+									<Button className="text-sm text-gray-500" onClick={() => {}}>
+										{getStatusText(item.status)}
+									</Button>
+								) : (
+									<>
+										<Button
+											className="text-sm text-red-500"
+											onClick={() => manageFriendApply(item, MangageApplyStatus.REFUSE)}
+										>
+											拒绝
+										</Button>
+										<Button
+											className="text-sm text-primary"
+											onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
+										>
+											同意
+										</Button>
+									</>
+								)}
+							</div>
+						</ListItem>
+					) : (
+						// 群聊
+						<ListItem key={index} text={$t(item?.remark || '对方没有留言')}>
+							<div slot="media" className="w-12 h-12">
+								<img
+									src={item?.receiver_info?.user_avatar}
+									alt={$t(item?.receiver_info?.user_name)}
+									className="w-full h-full object-cover rounded-full"
+								/>
+							</div>
+							<div slot="title">
+								<span>{$t(isRreceiver(item) ? '你' : item?.sender_info?.user_name)}</span>
+								<span>{$t('邀请')}</span>
+								<span>{$t(isRreceiver(item) ? item?.receiver_info?.user_name : '你')}</span>
+								<span>{$t('加入')}</span>
+								<span>{$t(item?.group_name)}</span>
+							</div>
+							<div slot="content" className="pr-2 flex">
+								{!isOperate(item) ? (
+									<Button className="text-sm text-gray-500" onClick={() => {}}>
+										{getStatusText(item.status)}
+									</Button>
+								) : (
+									<>
+										<Button
+											className="text-sm text-red-500"
+											onClick={() => manageFriendApply(item, MangageApplyStatus.REFUSE)}
+										>
+											拒绝
+										</Button>
+										<Button
+											className="text-sm text-primary"
+											onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
+										>
+											同意
+										</Button>
+									</>
+								)}
+							</div>
+						</ListItem>
+					)
+				)}
 			</List>
 		</Page>
 	)
