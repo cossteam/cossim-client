@@ -115,39 +115,29 @@ const ApplyList = () => {
 		}
 	}
 
-	// 同意加入群聊
-	const joinGroup = async (item: any, action: MangageApplyStatus = 0) => {
-		try {
-			f7.dialog.preloader($t('处理中...'))
-
-			const { code } = await GroupService.manageGroupApplyApi({ group_id: item.group_id, action })
-
-			if (code !== 200) return f7.dialog.alert($t('加入群聊失败'))
-
-			// 更新本地数据
-			await UserStore.update(UserStore.tables.apply_list, 'id', item.id, {
-				...item,
-				status: ApplyStatus.ACCEPT
-			})
-		} catch (error) {
-			console.error('加入群聊失败', error)
-			f7.dialog.alert($t('加入群聊失败'))
-		} finally {
-			f7.dialog.close()
+	// 获取好友请状态码文字
+	const getFriendStatusText = (status: ApplyStatus) => {
+		const friend_status = {
+			0: '等待验证', // 操作
+			1: '已通过',
+			2: '已拒绝',
+			3: '已发送', // 等待中对方验证
+			4: '已接收' // 操作
 		}
+		return friend_status[status]
 	}
 
 	// 获取群申请状态码文字
-	// const getGroupStatusText = (status: GroupApplyStatus) => {
-	// 	const group_status = {
-	// 		0: '等待验证',
-	// 		1: '已通过',
-	// 		2: '已拒绝',
-	// 		3: '邀请发送者', // '等待中对方验证',
-	// 		4: '邀请接收者'
-	// 	}
-	// 	return group_status[status]
-	// }
+	const getGroupStatusText = (status: GroupApplyStatus) => {
+		const group_status = {
+			0: '等待验证', // 操作
+			1: '已通过',
+			2: '已拒绝',
+			3: '邀请发送者', // 等待中对方验证
+			4: '邀请接收者' // 操作
+		}
+		return group_status[status]
+	}
 
 	return (
 		<Page noToolbar className="bg-bgTertiary" onPageBeforeOut={() => updateContacts(true)}>
@@ -176,7 +166,7 @@ const ApplyList = () => {
 
 			<List strongIos className="mt-0" mediaList>
 				{applyList.map((item, index) => (
-					<ListItem key={index} text={item?.remark || $t('对方没有留言')}>
+					<ListItem key={index} title={item?.remark || $t('对方没有留言')}>
 						<div slot="media" className="w-12 h-12">
 							<img
 								src={item?.receiver_info?.user_avatar}
@@ -184,116 +174,20 @@ const ApplyList = () => {
 								className="w-full h-full object-cover rounded-full"
 							/>
 						</div>
-
-						{/* <span slot="title">
-							{type === ApplyType.FRIEND ? (
-								<span>{item?.receiver_info?.user_name}</span>
-							) : item.status === GroupApplyStatus.INVITE_SENDER ? (
-								<>
-									<span className=" text-xs text-gray-500 mx-1">{$t('邀请')}</span>
-									{item?.sender_info?.user_name || item?.receiver_info?.user_name}
-									<span className=" text-xs text-gray-500 mx-1">{$t('邀请你加入群聊')}</span>
-								</>
-							) : (
-								<>
-									{item?.sender_info?.user_name || item?.receiver_info?.user_name}
-									<span className=" text-xs text-gray-500 mx-1">{$t('邀请你加入群聊')}</span>
-									<span>{item?.group_name}</span>
-								</>
-							)}
-						</span> */}
-						<span slot="title">
-							{type === ApplyType.FRIEND ? (
-								<span>{item?.receiver_info?.user_name}</span>
-							) : ![GroupApplyStatus.WAIT, GroupApplyStatus.INVITE_RECEIVER].includes(item.status) ? (
-								item.status === GroupApplyStatus.INVITE_SENDER ? '等待' + item.receiver_info.user_name + '验证' : ''
-							) : (
-								item.sender_info?.user_name +
-								'邀请' +
-								('你' || item.receiver_info?.user_name) +
-								'加入' +
-								item.group_name
-							)}
-							{/* status (0=等待, 1=已通过, 2=已拒绝, 3=邀请发送者, 4=邀请接收者) */}
-							{/* 群主或者管理(管理加入群聊) */}
-							{/* { item.status === 0 && (item.sender_info.user_id === user_id) ? '等待验证' : (() => {})() } */}
-							{/* 普通用户同意(加入群聊) */}
-							{/* { item.status === 4 && (() => {})() } */}
-						</span>
-
-						<div slot="content" className="pr-2">
-							{type === ApplyType.FRIEND ? (
-								// 好友
-								[ApplyStatus.PENDING, ApplyStatus.INVITE_RECEIVER].includes(item.status) ? (
-									user_id === (item?.sender_id || item?.sender_info?.user_id) ? (
-										<Button className="text-sm text-gray-500 " disabled>
-											{type === ApplyType.FRIEND ? $t('等待对方同意') : $t('申请中')}
-										</Button>
-									) : (
-										<div className="flex">
-											<Button
-												className="text-sm text-red-500"
-												onClick={() => manageFriendApply(item, MangageApplyStatus.REFUSE)}
-											>
-												拒绝
-											</Button>
-											<Button
-												className="text-sm text-primary"
-												onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
-											>
-												同意
-											</Button>
-										</div>
-									)
-								) : ApplyStatus.ACCEPT === item.status ? (
-									<Button className="text-sm text-primary" disabled>
-										{$t('已同意')}
-									</Button>
-								) : (
-									<Button className="text-sm text-primary text-red-500 " disabled>
-										{$t('已拒绝')}
-									</Button>
-								)
-							) : ![GroupApplyStatus.WAIT, GroupApplyStatus.INVITE_RECEIVER].includes(item.status) ? (
-								<span className=" text-xs text-gray-500 mx-1 whitespace-nowrap">{$t('等待中')}</span>
-							) : (
-								// 群聊
-								<div className="flex">
-									{item.status === GroupApplyStatus.WAIT && item?.sender_info?.user_id === user_id && (
-										<>
-											<Button
-												className="text-sm text-red-500"
-												onClick={() => manageFriendApply(item, MangageApplyStatus.REFUSE)}
-											>
-												拒绝
-											</Button>
-											<Button
-												className="text-sm text-primary"
-												onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
-											>
-												同意
-											</Button>
-										</>
-									)}
-									{item.status === GroupApplyStatus.INVITE_RECEIVER && (
-										<>
-											<Button
-												className="text-sm text-red-500"
-												onClick={() => joinGroup(item, MangageApplyStatus.REFUSE)}
-											>
-												拒绝
-											</Button>
-											<Button
-												className="text-sm text-primary"
-												onClick={() => joinGroup(item, MangageApplyStatus.ACCEPT)}
-											>
-												同意
-											</Button>
-										</>
-									)}
-								</div>
-							)}
-						</div>
+						{/* 区分好友申请和群申请 */}
+						{type === ApplyType.FRIEND ? (
+							<>
+								<span slot="text">
+									<span>{item?.receiver_info?.user_name}</span>
+								</span>
+								<div slot="content" className="pr-2"></div>
+							</>
+						) : (
+							<>
+								<span slot="text">$t('群聊')</span>
+								<div slot="content" className="pr-2"></div>
+							</>
+						)}
 					</ListItem>
 				))}
 			</List>

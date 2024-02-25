@@ -117,7 +117,8 @@ const ContactList: React.FC<RouterProps> = () => {
 						{$t('新请求')}
 					</span>
 				</ListItem>
-				<ListItem link="/apply_list/" badge={applyTotal} badgeColor="red">
+				{/* <ListItem link="/apply_list/" badge={applyTotal} badgeColor="red"> */}
+				<ListItem badgeColor="red">
 					<Person2Alt slot="media" className="text-primary text-2xl" />
 					<span slot="title" className="text-color-primary">
 						{$t('群聊')}
