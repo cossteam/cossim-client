@@ -57,6 +57,23 @@
 
         </activity>
 
+        <!--Push 开放平台中应用的 appid 和 api key-->
+<!--        <meta-data-->
+<!--            android:name="api_key"-->
+<!--            android:value="xxxxxxxx"/>-->
+<!--        <meta-data-->
+<!--            android:name="app_id"-->
+<!--            android:value="xxxx"/>-->
+
+        <!--push 应用定义消息 receiver 声明-->
+<!--        <receiver android:name="xxx.xxx.xxx.PushMessageReceiverImpl(自定义类名)"-->
+<!--            android:exported="false">-->
+<!--            <intent-filter>-->
+<!--                &lt;!&ndash;接收 push 消息&ndash;&gt;-->
+<!--                <action android:name="com.vivo.pushclient.action.RECEIVE"/>-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -64,7 +81,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths"/>
         </provider>
     </application>
 </manifest>
