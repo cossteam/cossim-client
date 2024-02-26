@@ -67,8 +67,25 @@ class Editor {
 		// 监听
 		this.eventListeners.addCustomEventListener(EventType.CHANGE)
 		this.eventListeners.addCustomEventListener(EventType.FOCUS)
+		this.eventListeners.addCustomEventListener(EventType.AITE)
+		this.eventListeners.addCustomEventListener(EventType.AITE_END)
 
-		this.on('input', () => this.eventListeners.triggerCustomEvent(EventType.CHANGE))
+		let is_at = false
+		this.on('input', (e) => {
+			this.eventListeners.triggerCustomEvent(EventType.CHANGE)
+
+			if (e.data === '@') {
+				this.eventListeners.triggerCustomEvent(EventType.AITE)
+				is_at = true
+				return
+			}
+
+			// @ 结束
+			if (is_at) {
+				this.eventListeners.triggerCustomEvent(EventType.AITE_END)
+				is_at = false
+			}
+		})
 		this.on('focus', () => {
 			if (this.isFocus) return
 			this.eventListeners.triggerCustomEvent(EventType.FOCUS)
@@ -111,6 +128,19 @@ class Editor {
 		this.isFocus = false
 		this.eventListeners.triggerCustomEvent(EventType.CHANGE)
 	}
+
+	// /**
+	//  * 删除当前光标所在的元素
+	//  * 
+	//  * @param { boolean } isFocus - 删除元素后是否聚焦
+	//  * @returns
+	//  */
+	// deleteElement(options?: { isFocus?: boolean }) {
+	// 	this.isFocus = true
+	// 	this.range.deleteElement(options?.isFocus)
+	// 	this.isFocus = false
+	// 	this.eventListeners.triggerCustomEvent(EventType.CHANGE)
+	// }
 
 	focus() {
 		this.el.focus()

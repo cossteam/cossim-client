@@ -50,6 +50,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		if (!el) return
 
 		const lis = document.querySelectorAll('li.coss_list_item')
+		// const lis = document.querySelectorAll('div.variable-list')
 
 		const { id = 0, index = 0, label = 0 } = el.dataset
 		setMsgId(Number(id))

@@ -33,7 +33,7 @@ const getAfterMessage = async () => {
 		if (code !== 200) return
 
 		const messages = data?.map((item: any) => {
-			const dialog_id = item.dialog_id
+			const dialog_id = Number(item.dialog_id)
 			return item?.msg_list?.map((v: any) => ({
 				...v,
 				dialog_id,
@@ -42,24 +42,33 @@ const getAfterMessage = async () => {
 				is_label: MESSAGE_MARK.NOT_MARK,
 				is_read: MESSAGE_READ.NOT_READ,
 				msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
-				// receiver: message?.sender_id || message?.group_id,
-				// read_at: message?.read_at || null,
-				// reply_id: message?.reply_id,
-				// sender_id: message?.sender_id,
-				// type: message?.type || message?.msgType,
-				// sender_info: message?.sender_info,
-				// at_all_user: message?.at_all_user || [],
-				// at_users: message?.at_users || [],
-				// group_id: message?.group_id,
+				receiver: v?.receiver_info?.user_id || v?.receiver_info?.group_id,
+				read_at: 0,
+				reply_id: v?.reply_id,
+				sender_id: v?.sender_info?.user_id,
+				type: v?.msg_type,
+				sender_info: v?.sender_info,
+				at_all_user: v?.at_all_user || [],
+				at_users: v?.at_users || [],
+				group_id: v?.group_id,
 				uid: uuidv4(),
 				is_tips: false
 			}))
 		})
 
-		console.log('message', messages)
 
 		if (!messages) return
-		await UserStore.bulkAdd(UserStore.tables.messages, messages.flat())
+
+		// TODO: 更新本地数据
+		// messages.map(async (item: any) => {
+		// 	const msgs = await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', item?.dialog_id)
+		// 	const index = msgs?.findIndex((v: any) => v?.msg_id === item?.msg_id) ?? -1
+		// 	if (index === -1) {
+		// 		await UserStore.add(UserStore.tables.messages, item)
+		// 	}
+		// })
+
+		// await UserStore.bulkAdd(UserStore.tables.messages, messages.flat())
 	} catch (error) {
 		console.error(error)
 	}
@@ -72,7 +81,7 @@ const DialogList: React.FC<RouterProps> = () => {
 	const getDialogList = async () => {
 		try {
 			// 获取落后的消息
-			// await getAfterMessage()
+			await getAfterMessage()
 
 			const { code, data } = await MsgService.getDialogApi()
 			if (code !== 200) return

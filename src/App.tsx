@@ -15,7 +15,8 @@ import {
 	handlerMessageSocket,
 	SocketEvent,
 	handlerLabelSocket,
-	handlerRequestResultSocket
+	handlerRequestResultSocket,
+	handlerEditSocket
 } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 import { useCallStore } from '@/stores/call'
@@ -135,8 +136,12 @@ function App() {
 					}
 					break
 				case SocketEvent.MessageLabelEvent:
-					console.log('消息标注信息', data)
 					handlerLabelSocket(data, msgStore)
+					break
+				case SocketEvent.MessageEditEvent:
+					console.log('消息编辑', data)
+
+					handlerEditSocket(data, msgStore)
 					break
 			}
 		}

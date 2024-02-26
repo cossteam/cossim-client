@@ -35,9 +35,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 	if (msg?.type === MESSAGE_TYPE.LABEL) {
 		return (
 			<div className="max-w-[70%] w-fit bg-gray-200 px-2 py-[2px] text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap text-[0.75rem] rounded mx-auto text-center cursor-pointer active:bg-opacity-50">
-				{isMe(msg?.label_id || msg?.sender_id)
-					? $t('我')
-					: $t(msg?.sender_info?.nickname || msg?.sender_info?.name)}
+				{$t(msg?.sender_info?.nickname || msg?.sender_info?.name)}
 				&nbsp;
 				{msg?.is_label !== 0 ? $t('标注了') : $t('取消标注')}&nbsp;
 				{`"${msg?.content}"`}
@@ -97,7 +95,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 								data-index={index}
 							/> */}
 							<ToolEditor
-								className="select-none text-[1rem] h-auto"
+								className="select-none text-[1rem] h-auto empty:before:text-transparent"
 								initValue={msg?.content}
 								data-id={msg?.msg_id}
 								data-index={index}
@@ -134,7 +132,10 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 								{reply?.sender_info?.nickname}:
 							</div>
 							{/* <ToolEditor readonly className="reply_editor" defaultValue={reply?.content} /> */}
-							<ToolEditor className="reply_editor" initValue={reply?.content} />
+							<ToolEditor
+								className="reply_editor empty:before:text-transparent"
+								initValue={reply?.content}
+							/>
 						</div>
 					)}
 				</div>

@@ -121,7 +121,7 @@ export const updateDialogs = async (dialog_id: string, msg: PrivateChats) => {
 		// 		},
 		// 		top_at: 0
 		// 	})
-		return await UserStore.update(UserStore.tables.private_chats, 'dialog_id', dialog_id, {
+		await UserStore.update(UserStore.tables.dialogs, 'dialog_id', dialog_id, {
 			...result,
 			last_message: { content: msg.content, msg_id: msg.msg_id, msg_type: msg.type, send_time: msg.create_at }
 		})

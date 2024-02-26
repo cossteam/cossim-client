@@ -203,10 +203,12 @@ export enum SocketEvent {
 	GroupCallHangupEvent = 19,
 	/** 接收到消息标注信息 */
 	MessageLabelEvent = 23,
+	/** 编辑消息事件 */
+	MessageEditEvent = 24,
 	/** 推送好友在线状态 */
-	FriendOnlineEvent = 24,
+	FriendOnlineEvent = 27,
 	/** 推送好友离线状态 */
-	FriendOfflineEvent = 25
+	FriendOfflineEvent = 28
 }
 
 /** 消息是否阅后即焚 */

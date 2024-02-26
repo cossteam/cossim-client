@@ -51,6 +51,7 @@ export interface MessageStore {
 	initMessage: (is_group: boolean, dialog_id: number, receiver_id: string) => Promise<void>
 	updateMessages: (msgs: PrivateChats[]) => Promise<void>
 	clearMessages: () => Promise<void>
+	updateMessageById: (msg: PrivateChats) => Promise<void>
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -320,5 +321,12 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	},
 	clearMessages: async () => {
 		set({ messages: [], all_meesages: [] })
+	},
+	updateMessageById: async (msg: PrivateChats) => {
+		const { messages } = get()
+		const newMessages = messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
+		console.log("newMessages",msg,newMessages);
+		
+		set({ messages: newMessages })
 	}
 }))

@@ -30,7 +30,9 @@ import ToolEditor, { EventType, ToolEditorMethods } from '@/Editor'
 import { useStateStore } from '@/stores/state'
 import { useLiveQuery } from 'dexie-react-hooks'
 import UserStore from '@/db/user'
-// import { FixedSizeList } from 'react-window';
+// import { FixedSizeList } from 'react-window'
+// import AutoSizer from 'react-virtualized-auto-sizer'
+// import VariableSizeList from '@/components/VariableSizeList/VariableSizeList'
 
 /**
  * 滚动元素到底部
@@ -61,6 +63,37 @@ const getUserMessageList = async (group_id: string | number) => {
 	return reslut
 }
 
+// const rowRender = ({ index, setItemSize }: { index: number; setItemSize: (index: number, height: number) => void }) => {
+// 	const
+
+// 	const item = messages[index]
+
+// 	if (!item) return <></>
+
+// 	return (
+// 		<div ref={itemRef} className="h-auto" style={{ height: 'auto' }}>
+// 			<List noChevron mediaList className="my-0">
+// 				<ListItem
+// 					key={index}
+// 					className="coss_list_item animate__animated  animate__fadeInUp"
+// 					data-index={index}
+// 					style={{ zIndex: 1 }}
+// 					checkbox={isSelect() && !item?.tips_msg_id}
+// 					onChange={(e) => onSelectChange(e, item)}
+// 				>
+// 					<Chat
+// 						msg={item}
+// 						index={index}
+// 						onSelect={onSelect}
+// 						isSelected={isSelect()}
+// 						reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
+// 					/>
+// 				</ListItem>
+// 			</List>
+// 		</div>
+// 	)
+// }
+
 const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
 	const contentRef = useRef<HTMLElement | null>(null)
@@ -81,6 +114,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const { updateChat } = useStateStore()
 	const { messages, ...msgStore } = useMessageStore()
 
+	// const [pageHeight, setPageHeight] = useState<number>(0)
+
 	// 在进入页面前设置内容高度
 	const onPageInit = async () => {
 		const navbarHeight = navbarRef.current.el!.offsetHeight || 56
@@ -89,6 +124,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 		const totalHeight = navbarHeight + subnavbarHeight + toolbarHeight
 		BlockRef.current!.el!.style.minHeight = `calc(100vh - ${totalHeight}px)`
+
+		// 设置内容高度
+		// setPageHeight(document.documentElement.clientHeight)
 
 		// const data = await MsgService.getUserMessageListApi({ user_id: receiver_id, page_num: 1, page_size: 10 })
 		// console.log('data', data)
@@ -316,6 +354,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 			const engine = editorRef.current!.engine
 			engine.on(EventType.CHANGE, () => setShowBtn(!engine.isEmpty()))
+
+			// 自定义聚焦事件
 			engine.on(EventType.FOCUS, () => {
 				BlockRef.current.el!.style.paddingBottom = 56 + 'px'
 				closeToolBar()
@@ -329,6 +369,33 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					}
 				})
 			})
+
+			// @ 事件
+			let is_at = false
+			is_group &&
+				engine.on(EventType.AITE, (e) => {
+					console.log("e,",e.target);
+					const rect = e.target?.getBoundingClientRect()
+					console.log('rect', rect)
+					const div = document.createElement('div')
+					div.id= 'tooltips'
+					div.style.left = `${rect.left}px`
+					div.style.top = `${rect.top - e.target.offsetHeight}px`
+					div.innerHTML = '暂不支持'
+					document.body.appendChild(div)
+					is_at = true
+				})
+
+			is_group &&
+				engine.on(EventType.AITE_END, () => {
+					console.log("@ 结束");
+					
+					if (is_at) {
+						const el = document.getElementById('tooltips')
+						if (el) el.remove()
+						is_at = false
+					}
+				})
 
 			// @ 功能
 			// engine.on('mention:default', () => {
@@ -385,9 +452,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		}
 	}, [messages])
 
-	useEffect(() => {
-		console.log('dialog', dialog)
-	}, [dialog])
+	// useEffect(() => {
+	// 	console.log('dialog', dialog)
+	// }, [dialog])
 
 	// 选择表情
 	const onSelectEmojis = (emojis: any) => {
@@ -457,12 +524,13 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				)}
 			</Navbar>
 
-			<Block className="my-0 px-0 pt-5 pb-16 transition-all duration-300 ease-linear" ref={BlockRef}>
+			{/* pt-5 pb-16 */}
+			<Block className="my-0 px-0 pt-0 pb-16 transition-all duration-300 ease-linear" ref={BlockRef}>
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (
 						<ListItem
 							key={index}
-							className="coss_list_item animate__animated  animate__fadeInUp"
+							className="coss_list_item animate__animated"
 							data-index={index}
 							style={{ zIndex: 1 }}
 							checkbox={isSelect() && !item?.tips_msg_id}
@@ -472,24 +540,45 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								msg={item}
 								index={index}
 								onSelect={onSelect}
-								// className={!isSelect() ? 'animate__fadeInUp' : ''}
 								isSelected={isSelect()}
 								reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
 							/>
 						</ListItem>
 					))}
 				</List>
+				{/* {messages.length > 0 ? (
+					<VariableSizeList
+						pageHeight={pageHeight}
+						len={messages.length}
+						render={rowRender}
+						messages={messages}
+						isSelect={isSelect}
+						onSelect={onSelect}
+						replyMessage={replyMessage}
+						onSelectChange={onSelectChange}
+					/>
+				) : (
+					messages.map((item, index) => (
+						<ListItem
+							key={index}
+							className="coss_list_item animate__animated"
+							data-index={index}
+							style={{ zIndex: 1 }}
+							checkbox={isSelect() && !item?.tips_msg_id}
+							onChange={(e) => onSelectChange(e, item)}
+						>
+							<Chat
+								msg={item}
+								index={index}
+								onSelect={onSelect}
+								isSelected={isSelect()}
+								reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
+							/>
+						</ListItem>
+					))
+				)} */}
+				{/* </List> */}
 			</Block>
-
-			{/* <Fab position="right-bottom" slot="fixed" className='animate__animated animate__fadeIn bottom-20'>
-				<Icon ios="f7:plus" md="material:add" />
-				<Icon ios="f7:xmark" md="material:close" />
-				<FabButtons position="top">
-					<FabButton label="Action 1">1</FabButton>
-					<FabButton label="Action 2">2</FabButton>
-					<FabButton label="Third Action">3</FabButton>
-				</FabButtons>
-			</Fab> */}
 
 			<div
 				className={clsx(

@@ -73,7 +73,6 @@ export const handlerRequestSocket = (data: any) => {
 	try {
 		console.log('处理好友请求', data)
 		// TODO: 存储对方的公钥信息
-
 	} catch (error) {
 		console.log('处理好友请求失败')
 	}
@@ -98,26 +97,31 @@ export const handlerRequestResultSocket = (data: any) => {
  */
 export const handlerLabelSocket = async (data: any, msgStore: MessageStore) => {
 	try {
-		//  TODO: 后续还要判断是否同一设备 id
-		if (user_id === data.uid) return
+		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
+		const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
+		if (user_id === data?.data?.sender_id && data?.driverId === user?.device_id) return
 
 		const msg = data.data
 		const doc = new DOMParser().parseFromString(msg?.content, 'text/html')
 		const txt = doc.body.textContent
 
-		const uid = msgStore.messages.find((m: any) => m.msg_id === msg.msg_id)?.uid
+		// const uid = msgStore.messages.find((m: any) => m.msg_id === msg.msg.id)?.uid
+
+		const uid = (await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', msg?.dialog_id))?.find(
+			(m: any) => m.msg_id === msg.id
+		)?.uid
 
 		const marks = {
-			tips_msg_id: msg.msg_id,
+			tips_msg_id: msg.id,
 			content: txt,
 			dialog_id: msg.dialog_id,
 			pid: uid,
 			uid: uuidv4(),
 			is_label: msg?.is_label,
-			sender_info: msg.sender_info,
+			sender_info: msg.operator_info,
 			sender_id: msg.sender_id,
 			type: MESSAGE_TYPE.LABEL,
-			label_id: data.uid
+			label_id: msg.sender_id
 		}
 
 		await UserStore.add(UserStore.tables.messages, marks)
@@ -125,6 +129,33 @@ export const handlerLabelSocket = async (data: any, msgStore: MessageStore) => {
 
 		return marks
 	} catch (error) {
-		console.log('处理标注失败')
+		console.log('处理标注失败', error)
+	}
+}
+
+/**
+ * 处理编辑消息
+ *
+ * @param {*} data  socket 消息
+ * @param {MessageStore} msgStore 消息存储
+ * @returns
+ */
+export const handlerEditSocket = async (data: any, msgStore: MessageStore) => {
+	try {
+		console.log('data', data, msgStore)
+		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
+		const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
+		if (user_id === data?.data?.sender_id && data?.driverId === user?.device_id) return
+
+		const msg = (
+			await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', data?.data?.dialog_id)
+		).find((m: any) => m.msg_id === data.data.id)
+		
+		msg?.content && (msg.content = data.data.content)
+
+		await UserStore.update(UserStore.tables.messages, 'id', msg.id, { ...msg})
+		await msgStore.updateMessageById(msg)
+	} catch (error) {
+		console.log('error', error)
 	}
 }
