@@ -44,7 +44,7 @@ function App() {
 		}
 	})
 
-	const { status: callStatus, callInfo, updateCallInfo, updateStatus } = useCallStore()
+	const { status: callStatus, callInfo, updateCallInfo, updateStatus, reject } = useCallStore()
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -77,11 +77,9 @@ function App() {
 				case SocketEvent.GroupCallReqEvent:
 					// 来电
 					try {
-						// 检查设备是否可用
-						await hasMediaDevices()
+						// 更新通话信息
 						const newCallInfo = { ...callInfo, evrntInfo: data }
 						console.log('来电', data)
-
 						if (event === SocketEvent.UserCallReqEvent) {
 							newCallInfo['userInfo'] = {
 								user_id: data?.data?.sender_id
@@ -92,11 +90,15 @@ function App() {
 							}
 						}
 						updateCallInfo(newCallInfo)
+						// 检查设备是否可用
+						await hasMediaDevices()
+						// 更新通话状态
 						updateStatus(CallStatus.WAITING)
 					} catch (error: any) {
 						console.dir(error)
 						if (error?.code === 8) {
 							f7.dialog.alert($t('当前媒体设备不可用，无法接听来电'))
+							reject()
 							return
 						}
 						f7.dialog.alert($t(error?.message || '接听失败...'))
