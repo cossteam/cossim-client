@@ -12,6 +12,7 @@ import RelationService from '@/api/relation'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
 import { getCookie } from '@/utils/cookie'
+import { hasMediaDevices } from '@/utils/media'
 
 const userId = getCookie(USER_ID) || ''
 
@@ -57,8 +58,15 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const callUser = async () => {
 		try {
 			f7.dialog.preloader($t('呼叫中...'))
+			// 检查设备是否可用
+			await hasMediaDevices()
 			await call({ userInfo })
 		} catch (error: any) {
+			console.dir(error)
+			if (error?.code === 8) {
+				f7.dialog.alert($t('当前媒体设备不可用，无法接听来电'))
+				return
+			}
 			f7.dialog.alert($t(error?.message || '呼叫失败...'))
 		} finally {
 			f7.dialog.close()

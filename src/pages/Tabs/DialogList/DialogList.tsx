@@ -14,7 +14,6 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { format } from 'timeago.js'
 import { isEqual } from 'lodash-es'
-
 import { $t, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND } from '@/shared'
 import UserStore from '@/db/user'
 import MsgService from '@/api/msg'

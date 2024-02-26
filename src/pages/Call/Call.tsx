@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Page, f7 } from 'framework7-react'
-
+import { PhoneFill } from 'framework7-icons/react'
 import '@livekit/components-styles'
 import {
 	ControlBar,
@@ -11,12 +11,10 @@ import {
 	RoomAudioRenderer,
 	useTracks
 } from '@livekit/components-react'
-
-import { PhoneFill } from 'framework7-icons/react'
+import { Track } from 'livekit-client'
 import './Call.scss'
 import { useCallStore } from '@/stores/call'
 import { CallStatus, getStatusDescription } from '@/shared'
-import { Track } from 'livekit-client'
 import { MessageEventEnum } from './enums'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
 
@@ -25,7 +23,9 @@ const Call: React.FC<RouterProps> = () => {
 	const roomReady = status === CallStatus.CALLING && callInfo?.wsInfo
 
 	const [worker, setWorker] = useState<Worker | null>(null)
-	const [waittingTimer, setWaitTimer] = useState(60)
+	// 等待时间
+	// const [waittingTimer, setWaitTimer] = useState(10 * 60 * 60) // 时 分 秒
+	const [waittingTimer, setWaitTimer] = useState(60) // 时 分 秒
 	useEffect(() => {
 		;(async () => {
 			console.log('通话状态', getStatusDescription(status), callInfo?.wsInfo)

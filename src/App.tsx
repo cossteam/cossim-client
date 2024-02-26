@@ -22,6 +22,7 @@ import { hasCookie, setCookie } from '@/utils/cookie'
 import { useCallStore } from '@/stores/call'
 import { useMessageStore } from './stores/message'
 import { useStateStore } from '@/stores/state'
+import { hasMediaDevices } from './utils/media'
 
 function App() {
 	const msgStore = useMessageStore()
@@ -44,7 +45,7 @@ function App() {
 		}
 	})
 
-	const { status: callStatus, callInfo, updateCallInfo, updateStatus } = useCallStore()
+	const { status: callStatus, callInfo, updateCallInfo, updateStatus, reject } = useCallStore()
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -54,7 +55,7 @@ function App() {
 		}
 
 		// 事件处理
-		const handlerInit = (e: any) => {
+		const handlerInit = async (e: any) => {
 			const data = JSON.parse(e.data)
 			const event = data.event
 			console.log('接收到所有 sokect 通知：', data)
@@ -76,10 +77,10 @@ function App() {
 				case SocketEvent.UserCallReqEvent:
 				case SocketEvent.GroupCallReqEvent:
 					// 来电
-					{
+					try {
+						// 更新通话信息
 						const newCallInfo = { ...callInfo, evrntInfo: data }
 						console.log('来电', data)
-
 						if (event === SocketEvent.UserCallReqEvent) {
 							newCallInfo['userInfo'] = {
 								user_id: data?.data?.sender_id
@@ -90,7 +91,18 @@ function App() {
 							}
 						}
 						updateCallInfo(newCallInfo)
+						// 检查设备是否可用
+						await hasMediaDevices()
+						// 更新通话状态
 						updateStatus(CallStatus.WAITING)
+					} catch (error: any) {
+						console.dir(error)
+						if (error?.code === 8) {
+							f7.dialog.alert($t('当前媒体设备不可用，无法接听来电'))
+							reject()
+							return
+						}
+						f7.dialog.alert($t(error?.message || '接听失败...'))
 					}
 					break
 				case SocketEvent.UserCallRejectEvent:
