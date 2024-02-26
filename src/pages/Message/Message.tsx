@@ -1,5 +1,5 @@
 import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
-import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
+import { Badge, Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
 import { useAsyncEffect, useClickOutside } from '@reactuses/core'
 import {
@@ -24,10 +24,13 @@ import clsx from 'clsx'
 import { useToast } from '@/hooks/useToast'
 import Contact from '@/components/Contact/Contact'
 import Emojis from '@/components/Emojis/Emojis'
-// import GroupService from '@/api/group'
+import GroupService from '@/api/group'
 
-import ToolEditor, { EventType, ToolEditorMethods as TT } from '@/Editor'
+import ToolEditor, { EventType, ToolEditorMethods } from '@/Editor'
 import { useStateStore } from '@/stores/state'
+import { useLiveQuery } from 'dexie-react-hooks'
+import UserStore from '@/db/user'
+// import { FixedSizeList } from 'react-window';
 
 /**
  * 滚动元素到底部
@@ -41,10 +44,27 @@ const scroll = (element: HTMLElement, isSmooth: boolean = false) => {
 
 type MoreType = 'emojis' | 'more' | ''
 
+/**
+ * 获取群公告
+ *
+ * @param receiver_id
+ */
+const getUserMessageList = async (group_id: string | number) => {
+	let reslut = null
+	try {
+		const { data } = await GroupService.groupAnnouncementApi({ group_id: Number(group_id) })
+		reslut = data
+	} catch (error) {
+		console.error(error)
+	}
+
+	return reslut
+}
+
 const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
 	const contentRef = useRef<HTMLElement | null>(null)
-	const editorRef = useRef<TT>(null)
+	const editorRef = useRef<ToolEditorMethods>(null)
 
 	// 主要用于计算内容区域高度
 	const navbarRef = useRef<{ el: HTMLDivElement | null }>({ el: null })
@@ -229,6 +249,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 	const [isWeb, setIsWeb] = useState<boolean>(true)
 
+	// 群公告
+	const [groupAnnouncement, setGroupAnnouncement] = useState<any>(null)
+
 	useAsyncEffect(
 		async () => {
 			if (!pageRef.current.el) return
@@ -242,6 +265,14 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				// 滚动到最底部
 				setTimeout(() => scroll(el), 0)
 			})
+
+			// 如果是群聊
+			if (is_group) {
+				getUserMessageList(receiver_id).then((res) => {
+					console.log('res', res)
+					setGroupAnnouncement(res)
+				})
+			}
 
 			setIsWeb(await isWebDevice())
 
@@ -335,17 +366,38 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		engine.focus()
 	}
 
+	const dialog = useLiveQuery(() => UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', dialog_id))
+
+	// 未读消息数
+	// const [unReadCount, setUnReadCount] = useState<number>(0)
+
 	// 滚动情况
 	useEffect(() => {
 		if (!messages.length) return
-		if (isScrollEnd() && !isMe(messages.at(-1)?.sender_id || '')) {
+
+		if (isScrollEnd(200) && !isMe(messages.at(-1)?.sender_id || '')) {
 			setTimeout(() => scroll(contentRef.current!, true), 100)
 		}
+
+		// 如果不是自己的消息，就设置已读
+		if (!isMe(messages.at(-1)?.sender_id || '')) {
+			msgStore.readMessage(messages)
+		}
 	}, [messages])
+
+	useEffect(() => {
+		console.log('dialog', dialog)
+	}, [dialog])
 
 	// 选择表情
 	const onSelectEmojis = (emojis: any) => {
 		editorRef.current!.engine.insertElement(emojis.native, { isFocus: false })
+	}
+
+	// 阅读所有
+	const readAll = () => {
+		scroll(contentRef.current!, true)
+		// setUnReadCount(0)
 	}
 
 	// 辅助函数
@@ -354,7 +406,6 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const isEdit = () => selectType === TOOLTIP_TYPE.EDIT
 	const replyMessage = (msg_id: number) => msgStore.all_meesages.find((v) => v?.msg_id === msg_id)
 	const setToolbarBottom = (bottom: number) => (toolbarRef.current!.style.transform = `translateY(${bottom}px)`)
-	// const isWeb = () => platformName === 'web'
 
 	// 关闭更多功能
 	const closeToolBar = () => {
@@ -399,7 +450,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 						</Link>
 					)}
 				</NavRight>
-				{is_group && (
+				{is_group && groupAnnouncement && (
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
 						1111
 					</Subnavbar>
@@ -429,6 +480,17 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					))}
 				</List>
 			</Block>
+
+			{/* <Fab position="right-bottom" slot="fixed" className='animate__animated animate__fadeIn bottom-20'>
+				<Icon ios="f7:plus" md="material:add" />
+				<Icon ios="f7:xmark" md="material:close" />
+				<FabButtons position="top">
+					<FabButton label="Action 1">1</FabButton>
+					<FabButton label="Action 2">2</FabButton>
+					<FabButton label="Third Action">3</FabButton>
+				</FabButtons>
+			</Fab> */}
+
 			<div
 				className={clsx(
 					'fixed bg-bgPrimary bottom-0 w-full h-auto z-[99]  transition-all duration-300 ease-in'
@@ -480,42 +542,22 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 							>
 								<div className={clsx('flex-1 rounded pl-2 max-w-[calc(100%-150px)]')}>
 									<div className="py-2 bg-bgSecondary rounded w-full">
-										{/* <ToolEditor
-											className="px-4"
-											ref={editorRef}
-											is_group={is_group}
-											focus={focus}
-											blur={blur}
-										/> */}
 										<ToolEditor
 											ref={editorRef}
 											readonly={false}
-											// focus={focus}
-											// blur={blur}
 											className="max-h-[150px]  overflow-y-auto"
 										/>
 									</div>
 									{(isReply() || isEdit()) && (
 										<div className="mt-1 bg-bgTertiary relative flex justify-between">
-											{/* <ToolEditor
-												className="px-2 py-1 coss_message_editor"
-												defaultValue={selectMsgs[0]?.content}
-												is_group={is_group}
-												focus={focus}
-												blur={blur}
-											/> */}
-
 											<ToolEditor
 												initValue={selectMsgs[0]?.content}
 												className="px-2 py-1 read-editor-1"
-												// focus={focus}
-												// blur={blur}
 											/>
 											<Link
 												className="pr-2"
 												onClick={() => {
 													setSelectType(TOOLTIP_TYPE.NONE)
-													// editorRef.current?.engine.setValue('')
 													editorRef.current?.engine.clear()
 												}}
 											>
@@ -560,6 +602,14 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					</div>
 					{/* )} */}
 				</div>
+
+				{!!dialog?.dialog_unread_count && dialog?.dialog_unread_count > 0 && (
+					<Badge className="w-6 h-6 absolute bottom-[calc(100%+10px)] right-5 overflow-hidden">
+						<Button fill round onClick={readAll}>
+							{dialog?.dialog_unread_count}
+						</Button>
+					</Badge>
+				)}
 			</div>
 
 			<Contact completed={setSelect} opened={showSelect} setOpened={setShowSelect} group />

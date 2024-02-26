@@ -1,5 +1,14 @@
 import { create } from 'zustand'
-import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE, USER_ID, addMarkMessage, initMessage } from '@/shared'
+import {
+	MESSAGE_MARK,
+	MESSAGE_READ,
+	MESSAGE_SEND,
+	MESSAGE_TYPE,
+	USER_ID,
+	addMarkMessage,
+	initMessage,
+	updateDialogs
+} from '@/shared'
 import UserStore from '@/db/user'
 import type { PrivateChats } from '@/types/db/user-db'
 import MsgService from '@/api/msg'
@@ -97,7 +106,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			is_burn_after_reading: options?.is_burn_after_reading ?? 0,
 			is_label: MESSAGE_MARK.NOT_MARK,
 			is_read: MESSAGE_READ.READ,
-			msg_id: Date.now(),
+			msg_id: 0,
 			msg_send_state: MESSAGE_SEND.SENDING,
 			receiver: options?.receiver_id ?? receiver_id,
 			read_at: Date.now(),
@@ -153,6 +162,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			msgs.push(msg)
 			!is_forward && (await updateDatabaseMessage(tableName, msg.uid, msg))
 
+			// 如果有错误信息
 			if (error_message) {
 				msgs.push({
 					dialog_id: msg.dialog_id,
@@ -163,6 +173,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 					uid: uuidv4()
 				})
 				!is_forward && (await updateDatabaseMessage(tableName, msgs[1].uid, msgs[1]))
+			} else {
+				// 更新会话
+				await updateDialogs(msg.dialog_id, msg)
 			}
 
 			set((state) => ({ messages: [...state.messages.slice(0, -1), ...msgs] }))
@@ -245,6 +258,16 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			unReadMsgs.map((item) => {
 				updateDatabaseMessage(tableName, item.uid, { ...item, is_read: MESSAGE_READ.READ }, true)
 			})
+
+			// 更新会话
+			const dialog = await UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', dialog_id)
+
+			if (dialog) {
+				await UserStore.update(UserStore.tables.dialogs, 'dialog_id', dialog_id, {
+					...dialog,
+					dialog_unread_count: 0
+				})
+			}
 		}
 	},
 	/**

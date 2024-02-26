@@ -1,4 +1,4 @@
-import type { EditMessage, LabelMessage, MessageListParams, ReadGroupMessage, ReadMessage, SendGroupMessage, SendMessage } from '@/types/api/msg'
+import type { EditMessage, GetBehindMessage, LabelMessage, MessageListParams, ReadGroupMessage, ReadMessage, SendGroupMessage, SendMessage } from '@/types/api/msg'
 import request from '@/utils/request'
 
 class MsgServiceImpl {
@@ -142,6 +142,21 @@ class MsgServiceImpl {
 	readUserMessageApi(data: ReadMessage): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/read/user`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 获取指定对话落后的消息
+	 * 
+	 * @param {*} data
+	 * @param {*} data.dialog_id
+	 * @param {*} data.msg_id
+	 */
+	getBehindMessageApi(data: GetBehindMessage[]): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/after/get`,
 			method: 'POST',
 			data
 		})

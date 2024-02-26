@@ -237,6 +237,30 @@ class GroupServiceImpl {
 			data
 		})
 	}
+
+	/**
+	 * 获取群公告
+	 * 
+	 * @param {*} param
+	 * @param {*} param.group_id
+	 * @returns
+	 */
+	groupAnnouncementApi(param: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/announcement/list',
+			method: 'GET',
+			params: param
+		})
+	}
+
+	/**
+	 *  创建群公告
+	 * 
+	 * @param {*} param
+	 * @param {*} param.group_id
+	 * @param {*} param.announcement
+	 * @returns
+	 */
 }
 
 const GroupService = new GroupServiceImpl()

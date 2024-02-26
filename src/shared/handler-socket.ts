@@ -56,7 +56,8 @@ export const handlerMessageSocket = async (data: any, updateMessage: (msg: any) 
 						msg_id: msg.msg_id,
 						send_time: msg.create_at,
 						sender_id: msg.sender_id
-					}
+					},
+					dialog_unread_count: chat.dialog_unread_count + 1
 				})
 			: stateStore.updateChat(true)
 	} catch (error) {

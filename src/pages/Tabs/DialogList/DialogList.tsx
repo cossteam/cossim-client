@@ -15,21 +15,65 @@ import { useEffect, useState } from 'react'
 import { format } from 'timeago.js'
 import { isEqual } from 'lodash-es'
 
-import { $t } from '@/shared'
+import { $t, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND } from '@/shared'
 import UserStore from '@/db/user'
 import MsgService from '@/api/msg'
 import './DialogList.scss'
 import ToolEditor from '@/components/Editor/ToolEditor'
-import { useStateStore } from '@/stores/state'
+import { v4 as uuidv4 } from 'uuid'
+
+const getAfterMessage = async () => {
+	try {
+		const dialogs = await UserStore.findAll(UserStore.tables.dialogs)
+
+		// 参数
+		const params = dialogs.map((v) => ({ dialog_id: v.dialog_id, msg_id: v?.last_message?.msg_id }))
+
+		const { code, data } = await MsgService.getBehindMessageApi(params)
+		if (code !== 200) return
+
+		const messages = data?.map((item: any) => {
+			const dialog_id = item.dialog_id
+			return item?.msg_list?.map((v: any) => ({
+				...v,
+				dialog_id,
+				create_at: v?.send_time,
+				is_burn_after_reading: 0,
+				is_label: MESSAGE_MARK.NOT_MARK,
+				is_read: MESSAGE_READ.NOT_READ,
+				msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
+				// receiver: message?.sender_id || message?.group_id,
+				// read_at: message?.read_at || null,
+				// reply_id: message?.reply_id,
+				// sender_id: message?.sender_id,
+				// type: message?.type || message?.msgType,
+				// sender_info: message?.sender_info,
+				// at_all_user: message?.at_all_user || [],
+				// at_users: message?.at_users || [],
+				// group_id: message?.group_id,
+				uid: uuidv4(),
+				is_tips: false
+			}))
+		})
+
+		console.log('message', messages)
+
+		if (!messages) return
+		await UserStore.bulkAdd(UserStore.tables.messages, messages.flat())
+	} catch (error) {
+		console.error(error)
+	}
+}
 
 const DialogList: React.FC<RouterProps> = () => {
 	const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
 	const [chats, setChats] = useState<any[]>(dialogs)
 
-	const { is_chat_update, updateChat } = useStateStore()
-
 	const getDialogList = async () => {
 		try {
+			// 获取落后的消息
+			// await getAfterMessage()
+
 			const { code, data } = await MsgService.getDialogApi()
 			if (code !== 200) return
 
@@ -57,13 +101,6 @@ const DialogList: React.FC<RouterProps> = () => {
 	}
 
 	useEffect(() => {
-		if (is_chat_update) {
-			getDialogList()
-			updateChat(false)
-		}
-	}, [is_chat_update])
-
-	useEffect(() => {
 		if (!dialogs.length) return
 		const list = dialogs.map((item) => {
 			return {
@@ -74,7 +111,7 @@ const DialogList: React.FC<RouterProps> = () => {
 	}, [dialogs])
 
 	return (
-		<Page ptr className="coss_dialog" onPageTabShow={getDialogList}>
+		<Page ptr className="coss_dialog" onPageTabShow={getDialogList} onPageBeforeIn={getDialogList}>
 			<Navbar title="COSS" className="hidden-navbar-bg bg-bgPrimary">
 				<NavRight>
 					<Link>

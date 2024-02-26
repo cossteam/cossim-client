@@ -2,6 +2,7 @@ export interface LoginData {
 	email: string
 	password: string
 	driver_id?: string
+	driver_token?: string
 }
 
 export interface RegisterData {

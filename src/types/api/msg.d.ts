@@ -41,3 +41,8 @@ export interface ReadMessage {
 }
 
 export type ReadGroupMessage = { group_id: number } & ReadMessage
+
+export interface GetBehindMessage {
+	dialog_id: number
+	msg_id: number
+}

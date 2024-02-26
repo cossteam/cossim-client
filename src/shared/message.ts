@@ -57,10 +57,6 @@ export const updateDatabaseMessage = async (
 	try {
 		const result = await UserStore.findOneById(tableName, 'uid', uid)
 
-
-		console.log("result",result);
-		
-
 		// 添加消息
 		if (!result) return await UserStore.add(tableName, msg)
 
@@ -100,6 +96,41 @@ export const addMarkMessage = async (tableName: string, msg: PrivateChats, is_la
 }
 
 /**
+ *  更新会话信息
+ *  @param {number} dialog_id
+ *  @param {PrivateChats} msg
+ *  @returns
+ */
+export const updateDialogs = async (dialog_id: string, msg: PrivateChats) => {
+	try {
+		const result = await UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', dialog_id)
+		if (!result) return
+		// 	return await UserStore.add(UserStore.tables.dialogs, {
+		// 		dialog_avatar: msg.sender_info.avatar,
+		// 		dialog_id,
+		// 		dialog_create_at: Date.now(),
+		// 		dialog_name: msg.sender_info.nickname,
+		// 		dialog_type: msg.type,
+		// 		dialog_unread_count: 0,
+		// 		last_message: {
+		// 			content: msg.content,
+		// 			msg_id: msg.msg_id,
+		// 			msg_type: msg.type,
+		// 			send_time: msg.create_at,
+		// 			sender_id: msg.sender_id
+		// 		},
+		// 		top_at: 0
+		// 	})
+		return await UserStore.update(UserStore.tables.private_chats, 'dialog_id', dialog_id, {
+			...result,
+			last_message: { content: msg.content, msg_id: msg.msg_id, msg_type: msg.type, send_time: msg.create_at }
+		})
+	} catch (error) {
+		console.log('获取用户信息失败', error)
+	}
+}
+
+/**
  * 判断是否是自己
  *
  * @param {string} user_id 用户 id
@@ -128,10 +159,9 @@ export const dillServerInfo = async (user_id: string, userInfo: any) => {
 	return result
 }
 
-
 /**
  * 更新会话
- * 
+ *
  * @param {string} user_id
  * @returns
  */

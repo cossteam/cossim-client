@@ -268,6 +268,14 @@ export interface ClientPGPKeys {
 }
 
 
+/** 所有消息 */
 export interface Messages {
 	[key:string]: any
+}
+
+/** 群成员 */
+export interface GroupMembers {
+	user_id: string
+	group_id: string
+	identity: number
 }

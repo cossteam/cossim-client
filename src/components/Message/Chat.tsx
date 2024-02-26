@@ -1,6 +1,6 @@
 import type { PrivateChats } from '@/types/db/user-db'
 import clsx from 'clsx'
-import { Exclamationmark, Gobackward, Checkmark2, Flag } from 'framework7-icons/react'
+import { Exclamationmark, Gobackward, Flag } from 'framework7-icons/react'
 import { format } from 'timeago.js'
 import { useRef } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -110,14 +110,15 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 						className={clsx('flex text-[0.85rem] items-center', is_self ? 'justify-end' : 'justify-start')}
 					>
 						<span className="text-[0.85rem] mr-1">{format(msg?.created_at, 'zh_CN')}</span>
-						{is_self &&
-							(msg?.msg_send_state === MESSAGE_SEND.SEND_SUCCESS || !msg?.msg_send_state ? (
-								<Checkmark2 className="text-primary" />
-							) : msg?.msg_send_state === MESSAGE_SEND.SEND_FAILED ? (
-								<Exclamationmark className="text-red-500" />
-							) : (
-								<Gobackward />
-							))}
+						{is_self && (
+							<>
+								{msg?.msg_send_state === MESSAGE_SEND.SEND_FAILED && (
+									<Exclamationmark className="text-red-500" />
+								)}
+
+								{msg?.msg_send_state === MESSAGE_SEND.SEND_FAILED && <Gobackward />}
+							</>
+						)}
 						{msg?.is_label !== 0 && <Flag className="text-primary ml-[2px]" />}
 					</div>
 

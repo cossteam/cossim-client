@@ -64,7 +64,7 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defau
 			const { identifier: driver_id } = await Device.getId()
 
 			// TODO： 后续希望传入一个唯一设备 id 给后端，后端那边判断是否新设备
-			const { code, data, msg } = await UserService.loginApi({ ...fromData, driver_id })
+			const { code, data, msg } = await UserService.loginApi({ ...fromData, driver_id, driver_token: '123' })
 			console.dir(data)
 
 			if (code !== 200) return f7.dialog.alert(msg)
