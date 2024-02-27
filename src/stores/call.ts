@@ -39,7 +39,7 @@ interface CallStore {
 	/** 使能通话视频 */
 	updateEnablesVideo: (enablesVideo: boolean) => void
 	/** 呼叫（呼叫方） */
-	call: (callInfo: { userInfo?: any; groupInfo?: any; eventInfo?: any }) => Promise<void>
+	call: (callInfo: { userInfo?: any; groupInfo?: any; eventInfo?: any }) => Promise<any>
 	/** 拒绝（接收方） */
 	reject: () => Promise<void>
 	/** 接通（接收方） */
@@ -126,7 +126,12 @@ export const callStore = (set: any, get: any): CallStore => ({
 		try {
 			const { callInfo } = get()
 			const isUser = callInfo?.userInfo?.user_id
-			const rejectResp = isUser ? await CallService.rejectLiveUserApi() : await CallService.rejectLiveGroupApi()
+			const createRoomParams = {
+				[isUser ? 'user_id' : 'group_id']: isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
+			}
+			const rejectResp = isUser
+				? await CallService.rejectLiveUserApi(createRoomParams)
+				: await CallService.rejectLiveGroupApi(createRoomParams)
 			if (rejectResp.code !== 200) {
 				return Promise.reject({
 					...rejectResp,
@@ -149,8 +154,12 @@ export const callStore = (set: any, get: any): CallStore => ({
 		try {
 			const { callInfo } = get()
 			const isUser = callInfo?.userInfo?.user_id
-			console.log(isUser)
-			const joinResp = isUser ? await CallService.joinLiveUserApi({}) : await CallService.joinLiveGroupApi({})
+			const createRoomParams = {
+				[isUser ? 'user_id' : 'group_id']: isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
+			}
+			const joinResp = isUser
+				? await CallService.joinLiveUserApi(createRoomParams)
+				: await CallService.joinLiveGroupApi(createRoomParams)
 			if (joinResp.code !== 200) {
 				return Promise.reject({
 					...joinResp,
@@ -169,8 +178,14 @@ export const callStore = (set: any, get: any): CallStore => ({
 		try {
 			const { callInfo } = get()
 			const isUser = callInfo?.userInfo?.user_id
-			console.log(isUser)
-			const leaveResp = isUser ? await CallService.leaveLiveUserApi() : await CallService.leaveLiveGroupApi()
+			const createRoomParams = {
+				[isUser ? 'user_id' : 'group_id']: parseInt(
+					isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
+				)
+			}
+			const leaveResp = isUser
+				? await CallService.leaveLiveUserApi(createRoomParams)
+				: await CallService.leaveLiveGroupApi(createRoomParams)
 			if (leaveResp.code !== 200) {
 				return Promise.reject({
 					...leaveResp,
