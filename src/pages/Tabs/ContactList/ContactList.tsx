@@ -27,9 +27,7 @@ const ContactList: React.FC<RouterProps> = () => {
 	const updateApplyTotal = async () => {
 		// 获取申请列表
 		const group = await GroupService.groupRequestListApi({ user_id })
-		console.table(group.data)
 		const friend = await RelationService.friendApplyListApi({ user_id })
-		console.table(friend.data)
 		const applyList: any[] = []
 		group.data && applyList.push(...group.data)
 		friend.data && applyList.push(...friend.data)
