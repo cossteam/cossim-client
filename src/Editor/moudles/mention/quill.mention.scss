@@ -1,0 +1,12 @@
+.ql-editor {
+    position: relative;
+}
+
+.ql-mention-denotation-char {
+    position: absolute;
+    left: 10px;
+    background: #fff;
+    box-shadow: 0 0 1px rgba(0,0,0,0.5);
+    padding: 2px 5px;
+    z-index: 9999999;
+}

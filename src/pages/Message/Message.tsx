@@ -394,12 +394,43 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 			const quill = editorRef.current!.quill
 
-			quill.on(Quill.events.EDITOR_CHANGE, (type, oldDelta, source) => {
+			quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
 				if (type !== Quill.events.SELECTION_CHANGE) {
 					setShowBtn(quill.getLength() > 1)
 				}
-				console.log('type', type, oldDelta, source)
+				// console.log('type', type, oldDelta, source)
 			})
+
+			// 自定义聚焦事件
+			// TODO：修复键盘弹起
+			quill.root.addEventListener('focus', () => {
+				BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+				closeToolBar()
+				requestAnimationFrame(() => {
+					// quill.readonly = false
+					// if (!moreType) {
+					// 	setTimeout(() => engine.focus(), 300)
+					// } else {
+					// 	setTimeout(() => engine.focus(), 0)
+					// 	return
+					// }
+				})
+			})
+			// quill.on('focus', () => {
+			// 	console.log("点开");
+
+			// 	BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+			// 	closeToolBar()
+			// 	requestAnimationFrame(() => {
+			// 		// quill.readonly = false
+			// 		// if (!moreType) {
+			// 		// 	setTimeout(() => engine.focus(), 300)
+			// 		// } else {
+			// 		// 	setTimeout(() => engine.focus(), 0)
+			// 		// 	return
+			// 		// }
+			// 	})
+			// })
 		},
 		() => {},
 		[]
