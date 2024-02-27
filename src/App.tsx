@@ -173,7 +173,7 @@ function App() {
 		<AppComponent {...f7params}>
 			{hasCookie(TOKEN) ? (
 				<>
-					{callStatus !== CallStatus.IDLE && <View url="/call/" id="view-call" name="call" />}
+					{/* {callStatus !== CallStatus.IDLE && <View url="/call/" id="view-call" name="call" />} */}
 					<Layout />
 				</>
 			) : (

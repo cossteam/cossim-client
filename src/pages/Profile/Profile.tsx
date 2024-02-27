@@ -65,6 +65,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			updateEnablesVideo(enableVideo)
 			await call({ userInfo })
 			f7.dialog.close()
+			f7router.navigate('/call/')
 		} catch (error: any) {
 			console.log(error?.code, error?.code === 8)
 			console.dir(error)

@@ -18,9 +18,8 @@ import { CallStatus, getStatusDescription } from '@/shared'
 import { MessageEventEnum } from './enums'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
 
-const Call: React.FC<RouterProps> = () => {
+const Call: React.FC<RouterProps> = (props) => {
 	const { enablesVideo, callInfo, status, reject, accept, hangup } = useCallStore()
-	console.log('Call', enablesVideo)
 
 	const roomReady = status === CallStatus.CALLING && callInfo?.wsInfo
 
@@ -30,7 +29,6 @@ const Call: React.FC<RouterProps> = () => {
 	const [waittingTimer, setWaitTimer] = useState(60) // 时 分 秒
 	useEffect(() => {
 		;(async () => {
-			console.log('通话状态', getStatusDescription(status), callInfo?.wsInfo)
 			if (status === CallStatus.WAITING) {
 				if (!worker) {
 					const worker = new Worker(new URL('./worker/timer.ts', import.meta.url))
@@ -61,6 +59,10 @@ const Call: React.FC<RouterProps> = () => {
 					f7.dialog.close()
 				})
 			}
+			if (status === CallStatus.IDLE) {
+				console.log('空闲')
+				props.f7router.back()
+			}
 		})()
 		return () => {
 			if (worker) {
@@ -72,12 +74,13 @@ const Call: React.FC<RouterProps> = () => {
 
 	const [errCount, setErrCount] = useState(0)
 	const onConnected = () => {
-		console.log('通话连接成功', getStatusDescription(status))
+		console.log('通话连接成功')
+		getStatusDescription(status)
 		setErrCount(0)
 	}
 	const roomDisconnect = () => {
-		console.log('通话断开', getStatusDescription(status))
-		// errCount >= 222 && hangup()
+		console.log('通话断开')
+		getStatusDescription(status)
 		errCount >= 3 && hangup()
 	}
 
@@ -106,7 +109,7 @@ const Call: React.FC<RouterProps> = () => {
 	}
 
 	return (
-		<Page className="bg-bgPrimary bg-zinc-900 z-[999] flex flex-col justify-center items-center">
+		<Page className="bg-bgPrimary bg-zinc-900 z-[999] flex flex-col justify-center items-center" noNavbar noToolbar>
 			{roomReady && (
 				<LiveKitRoom
 					data-lk-theme="default"
