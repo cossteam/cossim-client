@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
 import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
