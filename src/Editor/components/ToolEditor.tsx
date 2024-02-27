@@ -5,12 +5,13 @@ import 'quill/dist/quill.core.css'
 import './ToolEditor.scss'
 // import { Editor } from '..'
 import { useFocus } from '@reactuses/core'
-import Quill from 'quill'
+// import Quill from 'quill'
 import { $t } from '@/shared'
 // import 'quill-mention'
 // import Mention from 'quill-mention'
 // import 'quill-mention/dist/quill.mention.min.css'
-// import Quill from '../moudles/mention'
+// import Mention from '../moudles/mention/mention'
+import Quill from '../moudles'
 
 interface ToolEditorProps {
 	className?: string
@@ -34,19 +35,25 @@ export interface ToolEditorMethods {
 	quill: Quill
 }
 // 2.0.0-rc.2
-async function suggestPeople(searchTerm) {
-	const allPeople = [
-		{
-			id: 1,
-			value: 'Fredrik Sundqvist'
-		},
-		{
-			id: 2,
-			value: 'Patrik Sjölin'
-		}
-	]
-	return allPeople.filter((person) => person.value.includes(searchTerm))
-}
+// async function suggestPeople(searchTerm) {
+// 	const allPeople = [
+// 		{
+// 			id: 1,
+// 			value: 'Fredrik Sundqvist'
+// 		},
+// 		{
+// 			id: 2,
+// 			value: 'Patrik Sjölin'
+// 		}
+// 	]
+// 	return allPeople.filter((person) => person.value.includes(searchTerm))
+// }
+
+// Quill.register({
+// 	'modules/mention': Mention
+// })
+
+// 配置提及的数据源
 
 const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorProps> = (props, ref) => {
 	const EditorRef = useRef<HTMLDivElement | null>(null)
@@ -59,20 +66,19 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 	useEffect(() => {
 		if (!EditorRef.current) return
 
+		// console.dir(Mention)
+
 		const quill = new Quill(EditorRef.current, {
 			readOnly: props?.readonly ?? true,
 			placeholder: props?.readonly ? '' : $t('请输入内容'),
-			// registry: Mention,
-			// modules: {
-			// 	mention: {
-			// 		allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
-			// 		mentionDenotationChars: ['@'],
-			// 		source: async function (searchTerm: any, renderList: any) {
-			// 			const matchedPeople = await suggestPeople(searchTerm)
-			// 			renderList(matchedPeople)
-			// 		}
-			// 	}
-			// }
+			modules: {
+				mention: {
+					triggerChar: '@',
+					source: async () => {
+						return [{ data: 1 }]
+					}
+				}
+			}
 		})
 
 		setQuill(quill)
