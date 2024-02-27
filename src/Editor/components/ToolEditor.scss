@@ -47,13 +47,12 @@
         outline: none;
     }
 
-    // &[data-placeholder]:empty:before {
-    //     content: attr(data-placeholder);
-    //     color: gray;
-    //     font-size: 14px;
-    // }
+    &.ql-blank::before {
+        font-size: 0.9rem;
+        left: 10px !important;
+        right: auto !important;
+        font-style: normal !important;
+        top: 1px;
+    }
 
-    // &[data-placeholder]:focus {
-    //     content: none;
-    // }
 }

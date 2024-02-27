@@ -16,7 +16,7 @@ import { useClipboard } from '@reactuses/core'
 
 import './message.scss'
 import { useMessageStore } from '@/stores/message'
-import { $t, TOOLTIP_TYPE, MESSAGE_TYPE, isMe } from '@/shared'
+import { $t, TOOLTIP_TYPE, MESSAGE_TYPE, isMe, hasImageHtml } from '@/shared'
 import Chat from '@/components/Message/Chat'
 // import ToolEditor } from '@/components/Editor/ToolEditor'
 import { isWebDevice, platform } from '@/utils'
@@ -79,7 +79,7 @@ type MoreType = 'emojis' | 'more' | ''
 // 	)
 // }
 
-const Message: React.FC<RouterProps> = ({ f7route }) => {
+const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
 	const contentRef = useRef<HTMLElement | null>(null)
 	const editorRef = useRef<ToolEditorMethods>(null)
@@ -394,10 +394,11 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 			const quill = editorRef.current!.quill
 
-			quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
+			quill.on(Quill.events.EDITOR_CHANGE, (type, oldDelta, source) => {
 				if (type !== Quill.events.SELECTION_CHANGE) {
 					setShowBtn(quill.getLength() > 1)
 				}
+				console.log('type', type, oldDelta, source)
 			})
 		},
 		() => {},
@@ -407,12 +408,19 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const sendMessage = async () => {
 		const isEnd = isScrollEnd()
 		const quill = editorRef.current!.quill
+		// const content = quill.getSemanticHTML()
+
+		let type = msgType
 		const content = quill.getSemanticHTML()
+
+		if (hasImageHtml(content)) {
+			type = MESSAGE_TYPE.IMAGE
+		}
 
 		// 发送或编辑消息
 		selectType === TOOLTIP_TYPE.EDIT
 			? msgStore.editMessage(selectMsgs[0], content)
-			: msgStore.sendMessage(msgType, content, { replay_id: isReply() ? selectMsgs[0]?.msg_id : 0 })
+			: msgStore.sendMessage(type, content, { replay_id: isReply() ? selectMsgs[0]?.msg_id : 0 })
 
 		setSelectType(TOOLTIP_TYPE.NONE)
 		setTimeout(() => scroll(contentRef.current!, isEnd ? true : false), 100)
@@ -596,11 +604,11 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								)}
 							>
 								<div className={clsx('flex-1 rounded pl-2 max-w-[calc(100%-150px)]')}>
-									<div className="py-2 bg-bgSecondary rounded w-full">
+									<div className="py-2 bg-bgSecondary rounded w-full flex items-center">
 										<ToolEditor
 											ref={editorRef}
 											readonly={false}
-											className="max-h-[150px]  overflow-y-auto"
+											className="max-h-[150px]  overflow-y-auto h-full"
 										/>
 									</div>
 									{(isReply() || isEdit()) && (
@@ -655,7 +663,11 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 						style={{ height: keyboardHeight + 'px' }}
 						ref={moreRef}
 					>
-						{moreType === 'emojis' ? <Emojis onSelectEmojis={onSelectEmojis} /> : <ToolBarMore is_group={is_group} id={receiver_id} />}
+						{moreType === 'emojis' ? (
+							<Emojis onSelectEmojis={onSelectEmojis} />
+						) : (
+							<ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />
+						)}
 					</div>
 				</div>
 

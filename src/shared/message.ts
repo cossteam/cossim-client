@@ -5,7 +5,7 @@ import UserService from '@/api/user'
 import { isEqual } from 'lodash-es'
 import { v4 as uuidv4 } from 'uuid'
 import { PrivateChats } from '@/types/db/user-db'
-import { MESSAGE_TYPE } from '.'
+import { $t, MESSAGE_TYPE } from '.'
 import MsgService from '@/api/msg'
 
 interface CommonOptions {
@@ -66,8 +66,14 @@ export const updateDatabaseMessage = async (
  */
 export const addMarkMessage = async (tableName: string, msg: PrivateChats, is_label: number) => {
 	try {
-		const doc = new DOMParser().parseFromString(msg.content, 'text/html')
-		const txt = doc.body.textContent
+		let txt: string = ''
+		if (msg.type === MESSAGE_TYPE.IMAGE) {
+			txt = $t('[图片]')
+		} else {
+			const doc = new DOMParser().parseFromString(msg.content, 'text/html')
+			txt = doc.body.textContent ?? ''
+		}
+
 		const user_id = getCookie(USER_ID) || ''
 
 		const marks = {
@@ -183,4 +189,30 @@ export const getMessageFromServer = async (id: string, is_group: boolean) => {
 	}
 
 	return reslut
+}
+
+/**
+ * 检索数组中是否包含有图片类型
+ *
+ * @param {Array} data
+ * @returns
+ */
+export const hasImage = (data: any) => {
+	const ops = data.ops
+	for (const item of ops) {
+		if (item.insert && typeof item.insert === 'object' && 'image' in item.insert) {
+			return true
+		}
+	}
+	return false
+}
+
+export const hasImageHtml = (html: string) => {
+	// 匹配 img 标签
+	const imgReg = /<img[^>]+>/g
+	const imgArr = html.match(imgReg)
+	if (imgArr) {
+		return true
+	}
+	return false
 }

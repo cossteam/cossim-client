@@ -1,4 +1,5 @@
 import { useClickOutside } from '@reactuses/core'
+import { useMessageStore } from '@/stores/message'
 import clsx from 'clsx'
 import React, { useEffect, useRef } from 'react'
 
@@ -15,12 +16,15 @@ const LongPressButton: React.FC<LongPressButtonProps> = (props) => {
 
 	const LongPressButtonRef = useRef<HTMLDivElement>(null)
 
+	const { trgger, updateTrgger } = useMessageStore()
+
 	useClickOutside(LongPressButtonRef, () => {
 		LongPressButtonRef.current?.addEventListener('touchstart', handleTouchStart)
 	})
 
 	const handleTouchStart = (e: any) => {
 		e.preventDefault()
+
 		scrollingRef.current = false
 		timerRef.current = setTimeout(() => {
 			if (!scrollingRef.current) {
@@ -44,12 +48,22 @@ const LongPressButton: React.FC<LongPressButtonProps> = (props) => {
 	}
 
 	useEffect(() => {
+		if (trgger) {
+			LongPressButtonRef.current?.addEventListener('touchstart', handleTouchStart)
+			updateTrgger(false)
+		}
+	}, [trgger])
+
+
+	useEffect(() => {
 		if (!LongPressButtonRef.current) return
 		LongPressButtonRef.current.addEventListener('touchstart', handleTouchStart)
 		LongPressButtonRef.current.addEventListener('touchend', handleTouchEnd)
 		LongPressButtonRef.current.addEventListener('touchmove', handleScroll)
 		LongPressButtonRef.current.addEventListener('mousedown', handleTouchStart)
 		LongPressButtonRef.current.addEventListener('mouseup', handleTouchEnd)
+
+		// LongPressButtonRef.current.addEventListener('click', handlerClick)
 
 		// 在组件卸载或者长按事件触发时清除定时器
 		return () => {
@@ -75,7 +89,7 @@ const LongPressButton: React.FC<LongPressButtonProps> = (props) => {
 			// 	handleTouchStart(e)
 			// }}
 			// onMouseUp={() => handleTouchEnd()}
-			className={clsx('touch-none', props.className)}
+			className={clsx('long-press-button touch-none', props.className)}
 			ref={LongPressButtonRef}
 		>
 			{props.children}

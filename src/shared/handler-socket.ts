@@ -1,5 +1,5 @@
 import { getCookie } from '@/utils/cookie'
-import { DEVICE_ID, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE, USER_ID } from '.'
+import { $t, DEVICE_ID, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE, USER_ID } from '.'
 import UserStore from '@/db/user'
 import { v4 as uuidv4 } from 'uuid'
 import { MessageStore } from '@/stores/message'
@@ -101,12 +101,15 @@ export const handlerLabelSocket = async (data: any, msgStore: MessageStore) => {
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
 		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 		if (user_id === data?.data?.sender_id && data?.driverId === device_id) return
-
 		const msg = data.data
-		const doc = new DOMParser().parseFromString(msg?.content, 'text/html')
-		const txt = doc.body.textContent
 
-		// const uid = msgStore.messages.find((m: any) => m.msg_id === msg.msg.id)?.uid
+		let txt = ''
+		if (msg?.type === MESSAGE_TYPE.IMAGE) {
+			txt = $t('[图片]')
+		} else {
+			const doc = new DOMParser().parseFromString(msg?.content, 'text/html')
+			txt = doc.body.textContent ?? ''
+		}
 
 		const uid = (await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', msg?.dialog_id))?.find(
 			(m: any) => m.msg_id === msg.id
@@ -127,6 +130,14 @@ export const handlerLabelSocket = async (data: any, msgStore: MessageStore) => {
 
 		await UserStore.add(UserStore.tables.messages, marks)
 		msgStore.updateMessage(marks)
+
+		const message = await UserStore.findOneById(UserStore.tables.messages, 'uid', uid)
+		// 更新数据库
+		if (message) {
+			const data = { ...message, is_label: msg.is_label }
+			await msgStore.updateMessageById(data as any)
+			await UserStore.update(UserStore.tables.messages, 'uid', uid, data)
+		}
 
 		return marks
 	} catch (error) {
@@ -151,10 +162,10 @@ export const handlerEditSocket = async (data: any, msgStore: MessageStore) => {
 		const msg = (
 			await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', data?.data?.dialog_id)
 		).find((m: any) => m.msg_id === data.data.id)
-		
+
 		msg?.content && (msg.content = data.data.content)
 
-		await UserStore.update(UserStore.tables.messages, 'id', msg.id, { ...msg})
+		await UserStore.update(UserStore.tables.messages, 'id', msg.id, { ...msg })
 		await msgStore.updateMessageById(msg)
 	} catch (error) {
 		console.log('error', error)

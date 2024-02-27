@@ -43,15 +43,90 @@ export interface MessageStore {
 	userInfo: any
 	members: any[]
 	myInfo: any
+	/**
+	 * 触发 手机触摸事件
+	 */
+	trgger: boolean
+	/**
+	 * 更新触发
+	 * 
+	 * @param trgger 
+	 * @returns 
+	 */
+	updateTrgger: (trgger: boolean) => void
+	/**
+	 * 更新消息
+	 * 
+	 * @param msg 
+	 * @returns 
+	 */
 	updateMessage: (msg: any) => Promise<void>
+	/**
+	 * 删除消息
+	 * 
+	 * @param msg_id 
+	 * @returns 
+	 */
 	deleteMessage: (msg_id: number) => Promise<void>
+	/**
+	 * 发送消息并处理发送过程，包括更新本地消息状态和数据库。
+	 *
+	 * @param {MESSAGE_TYPE} type -消息的类型
+	 * @param {string} content -消息的内容
+	 * @param {number} [replay_id] -正在回复的消息的ID，可选
+	 * @return {Promise<void>}
+	 */
 	sendMessage: (type: MESSAGE_TYPE, content: string, options?: Options) => Promise<void>
+	/**
+	 * 编辑消息
+	 * 
+	 * @param msg 
+	 * @param content 
+	 * @returns 
+	 */
 	editMessage: (msg: any, content: string) => Promise<void>
+	/**
+	 * 标记消息
+	 * 
+	 * @param msg 
+	 * @returns 
+	 */
 	markMessage: (msg: PrivateChats) => Promise<boolean>
+	/**
+	 * 设置消息已读
+	 * 
+	 * @param msgs 
+	 * @returns 
+	 */
 	readMessage: (msgs: PrivateChats[]) => Promise<void>
+	/**
+	 * 初始化消息的函数。
+	 *
+	 * @param {boolean} is_group -指示对话框是否是一个组
+	 * @param {number}dialog_id -对话框的ID
+	 * @param {string}receiver_id -消息接收者的id
+	 * @return  消息初始化时解析的 Promise
+	 */
 	initMessage: (is_group: boolean, dialog_id: number, receiver_id: string) => Promise<void>
+	/**
+	 * 更新消息
+	 * 
+	 * @param msgs 
+	 * @returns 
+	 */
 	updateMessages: (msgs: PrivateChats[]) => Promise<void>
+	/**
+	 * 清空消息
+	 * 
+	 * @returns
+	 */
 	clearMessages: () => Promise<void>
+	/**
+	 * 更新某条消息
+	 * 
+	 * @param msg 
+	 * @returns 
+	 */
 	updateMessageById: (msg: PrivateChats) => Promise<void>
 }
 
@@ -66,6 +141,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	userInfo: null,
 	members: [],
 	myInfo: null,
+	trgger: false,
+	updateTrgger: (trgger: boolean) => set({ trgger }),
+
 	updateMessage: async (msg: PrivateChats) => {
 		const { messages } = get()
 		set({ messages: [...messages, msg] })
@@ -79,14 +157,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			console.log('删除消息失败', error)
 		}
 	},
-	/**
-	 * 发送消息并处理发送过程，包括更新本地消息状态和数据库。
-	 *
-	 * @param {MESSAGE_TYPE} type -消息的类型
-	 * @param {string} content -消息的内容
-	 * @param {number} [replay_id] -正在回复的消息的ID，可选
-	 * @return {Promise<void>}
-	 */
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
 		const { messages, receiver_id, dialog_id, myInfo } = get()
 
@@ -272,14 +342,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			}
 		}
 	},
-	/**
-	 * 初始化消息的函数。
-	 *
-	 * @param {boolean} is_group -指示对话框是否是一个组
-	 * @param {number}dialog_id -对话框的ID
-	 * @param {string}receiver_id -消息接收者的id
-	 * @return  消息初始化时解析的 Promise
-	 */
 	initMessage: async (is_group: boolean, dialog_id: number, receiver_id: string) => {
 		const { shareKey, readMessage } = get()
 
@@ -339,7 +401,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		const { messages } = get()
 		const newMessages = messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
 		console.log('newMessages', msg, newMessages)
-
 		set({ messages: newMessages })
 	}
 }))

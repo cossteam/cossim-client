@@ -1,11 +1,16 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
+import 'quill/dist/quill.core.css'
 import './ToolEditor.scss'
 // import { Editor } from '..'
 import { useFocus } from '@reactuses/core'
 import Quill from 'quill'
 import { $t } from '@/shared'
+// import 'quill-mention'
+// import Mention from 'quill-mention'
+// import 'quill-mention/dist/quill.mention.min.css'
+// import Quill from '../moudles/mention'
 
 interface ToolEditorProps {
 	className?: string
@@ -28,6 +33,20 @@ export interface ToolEditorMethods {
 	// isFocus: boolean
 	quill: Quill
 }
+// 2.0.0-rc.2
+async function suggestPeople(searchTerm) {
+	const allPeople = [
+		{
+			id: 1,
+			value: 'Fredrik Sundqvist'
+		},
+		{
+			id: 2,
+			value: 'Patrik Sjölin'
+		}
+	]
+	return allPeople.filter((person) => person.value.includes(searchTerm))
+}
 
 const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorProps> = (props, ref) => {
 	const EditorRef = useRef<HTMLDivElement | null>(null)
@@ -42,8 +61,18 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 
 		const quill = new Quill(EditorRef.current, {
 			readOnly: props?.readonly ?? true,
-			placeholder: props?.readonly ? '' : $t('请输入内容')
-			// theme: 'snow'
+			placeholder: props?.readonly ? '' : $t('请输入内容'),
+			// registry: Mention,
+			// modules: {
+			// 	mention: {
+			// 		allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
+			// 		mentionDenotationChars: ['@'],
+			// 		source: async function (searchTerm: any, renderList: any) {
+			// 			const matchedPeople = await suggestPeople(searchTerm)
+			// 			renderList(matchedPeople)
+			// 		}
+			// 	}
+			// }
 		})
 
 		setQuill(quill)
@@ -51,7 +80,12 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 
 	useEffect(() => {
 		if (quill && props.initValue) {
-			quill.root.innerHTML = props.initValue
+			try {
+				quill.root.innerHTML = props.initValue
+			} catch {
+				const content = JSON.parse(props.initValue)
+				quill.setContents(content)
+			}
 		}
 	}, [quill, props.initValue])
 

@@ -105,6 +105,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 								initValue={msg?.content}
 								data-id={msg?.msg_id}
 								data-index={index}
+								readonly
 								// content={reply?.content ? reply.content : ''}
 							>
 							</ToolEditor>
@@ -142,6 +143,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							<ToolEditor
 								className="reply_editor empty:before:text-transparent"
 								initValue={reply?.content}
+								readonly
 							/>
 						</div>
 					)}

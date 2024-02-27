@@ -13,6 +13,7 @@ import {
 	TextAlignleft
 } from 'framework7-icons/react'
 import { createRoot } from 'react-dom/client'
+import { useMessageStore } from '@/stores/message'
 
 interface ToolTipProps {
 	el: HTMLElement
@@ -91,7 +92,6 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 				/>
 			)
 			document.body.appendChild(divRef.current)
-
 			return
 		}
 		// 控制上边界
@@ -178,6 +178,15 @@ interface ToolTipViewProps {
 	top: boolean
 }
 
+// function findAncestorWithClassName(element: any, className: string) {
+// 	// 循环向上查找父元素，直到找到满足条件的元素或到达文档顶部
+// 	while (element && !element.classList.contains(className)) {
+// 		element = element.parentNode
+// 	}
+// 	// 返回满足条件的父元素或 null（如果未找到）
+// 	return element
+// }
+
 const ToolTipView: React.FC<ToolTipViewProps> = ({
 	tooltipRef,
 	triangleRef,
@@ -188,6 +197,17 @@ const ToolTipView: React.FC<ToolTipViewProps> = ({
 	className,
 	top
 }) => {
+
+	const { updateTrgger } = useMessageStore()
+
+	const handlerClick = (item: any) => {
+		onSelect(item.name, msgId)
+		// 获取父元素
+		// console.log('tooltipRef', findAncestorWithClassName(tooltipRef.current, 'long-press-button'))
+		setVisible(false)
+		updateTrgger(true)
+	}
+
 	return (
 		<div
 			className={clsx(
@@ -208,13 +228,7 @@ const ToolTipView: React.FC<ToolTipViewProps> = ({
 				<div className="flex flex-wrap">
 					{tips.map((item, index) => (
 						<div key={item.name} className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')}>
-							<Link
-								onClick={() => {
-									setVisible(false)
-									onSelect(item.name, msgId)
-								}}
-								className="w-full"
-							>
+							<Link onClick={() => handlerClick(item)} className="w-full">
 								<div className="flex flex-col items-center justify-center">
 									<div className="mb-[6px]">{item.icon}</div>
 									<span className="text-[0.75rem]">{item.title}</span>
