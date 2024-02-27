@@ -1,4 +1,4 @@
-import Cookies from 'js-cookie'
+// import Cookies from 'js-cookie'
 
 /**
  * 获取cookie
@@ -6,7 +6,8 @@ import Cookies from 'js-cookie'
  * @param name
  * @returns
  */
-export const getCookie = (name: string): string | undefined => Cookies.get(name)
+export const getCookie = (name: string): string | undefined => localStorage.getItem(name) ?? undefined
+// Cookies.get(name)
 
 /**
  * 设置具有给定名称和值以及可选属性的 cookie。
@@ -17,12 +18,13 @@ export const getCookie = (name: string): string | undefined => Cookies.get(name)
  * @return {void}
  */
 
-export const setCookie = (name: string, value: string, options?: Cookies.CookieAttributes) => {
-	Cookies.set(name, value, {
-		// 默认永久
-		expires: new Date('9999-12-31T23:59:59'),
-		...options
-	})
+export const setCookie = (name: string, value: string) => {
+	// Cookies.set(name, value, {
+	// 	// 默认永久
+	// 	expires: new Date('9999-12-31T23:59:59'),
+	// 	...options
+	// })
+	localStorage.setItem(name, value)
 }
 
 /**
@@ -31,7 +33,7 @@ export const setCookie = (name: string, value: string, options?: Cookies.CookieA
  * @param name
  * @returns
  */
-export const removeCookie = (name: string) => Cookies.remove(name)
+export const removeCookie = (name: string) => localStorage.removeItem(name)
 
 /**
  * 判断cookie是否存在
@@ -39,14 +41,15 @@ export const removeCookie = (name: string) => Cookies.remove(name)
  * @param name
  * @returns
  */
-export const hasCookie = (name: string) => Cookies.get(name) !== undefined
+export const hasCookie = (name: string) => !!localStorage.getItem(name)
 
 /**
  * 移除所有 cookie
  */
 export const removeAllCookie = () => {
-	const keys = Object.keys(Cookies.get())
-	keys.forEach((key: string) => {
-		Cookies.remove(key)
-	})
+	// const keys = Object.keys(Cookies.get())
+	// keys.forEach((key: string) => {
+	// 	Cookies.remove(key)
+	// })
+	localStorage.clear()
 }

@@ -34,19 +34,19 @@ export interface ToolEditorMethods {
 	quill: Quill
 }
 // 2.0.0-rc.2
-async function suggestPeople(searchTerm) {
-	const allPeople = [
-		{
-			id: 1,
-			value: 'Fredrik Sundqvist'
-		},
-		{
-			id: 2,
-			value: 'Patrik Sjölin'
-		}
-	]
-	return allPeople.filter((person) => person.value.includes(searchTerm))
-}
+// async function suggestPeople(searchTerm) {
+// 	const allPeople = [
+// 		{
+// 			id: 1,
+// 			value: 'Fredrik Sundqvist'
+// 		},
+// 		{
+// 			id: 2,
+// 			value: 'Patrik Sjölin'
+// 		}
+// 	]
+// 	return allPeople.filter((person) => person.value.includes(searchTerm))
+// }
 
 const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorProps> = (props, ref) => {
 	const EditorRef = useRef<HTMLDivElement | null>(null)
@@ -61,7 +61,7 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 
 		const quill = new Quill(EditorRef.current, {
 			readOnly: props?.readonly ?? true,
-			placeholder: props?.readonly ? '' : $t('请输入内容'),
+			placeholder: props?.readonly ? '' : $t('请输入内容')
 			// registry: Mention,
 			// modules: {
 			// 	mention: {
