@@ -12,7 +12,7 @@ import RelationService from '@/api/relation'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
 import { getCookie } from '@/utils/cookie'
-import { hasMediaDevices } from '@/utils/media'
+import { hasCamera, hasMike } from '@/utils/media'
 
 const userId = getCookie(USER_ID) || ''
 
@@ -54,22 +54,25 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}
 
 	// 呼叫
-	const { call } = useCallStore()
-	const callUser = async () => {
+	const { call, updateEnablesVideo } = useCallStore()
+	const callUser = async (enableVideo: boolean) => {
 		try {
-			f7.dialog.preloader($t('呼叫中...'))
 			// 检查设备是否可用
-			await hasMediaDevices()
+			await hasMike()
+			enableVideo && (await hasCamera())
+			f7.dialog.preloader($t('呼叫中...'))
+			// 是否开启摄像头
+			updateEnablesVideo(enableVideo)
 			await call({ userInfo })
+			f7.dialog.close()
 		} catch (error: any) {
+			console.log(error?.code, error?.code === 8)
 			console.dir(error)
 			if (error?.code === 8) {
 				f7.dialog.alert($t('当前媒体设备不可用，无法接听来电'))
 				return
 			}
 			f7.dialog.alert($t(error?.message || '呼叫失败...'))
-		} finally {
-			f7.dialog.close()
 		}
 	}
 
@@ -211,8 +214,8 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 									iconF7="chat_bubble_fill"
 									href={`/message/${f7route.params.id}/${userInfo?.dialog_id}/?is_group=false&dialog_name=${userInfo?.nickname}`}
 								/>
-								<Link iconF7="camera_fill" />
-								<Link iconF7="phone_fill" onClick={callUser} />
+								<Link iconF7="videocam_fill" onClick={() => callUser(true)} />
+								<Link iconF7="phone_fill" onClick={() => callUser(false)} />
 							</div>
 						)}
 					</ListItem>

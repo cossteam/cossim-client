@@ -19,7 +19,9 @@ import { MessageEventEnum } from './enums'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
 
 const Call: React.FC<RouterProps> = () => {
-	const { callInfo, status, reject, accept, hangup } = useCallStore()
+	const { enablesVideo, callInfo, status, reject, accept, hangup } = useCallStore()
+	console.log('Call', enablesVideo)
+
 	const roomReady = status === CallStatus.CALLING && callInfo?.wsInfo
 
 	const [worker, setWorker] = useState<Worker | null>(null)
@@ -111,7 +113,7 @@ const Call: React.FC<RouterProps> = () => {
 					token={callInfo.wsInfo.token}
 					serverUrl={callInfo.wsInfo.url}
 					audio={true}
-					video={false}
+					video={enablesVideo}
 					screen={false}
 					onConnected={onConnected}
 					onDisconnected={roomDisconnect}
@@ -149,6 +151,9 @@ const Call: React.FC<RouterProps> = () => {
 }
 
 function MyVideoConference() {
+	// const { enablesVideo } = useCallStore()
+	// console.log('MyVideoConference', enablesVideo)
+
 	const tracks = useTracks(
 		[
 			{ source: Track.Source.Camera, withPlaceholder: true },

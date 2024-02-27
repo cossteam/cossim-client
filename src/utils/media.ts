@@ -1,11 +1,27 @@
+import { $t } from '@/shared'
 export async function hasMike() {
-	return navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+	try {
+		return navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+	} catch (error: any) {
+		console.log(error)
+		throw Error(error?.message || $t('麦克风无法使用'))
+	}
 }
 
 export async function hasCamera() {
-	return navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+	try {
+		return navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+	} catch (error: any) {
+		console.log(error)
+		throw Error(error?.message || $t('摄像头无法使用'))
+	}
 }
 
 export async function hasMediaDevices() {
-	return navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+	try {
+		return navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+	} catch (error: any) {
+		console.log(error)
+		throw Error(error?.message || $t('麦克风或摄像头无法使用'))
+	}
 }

@@ -22,7 +22,7 @@ import { hasCookie, setCookie } from '@/utils/cookie'
 import { useCallStore } from '@/stores/call'
 import { useMessageStore } from './stores/message'
 import { useStateStore } from '@/stores/state'
-import { hasMediaDevices } from './utils/media'
+import { hasMike } from './utils/media'
 
 function App() {
 	const msgStore = useMessageStore()
@@ -92,7 +92,7 @@ function App() {
 						}
 						updateCallInfo(newCallInfo)
 						// 检查设备是否可用
-						await hasMediaDevices()
+						await hasMike()
 						// 更新通话状态
 						updateStatus(CallStatus.WAITING)
 					} catch (error: any) {

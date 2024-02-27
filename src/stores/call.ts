@@ -53,7 +53,7 @@ export const callStore = (set: any, get: any): CallStore => ({
 	status: CallStatus.IDLE,
 	waitingTime: null,
 	type: CallType.AUDIO,
-	enablesVideo: true,
+	enablesVideo: false,
 	updateCallInfo: (callInfo: any) => {
 		set({ callInfo })
 	},
@@ -66,7 +66,7 @@ export const callStore = (set: any, get: any): CallStore => ({
 			status: CallStatus.IDLE,
 			waitingTime: null,
 			type: CallType.AUDIO,
-			enablesVideo: true
+			enablesVideo: false
 		})
 	},
 	updateWaitingTime: (waitingTime: Date) => {
@@ -82,19 +82,20 @@ export const callStore = (set: any, get: any): CallStore => ({
 		try {
 			set({ callInfo })
 			set({ status: CallStatus.WAITING })
+			const { enablesVideo } = get()
 			// 创建通话
 			const isUser = callInfo?.userInfo?.user_id
 			const createRoomParams = {
 				[isUser ? 'user_id' : 'group_id']: isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
 			}
 			!isUser && (createRoomParams['member'] = callInfo?.groupInfo?.member || [])
-			// createRoomParams['option'] = {
-			// 	audio_enabled: true,
-			// 	codec: 'vp8',
-			// 	frame_rate: 0,
-			// 	resolution: '1280x720',
-			// 	video_enabled: true
-			// }
+			createRoomParams['option'] = {
+				// audio_enabled: true,
+				// codec: 'vp8',
+				// frame_rate: 0,
+				// resolution: '1280x720',
+				video_enabled: enablesVideo
+			}
 			const createResp = isUser
 				? await CallService.createLiveUserApi(createRoomParams)
 				: await CallService.createLiveGroupApi(createRoomParams)
@@ -117,6 +118,7 @@ export const callStore = (set: any, get: any): CallStore => ({
 			set({ status: CallStatus.CALLING })
 			return Promise.resolve(joinResp.data)
 		} catch (error) {
+			set({ enablesVideo: false })
 			return Promise.reject(error)
 		}
 	},
@@ -124,7 +126,6 @@ export const callStore = (set: any, get: any): CallStore => ({
 		try {
 			const { callInfo } = get()
 			const isUser = callInfo?.userInfo?.user_id
-			console.log(isUser)
 			const rejectResp = isUser ? await CallService.rejectLiveUserApi() : await CallService.rejectLiveGroupApi()
 			if (rejectResp.code !== 200) {
 				return Promise.reject({
@@ -135,6 +136,7 @@ export const callStore = (set: any, get: any): CallStore => ({
 			set({ status: CallStatus.REFUSE })
 			return Promise.resolve()
 		} catch (error: any) {
+			set({ enablesVideo: false })
 			return Promise.resolve(error)
 		} finally {
 			setTimeout(() => {
@@ -159,6 +161,7 @@ export const callStore = (set: any, get: any): CallStore => ({
 			set({ status: CallStatus.CALLING })
 			return Promise.resolve(joinResp.data)
 		} catch (error: any) {
+			set({ enablesVideo: false })
 			return Promise.resolve(error)
 		}
 	},
@@ -177,6 +180,7 @@ export const callStore = (set: any, get: any): CallStore => ({
 			set({ status: CallStatus.HANGUP })
 			return Promise.resolve()
 		} catch (error: any) {
+			set({ enablesVideo: false })
 			return Promise.resolve(error)
 		} finally {
 			setTimeout(() => {
