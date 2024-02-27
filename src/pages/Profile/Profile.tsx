@@ -208,16 +208,16 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			<div className="profile-content bg-gray-100">
 				<List strong outline dividers mediaList className="no-margin-top m-0 mb-3 bg-white">
 					<ListItem title={userInfo?.name} text={userInfo?.nickname}>
-						{!is_from_message_page && (
-							<div slot="after" className="profile-actions-links">
+						<div slot="after" className="profile-actions-links">
+							{!is_from_message_page && (
 								<Link
 									iconF7="chat_bubble_fill"
 									href={`/message/${f7route.params.id}/${userInfo?.dialog_id}/?is_group=false&dialog_name=${userInfo?.nickname}`}
 								/>
-								<Link iconF7="videocam_fill" onClick={() => callUser(true)} />
-								<Link iconF7="phone_fill" onClick={() => callUser(false)} />
-							</div>
-						)}
+							)}
+							<Link iconF7="videocam_fill" onClick={() => callUser(true)} />
+							<Link iconF7="phone_fill" onClick={() => callUser(false)} />
+						</div>
 					</ListItem>
 					<ListItem subtitle={userInfo?.signature} text={userInfo?.email} />
 				</List>

@@ -143,10 +143,10 @@ const ApplyList = () => {
 	}
 
 	// 是否可操作
-	const isOperate = ({ status }: any) => {
+	const isOperate = ({ status, sender_id }: any) => {
 		if (type === ApplyType.FRIEND) {
 			// 好友
-			return status === ApplyStatus.PENDING
+			return status === ApplyStatus.PENDING && sender_id !== user_id
 		} else {
 			// 群
 			return status === ApplyStatus.PENDING || status === ApplyStatus.INVITE_RECEIVER
