@@ -1,5 +1,5 @@
 import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
-import { Badge, Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
+import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
 import { useEffect, useRef, useState } from 'react'
 import { useAsyncEffect, useClickOutside } from '@reactuses/core'
 import {
@@ -28,8 +28,8 @@ import GroupService from '@/api/group'
 
 import ToolEditor, { EventType, ToolEditorMethods } from '@/Editor'
 import { useStateStore } from '@/stores/state'
-import { useLiveQuery } from 'dexie-react-hooks'
-import UserStore from '@/db/user'
+// import { useLiveQuery } from 'dexie-react-hooks'
+// import UserStore from '@/db/user'
 // import { FixedSizeList } from 'react-window'
 // import AutoSizer from 'react-virtualized-auto-sizer'
 // import VariableSizeList from '@/components/VariableSizeList/VariableSizeList'
@@ -46,22 +46,6 @@ const scroll = (element: HTMLElement, isSmooth: boolean = false) => {
 
 type MoreType = 'emojis' | 'more' | ''
 
-/**
- * 获取群公告
- *
- * @param receiver_id
- */
-const getUserMessageList = async (group_id: string | number) => {
-	let reslut = null
-	try {
-		const { data } = await GroupService.groupAnnouncementApi({ group_id: Number(group_id) })
-		reslut = data
-	} catch (error) {
-		console.error(error)
-	}
-
-	return reslut
-}
 
 // const rowRender = ({ index, setItemSize }: { index: number; setItemSize: (index: number, height: number) => void }) => {
 // 	const
@@ -294,9 +278,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		async () => {
 			if (!pageRef.current.el) return
 			const el = pageRef.current.el.querySelector('.page-content') as HTMLElement
-
 			contentRef.current = el
 
+			// 初始化消息
 			await msgStore.initMessage(is_group, dialog_id, receiver_id)
 
 			requestAnimationFrame(() => {
@@ -306,12 +290,19 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 			// 如果是群聊
 			if (is_group) {
-				getUserMessageList(receiver_id).then((res) => {
-					console.log('res', res)
-					setGroupAnnouncement(res)
+				const params = { group_id: Number(receiver_id) }
+
+				GroupService.groupAnnouncementApi(params).then((res) => {
+					console.log('群公告：', res.data)
+					setGroupAnnouncement(res.data)
+				})
+
+				GroupService.groupMemberApi(params).then((res) => {
+					console.log('群成员', res.data)
 				})
 			}
 
+			// 判断设备
 			setIsWeb(await isWebDevice())
 
 			// 手机端监听键盘
@@ -374,11 +365,11 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			let is_at = false
 			is_group &&
 				engine.on(EventType.AITE, (e) => {
-					console.log("e,",e.target);
+					console.log('e,', e.target)
 					const rect = e.target?.getBoundingClientRect()
 					console.log('rect', rect)
 					const div = document.createElement('div')
-					div.id= 'tooltips'
+					div.id = 'tooltips'
 					div.style.left = `${rect.left}px`
 					div.style.top = `${rect.top - e.target.offsetHeight}px`
 					div.innerHTML = '暂不支持'
@@ -388,8 +379,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 			is_group &&
 				engine.on(EventType.AITE_END, () => {
-					console.log("@ 结束");
-					
+					console.log('@ 结束')
+
 					if (is_at) {
 						const el = document.getElementById('tooltips')
 						if (el) el.remove()
@@ -422,9 +413,12 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		const engine = editorRef.current!.engine
 		const content = engine.toValue()
 		engine.clear()
+
+		// 发送或编辑消息
 		selectType === TOOLTIP_TYPE.EDIT
 			? msgStore.editMessage(selectMsgs[0], content)
 			: msgStore.sendMessage(msgType, content, { replay_id: isReply() ? selectMsgs[0]?.msg_id : 0 })
+
 		editorRef.current!.focus()
 		setSelectType(TOOLTIP_TYPE.NONE)
 		setTimeout(() => scroll(contentRef.current!, isEnd ? true : false), 100)
@@ -433,8 +427,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		engine.focus()
 	}
 
-	const dialog = useLiveQuery(() => UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', dialog_id))
-
+	// const dialog = useLiveQuery(() => UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', dialog_id))
 	// 未读消息数
 	// const [unReadCount, setUnReadCount] = useState<number>(0)
 
@@ -462,10 +455,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	}
 
 	// 阅读所有
-	const readAll = () => {
-		scroll(contentRef.current!, true)
-		// setUnReadCount(0)
-	}
+	// const readAll = () => {
+	// 	scroll(contentRef.current!, true)
+	// }
 
 	// 辅助函数
 	const isSelect = () => selectType === TOOLTIP_TYPE.SELECT
@@ -487,6 +479,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - setp
 		)
 	}
+
+	// const listItemRef = useRef<{ el: HTMLDivElement[] }>()
 
 	return (
 		<Page
@@ -542,6 +536,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								onSelect={onSelect}
 								isSelected={isSelect()}
 								reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
+								// ref={(el: HTMLDivElement) => (listItemRef.current!.el[index] = el)}
 							/>
 						</ListItem>
 					))}
@@ -692,13 +687,13 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					{/* )} */}
 				</div>
 
-				{!!dialog?.dialog_unread_count && dialog?.dialog_unread_count > 0 && (
+				{/* {!!dialog?.dialog_unread_count && dialog?.dialog_unread_count > 0 && (
 					<Badge className="w-6 h-6 absolute bottom-[calc(100%+10px)] right-5 overflow-hidden">
 						<Button fill round onClick={readAll}>
 							{dialog?.dialog_unread_count}
 						</Button>
 					</Badge>
-				)}
+				)} */}
 			</div>
 
 			<Contact completed={setSelect} opened={showSelect} setOpened={setShowSelect} group />

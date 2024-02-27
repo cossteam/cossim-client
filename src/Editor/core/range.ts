@@ -68,7 +68,7 @@ class CustomRange extends Range {
 	 * @param { boolean } isFocus - 插入元素后是否聚焦
 	 */
 	insertElement(html: string, tagName: string = 'span', isFocus: boolean = false) {
-        this.el?.focus()
+		this.el?.focus()
 		let selection = null
 		let range = null
 		if (this.isSupportRange()) {
@@ -135,7 +135,29 @@ class CustomRange extends Range {
 			selection = document.getSelection()
 			if (selection?.getRangeAt && selection.rangeCount) {
 				range = document.getSelection()?.getRangeAt(0)
-				range!.deleteContents()
+				// 获取当前选区的起始位置
+				const startOffset = range!.startOffset
+				// 如果起始位置为 0，说明光标在节点的开头，无法删除前一个节点
+				if (startOffset === 0) {
+					return
+				}
+				// 获取当前选区的父节点
+				const parent = range!.commonAncestorContainer
+				// 获取光标前一个节点
+				const nodeBeforeCursor = parent?.childNodes[startOffset - 1]
+				if (nodeBeforeCursor) {
+					// 从父节点中移除光标前一个节点
+					parent?.removeChild(nodeBeforeCursor)
+				}
+			}
+		} else {
+			// @ts-ignore 如果不支持 Range API 或 Selection API 的处理逻辑，例如使用 document.selection
+			const selection = document.selection
+			if (selection) {
+				const range = selection.createRange()
+				// 将选区移动到前一个元素
+				range.moveStart('character', -1)
+				range.text = '' // 删除前一个元素
 			}
 		}
 	}

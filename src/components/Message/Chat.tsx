@@ -2,7 +2,7 @@ import type { PrivateChats } from '@/types/db/user-db'
 import clsx from 'clsx'
 import { Exclamationmark, Gobackward, Flag } from 'framework7-icons/react'
 import { format } from 'timeago.js'
-import { useRef } from 'react'
+import { RefObject, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { $t, isMe, MESSAGE_SEND, MESSAGE_TYPE } from '@/shared'
@@ -18,9 +18,10 @@ interface ChatProps {
 	className?: string
 	isSelected?: boolean
 	reply?: any
+	ref?: RefObject<HTMLDivElement>
 }
 
-const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected, reply }) => {
+const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected, reply, ref }) => {
 	const tooltipRef = useRef<HTMLDivElement | null>(null)
 
 	const is_self = isMe(msg?.sender_id)
@@ -52,7 +53,11 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 	}
 
 	return (
-		<div className={clsx('flex', is_self ? 'justify-end' : 'justify-start', className)} id={`msg_${msg?.msg_id}`}>
+		<div
+			className={clsx('flex', is_self ? 'justify-end' : 'justify-start', className)}
+			id={`msg_${msg?.msg_id}`}
+			ref={ref}
+		>
 			<div className="flex max-w-[85%]">
 				<div
 					className={clsx(

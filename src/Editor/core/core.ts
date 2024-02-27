@@ -64,10 +64,13 @@ class Editor {
 		// 	}
 		// })
 
-		// 监听
+		// 输入内容变化
 		this.eventListeners.addCustomEventListener(EventType.CHANGE)
+		// 聚焦
 		this.eventListeners.addCustomEventListener(EventType.FOCUS)
+		// @ 开始
 		this.eventListeners.addCustomEventListener(EventType.AITE)
+		// @ 结束
 		this.eventListeners.addCustomEventListener(EventType.AITE_END)
 
 		let is_at = false
@@ -75,6 +78,8 @@ class Editor {
 			this.eventListeners.triggerCustomEvent(EventType.CHANGE)
 
 			if (e.data === '@') {
+				this.range.removeElement()
+				// this.insertElement('<p class="at">@<p>', { isFocus: true })
 				this.eventListeners.triggerCustomEvent(EventType.AITE)
 				is_at = true
 				return
@@ -86,6 +91,14 @@ class Editor {
 				is_at = false
 			}
 		})
+
+		document.addEventListener('click', () => {
+			if (is_at) {
+				this.eventListeners.triggerCustomEvent(EventType.AITE_END)
+				is_at = false
+			}
+		})
+
 		this.on('focus', () => {
 			if (this.isFocus) return
 			this.eventListeners.triggerCustomEvent(EventType.FOCUS)
@@ -111,6 +124,22 @@ class Editor {
 				return
 			}
 		})
+
+		// this.on('keydown', (event: KeyboardEvent) => {
+		// 	// 如果按下回车键
+		// 	if (event.key === 'Enter') {
+		// 		event.preventDefault() // 阻止默认行为
+		// 		// 在这里添加你的自定义逻辑，例如插入特定的标签或处理输入内容
+		// 		this.insertElement('<p></p>', { isFocus: true })
+		// 	}
+
+		// 	// 如果按下退格键，并且编辑器内容为空
+		// 	else if (event.key === 'Backspace' && this.isEmpty()) {
+		// 		event.preventDefault() // 阻止默认行为
+		// 		// 针对空内容时的删除操作进行处理，比如保留最后一个 <p> 标签
+		// 		this.handleEmptyContentDelete()
+		// 	}
+		// })
 	}
 
 	/**
@@ -129,19 +158,6 @@ class Editor {
 		this.eventListeners.triggerCustomEvent(EventType.CHANGE)
 	}
 
-	// /**
-	//  * 删除当前光标所在的元素
-	//  * 
-	//  * @param { boolean } isFocus - 删除元素后是否聚焦
-	//  * @returns
-	//  */
-	// deleteElement(options?: { isFocus?: boolean }) {
-	// 	this.isFocus = true
-	// 	this.range.deleteElement(options?.isFocus)
-	// 	this.isFocus = false
-	// 	this.eventListeners.triggerCustomEvent(EventType.CHANGE)
-	// }
-
 	focus() {
 		this.el.focus()
 	}
@@ -156,6 +172,7 @@ class Editor {
 
 	clear() {
 		this.el.innerHTML = ''
+		this.eventListeners.triggerCustomEvent(EventType.CHANGE)
 	}
 
 	isEmpty() {

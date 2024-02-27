@@ -10,13 +10,13 @@ import {
 	TOKEN,
 	SocketClient,
 	handlerRequestSocket,
-	RID,
 	CallStatus,
 	handlerMessageSocket,
 	SocketEvent,
 	handlerLabelSocket,
 	handlerRequestResultSocket,
-	handlerEditSocket
+	handlerEditSocket,
+	DEVICE_ID
 } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 import { useCallStore } from '@/stores/call'
@@ -61,7 +61,7 @@ function App() {
 			console.log('接收到所有 sokect 通知：', data)
 			switch (event) {
 				case SocketEvent.OnlineEvent:
-					setCookie(RID, data.rid)
+					setCookie(DEVICE_ID, data.driverId)
 					break
 				case SocketEvent.PrivateChatsEvent:
 				case SocketEvent.GroupChatsEvent:
