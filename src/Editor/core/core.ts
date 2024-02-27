@@ -78,8 +78,8 @@ class Editor {
 			this.eventListeners.triggerCustomEvent(EventType.CHANGE)
 
 			if (e.data === '@') {
-				this.range.removeElement()
-				// this.insertElement('<p class="at">@<p>', { isFocus: true })
+				// this.range.removeElement()
+				this.insertElement('<p class="at"><p>', { isFocus: true })
 				this.eventListeners.triggerCustomEvent(EventType.AITE)
 				is_at = true
 				return

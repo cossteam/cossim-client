@@ -31,7 +31,6 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 		const div = document.createElement('div')
 		createRoot(div).render(<ToolTip onSelect={onSelect} el={tooltipRef.current!} />)
 		tooltipRef.current!.appendChild(div)
-		return true
 	}
 
 	if (msg?.type === MESSAGE_TYPE.LABEL) {
@@ -105,9 +104,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 								initValue={msg?.content}
 								data-id={msg?.msg_id}
 								data-index={index}
-								// content={reply?.content ? reply.content : ''}
-							>
-							</ToolEditor>
+							/>
 						</div>
 					</LongPressButton>
 
@@ -139,6 +136,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							<div className="whitespace-nowrap text-[0.75rem] w-fit text-textTertiary">
 								{reply?.sender_info?.nickname}:
 							</div>
+							{/* <ToolEditor readonly className="reply_editor" defaultValue={reply?.content} /> */}
 							<ToolEditor
 								className="reply_editor empty:before:text-transparent"
 								initValue={reply?.content}

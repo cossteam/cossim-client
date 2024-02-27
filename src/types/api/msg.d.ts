@@ -46,3 +46,13 @@ export interface GetBehindMessage {
 	dialog_id: number
 	msg_id: number
 }
+
+export interface GetMessage {
+	user_id?:string
+	type?: string
+	content?: string
+	page_num: number
+	page_size: number
+}
+
+export type GetGroupMessage = { group_id?: number } & GetMessage

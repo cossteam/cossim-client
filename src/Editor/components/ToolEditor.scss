@@ -39,3 +39,21 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+.ql-editor {
+    padding: 0 12px;
+
+    &:focus-visible {
+        outline: none;
+    }
+
+    // &[data-placeholder]:empty:before {
+    //     content: attr(data-placeholder);
+    //     color: gray;
+    //     font-size: 14px;
+    // }
+
+    // &[data-placeholder]:focus {
+    //     content: none;
+    // }
+}

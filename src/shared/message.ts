@@ -6,6 +6,7 @@ import { isEqual } from 'lodash-es'
 import { v4 as uuidv4 } from 'uuid'
 import { PrivateChats } from '@/types/db/user-db'
 import { MESSAGE_TYPE } from '.'
+import MsgService from '@/api/msg'
 
 interface CommonOptions {
 	tableName: string
@@ -26,18 +27,6 @@ export const initMessage = async (options: CommonOptions) => {
 
 	return messages
 }
-
-export const sendMessage = async () => {}
-
-export const updateMessage = async () => {}
-
-export const deleteMessage = async () => {}
-
-export const editMessage = async () => {}
-
-export const markMessage = async () => {}
-
-export const readMessage = async () => {}
 
 /**
  * 更新数据库中的消息。
@@ -67,6 +56,14 @@ export const updateDatabaseMessage = async (
 	}
 }
 
+/**
+ * 将标记消息添加到特定表的函数。
+ *
+ * @param {string} tableName -要添加标记消息的表的名称
+ * @param {PrivateChats} msg -要标记的私人聊天消息
+ * @param {number} is_label -指示消息是否是标签
+ * @return {Promise<object>} 添加的标记消息
+ */
 export const addMarkMessage = async (tableName: string, msg: PrivateChats, is_label: number) => {
 	try {
 		const doc = new DOMParser().parseFromString(msg.content, 'text/html')
@@ -160,8 +157,30 @@ export const dillServerInfo = async (user_id: string, userInfo: any) => {
 }
 
 /**
- * 更新会话
+ * 对比当前信息和会话消息的 id 是否一致，如果不一致就从服务端拉取消息
  *
- * @param {string} user_id
+ * @param {number} id				好友的 user_id 或者群聊 id
+ * @param {number} msg_id			当前消息 id
+ * @param {number} group_id			当前群聊 id
  * @returns
  */
+export const getMessageFromServer = async (id: string, is_group: boolean) => {
+	let reslut: any = null
+	try {
+		const params: any = { page_num: 1, page_size: 10 }
+
+		if (is_group) params['group_id'] = id
+		else params['user_id'] = id
+
+		const { code, data } = is_group
+			? await MsgService.getGroupMessageApi(params)
+			: await MsgService.getUserMessageApi(params)
+
+		if (code !== 200) return null
+		reslut = data
+	} catch (error) {
+		console.error('获取消息失败', error)
+	}
+
+	return reslut
+}

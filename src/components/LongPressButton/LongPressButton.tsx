@@ -1,3 +1,4 @@
+import { useClickOutside } from '@reactuses/core'
 import clsx from 'clsx'
 import React, { useEffect, useRef } from 'react'
 
@@ -14,12 +15,17 @@ const LongPressButton: React.FC<LongPressButtonProps> = (props) => {
 
 	const LongPressButtonRef = useRef<HTMLDivElement>(null)
 
+	useClickOutside(LongPressButtonRef, () => {
+		LongPressButtonRef.current?.addEventListener('touchstart', handleTouchStart)
+	})
+
 	const handleTouchStart = (e: any) => {
 		e.preventDefault()
 		scrollingRef.current = false
 		timerRef.current = setTimeout(() => {
 			if (!scrollingRef.current) {
 				props.callback()
+				LongPressButtonRef.current?.removeEventListener('touchstart', handleTouchStart)
 			}
 		}, props.duration ?? 500)
 	}
@@ -41,7 +47,7 @@ const LongPressButton: React.FC<LongPressButtonProps> = (props) => {
 		if (!LongPressButtonRef.current) return
 		LongPressButtonRef.current.addEventListener('touchstart', handleTouchStart)
 		LongPressButtonRef.current.addEventListener('touchend', handleTouchEnd)
-		LongPressButtonRef.current.addEventListener('touchmove', handleScroll, { passive: true })
+		LongPressButtonRef.current.addEventListener('touchmove', handleScroll)
 		LongPressButtonRef.current.addEventListener('mousedown', handleTouchStart)
 		LongPressButtonRef.current.addEventListener('mouseup', handleTouchEnd)
 

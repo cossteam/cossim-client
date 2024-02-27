@@ -1,4 +1,4 @@
-import type { EditMessage, GetBehindMessage, LabelMessage, MessageListParams, ReadGroupMessage, ReadMessage, SendGroupMessage, SendMessage } from '@/types/api/msg'
+import type { EditMessage, GetBehindMessage, GetGroupMessage, GetMessage, LabelMessage, MessageListParams, ReadGroupMessage, ReadMessage, SendGroupMessage, SendMessage } from '@/types/api/msg'
 import request from '@/utils/request'
 
 class MsgServiceImpl {
@@ -159,6 +159,30 @@ class MsgServiceImpl {
 			url: `${this.baseUrl}/after/get`,
 			method: 'POST',
 			data
+		})
+	}
+
+	/**
+	 * 获取私聊消息
+	 * 
+	 * @param {GetMessage} params
+	 */
+	getUserMessageApi(params: GetMessage): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/list/user`,
+			params
+		})
+	}
+
+	/**
+	 * 获取群聊消息
+	 * 
+	 * @param {GetGroupMessage} params
+	 */
+	getGroupMessageApi(params: GetGroupMessage): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/list/group`,
+			params
 		})
 	}
 }

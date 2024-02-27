@@ -6,6 +6,7 @@ import {
 	MESSAGE_TYPE,
 	USER_ID,
 	addMarkMessage,
+	getMessageFromServer,
 	initMessage,
 	updateDialogs
 } from '@/shared'
@@ -292,6 +293,18 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			shareKey
 		})
 
+		// 获取服务器上的消息
+		getMessageFromServer(receiver_id, is_group).then((res: any) => {
+			const newMessages = messages.filter((v) => v?.msg_send_state === MESSAGE_SEND.SEND_SUCCESS)
+			const msgFormServer = res?.user_messages?.[0] || res?.group_messages?.[0]
+			const msgFormStore = newMessages?.at(-1)
+			
+			console.log('获取服务器上的消息', res, newMessages)
+			if (msgFormServer.id !== msgFormStore.msg_id) {
+				console.log('需要加载服务器消息', msgFormServer, msgFormStore)
+			}
+		})
+
 		// 当前会话的信息，如果是私聊就是好友信息，如果是群聊就是群信息
 		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', receiver_id)
 
@@ -325,8 +338,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	updateMessageById: async (msg: PrivateChats) => {
 		const { messages } = get()
 		const newMessages = messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
-		console.log("newMessages",msg,newMessages);
-		
+		console.log('newMessages', msg, newMessages)
+
 		set({ messages: newMessages })
 	}
 }))
