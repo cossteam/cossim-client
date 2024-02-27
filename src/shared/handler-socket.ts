@@ -1,12 +1,13 @@
 import { getCookie } from '@/utils/cookie'
-import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE, USER_ID } from '.'
+import { DEVICE_ID, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE, USER_ID } from '.'
 import UserStore from '@/db/user'
 import { v4 as uuidv4 } from 'uuid'
 import { MessageStore } from '@/stores/message'
-import CommonStore from '@/db/common'
+// import CommonStore from '@/db/common'
 import { StateStore } from '@/stores/state'
 
-const user_id = getCookie(USER_ID) || ''
+const user_id = getCookie(USER_ID) ?? ''
+const device_id = getCookie(DEVICE_ID) ?? ''
 
 /**
  * 处理私聊接收的 socket 的消息
@@ -15,10 +16,10 @@ const user_id = getCookie(USER_ID) || ''
 export const handlerMessageSocket = async (data: any, updateMessage: (msg: any) => void, stateStore: StateStore) => {
 	try {
 		const message = data.data
-		const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
+		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
-		if (user_id === message.sender_id && data.driverId === user?.device_id) return
+		if (user_id === message.sender_id && data.driverId === device_id) return
 
 		const msg = {
 			dialog_id: message?.dialog_id,
@@ -98,8 +99,8 @@ export const handlerRequestResultSocket = (data: any) => {
 export const handlerLabelSocket = async (data: any, msgStore: MessageStore) => {
 	try {
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
-		const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-		if (user_id === data?.data?.sender_id && data?.driverId === user?.device_id) return
+		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
+		if (user_id === data?.data?.sender_id && data?.driverId === device_id) return
 
 		const msg = data.data
 		const doc = new DOMParser().parseFromString(msg?.content, 'text/html')
@@ -144,8 +145,8 @@ export const handlerEditSocket = async (data: any, msgStore: MessageStore) => {
 	try {
 		console.log('data', data, msgStore)
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
-		const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-		if (user_id === data?.data?.sender_id && data?.driverId === user?.device_id) return
+		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
+		if (user_id === data?.data?.sender_id && data?.driverId === device_id) return
 
 		const msg = (
 			await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', data?.data?.dialog_id)
