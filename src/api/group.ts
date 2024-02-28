@@ -82,7 +82,7 @@ class GroupServiceImpl {
 	 * @param {*} param
 	 * @returns
 	 */
-	groupListApi(param: any): Promise<DataResponse> {
+	groupListApi(param?: any): Promise<DataResponse> {
 		return request({
 			url: this.baseGroupUrl + '/list',
 			method: 'GET',
@@ -240,7 +240,7 @@ class GroupServiceImpl {
 
 	/**
 	 * 获取群公告
-	 * 
+	 *
 	 * @param {*} param
 	 * @param {*} param.group_id
 	 * @returns
@@ -255,7 +255,7 @@ class GroupServiceImpl {
 
 	/**
 	 *  创建群公告
-	 * 
+	 *
 	 * @param {*} param
 	 * @param {*} param.group_id
 	 * @param {*} param.announcement

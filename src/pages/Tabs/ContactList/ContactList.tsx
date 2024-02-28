@@ -118,13 +118,13 @@ const ContactList: React.FC<RouterProps> = () => {
 					</span>
 				</ListItem>
 				{/* <ListItem link="/apply_list/" badge={applyTotal} badgeColor="red"> */}
-				<ListItem badgeColor="red">
+				<ListItem link="/groups/">
 					<Person2Alt slot="media" className="text-primary text-2xl" />
 					<span slot="title" className="text-color-primary">
 						{$t('群聊')}
 					</span>
 				</ListItem>
-				<ListItem link="/groups/">
+				<ListItem>
 					<PersonBadgeMinusFill slot="media" className="text-red-400 text-2xl" />
 					<span slot="title" className="text-red-400">
 						{$t('黑名单')}
