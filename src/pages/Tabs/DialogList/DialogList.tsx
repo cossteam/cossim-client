@@ -17,6 +17,7 @@ import { isEqual } from 'lodash-es'
 import { $t, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND } from '@/shared'
 import UserStore from '@/db/user'
 import MsgService from '@/api/msg'
+import RelationService from '@/api/relation'
 import './DialogList.scss'
 import ToolEditor from '@/components/Editor/ToolEditor'
 import { v4 as uuidv4 } from 'uuid'
@@ -55,7 +56,6 @@ const getAfterMessage = async () => {
 			}))
 		})
 
-
 		if (!messages) return
 
 		// TODO: 更新本地数据
@@ -77,7 +77,8 @@ const DialogList: React.FC<RouterProps> = () => {
 	const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
 	const [chats, setChats] = useState<any[]>(dialogs)
 
-	const getDialogList = async () => {
+	// 获取对话列表
+	const getDialogList = async (done?: ((...args: any[]) => void) | undefined) => {
 		try {
 			// 获取落后的消息
 			await getAfterMessage()
@@ -105,7 +106,23 @@ const DialogList: React.FC<RouterProps> = () => {
 			})
 		} catch {
 			console.log('错误')
+		} finally {
+			done && done()
 		}
+	}
+
+	// 置顶对话
+	const topDialog = async (e: any, item: any) => {
+		console.log('top', e, item)
+		await RelationService.topDialogApi({ dialog_id: item.dialog_id, action: item?.top_at ? 0 : 1 })
+		await getDialogList()
+	}
+
+	// 删除对话
+	const deleteDialog = async (e: any, item: any) => {
+		console.log('delete', e, item)
+		await RelationService.showDialogApi({ dialog_id: item.dialog_id, action: 0 })
+		await getDialogList()
 	}
 
 	useEffect(() => {
@@ -119,7 +136,13 @@ const DialogList: React.FC<RouterProps> = () => {
 	}, [dialogs])
 
 	return (
-		<Page ptr className="coss_dialog" onPageTabShow={getDialogList} onPageBeforeIn={getDialogList}>
+		<Page
+			ptr
+			className="coss_dialog"
+			onPageTabShow={getDialogList}
+			onPageBeforeIn={getDialogList}
+			onPtrRefresh={getDialogList}
+		>
 			<Navbar title="COSS" className="hidden-navbar-bg bg-bgPrimary">
 				<NavRight>
 					<Link>
@@ -158,7 +181,6 @@ const DialogList: React.FC<RouterProps> = () => {
 						title={item?.dialog_name}
 						badge={item?.dialog_unread_count}
 						badgeColor="red"
-						after={format(item?.last_message?.send_time, 'zh_CN')}
 						swipeout
 					>
 						<img
@@ -172,11 +194,21 @@ const DialogList: React.FC<RouterProps> = () => {
 							{/* {item?.last_message?.content} */}
 							<ToolEditor defaultValue={item?.last_message?.content} readonly className="read_editor" />
 						</div>
+						<div slot="after">
+							<span className=" text-sm text-gray-500">
+								{format(
+									item?.last_message?.send_time
+										? item?.last_message?.send_time
+										: item?.dialog_create_at,
+									'zh_CN'
+								)}
+							</span>
+						</div>
 						<SwipeoutActions right>
-							<SwipeoutButton close overswipe color="blue">
+							<SwipeoutButton close overswipe color="blue" onClick={(e) => topDialog(e, item)}>
 								{$t('置顶')}
 							</SwipeoutButton>
-							<SwipeoutButton close color="red">
+							<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
 								{$t('删除')}
 							</SwipeoutButton>
 						</SwipeoutActions>
