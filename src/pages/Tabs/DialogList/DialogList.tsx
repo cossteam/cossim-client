@@ -166,7 +166,6 @@ const DialogList: React.FC<RouterProps> = () => {
 						title={item?.dialog_name}
 						badge={item?.dialog_unread_count}
 						badgeColor="red"
-						after={format(item?.last_message?.send_time, 'zh_CN')}
 						swipeout
 					>
 						<img
@@ -179,6 +178,16 @@ const DialogList: React.FC<RouterProps> = () => {
 						<div slot="text" className="max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
 							{/* {item?.last_message?.content} */}
 							<ToolEditor defaultValue={item?.last_message?.content} readonly className="read_editor" />
+						</div>
+						<div slot="after">
+							<span className=" text-sm text-gray-500">
+								{format(
+									item?.last_message?.send_time
+										? item?.last_message?.send_time
+										: item?.dialog_create_at,
+									'zh_CN'
+								)}
+							</span>
 						</div>
 						<SwipeoutActions right>
 							<SwipeoutButton close overswipe color="blue">
