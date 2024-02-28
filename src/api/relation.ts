@@ -10,6 +10,7 @@ import request from '@/utils/request'
 
 class RelationServiceImpl {
 	private baseUrl: string = '/relation/user'
+	private relationDialog: string = '/relation/dialog'
 
 	/**
 	 * 获取好友列表
@@ -148,6 +149,36 @@ class RelationServiceImpl {
 	setBurnApi(data: BurnData): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/burn/open`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 是否置顶对话(action: 0:关闭取消置顶对话, 1:置顶对话)
+	 * @param data
+	 * @param {number} data.dialog_id
+	 * @param {number} data.action
+	 * @returns
+	 */
+	topDialogApi(data: { dialog_id: number; action: number }): Promise<DataResponse> {
+		return request({
+			url: `${this.relationDialog}/top`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 关闭或打开对话(action: 0:关闭对话, 1:打开对话)
+	 * @param data
+	 * @param {number} data.dialog_id
+	 * @param {number} data.action
+	 * @returns
+	 */
+	showDialogApi(data: { dialog_id: number; action: number }): Promise<DataResponse> {
+		return request({
+			url: `${this.relationDialog}/show`,
 			method: 'POST',
 			data
 		})

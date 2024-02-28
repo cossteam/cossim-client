@@ -32,7 +32,6 @@ const ContactList: React.FC<RouterProps> = () => {
 		group.data && applyList.push(...group.data)
 		friend.data && applyList.push(...friend.data)
 		const len = applyList.filter((v) => [0, 4].includes(v?.status) && v?.sender_id !== user_id).length
-		console.log('len', len)
 
 		setApplyTotal(len)
 	}
