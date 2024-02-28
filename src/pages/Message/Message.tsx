@@ -347,9 +347,9 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			// let members: any = []
 			// try {
 			// 	const { data } = await GroupService.groupMemberApi({ group_id: Number(receiver_id) })
-			// 	members = data
+			// 	// members = data
 			// } catch (error) {
-			// 	members = []
+			// 	// members = []
 			// }
 
 			// const engine = editorRef.current!.engine
@@ -648,7 +648,9 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 										<ToolEditor
 											ref={editorRef}
 											readonly={false}
-											className="max-h-[150px]  overflow-y-auto h-full"
+											placeholder={$t('请输入内容')}
+											id={receiver_id}
+											is_group={is_group}
 										/>
 									</div>
 									{(isReply() || isEdit()) && (

@@ -27,6 +27,6 @@
 			"framework7/lite-bundle":["node_modules/framework7/framework7.d.ts"]
 		}
 	},
-	"include": ["src", "src/**/*.d.ts", "src/types"],
+	"include": ["src", "src/**/*.d.ts", "src/types", "src/**/*"],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }

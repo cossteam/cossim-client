@@ -38,10 +38,14 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    word-break: break-all;
 }
 
 .ql-editor {
     padding: 0 12px;
+    max-height: 150px;
+    overflow-y: auto;
+    word-break: break-all;
 
     &:focus-visible {
         outline: none;
@@ -53,6 +57,14 @@
         right: auto !important;
         font-style: normal !important;
         top: 1px;
+    }
+
+    code {
+        color: var(--coss-text-primary);
+        background: #ccc;
+        padding: 4px;
+        border-radius: 4px;
+        box-sizing: border-box;
     }
 
 }
