@@ -102,11 +102,11 @@ dependencies:
     specifier: ^5.11.0
     version: 5.11.0
   quill:
-    specifier: 2.0.0-rc.2
-    version: 2.0.0-rc.2
+    specifier: 2.0.0-rc.0
+    version: 2.0.0-rc.0
   quill-mention:
-    specifier: ^4.1.0
-    version: 4.1.0
+    specifier: ^2.0.6
+    version: 2.0.6
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -3952,14 +3952,14 @@ packages:
       lodash.isequal: 4.5.0
     dev: false
 
-  /quill-mention@4.1.0:
-    resolution: {integrity: sha512-dT8HLYeuGU8yjjUr5SgdOusFSqQ7FQt/DWefz4V/L2omJsZ9CVYWepg3GyqV/evNDV7LQtfM7cadxtYD2bi2ew==}
+  /quill-mention@2.0.6:
+    resolution: {integrity: sha512-6UXfDoantPzC1QFJIfRVJ6cEy2+7YdGHWfhZgiaZHFgIOXd1iOenebYQxHvAIELhWf7UKuJp/8BM5Hgk4u2S/Q==}
     dependencies:
-      quill: 1.3.7
+      quill: 1.3.6
     dev: false
 
-  /quill@1.3.7:
-    resolution: {integrity: sha512-hG/DVzh/TiknWtE6QmWAF/pxoZKYxfe3J/d/+ShUWkDvvkZQVTPeVmUJVu1uE6DDooC4fWTiCLh84ul89oNz5g==}
+  /quill@1.3.6:
+    resolution: {integrity: sha512-K0mvhimWZN6s+9OQ249CH2IEPZ9JmkFuCQeHAOQax3EZ2nDJ3wfGh59mnlQaZV2i7u8eFarx6wAtvQKgShojug==}
     dependencies:
       clone: 2.1.2
       deep-equal: 1.1.2
@@ -3969,8 +3969,8 @@ packages:
       quill-delta: 3.6.3
     dev: false
 
-  /quill@2.0.0-rc.2:
-    resolution: {integrity: sha512-3uh7uZqXpN4t0HmHCjBHXSaeSgYNij6LP1t8ncEjr6+JMq5zR6svpH5Frx7Lxmxv1DUHYDE28eV7R3f4r8Z2Kw==}
+  /quill@2.0.0-rc.0:
+    resolution: {integrity: sha512-LC9TCvNiHn0U2q5o1a/G1IdkdrcMRcCXuXl39duiPKPded8FzaNVy4yzZGvZlzRYHAw4/WA4jzXyKI1kRivx9Q==}
     engines: {npm: '>=8.2.3'}
     dependencies:
       eventemitter3: 5.0.1

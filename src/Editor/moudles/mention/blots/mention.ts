@@ -1,13 +1,35 @@
 import Quill from 'quill'
-import Embed from 'quill/blots/embed'
+import QuillEmbed from 'quill/blots/embed'
+import ScrollBlot from 'quill/blots/scroll'
 
-// const QuillEmbed = Quill.import('blots/embed') as Embed
+const Embed = Quill.import('blots/embed') as QuillEmbed
 
-class Mention extends Embed {}
+// @ts-ignore
+class MentionBlot extends Embed {
+	public static blotName = 'mention'
+	public static className = 'quill-mention'
+	public static tagName = 'span'
 
-Mention.blotName = 'MentionBlot'
-Mention.className = 'mntion-chat'
-Mention.tagName = 'span'
-Quill.register({ 'formats/mention': Mention })
+	static create(data: { name: string }) {
+		const node = super.create(data.name)
+		node.nodeData = data
+		node.innerHTML = data.name
+		node.setAttribute('spellcheck', 'false')
+		node.setAttribute('autocomplete', 'off')
+		node.setAttribute('autocorrect', 'off')
+		node.setAttribute('autocapitalize', 'off')
+		node.setAttribute('class', 'tag-input')
+		node.setAttribute('contentEditable', 'false')
+		return node
+	}
 
-export default Mention
+	static value(domNode: any) {
+		return domNode.nodeData
+	}
+
+	constructor(scroll: ScrollBlot, node: Node) {
+		super(scroll, node)
+	}
+}
+
+Quill.register({ 'blots/mention': MentionBlot })

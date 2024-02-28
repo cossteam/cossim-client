@@ -43,29 +43,31 @@ export interface MessageStore {
 	userInfo: any
 	members: any[]
 	myInfo: any
+	at_all_user: number
+	at_users: string[]
 	/**
 	 * 触发 手机触摸事件
 	 */
 	trgger: boolean
 	/**
 	 * 更新触发
-	 * 
-	 * @param trgger 
-	 * @returns 
+	 *
+	 * @param trgger
+	 * @returns
 	 */
 	updateTrgger: (trgger: boolean) => void
 	/**
 	 * 更新消息
-	 * 
-	 * @param msg 
-	 * @returns 
+	 *
+	 * @param msg
+	 * @returns
 	 */
 	updateMessage: (msg: any) => Promise<void>
 	/**
 	 * 删除消息
-	 * 
-	 * @param msg_id 
-	 * @returns 
+	 *
+	 * @param msg_id
+	 * @returns
 	 */
 	deleteMessage: (msg_id: number) => Promise<void>
 	/**
@@ -79,24 +81,24 @@ export interface MessageStore {
 	sendMessage: (type: MESSAGE_TYPE, content: string, options?: Options) => Promise<void>
 	/**
 	 * 编辑消息
-	 * 
-	 * @param msg 
-	 * @param content 
-	 * @returns 
+	 *
+	 * @param msg
+	 * @param content
+	 * @returns
 	 */
 	editMessage: (msg: any, content: string) => Promise<void>
 	/**
 	 * 标记消息
-	 * 
-	 * @param msg 
-	 * @returns 
+	 *
+	 * @param msg
+	 * @returns
 	 */
 	markMessage: (msg: PrivateChats) => Promise<boolean>
 	/**
 	 * 设置消息已读
-	 * 
-	 * @param msgs 
-	 * @returns 
+	 *
+	 * @param msgs
+	 * @returns
 	 */
 	readMessage: (msgs: PrivateChats[]) => Promise<void>
 	/**
@@ -110,24 +112,36 @@ export interface MessageStore {
 	initMessage: (is_group: boolean, dialog_id: number, receiver_id: string) => Promise<void>
 	/**
 	 * 更新消息
-	 * 
-	 * @param msgs 
-	 * @returns 
+	 *
+	 * @param msgs
+	 * @returns
 	 */
 	updateMessages: (msgs: PrivateChats[]) => Promise<void>
 	/**
 	 * 清空消息
-	 * 
+	 *
 	 * @returns
 	 */
 	clearMessages: () => Promise<void>
 	/**
 	 * 更新某条消息
-	 * 
-	 * @param msg 
-	 * @returns 
+	 *
+	 * @param msg
+	 * @returns
 	 */
 	updateMessageById: (msg: PrivateChats) => Promise<void>
+	/**
+	 * 更新 @ 全体成员
+	 *
+	 * @param updateAllUser
+	 */
+	updateAtAllUser: (updateAllUser: boolean) => void
+	/**
+	 * 更新 @ 成员
+	 *
+	 * @param updateAtUsers
+	 */
+	updateAtUsers: (updateAtUsers: string) => void
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -142,6 +156,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	members: [],
 	myInfo: null,
 	trgger: false,
+	at_all_user: 0,
+	at_users: [],
 	updateTrgger: (trgger: boolean) => set({ trgger }),
 
 	updateMessage: async (msg: PrivateChats) => {
@@ -158,7 +174,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
-		const { messages, receiver_id, dialog_id, myInfo } = get()
+		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users } = get()
+
+		console.log('at_all_user', at_all_user, at_users)
 
 		let error_message = ''
 
@@ -190,8 +208,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 				nickname: myInfo?.user_info?.nickname,
 				user_id
 			},
-			at_all_user: options?.at_all_user || 0,
-			at_users: options?.at_users || [],
+			at_all_user: at_all_user || 0,
+			at_users: at_users || [],
 			group_id: is_group ? Number(options?.receiver_id || receiver_id) : 0,
 			uid: uuidv4(),
 			is_tips: false
@@ -208,8 +226,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			}
 
 			if (is_group) {
-				params['at_all_user'] = options?.at_all_user || 0
-				params['at_users'] = options?.at_users || []
+				params['at_all_user'] = at_all_user || 0
+				params['at_users'] = at_users || []
 				params['group_id'] = msg.group_id
 			} else {
 				params['receiver_id'] = msg.receiver
@@ -250,7 +268,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 				await updateDialogs(msg.dialog_id, msg)
 			}
 
-			set((state) => ({ messages: [...state.messages.slice(0, -1), ...msgs] }))
+			set((state) => ({ messages: [...state.messages.slice(0, -1), ...msgs], at_all_user: 0, at_users: [] }))
 		}
 	},
 	editMessage: async (msg: PrivateChats, content: string) => {
@@ -402,5 +420,12 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		const newMessages = messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
 		console.log('newMessages', msg, newMessages)
 		set({ messages: newMessages })
+	},
+	updateAtAllUser: (updateAllUser: boolean) => {
+		set({ at_all_user: updateAllUser ? 1 : 0 })
+	},
+	updateAtUsers: (atUsers: string) => {
+		const { at_users } = get()
+		set({ at_users: [...at_users, atUsers] })
 	}
 }))
