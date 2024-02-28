@@ -25,7 +25,7 @@ android {
 
     android.applicationVariants.all {
         variant -> variant.outputs.all { output ->
-                def date = new Date().format("yyyy-MM-dd hh:mm:ss",
+                def date = new Date().format("yyyy-MM-dd HH:mm:ss",
                         TimeZone.getTimeZone("GMT+08"))
                 if (variant.buildType.name == 'debug') {
                     output.outputFileName = "coss_" +
