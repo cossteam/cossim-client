@@ -24,6 +24,7 @@ const ApplyList = () => {
 	const updateApplyList = async () => {
 		const applyList = await UserStore.findAll(UserStore.tables.apply_list)
 		const newApplyList = applyList.filter((v) => (type === ApplyType.FRIEND ? v?.sender_id : !v?.sender_id))
+		console.log(newApplyList)
 		setApplyList(newApplyList)
 		return newApplyList
 	}
@@ -39,7 +40,7 @@ const ApplyList = () => {
 
 			data.map(async (item: any) => {
 				const apply = applyList.find((v) => (v?.id === ApplyType.FRIEND ? item?.id : `group_${item?.id}`))
-
+				console.log('apply', apply?.status, apply)
 				if (apply) {
 					!isEqual(apply, item) && (await UserStore.update(UserStore.tables.apply_list, 'id', item?.id, item))
 				} else {
