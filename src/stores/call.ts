@@ -21,7 +21,10 @@ interface CallStore {
 	callInfo: any
 	/** 通话状态 */
 	status: CallStatus
+	/** 等待通话时间 */
 	waitingTime: Date | null
+	/** 是否隐藏通话界面 */
+	hideCall: boolean
 	/** 通话类型 */
 	type: CallType
 	/** 是否启用视频通话 */
@@ -34,6 +37,8 @@ interface CallStore {
 	handlerTimeout: () => void
 	/** 更新等待通话时间 */
 	updateWaitingTime: (waitingTime: Date) => void
+	/** 更新通话隐藏通状态 */
+	updateHideCall: (hideCall: boolean) => void
 	/** 更新通话类型 */
 	updateType: (type: CallType) => void
 	/** 使能通话视频 */
@@ -52,6 +57,7 @@ export const callStore = (set: any, get: any): CallStore => ({
 	callInfo: null,
 	status: CallStatus.IDLE,
 	waitingTime: null,
+	hideCall: false,
 	type: CallType.AUDIO,
 	enablesVideo: false,
 	updateCallInfo: (callInfo: any) => {
@@ -72,6 +78,9 @@ export const callStore = (set: any, get: any): CallStore => ({
 	updateWaitingTime: (waitingTime: Date) => {
 		set({ waitingTime })
 	},
+	updateHideCall: (hideCall: boolean) => {
+		set({ hideCall })
+	},
 	updateType: (type: CallType) => {
 		set({ type })
 	},
@@ -83,8 +92,8 @@ export const callStore = (set: any, get: any): CallStore => ({
 			set({ callInfo })
 			set({ status: CallStatus.WAITING })
 			const { enablesVideo } = get()
-			// 创建通话
 			const isUser = callInfo?.userInfo?.user_id
+			// 创建通话参数
 			const createRoomParams = {
 				[isUser ? 'user_id' : 'group_id']: isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
 			}
@@ -96,6 +105,7 @@ export const callStore = (set: any, get: any): CallStore => ({
 				// resolution: '1280x720',
 				video_enabled: enablesVideo
 			}
+			// 创建通话
 			const createResp = isUser
 				? await CallService.createLiveUserApi(createRoomParams)
 				: await CallService.createLiveGroupApi(createRoomParams)
@@ -106,8 +116,14 @@ export const callStore = (set: any, get: any): CallStore => ({
 					message: createResp.msg
 				})
 			}
+			// 加入通话参数
+			const joinRoomParams = {
+				[isUser ? 'user_id' : 'group_id']: isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
+			}
 			// 加入通话
-			const joinResp = isUser ? await CallService.joinLiveUserApi({}) : await CallService.joinLiveGroupApi({})
+			const joinResp = isUser
+				? await CallService.joinLiveUserApi(joinRoomParams)
+				: await CallService.joinLiveGroupApi(joinRoomParams)
 			if (joinResp.code !== 200) {
 				return Promise.reject({
 					...joinResp,
@@ -145,8 +161,11 @@ export const callStore = (set: any, get: any): CallStore => ({
 			return Promise.resolve(error)
 		} finally {
 			setTimeout(() => {
-				set({ callInfo: null })
-				set({ status: CallStatus.IDLE })
+				set({
+					callInfo: null,
+					hideCall: false,
+					status: CallStatus.IDLE
+				})
 			}, 2000)
 		}
 	},
@@ -157,6 +176,8 @@ export const callStore = (set: any, get: any): CallStore => ({
 			const createRoomParams = {
 				[isUser ? 'user_id' : 'group_id']: isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
 			}
+			console.log('createRoomParams', createRoomParams)
+
 			const joinResp = isUser
 				? await CallService.joinLiveUserApi(createRoomParams)
 				: await CallService.joinLiveGroupApi(createRoomParams)
@@ -199,8 +220,11 @@ export const callStore = (set: any, get: any): CallStore => ({
 			return Promise.resolve(error)
 		} finally {
 			setTimeout(() => {
-				set({ callInfo: null })
-				set({ status: CallStatus.IDLE })
+				set({
+					callInfo: null,
+					hideCall: false,
+					status: CallStatus.IDLE
+				})
 			}, 2000)
 		}
 	}

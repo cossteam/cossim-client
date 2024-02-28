@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Page, f7 } from 'framework7-react'
+import { Button, Page, f7 } from 'framework7-react'
 import { PhoneFill } from 'framework7-icons/react'
 import '@livekit/components-styles'
 import {
@@ -14,14 +14,27 @@ import {
 import { Track } from 'livekit-client'
 import './Call.scss'
 import { useCallStore } from '@/stores/call'
-import { CallStatus, getStatusDescription } from '@/shared'
+import { CallStatus, USER_ID, getStatusDescription } from '@/shared'
 import { MessageEventEnum } from './enums'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
+import { getCookie } from '@/utils/cookie'
 
 const Call: React.FC<RouterProps> = (props) => {
 	const { enablesVideo, callInfo, status, reject, accept, hangup } = useCallStore()
-
+	const user_id = getCookie(USER_ID) || ''
 	const roomReady = status === CallStatus.CALLING && callInfo?.wsInfo
+
+	// 页面离开时关闭Worker
+	const closeWorker = () => {
+		worker?.postMessage({
+			event: MessageEventEnum.TIMER_STOP,
+			data: null
+		})
+		if (worker) {
+			worker.terminate()
+			setWorker(null)
+		}
+	}
 
 	const [worker, setWorker] = useState<Worker | null>(null)
 	// 等待时间
@@ -29,7 +42,10 @@ const Call: React.FC<RouterProps> = (props) => {
 	// const [waittingTimer, setWaitTimer] = useState(60) // 时 分 秒
 	useEffect(() => {
 		;(async () => {
-			if (status === CallStatus.WAITING) {
+			if (
+				status === CallStatus.WAITING &&
+				user_id !== (callInfo?.userInfo?.user_id || callInfo?.groupInfo?.user_id)
+			) {
 				if (!worker) {
 					const worker = new Worker(new URL('./worker/timer.ts', import.meta.url))
 					worker.postMessage({
@@ -63,12 +79,13 @@ const Call: React.FC<RouterProps> = (props) => {
 				console.log('空闲')
 				props.f7router.back()
 			}
+			if (status === CallStatus.HANGUP) {
+				console.log('挂断')
+				closeWorker()
+			}
 		})()
 		return () => {
-			if (worker) {
-				worker.terminate()
-				setWorker(null)
-			}
+			closeWorker()
 		}
 	}, [status, callInfo?.wsInfo])
 
@@ -89,27 +106,29 @@ const Call: React.FC<RouterProps> = (props) => {
 		console.log('通话出现异常：', getStatusDescription(status), err)
 		status === CallStatus.WAITING && reject()
 	}
-
-	// 挂断
+	// 拒绝
 	const onRefuse = async () => {
 		await reject()
-		worker?.postMessage({
-			event: MessageEventEnum.TIMER_STOP,
-			data: null
-		})
-		worker?.terminate()
+		closeWorker()
 	}
 	// 接通
 	const onConnect = async () => {
 		await accept()
-		worker?.postMessage({
-			event: MessageEventEnum.TIMER_STOP,
-			data: null
-		})
+		closeWorker()
+	}
+	// 挂断
+	const onHangup = async () => {
+		await hangup()
+		closeWorker()
 	}
 
 	return (
-		<Page className="bg-bgPrimary bg-zinc-900 z-[999] flex flex-col justify-center items-center" noNavbar noToolbar>
+		<Page
+			className="bg-bgPrimary bg-zinc-900 z-[999] flex flex-col justify-center items-center"
+			noNavbar
+			noToolbar
+			onPageBeforeOut={closeWorker}
+		>
 			{roomReady && (
 				<LiveKitRoom
 					data-lk-theme="default"
@@ -124,7 +143,7 @@ const Call: React.FC<RouterProps> = (props) => {
 				>
 					<MyVideoConference />
 					<RoomAudioRenderer />
-					<MyControlBar errCount={errCount} hangup={hangup} />
+					<MyControlBar errCount={errCount} hangup={onHangup} />
 				</LiveKitRoom>
 			)}
 			<div className="absolute bottom-10 w-full flex flex-col justify-evenly items-center">
@@ -177,6 +196,7 @@ interface MyControlBarProps {
 }
 
 function MyControlBar(props: MyControlBarProps) {
+	const { updateHideCall } = useCallStore()
 	return (
 		<>
 			<ControlBar />
@@ -185,8 +205,13 @@ function MyControlBar(props: MyControlBarProps) {
 					<div>网络异常,重试中(3/{props.errCount})...</div>
 				</div>
 			)}
-			<div className="p-2 box-border">
-				<DisconnectButton onClick={props.hangup}>挂断</DisconnectButton>
+			<div className="px-2 pb-6 flex justify-evenly items-center">
+				<Button className="flex-1 mx-2 py-4 px-[14px]" fill onClick={() => updateHideCall(true)}>
+					收起
+				</Button>
+				<Button className="flex-1 mx-2 py-4 px-[14px]" fill color="red" onClick={props.hangup}>
+					挂断
+				</Button>
 			</div>
 		</>
 	)

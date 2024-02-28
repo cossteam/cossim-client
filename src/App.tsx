@@ -23,6 +23,8 @@ import { useCallStore } from '@/stores/call'
 import { useMessageStore } from './stores/message'
 import { useStateStore } from '@/stores/state'
 import { hasMike } from './utils/media'
+import clsx from 'clsx'
+import { PhoneFill } from 'framework7-icons/react'
 
 function App() {
 	const msgStore = useMessageStore()
@@ -45,7 +47,15 @@ function App() {
 		}
 	})
 
-	const { status: callStatus, callInfo, updateCallInfo, updateStatus, reject } = useCallStore()
+	const {
+		status: callStatus,
+		hideCall,
+		updateHideCall,
+		callInfo,
+		updateCallInfo,
+		updateStatus,
+		reject
+	} = useCallStore()
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -173,7 +183,24 @@ function App() {
 		<AppComponent {...f7params}>
 			{hasCookie(TOKEN) ? (
 				<>
-					{callStatus !== CallStatus.IDLE && <View url="/call/" id="view-call" name="call" />}
+					{callStatus !== CallStatus.IDLE && (
+						<>
+							<View
+								url="/call/"
+								id="view-call"
+								name="call"
+								className={clsx('xm', hideCall ? 'hide-call' : '')}
+							/>
+							{hideCall && (
+								<div className=" fixed z-[9999] right-0 top-1/3 bg-slate-300 rounded-l-lg">
+									<PhoneFill
+										className="size-[40px] box-content p-2"
+										onClick={() => updateHideCall(false)}
+									/>
+								</div>
+							)}
+						</>
+					)}
 					<Layout />
 				</>
 			) : (

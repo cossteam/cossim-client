@@ -27,18 +27,12 @@ const ToolBarMore: React.FC<ToolBarMoreProps> = (props) => {
 	// 获取成员列表
 	const loadMembers = async () => {
 		const { code, data } = await GroupService.groupMemberApi({ group_id: props.id })
-		console.log(data)
 		const memberIds = data?.map((item: any) => item.user_id) ?? []
 		code === 200 && setMembers(memberIds)
-		console.log('memberIds', memberIds, members)
 	}
 	useEffect(() => {
 		loadMembers()
 	}, [])
-
-	useEffect(() => {
-		console.log('members', members)
-	}, [members])
 
 	// 呼叫
 	const { call, updateEnablesVideo } = useCallStore()
@@ -50,14 +44,12 @@ const ToolBarMore: React.FC<ToolBarMoreProps> = (props) => {
 			f7.dialog.preloader($t('呼叫中...'))
 			// 是否开启摄像头
 			updateEnablesVideo(enableVideo)
-			console.log('memberIds', members)
 			const { code } = !is_group
 				? await call({ userInfo: { user_id: id } })
 				: await call({ groupInfo: { group_id: parseInt(id), member: members } })
 			console.log('call status', code)
 			code === 200 && props.f7router.navigate('/call/')
 		} catch (error: any) {
-			console.log(error?.code, error?.code === 8)
 			console.dir(error)
 			if (error?.code === 8) {
 				f7.dialog.alert($t('当前媒体设备不可用，无法接听来电'))
