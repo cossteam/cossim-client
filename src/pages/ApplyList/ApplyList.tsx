@@ -32,20 +32,21 @@ const ApplyList = () => {
 		try {
 			const applyList = await updateApplyList()
 
-			console.log('applyList', applyList)
-
 			const { data } =
 				type === ApplyType.FRIEND
 					? await RelationService.friendApplyListApi({ user_id })
 					: await GroupService.groupRequestListApi({ user_id })
 
 			data.map(async (item: any) => {
-				const apply = applyList.find((v) => v?.id === item?.id)
+				const apply = applyList.find((v) => (v?.id === ApplyType.FRIEND ? item?.id : `group_${item?.id}`))
 
 				if (apply) {
 					!isEqual(apply, item) && (await UserStore.update(UserStore.tables.apply_list, 'id', item?.id, item))
 				} else {
-					await UserStore.add(UserStore.tables.apply_list, { ...item })
+					await UserStore.add(UserStore.tables.apply_list, {
+						...item,
+						id: type === ApplyType.FRIEND ? item.id : `group_${item.id}`
+					})
 				}
 			})
 		} catch (error) {
@@ -55,7 +56,6 @@ const ApplyList = () => {
 
 	useEffect(() => {
 		if (!allApplyList.length) return
-		console.log('获取更新', allApplyList)
 		updateApplyList()
 		// const newApplyList = applyList.filter((v) => (type === ApplyType.FRIEND ? v?.sender_id : !v?.sender_id))
 		// setApplyList(newApplyList)
@@ -96,12 +96,12 @@ const ApplyList = () => {
 						? await GroupService.manageGroupRequestApi({
 								group_id: item.group_id,
 								action,
-								id: item.id
+								id: parseInt(item.id.split('_')[1])
 							})
 						: await GroupService.manageGroupRequestAdminApi({
 								group_id: item.group_id,
 								action,
-								id: item.id
+								id: parseInt(item.id.split('_')[1])
 							})
 
 			if (code !== 200) return f7.dialog.alert($t(msg))
