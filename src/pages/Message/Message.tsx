@@ -1,6 +1,6 @@
 import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
 import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAsyncEffect, useClickOutside } from '@reactuses/core'
 import {
 	FaceSmiling,
@@ -95,6 +95,11 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const receiver_id = f7route.params.id as string
 	const dialog_id = Number(f7route.params.dialog_id as string)
 	const dialog_name = f7route.query.dialog_name
+
+	// 是否是系统通知
+	const is_system = useMemo(() => {
+		return receiver_id === '10001'
+	}, [receiver_id])
 
 	const { updateChat } = useStateStore()
 	const { messages, ...msgStore } = useMessageStore()
@@ -545,13 +550,17 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					{isSelect() ? (
 						<Link onClick={selectEvent.clear}>{$t('取消')}</Link>
 					) : (
-						<Link
-							href={
-								is_group ? `/group_info/${receiver_id}/` : `/profile/${receiver_id}/?from_page=message`
-							}
-						>
-							<Ellipsis className="w-6 h-6 mr-2" />
-						</Link>
+						!is_system && (
+							<Link
+								href={
+									is_group
+										? `/group_info/${receiver_id}/`
+										: `/profile/${receiver_id}/?from_page=message`
+								}
+							>
+								<Ellipsis className="w-6 h-6 mr-2" />
+							</Link>
+						)
 					)}
 				</NavRight>
 				{is_group && groupAnnouncement && (
@@ -697,7 +706,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						{moreType === 'emojis' ? (
 							<Emojis onSelectEmojis={onSelectEmojis} />
 						) : (
-							<ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />
+							!is_system && <ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />
 						)}
 					</div>
 				</div>
