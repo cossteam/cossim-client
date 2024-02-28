@@ -71,11 +71,13 @@ const Call: React.FC<RouterProps> = (props) => {
 			if (status === CallStatus.CALLING && !callInfo?.wsInfo) {
 				f7.dialog.alert('通话信息异常，请重新发起通话！', () => {
 					hangup()
+					closeWorker()
 					f7.dialog.close()
 				})
 			}
 			if (status === CallStatus.IDLE) {
 				console.log('空闲')
+				closeWorker()
 				props.f7router.back()
 			}
 			if (status === CallStatus.HANGUP) {
