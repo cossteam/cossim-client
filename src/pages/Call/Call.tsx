@@ -25,8 +25,8 @@ const Call: React.FC<RouterProps> = (props) => {
 
 	const [worker, setWorker] = useState<Worker | null>(null)
 	// 等待时间
-	// const [waittingTimer, setWaitTimer] = useState(10 * 60 * 60) // 时 分 秒
-	const [waittingTimer, setWaitTimer] = useState(60) // 时 分 秒
+	const [waittingTimer, setWaitTimer] = useState(10 * 60 * 60) // 时 分 秒
+	// const [waittingTimer, setWaitTimer] = useState(60) // 时 分 秒
 	useEffect(() => {
 		;(async () => {
 			if (status === CallStatus.WAITING) {

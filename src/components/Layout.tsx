@@ -19,7 +19,7 @@ const Layout: React.FC = () => {
 	}
 
 	return (
-		<Views tabs className="safe-area">
+		<Views tabs className="safe-area app">
 			<View id="view-dialog" onTabShow={() => setTabActive('dialog')} tabActive tab url="/dialog/" main />
 			<View id="view-contacts" onTabShow={() => setTabActive('contacts')} tab url="/contacts/" />
 			<View id="view-my" onTabShow={() => setTabActive('my')} name="my" tab url="/my/" />

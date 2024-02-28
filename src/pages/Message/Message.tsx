@@ -596,7 +596,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 			<div
 				className={clsx(
-					'fixed bg-bgPrimary bottom-0 w-full h-auto z-[99]  transition-all duration-300 ease-in'
+					'message-toolbar fixed bg-bgPrimary bottom-0 w-full h-auto z-[99]  transition-all duration-300 ease-in'
 				)}
 				ref={toolbarRef}
 				style={{ transform: `translateY(${keyboardHeight}px)` }}

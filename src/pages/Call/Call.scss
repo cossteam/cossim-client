@@ -7,3 +7,9 @@
 		}
 	}
 }
+
+#view-call + .app {
+	#view-dialog .message-toolbar {
+		display: none;
+	}
+}
