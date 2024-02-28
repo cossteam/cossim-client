@@ -2,6 +2,7 @@ export interface LoginData {
 	email: string
 	password: string
 	driver_id?: string
+	platform?: string
 	driver_token?: string
 }
 
@@ -29,9 +30,9 @@ export interface UpdateUserInfData {
 }
 
 export interface updatePassWorData {
-	old_password:string
-	password:string
-	confirm_password:string
+	old_password: string
+	password: string
+	confirm_password: string
 }
 
 export interface SearchUserParams {

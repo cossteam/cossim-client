@@ -55,7 +55,6 @@ const getAfterMessage = async () => {
 			}))
 		})
 
-
 		if (!messages) return
 
 		// TODO: 更新本地数据
@@ -77,7 +76,8 @@ const DialogList: React.FC<RouterProps> = () => {
 	const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
 	const [chats, setChats] = useState<any[]>(dialogs)
 
-	const getDialogList = async () => {
+	// 获取对话列表
+	const getDialogList = async (done: ((...args: any[]) => void) | undefined) => {
 		try {
 			// 获取落后的消息
 			await getAfterMessage()
@@ -105,6 +105,8 @@ const DialogList: React.FC<RouterProps> = () => {
 			})
 		} catch {
 			console.log('错误')
+		} finally {
+			done && done()
 		}
 	}
 
@@ -119,7 +121,13 @@ const DialogList: React.FC<RouterProps> = () => {
 	}, [dialogs])
 
 	return (
-		<Page ptr className="coss_dialog" onPageTabShow={getDialogList} onPageBeforeIn={getDialogList}>
+		<Page
+			ptr
+			className="coss_dialog"
+			onPageTabShow={getDialogList}
+			onPageBeforeIn={getDialogList}
+			onPtrRefresh={getDialogList}
+		>
 			<Navbar title="COSS" className="hidden-navbar-bg bg-bgPrimary">
 				<NavRight>
 					<Link>

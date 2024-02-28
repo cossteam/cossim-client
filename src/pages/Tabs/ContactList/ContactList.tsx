@@ -61,7 +61,7 @@ const ContactList: React.FC<RouterProps> = () => {
 		})
 	}
 
-	const onPageTabShow = async () => {
+	const onPageTabShow = async (done: ((...args: any[]) => void) | undefined) => {
 		try {
 			await updateContactInit()
 			// 获取群聊消息
@@ -85,6 +85,7 @@ const ContactList: React.FC<RouterProps> = () => {
 		} catch (error) {
 			console.error('获取好友列表出错', error)
 		} finally {
+			done && done()
 			await updateContact()
 		}
 	}
@@ -97,7 +98,7 @@ const ContactList: React.FC<RouterProps> = () => {
 	}, [is_contacts_update])
 
 	return (
-		<Page ptr onPageTabShow={onPageTabShow}>
+		<Page ptr onPageTabShow={onPageTabShow} onPtrRefresh={onPageTabShow}>
 			<Navbar title={$t('联系人')} className="hidden-navbar-bg bg-bgPrimary">
 				<Subnavbar inner={false}>
 					<Searchbar
