@@ -86,6 +86,15 @@ export class ServiceImpl implements ServiceMixin {
 	 */
 	async update(table: string, key: string = this.defaultKey, value: string | number, data: any) {
 		return await this.db.table(table).where(key).equals(value).modify(data)
+		// .modify((_, ref) => {
+		// ref.value = data
+		// for (const key in ref.value) {
+		// 	if (Object.prototype.hasOwnProperty.call(ref.value, key)) {
+		// 		const value = ref.value[key]
+		// 		console.log(key, value)
+		// 	}
+		// }
+		// })
 	}
 
 	/**
@@ -99,7 +108,6 @@ export class ServiceImpl implements ServiceMixin {
 	async delete(table: string, key: string = this.defaultKey, value: string | number) {
 		return await this.db.table(table).where(key).equals(value).delete()
 	}
-
 
 	/**
 	 * 清除数据库中指定的表。

@@ -24,7 +24,7 @@ const ApplyList = () => {
 	const updateApplyList = async () => {
 		const applyList = await UserStore.findAll(UserStore.tables.apply_list)
 		const newApplyList = applyList.filter((v) => (type === ApplyType.FRIEND ? v?.sender_id : !v?.sender_id))
-		console.log(newApplyList)
+		// console.log(newApplyList)
 		setApplyList(newApplyList)
 		return newApplyList
 	}
@@ -37,11 +37,15 @@ const ApplyList = () => {
 				type === ApplyType.FRIEND
 					? await RelationService.friendApplyListApi({ user_id })
 					: await GroupService.groupRequestListApi({ user_id })
-
+			// console.log(data)
 			data.map(async (item: any) => {
-				const apply = applyList.find((v) => (v?.id === ApplyType.FRIEND ? item?.id : `group_${item?.id}`))
-				console.log('apply', apply?.status, apply)
+				const apply = applyList.find((v) => {
+					// console.log(v.id, v)
+					return v.id === (type === ApplyType.FRIEND ? item?.id : `group_${item?.id}`)
+				})
+				// console.log('apply', Boolean(apply), apply?.status, apply)
 				if (apply) {
+					// console.log(isEqual(apply, item), apply, item)
 					!isEqual(apply, item) && (await UserStore.update(UserStore.tables.apply_list, 'id', item?.id, item))
 				} else {
 					await UserStore.add(UserStore.tables.apply_list, {
@@ -50,8 +54,8 @@ const ApplyList = () => {
 					})
 				}
 			})
-		} catch (error) {
-			console.error('获取申请列表失败', error)
+		} catch (error: any) {
+			console.error('获取申请列表失败', error?.message)
 		}
 	}
 
