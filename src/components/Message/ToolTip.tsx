@@ -144,7 +144,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 			icon: <Flag className="tooltip__icon" />
 		},
 		{
-			name: TOOLTIP_TYPE.MARK,
+			name: TOOLTIP_TYPE.NOTICE,
 			title: $t('设置为群公告'),
 			icon: <Flag className="tooltip__icon" />
 		}
