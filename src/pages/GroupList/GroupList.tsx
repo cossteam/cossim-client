@@ -26,7 +26,7 @@ const GroupListList: React.FC<RouterProps> = () => {
 		<Page className="group-page" noToolbar messagesContent>
 			<Navbar className="messages-navbar" backLink>
 				<NavTitle>
-					<div className="mr-16">{$t('群组')}</div>
+					<div className="">{$t('群组')}</div>
 				</NavTitle>
 			</Navbar>
 			<List contactsList noChevron dividers>

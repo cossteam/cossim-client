@@ -258,9 +258,17 @@ class GroupServiceImpl {
 	 *
 	 * @param {*} param
 	 * @param {*} param.group_id
-	 * @param {*} param.announcement
+	 * @param {*} param.title
+	 * @param {*} param.content
 	 * @returns
 	 */
+	createGroupAnnouncementApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/admin/announcement',
+			method: 'POST',
+			data
+		})
+	}
 }
 
 const GroupService = new GroupServiceImpl()

@@ -94,7 +94,10 @@ const ApplyList = () => {
 					? await RelationService.manageFriendApplyApi({ request_id: item.id, action, e2e_public_key })
 					: await GroupService.manageGroupRequestApi({ group_id: item.group_id, action, e2e_public_key })
 
-			if (code !== 200) return f7.dialog.alert($t('处理好友请求失败'))
+			if (code !== 200) {
+				f7.dialog.alert($t('处理好友请求失败'))
+				return
+			}
 
 			// 更新本地数据
 			await UserStore.update(UserStore.tables.apply_list, 'id', item.id, {
@@ -122,7 +125,10 @@ const ApplyList = () => {
 
 			const { code } = await GroupService.manageGroupApplyApi({ group_id: item.group_id, action })
 
-			if (code !== 200) return f7.dialog.alert($t('加入群聊失败'))
+			if (code !== 200) {
+				f7.dialog.alert($t('加入群聊失败'))
+				return
+			}
 
 			// 更新本地数据
 			await UserStore.update(UserStore.tables.apply_list, 'id', item.id, {
@@ -206,7 +212,11 @@ const ApplyList = () => {
 							{type === ApplyType.FRIEND ? (
 								<span>{item?.receiver_info?.user_name}</span>
 							) : ![GroupApplyStatus.WAIT, GroupApplyStatus.INVITE_RECEIVER].includes(item.status) ? (
-								item.status === GroupApplyStatus.INVITE_SENDER ? '等待' + item.receiver_info.user_name + '验证' : ''
+								item.status === GroupApplyStatus.INVITE_SENDER ? (
+									'等待' + item.receiver_info.user_name + '验证'
+								) : (
+									''
+								)
 							) : (
 								item.sender_info?.user_name +
 								'邀请' +
@@ -259,22 +269,23 @@ const ApplyList = () => {
 							) : (
 								// 群聊
 								<div className="flex">
-									{item.status === GroupApplyStatus.WAIT && item?.sender_info?.user_id === user_id && (
-										<>
-											<Button
-												className="text-sm text-red-500"
-												onClick={() => manageFriendApply(item, MangageApplyStatus.REFUSE)}
-											>
-												拒绝
-											</Button>
-											<Button
-												className="text-sm text-primary"
-												onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
-											>
-												同意
-											</Button>
-										</>
-									)}
+									{item.status === GroupApplyStatus.WAIT &&
+										item?.sender_info?.user_id === user_id && (
+											<>
+												<Button
+													className="text-sm text-red-500"
+													onClick={() => manageFriendApply(item, MangageApplyStatus.REFUSE)}
+												>
+													拒绝
+												</Button>
+												<Button
+													className="text-sm text-primary"
+													onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
+												>
+													同意
+												</Button>
+											</>
+										)}
 									{item.status === GroupApplyStatus.INVITE_RECEIVER && (
 										<>
 											<Button

@@ -72,7 +72,10 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defau
 			})
 			console.dir(data)
 
-			if (code !== 200) return f7.dialog.alert(msg)
+			if (code !== 200) {
+				f7.dialog.alert(msg)
+				return
+			}
 
 			const user_id = data?.user_info?.user_id
 

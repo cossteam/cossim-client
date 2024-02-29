@@ -66,7 +66,10 @@ const RegisterScreen: React.FC<RouterProps> = ({ f7router }) => {
 			if (!valid()) return
 
 			const { code, data, msg } = await UserService.registerApi(fromData)
-			if (code !== 200) return f7.dialog.alert(msg)
+			if (code !== 200) {
+				f7.dialog.alert(msg)
+				return
+			}
 
 			await cretaeIdentity(data.user_id, fromData.email)
 			f7router.navigate('/login/', { props: { defaultData: fromData } })

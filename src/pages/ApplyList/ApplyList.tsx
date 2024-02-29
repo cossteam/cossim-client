@@ -109,7 +109,10 @@ const ApplyList = () => {
 								id: parseInt(item.id.split('_')[1])
 							})
 
-			if (code !== 200) return f7.dialog.alert($t(msg))
+			if (code !== 200) {
+				f7.dialog.alert($t(msg))
+				return
+			}
 
 			// 更新本地数据
 			await UserStore.update(UserStore.tables.apply_list, 'id', item.id, {

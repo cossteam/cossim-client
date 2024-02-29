@@ -76,7 +76,10 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			try {
 				f7.dialog.preloader($t('删除中...'))
 				const { code } = await RelationService.deleteFriendApi(user_id)
-				if (code !== 200) return f7.dialog.alert($t('删除好友失败'))
+				if (code !== 200) {
+					f7.dialog.alert($t('删除好友失败'))
+					return
+				}
 				updateContacts(true)
 				// 删除数据库中的好友
 				await UserStore.delete(UserStore.tables.friends, 'user_id', user_id)
@@ -119,7 +122,10 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			try {
 				f7.dialog.preloader($t('设置中...'))
 				const { code } = await RelationService.setBurnApi({ action, user_id })
-				if (code !== 200) return f7.dialog.alert(tips_error)
+				if (code !== 200) {
+					f7.dialog.alert(tips_error)
+					return
+				}
 				// 更新本地数据库
 				await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
 					preferences: { ...userInfo?.preferences, open_burn_after_reading: action }
@@ -147,7 +153,10 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			try {
 				f7.dialog.preloader($t('消息免打扰中...'))
 				const { code } = await RelationService.setSilenceApi({ is_silent, user_id })
-				if (code !== 200) return f7.dialog.alert(tips_error)
+				if (code !== 200) {
+					f7.dialog.alert(tips_error)
+					return
+				}
 				// 更新本地数据库
 				await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
 					preferences: { ...userInfo?.preferences, silent_notification: is_silent }
@@ -183,7 +192,10 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					? await RelationService.deleteBlackListApi(params)
 					: await RelationService.addBlackListApi(params)
 
-				if (code !== 200) return f7.dialog.alert(tips_error)
+				if (code !== 200) {
+					f7.dialog.alert(tips_error)
+					return
+				}
 
 				// 更新本地数据库
 				await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
