@@ -1,4 +1,4 @@
-import { Icon, Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react'
+import { Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react'
 import { useRef, useState } from 'react'
 import { isEqual } from 'lodash-es'
 
@@ -238,25 +238,23 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					</div>
 					<div
 						className="size-10 mr-3 flex flex-col justify-center items-center"
-						onClick={() => callUser(true)}
+						onClick={() => callUser(false)}
 					>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-							<Link iconF7="phone_fill" iconSize={22} onClick={() => callUser(false)} />
+							<Link iconF7="phone_fill" iconSize={22} />
 						</div>
 						<span className="text-xs">语音</span>
 					</div>
-					<div
-						className="size-10 mr-3 flex flex-col justify-center items-center"
-						onClick={() => callUser(true)}
-					>
+					<div className="size-10 mr-3 flex flex-col justify-center items-center" onClick={() => {}}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-							<Link iconF7="tag_fill" iconSize={22} onClick={() => {}} />
+							<Link iconF7="tag_fill" iconSize={22} />
 						</div>
 						<span className="text-xs">标注</span>
 					</div>
-					<div className="size-10 flex flex-col justify-center items-center" onClick={() => callUser(true)}>
+					<div className="size-10 flex flex-col justify-center items-center" onClick={() => {}}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-							<Link iconF7="phone_fill" iconSize={22} onClick={() => {}} />
+							{/* <Link iconF7="ellipsis" iconSize={22} /> */}
+							<Link iconF7="ellipsis" iconSize={22} popoverOpen=".popover-menu" />
 						</div>
 						<span className="text-xs">更多</span>
 					</div>
