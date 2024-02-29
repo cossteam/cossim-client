@@ -80,7 +80,7 @@ const routes: Router.RouteParameters[] = [
 	},
 	{
 		path: '/group_info/:group_id/',
-		asyncComponent: () => import('@/pages/GroupInfo/GroupInfo')
+		asyncComponent: () => import('@/pages/GroupInfo/GroupInfo'),
 	},
 	{
 		path: '/group_info/:group_id/member/:list_type',
@@ -93,6 +93,14 @@ const routes: Router.RouteParameters[] = [
 	{
 		path: '/groups/',
 		asyncComponent: () => import('@/pages/GroupList/GroupList')
+	},
+	{
+		path: '/group_notice/:group_id/',
+		asyncComponent: () => import('@/pages/GroupNotice/GroupNotice')
+	},
+	{
+		path: '/create_group_notice/:group_id/',
+		asyncComponent: () => import('@/pages/CreateGroupNotice/CreateGroupNotice')
 	},
 	{
 		path: '(.*)',

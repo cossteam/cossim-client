@@ -24,6 +24,7 @@ class UserStoreImpl extends Dexie {
 	client_pgp_keys!: Table<ClientPGPKeys>
 	messages!: Table<Messages>
 	group_members!: Table<GroupMembers>
+	// group_notice
 
 	constructor(name: string, version: number = 1) {
 		super(name)

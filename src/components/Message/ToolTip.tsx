@@ -51,8 +51,6 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		if (!el) return
 
 		const lis = document.querySelectorAll('li.coss_list_item')
-		// const lis = document.querySelectorAll('div.variable-list')
-
 		const { id = 0, index = 0, label = 0 } = el.dataset
 		setMsgId(Number(id))
 
@@ -112,37 +110,42 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 	const [tips, setTips] = useState<any[]>([
 		{
 			name: TOOLTIP_TYPE.COPY,
-			title: '复制',
+			title: $t('复制'),
 			icon: <SquareOnSquare className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.FORWARD,
-			title: '转发',
+			title: $t('转发'),
 			icon: <ArrowUpRight className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.EDIT,
-			title: '编辑',
+			title: $t('编辑'),
 			icon: <SquarePencil className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.DELETE,
-			title: '删除',
+			title: $t('删除'),
 			icon: <Trash className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.SELECT,
-			title: '多选',
+			title: $t('多选'),
 			icon: <TextAlignleft className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.REPLY,
-			title: '回复',
+			title: $t('回复'),
 			icon: <BubbleLeftBubbleRight className="tooltip__icon" />
 		},
 		{
 			name: TOOLTIP_TYPE.MARK,
-			title: '标注',
+			title: $t('标注'),
+			icon: <Flag className="tooltip__icon" />
+		},
+		{
+			name: TOOLTIP_TYPE.MARK,
+			title: $t('设置为群公告'),
 			icon: <Flag className="tooltip__icon" />
 		}
 	])
@@ -178,15 +181,6 @@ interface ToolTipViewProps {
 	top: boolean
 }
 
-// function findAncestorWithClassName(element: any, className: string) {
-// 	// 循环向上查找父元素，直到找到满足条件的元素或到达文档顶部
-// 	while (element && !element.classList.contains(className)) {
-// 		element = element.parentNode
-// 	}
-// 	// 返回满足条件的父元素或 null（如果未找到）
-// 	return element
-// }
-
 const ToolTipView: React.FC<ToolTipViewProps> = ({
 	tooltipRef,
 	triangleRef,
@@ -197,13 +191,10 @@ const ToolTipView: React.FC<ToolTipViewProps> = ({
 	className,
 	top
 }) => {
-
 	const { updateTrgger } = useMessageStore()
 
 	const handlerClick = (item: any) => {
 		onSelect(item.name, msgId)
-		// 获取父元素
-		// console.log('tooltipRef', findAncestorWithClassName(tooltipRef.current, 'long-press-button'))
 		setVisible(false)
 		updateTrgger(true)
 	}

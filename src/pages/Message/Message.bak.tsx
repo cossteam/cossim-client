@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
 import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAsyncEffect, useClickOutside } from '@reactuses/core'
 import {
 	FaceSmiling,
@@ -17,7 +16,7 @@ import { useClipboard } from '@reactuses/core'
 
 import './message.scss'
 import { useMessageStore } from '@/stores/message'
-import { $t, TOOLTIP_TYPE, MESSAGE_TYPE, isMe } from '@/shared'
+import { $t, TOOLTIP_TYPE, MESSAGE_TYPE, isMe, hasImageHtml } from '@/shared'
 import Chat from '@/components/Message/Chat'
 // import ToolEditor } from '@/components/Editor/ToolEditor'
 import { isWebDevice, platform } from '@/utils'
@@ -27,8 +26,10 @@ import Contact from '@/components/Contact/Contact'
 import Emojis from '@/components/Emojis/Emojis'
 import GroupService from '@/api/group'
 
-import ToolEditor, { EventType, ToolEditorMethods } from '@/Editor'
+import ToolEditor, { ToolEditorMethods, ReadEditor } from '@/Editor'
 import { useStateStore } from '@/stores/state'
+import Quill from 'quill'
+import ToolBarMore from '@/components/Message/ToolBarMore'
 // import { useLiveQuery } from 'dexie-react-hooks'
 // import UserStore from '@/db/user'
 // import { FixedSizeList } from 'react-window'
@@ -46,7 +47,6 @@ const scroll = (element: HTMLElement, isSmooth: boolean = false) => {
 }
 
 type MoreType = 'emojis' | 'more' | ''
-
 
 // const rowRender = ({ index, setItemSize }: { index: number; setItemSize: (index: number, height: number) => void }) => {
 // 	const
@@ -79,7 +79,7 @@ type MoreType = 'emojis' | 'more' | ''
 // 	)
 // }
 
-const Message: React.FC<RouterProps> = ({ f7route }) => {
+const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
 	const contentRef = useRef<HTMLElement | null>(null)
 	const editorRef = useRef<ToolEditorMethods>(null)
@@ -95,6 +95,11 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const receiver_id = f7route.params.id as string
 	const dialog_id = Number(f7route.params.dialog_id as string)
 	const dialog_name = f7route.query.dialog_name
+
+	// 是否是系统通知
+	const is_system = useMemo(() => {
+		return receiver_id === '10001'
+	}, [receiver_id])
 
 	const { updateChat } = useStateStore()
 	const { messages, ...msgStore } = useMessageStore()
@@ -124,7 +129,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		type !== TOOLTIP_TYPE.SELECT && setSelectMsgs([msg])
 		setSelectType(type)
 
-		console.log('提示选择', msg_id, type)
+		console.log('提示选择', msg_id, type, msg)
 
 		switch (type) {
 			case TOOLTIP_TYPE.COPY:
@@ -134,7 +139,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				setShowSelect(true)
 				break
 			case TOOLTIP_TYPE.EDIT:
-				editorRef.current?.engine.insertElement(msg?.content || '', { isFocus: true })
+				// editorRef.current?.engine.insertElement(msg?.content || '', { isFocus: true })
+				editorRef.current!.quill.root.innerHTML = msg?.content || ''
 				break
 			case TOOLTIP_TYPE.DELETE:
 				f7.dialog.confirm($t('确认删除消息？'), () => {
@@ -236,7 +242,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const showMore = (type: MoreType) => {
 		const isEnd = isScrollEnd()
 
-		if (type === moreType && isWeb) {
+		// isWeb
+		if (type === moreType) {
 			setMoreType('')
 			setToolbarBottom(keyboardHeight)
 			// setTimeout(() => {
@@ -245,7 +252,8 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			// }, 300)
 			return
 		}
-		!isWeb ? Keyboard?.hide() : setToolbarBottom(0)
+		// !isWeb ? Keyboard?.hide() : setToolbarBottom(0)
+		setToolbarBottom(0)
 
 		setMoreType(type)
 
@@ -339,71 +347,80 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			// let members: any = []
 			// try {
 			// 	const { data } = await GroupService.groupMemberApi({ group_id: Number(receiver_id) })
-			// 	members = data
+			// 	// members = data
 			// } catch (error) {
-			// 	members = []
+			// 	// members = []
 			// }
 
-			const engine = editorRef.current!.engine
-			engine.on(EventType.CHANGE, () => setShowBtn(!engine.isEmpty()))
+			// const engine = editorRef.current!.engine
+			// engine.on(EventType.CHANGE, () => setShowBtn(!engine.isEmpty()))
 
-			// 自定义聚焦事件
-			engine.on(EventType.FOCUS, () => {
-				BlockRef.current.el!.style.paddingBottom = 56 + 'px'
-				closeToolBar()
-				requestAnimationFrame(() => {
-					engine.readonly = false
-					if (!moreType) {
-						setTimeout(() => engine.focus(), 300)
-					} else {
-						setTimeout(() => engine.focus(), 0)
-						return
-					}
-				})
-			})
+			// // 自定义聚焦事件
+			// engine.on(EventType.FOCUS, () => {
+			// 	BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+			// 	closeToolBar()
+			// 	requestAnimationFrame(() => {
+			// 		engine.readonly = false
+			// 		if (!moreType) {
+			// 			setTimeout(() => engine.focus(), 300)
+			// 		} else {
+			// 			setTimeout(() => engine.focus(), 0)
+			// 			return
+			// 		}
+			// 	})
+			// })
 
-			// @ 事件
-			let is_at = false
-			is_group &&
-				engine.on(EventType.AITE, (e) => {
-					console.log('e,', e.target)
-					const rect = e.target?.getBoundingClientRect()
-					console.log('rect', rect)
-					const div = document.createElement('div')
-					div.id = 'tooltips'
-					div.style.left = `${rect.left}px`
-					div.style.top = `${rect.top - e.target.offsetHeight}px`
-					div.innerHTML = '暂不支持'
-					document.body.appendChild(div)
-					is_at = true
-				})
+			// // @ 事件
+			// let is_at = false
+			// is_group &&
+			// 	engine.on(EventType.AITE, (e) => {
+			// 		console.log('e,', e.target)
+			// 		const rect = e.target?.getBoundingClientRect()
+			// 		console.log('rect', rect)
+			// 		const div = document.createElement('div')
+			// 		div.id = 'tooltips'
+			// 		div.style.left = `${rect.left}px`
+			// 		div.style.top = `${rect.top - e.target.offsetHeight}px`
+			// 		div.innerHTML = '暂不支持'
+			// 		document.body.appendChild(div)
+			// 		is_at = true
+			// 	})
 
-			is_group &&
-				engine.on(EventType.AITE_END, () => {
-					console.log('@ 结束')
+			// is_group &&
+			// 	engine.on(EventType.AITE_END, () => {
+			// 		console.log('@ 结束')
 
-					if (is_at) {
-						const el = document.getElementById('tooltips')
-						if (el) el.remove()
-						is_at = false
-					}
-				})
-
-			// @ 功能
-			// engine.on('mention:default', () => {
-			// 	const newMembers = members.map((v: any) => {
-			// 		return {
-			// 			key: v.user_id,
-			// 			name: v.nickname
+			// 		if (is_at) {
+			// 			const el = document.getElementById('tooltips')
+			// 			if (el) el.remove()
+			// 			is_at = false
 			// 		}
 			// 	})
 
-			// 	console.log('newMembers', newMembers)
+			const quill = editorRef.current!.quill
 
-			// 	const arr = [{ key: 'all', name: '全体成员' }, ...newMembers]
+			quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
+				if (type !== Quill.events.SELECTION_CHANGE) {
+					setShowBtn(quill.getLength() > 1)
+				}
+				// console.log('type', type, oldDelta, source)
+			})
 
-			// 	return arr
-			// })
+			// 自定义聚焦事件
+			// TODO：修复键盘弹起
+			quill.root.addEventListener('focus', () => {
+				BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+				closeToolBar()
+				// requestAnimationFrame(() => {
+				// 	// quill.readonly = false
+				// 	// if (!moreType) {
+				// 	// 	setTimeout(() => engine.focus(), 300)
+				// 	// } else {
+				// 	// 	setTimeout(() => engine.focus(), 0)
+				// 	// 	return
+				// 	// }
+				// })
+			})
 		},
 		() => {},
 		[]
@@ -411,21 +428,27 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 	const sendMessage = async () => {
 		const isEnd = isScrollEnd()
-		const engine = editorRef.current!.engine
-		const content = engine.toValue()
-		engine.clear()
+		const quill = editorRef.current!.quill
+		// const content = quill.getSemanticHTML()
+
+		let type = msgType
+		const content = quill.getSemanticHTML()
+
+		if (hasImageHtml(content)) {
+			type = MESSAGE_TYPE.IMAGE
+		}
 
 		// 发送或编辑消息
 		selectType === TOOLTIP_TYPE.EDIT
 			? msgStore.editMessage(selectMsgs[0], content)
-			: msgStore.sendMessage(msgType, content, { replay_id: isReply() ? selectMsgs[0]?.msg_id : 0 })
+			: msgStore.sendMessage(type, content, { replay_id: isReply() ? selectMsgs[0]?.msg_id : 0 })
 
-		editorRef.current!.focus()
 		setSelectType(TOOLTIP_TYPE.NONE)
 		setTimeout(() => scroll(contentRef.current!, isEnd ? true : false), 100)
-		setMoreType('')
-		engine.readonly = false
-		engine.focus()
+
+		// 发送成功的操作
+		quill.deleteText(0, quill.getLength() - 1)
+		if (!moreType) quill.focus()
 	}
 
 	// const dialog = useLiveQuery(() => UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', dialog_id))
@@ -452,7 +475,14 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 	// 选择表情
 	const onSelectEmojis = (emojis: any) => {
-		editorRef.current!.engine.insertElement(emojis.native, { isFocus: false })
+		// 先确保编辑器已经聚焦
+		editorRef.current!.quill.focus()
+		editorRef.current!.quill.insertText(
+			editorRef.current!.quill.getSelection()?.index || 0,
+			emojis.native,
+			Quill.sources.USER
+		)
+		editorRef.current!.quill.blur()
 	}
 
 	// 阅读所有
@@ -503,13 +533,17 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					{isSelect() ? (
 						<Link onClick={selectEvent.clear}>{$t('取消')}</Link>
 					) : (
-						<Link
-							href={
-								is_group ? `/group_info/${receiver_id}/` : `/profile/${receiver_id}/?from_page=message`
-							}
-						>
-							<Ellipsis className="w-6 h-6 mr-2" />
-						</Link>
+						!is_system && (
+							<Link
+								href={
+									is_group
+										? `/group_info/${receiver_id}/`
+										: `/profile/${receiver_id}/?from_page=message`
+								}
+							>
+								<Ellipsis className="w-6 h-6 mr-2" />
+							</Link>
+						)
 					)}
 				</NavRight>
 				{is_group && groupAnnouncement && (
@@ -537,48 +571,15 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								onSelect={onSelect}
 								isSelected={isSelect()}
 								reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
-								// ref={(el: HTMLDivElement) => (listItemRef.current!.el[index] = el)}
 							/>
 						</ListItem>
 					))}
 				</List>
-				{/* {messages.length > 0 ? (
-					<VariableSizeList
-						pageHeight={pageHeight}
-						len={messages.length}
-						render={rowRender}
-						messages={messages}
-						isSelect={isSelect}
-						onSelect={onSelect}
-						replyMessage={replyMessage}
-						onSelectChange={onSelectChange}
-					/>
-				) : (
-					messages.map((item, index) => (
-						<ListItem
-							key={index}
-							className="coss_list_item animate__animated"
-							data-index={index}
-							style={{ zIndex: 1 }}
-							checkbox={isSelect() && !item?.tips_msg_id}
-							onChange={(e) => onSelectChange(e, item)}
-						>
-							<Chat
-								msg={item}
-								index={index}
-								onSelect={onSelect}
-								isSelected={isSelect()}
-								reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
-							/>
-						</ListItem>
-					))
-				)} */}
-				{/* </List> */}
 			</Block>
 
 			<div
 				className={clsx(
-					'fixed bg-bgPrimary bottom-0 w-full h-auto z-[99]  transition-all duration-300 ease-in'
+					'message-toolbar fixed bg-bgPrimary bottom-0 w-full h-auto z-[99]  transition-all duration-300 ease-in'
 				)}
 				ref={toolbarRef}
 				style={{ transform: `translateY(${keyboardHeight}px)` }}
@@ -626,24 +627,33 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 								)}
 							>
 								<div className={clsx('flex-1 rounded pl-2 max-w-[calc(100%-150px)]')}>
-									<div className="py-2 bg-bgSecondary rounded w-full">
+									<div className="py-2 bg-bgSecondary rounded w-full flex items-center">
 										<ToolEditor
 											ref={editorRef}
 											readonly={false}
-											className="max-h-[150px]  overflow-y-auto"
+											placeholder={$t('请输入内容')}
+											id={receiver_id}
+											is_group={is_group}
 										/>
 									</div>
 									{(isReply() || isEdit()) && (
 										<div className="mt-1 bg-bgTertiary relative flex justify-between">
-											<ToolEditor
+											{/* <ToolEditor
 												initValue={selectMsgs[0]?.content}
 												className="px-2 py-1 read-editor-1"
+											/> */}
+											<ReadEditor
+												content={selectMsgs[0]?.content}
+												className="reply-read-editor"
 											/>
 											<Link
 												className="pr-2"
 												onClick={() => {
 													setSelectType(TOOLTIP_TYPE.NONE)
-													editorRef.current?.engine.clear()
+													editorRef.current?.quill.deleteText(
+														0,
+														editorRef.current?.quill.getLength()
+													)
 												}}
 											>
 												<XmarkCircle className="text-textTertiary" />
@@ -677,15 +687,17 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 							</div>
 						</div>
 					</div>
-					{/* {moreType && ( */}
 					<div
 						className={clsx('w-full overflow-hidden transition-all duration-200 ease-linear')}
 						style={{ height: keyboardHeight + 'px' }}
 						ref={moreRef}
 					>
-						{moreType === 'emojis' ? <Emojis onSelectEmojis={onSelectEmojis} /> : <div></div>}
+						{moreType === 'emojis' ? (
+							<Emojis onSelectEmojis={onSelectEmojis} />
+						) : (
+							!is_system && <ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />
+						)}
 					</div>
-					{/* )} */}
 				</div>
 
 				{/* {!!dialog?.dialog_unread_count && dialog?.dialog_unread_count > 0 && (

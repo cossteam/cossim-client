@@ -11,6 +11,7 @@ import request from '@/utils/request'
 class RelationServiceImpl {
 	private baseUrl: string = '/relation/user'
 	private relationDialog: string = '/relation/dialog'
+	private relationGroup: string = '/relation/group'
 
 	/**
 	 * 获取好友列表
@@ -179,6 +180,22 @@ class RelationServiceImpl {
 	showDialogApi(data: { dialog_id: number; action: number }): Promise<DataResponse> {
 		return request({
 			url: `${this.relationDialog}/show`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 创建群公告
+	 *
+	 * @param data
+	 * @param {number} data.group_id
+	 * @param {string} data.content
+	 * @returns
+	 */
+	createGroupNoticeApi(data: { group_id: number; content: string; title: string }): Promise<DataResponse> {
+		return request({
+			url: `${this.relationGroup}/admin/announcement`,
 			method: 'POST',
 			data
 		})

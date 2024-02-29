@@ -27,3 +27,9 @@
         @apply text-ellipsis overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1 max-w-[300px];
     }
 }
+
+.hidden-toolbar {
+    .toolbar.toolbar-bottom {
+        display: none;
+    }
+}

@@ -207,6 +207,12 @@ export const hasImage = (data: any) => {
 	return false
 }
 
+/**
+ * 检查给定的 HTML 字符串是否包含图像标签。
+ *
+ * @param {string} html -用于搜索图像标签的 HTML 字符串。
+ * @return {boolean} 如果 HTML 包含图像标签，则为 true，否则为 false。
+ */
 export const hasImageHtml = (html: string) => {
 	// 匹配 img 标签
 	const imgReg = /<img[^>]+>/g
@@ -215,4 +221,15 @@ export const hasImageHtml = (html: string) => {
 		return true
 	}
 	return false
+}
+
+
+/**
+ * 滚动元素到底部
+ *
+ * @param element		滚动元素
+ * @param isSmooth		是否平滑滚动
+ */
+export const scroll = (element: HTMLElement, isSmooth: boolean = false) => {
+	element.scrollTo({ top: element.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
 }

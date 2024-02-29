@@ -5,7 +5,6 @@ import { useAsyncEffect, useClickOutside } from '@reactuses/core'
 import {
 	FaceSmiling,
 	PlusCircle,
-	// EllipsesBubbleFill,
 	ArrowRightCircleFill,
 	MicCircleFill,
 	Xmark,
@@ -16,9 +15,8 @@ import { useClipboard } from '@reactuses/core'
 
 import './message.scss'
 import { useMessageStore } from '@/stores/message'
-import { $t, TOOLTIP_TYPE, MESSAGE_TYPE, isMe, hasImageHtml } from '@/shared'
+import { $t, TOOLTIP_TYPE, MESSAGE_TYPE, isMe, hasImageHtml, scroll, MessageMore } from '@/shared'
 import Chat from '@/components/Message/Chat'
-// import ToolEditor } from '@/components/Editor/ToolEditor'
 import { isWebDevice, platform } from '@/utils'
 import clsx from 'clsx'
 import { useToast } from '@/hooks/useToast'
@@ -30,54 +28,7 @@ import ToolEditor, { ToolEditorMethods, ReadEditor } from '@/Editor'
 import { useStateStore } from '@/stores/state'
 import Quill from 'quill'
 import ToolBarMore from '@/components/Message/ToolBarMore'
-// import { useLiveQuery } from 'dexie-react-hooks'
-// import UserStore from '@/db/user'
-// import { FixedSizeList } from 'react-window'
-// import AutoSizer from 'react-virtualized-auto-sizer'
-// import VariableSizeList from '@/components/VariableSizeList/VariableSizeList'
-
-/**
- * 滚动元素到底部
- *
- * @param element		滚动元素
- * @param isSmooth		是否平滑滚动
- */
-const scroll = (element: HTMLElement, isSmooth: boolean = false) => {
-	element.scrollTo({ top: element.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
-}
-
-type MoreType = 'emojis' | 'more' | ''
-
-// const rowRender = ({ index, setItemSize }: { index: number; setItemSize: (index: number, height: number) => void }) => {
-// 	const
-
-// 	const item = messages[index]
-
-// 	if (!item) return <></>
-
-// 	return (
-// 		<div ref={itemRef} className="h-auto" style={{ height: 'auto' }}>
-// 			<List noChevron mediaList className="my-0">
-// 				<ListItem
-// 					key={index}
-// 					className="coss_list_item animate__animated  animate__fadeInUp"
-// 					data-index={index}
-// 					style={{ zIndex: 1 }}
-// 					checkbox={isSelect() && !item?.tips_msg_id}
-// 					onChange={(e) => onSelectChange(e, item)}
-// 				>
-// 					<Chat
-// 						msg={item}
-// 						index={index}
-// 						onSelect={onSelect}
-// 						isSelected={isSelect()}
-// 						reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
-// 					/>
-// 				</ListItem>
-// 			</List>
-// 		</div>
-// 	)
-// }
+import { KeyboardIcon } from '@/components/Icon/Icon'
 
 const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
@@ -104,8 +55,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const { updateChat } = useStateStore()
 	const { messages, ...msgStore } = useMessageStore()
 
-	// const [pageHeight, setPageHeight] = useState<number>(0)
-
 	// 在进入页面前设置内容高度
 	const onPageInit = async () => {
 		const navbarHeight = navbarRef.current.el!.offsetHeight || 56
@@ -117,7 +66,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 		// 设置内容高度
 		// setPageHeight(document.documentElement.clientHeight)
-
 		// const data = await MsgService.getUserMessageListApi({ user_id: receiver_id, page_num: 1, page_size: 10 })
 		// console.log('data', data)
 	}
@@ -139,7 +87,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				setShowSelect(true)
 				break
 			case TOOLTIP_TYPE.EDIT:
-				// editorRef.current?.engine.insertElement(msg?.content || '', { isFocus: true })
 				editorRef.current!.quill.root.innerHTML = msg?.content || ''
 				break
 			case TOOLTIP_TYPE.DELETE:
@@ -237,32 +184,26 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	)
 
 	// 表情/更多切换
-	const [moreType, setMoreType] = useState<MoreType>('')
+	const [moreType, setMoreType] = useState<MessageMore>(MessageMore.TEXT)
 	const moreRef = useRef<HTMLDivElement | null>(null)
-	const showMore = (type: MoreType) => {
+	const showMore = (type: MessageMore) => {
 		const isEnd = isScrollEnd()
 
-		// isWeb
-		if (type === moreType) {
-			setMoreType('')
-			setToolbarBottom(keyboardHeight)
-			// setTimeout(() => {
-			BlockRef.current.el!.style.transitionDuration = '0.3s'
-			isWeb && (BlockRef.current.el!.style.paddingBottom = 56 + 'px')
-			// }, 300)
+		if (type === MessageMore.TEXT) {
+			closeToolBar()
+			setTimeout(() => {
+				focusInput()
+			}, 300)
 			return
+		} else {
+			setMoreType(type)
+			setToolbarBottom(0)
 		}
-		// !isWeb ? Keyboard?.hide() : setToolbarBottom(0)
-		setToolbarBottom(0)
-
-		setMoreType(type)
 
 		BlockRef.current.el!.style.transitionDuration = '0s'
 		BlockRef.current.el!.style.paddingBottom = keyboardHeight + 56 + 'px'
 		requestAnimationFrame(() => {
-			// setTimeout(()=>{
 			isEnd && scroll(contentRef.current!, true)
-			// },300)
 		})
 	}
 
@@ -275,9 +216,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	useClickOutside(toolbarRef, () => closeToolBar())
 	// 设备信息
 	const [platformName, setPlatformName] = useState<string>('web')
-	// 键盘显示
-	// const [keyboardShow, setKeyboardShow] = useState<boolean>(false)
-
+	
 	const [isWeb, setIsWeb] = useState<boolean>(true)
 
 	// 群公告
@@ -321,11 +260,8 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			if (!isWeb) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
 					setKeyboardHeight(info.keyboardHeight - 15)
-					setMoreType('')
+					setMoreType(MessageMore.TEXT)
 					setToolbarBottom(keyboardHeight)
-					// requestAnimationFrame(() => {
-					// 	Keyboard.show()
-					// })
 				})
 				// Keyboard.addListener('keyboardDidShow', () => {
 				// 	setToolbarBottom(keyboardHeight)
@@ -344,98 +280,33 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				})
 			}
 
-			// let members: any = []
-			// try {
-			// 	const { data } = await GroupService.groupMemberApi({ group_id: Number(receiver_id) })
-			// 	// members = data
-			// } catch (error) {
-			// 	// members = []
-			// }
-
-			// const engine = editorRef.current!.engine
-			// engine.on(EventType.CHANGE, () => setShowBtn(!engine.isEmpty()))
-
-			// // 自定义聚焦事件
-			// engine.on(EventType.FOCUS, () => {
-			// 	BlockRef.current.el!.style.paddingBottom = 56 + 'px'
-			// 	closeToolBar()
-			// 	requestAnimationFrame(() => {
-			// 		engine.readonly = false
-			// 		if (!moreType) {
-			// 			setTimeout(() => engine.focus(), 300)
-			// 		} else {
-			// 			setTimeout(() => engine.focus(), 0)
-			// 			return
-			// 		}
-			// 	})
-			// })
-
-			// // @ 事件
-			// let is_at = false
-			// is_group &&
-			// 	engine.on(EventType.AITE, (e) => {
-			// 		console.log('e,', e.target)
-			// 		const rect = e.target?.getBoundingClientRect()
-			// 		console.log('rect', rect)
-			// 		const div = document.createElement('div')
-			// 		div.id = 'tooltips'
-			// 		div.style.left = `${rect.left}px`
-			// 		div.style.top = `${rect.top - e.target.offsetHeight}px`
-			// 		div.innerHTML = '暂不支持'
-			// 		document.body.appendChild(div)
-			// 		is_at = true
-			// 	})
-
-			// is_group &&
-			// 	engine.on(EventType.AITE_END, () => {
-			// 		console.log('@ 结束')
-
-			// 		if (is_at) {
-			// 			const el = document.getElementById('tooltips')
-			// 			if (el) el.remove()
-			// 			is_at = false
-			// 		}
-			// 	})
-
 			const quill = editorRef.current!.quill
 
+			/**
+			 * @description 编辑器变化
+			 */
 			quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
 				if (type !== Quill.events.SELECTION_CHANGE) {
 					setShowBtn(quill.getLength() > 1)
 				}
-				// console.log('type', type, oldDelta, source)
 			})
 
 			// 自定义聚焦事件
 			// TODO：修复键盘弹起
 			quill.root.addEventListener('focus', () => {
+				console.log('聚焦事件')
 				BlockRef.current.el!.style.paddingBottom = 56 + 'px'
-				closeToolBar()
-				requestAnimationFrame(() => {
-					// quill.readonly = false
-					// if (!moreType) {
-					// 	setTimeout(() => engine.focus(), 300)
-					// } else {
-					// 	setTimeout(() => engine.focus(), 0)
-					// 	return
-					// }
-				})
+				// closeToolBar()
+				// requestAnimationFrame(() => {
+				// 	// quill.readonly = false
+				// 	// if (!moreType) {
+				// 	// 	setTimeout(() => engine.focus(), 300)
+				// 	// } else {
+				// 	// 	setTimeout(() => engine.focus(), 0)
+				// 	// 	return
+				// 	// }
+				// })
 			})
-			// quill.on('focus', () => {
-			// 	console.log("点开");
-
-			// 	BlockRef.current.el!.style.paddingBottom = 56 + 'px'
-			// 	closeToolBar()
-			// 	requestAnimationFrame(() => {
-			// 		// quill.readonly = false
-			// 		// if (!moreType) {
-			// 		// 	setTimeout(() => engine.focus(), 300)
-			// 		// } else {
-			// 		// 	setTimeout(() => engine.focus(), 0)
-			// 		// 	return
-			// 		// }
-			// 	})
-			// })
 		},
 		() => {},
 		[]
@@ -490,7 +361,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	// 选择表情
 	const onSelectEmojis = (emojis: any) => {
-		// editorRef.current!.engine.insertElement(emojis.native, { isFocus: false })
 		// 先确保编辑器已经聚焦
 		editorRef.current!.quill.focus()
 		editorRef.current!.quill.insertText(
@@ -498,8 +368,19 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			emojis.native,
 			Quill.sources.USER
 		)
-		// 取消聚焦
 		editorRef.current!.quill.blur()
+	}
+
+	const focusInput = () => {
+		console.log('键盘显示')
+		editorRef.current?.quill.enable(true)
+		editorRef.current?.quill.focus()
+	}
+
+	const blurInput = () => {
+		console.log('键盘隐藏')
+		editorRef.current?.quill.enable(false)
+		editorRef.current?.quill.blur()
 	}
 
 	// 阅读所有
@@ -516,8 +397,9 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	// 关闭更多功能
 	const closeToolBar = () => {
-		setMoreType('')
+		setMoreType(MessageMore.TEXT)
 		platformName === 'web' && setToolbarBottom(keyboardHeight)
+		blurInput()
 	}
 
 	// 判断是否滚动到底部
@@ -632,7 +514,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 								<Button fill className="w-full h-9 mx-2 animate__animated animate__zoomIn" round>
 									{$t('长按说话')}
 								</Button>
-								<Link onClick={() => showMore('more')}>
+								<Link onClick={() => showMore(MessageMore.TEXT)}>
 									<PlusCircle className="text-4xl text-gray-500 mr-2" />
 								</Link>
 							</div>
@@ -644,10 +526,13 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 								)}
 							>
 								<div className={clsx('flex-1 rounded pl-2 max-w-[calc(100%-150px)]')}>
-									<div className="py-2 bg-bgSecondary rounded w-full flex items-center">
+									<div
+										className="py-2 bg-bgSecondary rounded w-full flex items-center"
+										onClick={focusInput}
+									>
 										<ToolEditor
 											ref={editorRef}
-											readonly={false}
+											// readonly={false}
 											placeholder={$t('请输入内容')}
 											id={receiver_id}
 											is_group={is_group}
@@ -679,10 +564,17 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 									)}
 								</div>
 								<div className="flex items-center px-2 w-[150px]">
-									<Link onClick={() => showMore('emojis')}>
-										<FaceSmiling className="text-4xl text-gray-500 mr-2" />
-									</Link>
-									<Link onClick={() => showMore('more')}>
+									{moreType === MessageMore.EMOJI ? (
+										<Link onClick={() => showMore(MessageMore.TEXT)}>
+											<KeyboardIcon className="text-4xl text-gray-500 mr-2" />
+										</Link>
+									) : (
+										<Link onClick={() => showMore(MessageMore.EMOJI)}>
+											<FaceSmiling className="text-4xl text-gray-500 mr-2" />
+										</Link>
+									)}
+
+									<Link onClick={() => showMore(MessageMore.OTHER)}>
 										<PlusCircle className="text-4xl text-gray-500 mr-2" />
 									</Link>
 
@@ -709,10 +601,9 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						style={{ height: keyboardHeight + 'px' }}
 						ref={moreRef}
 					>
-						{moreType === 'emojis' ? (
-							<Emojis onSelectEmojis={onSelectEmojis} />
-						) : (
-							!is_system && <ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />
+						{moreType === MessageMore.EMOJI && <Emojis onSelectEmojis={onSelectEmojis} />}
+						{moreType === MessageMore.OTHER && !is_system && (
+							<ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />
 						)}
 					</div>
 				</div>

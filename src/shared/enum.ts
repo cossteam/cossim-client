@@ -69,7 +69,9 @@ export enum TOOLTIP_TYPE {
 	/** 标记 */
 	MARK = 'mark',
 	/** 无操作 */
-	NONE = 'none'
+	NONE = 'none',
+	/** 设置为群公告 */
+	NOTICE = 'notice'
 }
 
 /** 平台 */
@@ -249,4 +251,14 @@ export enum GroupApplyStatus {
 	INVITE_SENDER = 3,
 	/** 邀请接收者 */
 	INVITE_RECEIVER = 4
+}
+
+/** 消息页表情和更多切换 */
+export enum MessageMore {
+	/** 文本 */
+	TEXT = 0,
+	/** 表情 */
+	EMOJI = 1,
+	/** 更多 */
+	OTHER = 2
 }
