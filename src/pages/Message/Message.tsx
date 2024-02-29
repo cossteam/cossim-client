@@ -213,10 +213,13 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	// 键盘弹起
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(300)
 	// 控制工具栏的显示
-	useClickOutside(toolbarRef, () => closeToolBar())
+	useClickOutside(toolbarRef, () => {
+		blurInput()
+		closeToolBar()
+	})
 	// 设备信息
 	const [platformName, setPlatformName] = useState<string>('web')
-	
+
 	const [isWeb, setIsWeb] = useState<boolean>(true)
 
 	// 群公告
@@ -296,7 +299,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			quill.root.addEventListener('focus', () => {
 				console.log('聚焦事件')
 				BlockRef.current.el!.style.paddingBottom = 56 + 'px'
-				// closeToolBar()
+				closeToolBar()
 				// requestAnimationFrame(() => {
 				// 	// quill.readonly = false
 				// 	// if (!moreType) {
@@ -373,6 +376,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	const focusInput = () => {
 		console.log('键盘显示')
+		if (moreType !== MessageMore.TEXT) return
 		editorRef.current?.quill.enable(true)
 		editorRef.current?.quill.focus()
 	}
@@ -399,7 +403,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const closeToolBar = () => {
 		setMoreType(MessageMore.TEXT)
 		platformName === 'web' && setToolbarBottom(keyboardHeight)
-		blurInput()
+		// blurInput()
 	}
 
 	// 判断是否滚动到底部
