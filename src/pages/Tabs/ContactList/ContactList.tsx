@@ -1,5 +1,5 @@
 import { List, ListGroup, ListItem, Navbar, Page, Searchbar, Subnavbar } from 'framework7-react'
-import { Person2Alt, PersonBadgePlusFill, PersonBadgeMinusFill } from 'framework7-icons/react'
+import { Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 
 import { $t, USER_ID, arrayToGroups, groupsToArray } from '@/shared'
 import RelationService from '@/api/relation'
@@ -60,7 +60,7 @@ const ContactList: React.FC<RouterProps> = () => {
 		})
 	}
 
-	const onPageTabShow = async (done: ((...args: any[]) => void) | undefined) => {
+	const onPageTabShow = async () => {
 		try {
 			await updateContactInit()
 			// 获取群聊消息
@@ -84,9 +84,14 @@ const ContactList: React.FC<RouterProps> = () => {
 		} catch (error) {
 			console.error('获取好友列表出错', error)
 		} finally {
-			done && done()
 			await updateContact()
 		}
+	}
+
+	// 刷新
+	const onRefresh = async (done: any) => {
+		await onPageTabShow()
+		done()
 	}
 
 	useEffect(() => {
@@ -97,7 +102,7 @@ const ContactList: React.FC<RouterProps> = () => {
 	}, [is_contacts_update])
 
 	return (
-		<Page ptr onPageTabShow={onPageTabShow} onPtrRefresh={onPageTabShow}>
+		<Page ptr onPageTabShow={onPageTabShow} onPtrRefresh={onRefresh}>
 			<Navbar title={$t('联系人')} className="hidden-navbar-bg bg-bgPrimary">
 				<Subnavbar inner={false}>
 					<Searchbar
@@ -124,12 +129,12 @@ const ContactList: React.FC<RouterProps> = () => {
 						{$t('群聊')}
 					</span>
 				</ListItem>
-				<ListItem>
+				{/* <ListItem>
 					<PersonBadgeMinusFill slot="media" className="text-red-400 text-2xl" />
 					<span slot="title" className="text-red-400">
 						{$t('黑名单')}
 					</span>
-				</ListItem>
+				</ListItem> */}
 
 				{Object.keys(contact).map((groupKey: any) => (
 					<ListGroup key={groupKey}>

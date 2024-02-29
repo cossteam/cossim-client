@@ -78,7 +78,7 @@ const DialogList: React.FC<RouterProps> = () => {
 	const [chats, setChats] = useState<any[]>(dialogs)
 
 	// 获取对话列表
-	const getDialogList = async (done?: ((...args: any[]) => void) | undefined) => {
+	const getDialogList = async () => {
 		try {
 			// 获取落后的消息
 			await getAfterMessage()
@@ -106,9 +106,13 @@ const DialogList: React.FC<RouterProps> = () => {
 			})
 		} catch {
 			console.log('错误')
-		} finally {
-			done && done()
 		}
+	}
+
+	// 刷新
+	const onRefresh = async (done: any) => {
+		await getDialogList()
+		done()
 	}
 
 	// 置顶对话
@@ -141,7 +145,7 @@ const DialogList: React.FC<RouterProps> = () => {
 			className="coss_dialog"
 			onPageTabShow={getDialogList}
 			onPageBeforeIn={getDialogList}
-			onPtrRefresh={getDialogList}
+			onPtrRefresh={onRefresh}
 		>
 			<Navbar title="COSS" className="hidden-navbar-bg bg-bgPrimary">
 				<NavRight>

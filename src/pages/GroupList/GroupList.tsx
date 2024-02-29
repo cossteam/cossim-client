@@ -1,17 +1,26 @@
 import GroupService from '@/api/group'
-import { $t, USER_ID } from '@/shared'
-import { getCookie } from '@/utils/cookie'
-import { List, ListGroup, ListItem, NavTitle, Navbar, Page } from 'framework7-react'
-import { useEffect, useState } from 'react'
+import { $t } from '@/shared'
+import { useAsyncEffect } from '@reactuses/core'
+import { List, ListGroup, ListItem, NavTitle, Navbar, Page, f7 } from 'framework7-react'
+import { useState } from 'react'
 
 const GroupListList: React.FC<RouterProps> = () => {
-	const user_id = getCookie(USER_ID) || ''
 	const [groups, setGroups] = useState({})
-	useEffect(() => {
-		GroupService.groupListApi().then(({ code, data }) => {
-			code === 200 && setGroups(data)
-		})
-	}, [])
+	useAsyncEffect(
+		async () => {
+			try {
+				f7.dialog.preloader($t('获取中...'))
+				const { code, data } = await GroupService.groupListApi()
+				code === 200 && setGroups(data)
+			} catch (error: any) {
+				f7.dialog.alert($t(error?.message || '获取群列表失败...'))
+			} finally {
+				f7.dialog.close()
+			}
+		},
+		() => {},
+		[]
+	)
 
 	return (
 		<Page className="group-page" noToolbar messagesContent>
