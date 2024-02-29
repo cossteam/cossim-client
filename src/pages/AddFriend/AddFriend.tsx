@@ -24,7 +24,10 @@ const AddFriend: React.FC<RouterProps> = ({ f7router }) => {
 
 			const { data } = await UserService.searchUserApi({ email: keyWord })
 
-			if (!data) return f7.dialog.alert($t('搜索用户不存在'))
+			if (!data) {
+				f7.dialog.alert($t('搜索用户不存在'))
+				return
+			}
 			f7router.navigate(`/personal_detail/${data.user_id}/`)
 		} catch (error) {
 			console.error('搜索用户失败', error)
@@ -43,7 +46,7 @@ const AddFriend: React.FC<RouterProps> = ({ f7router }) => {
 						disableButtonText={$t('取消')}
 						onChange={(e) => setKeyword(e.target.value)}
 						onClickClear={() => setKeyword('')}
-						onClickDisable={() => setKeyword('')}
+						onClickDisable={() => f7router.back()}
 					/>
 				</Subnavbar>
 			</Navbar>

@@ -13,20 +13,27 @@ interface ReadEditorProps {
 const ReadEditor: React.FC<ReadEditorProps> = (props) => {
 	const ReadEditorRef = useRef<HTMLDivElement | null>(null)
 
+	console.log('props', props.content)
+
 	useEffect(() => {
 		if (!props.content || !ReadEditorRef.current) return
 
 		let content = DOMPurify.sanitize(props.content)
+		// let content = props.content
 
-		if (props.replyContent)
-			content =
+		// console.log("content",content);
+
+		if (props.replyContent) {
+			const newContent =
 				`<blockquote class="read-editor-reply">
                     <p class="read-editor-reply-name">${props.replyName}</p>
                     <p>${props.replyContent}</p>
                 </blockquote>` + content
+			content = newContent
+		}
 
 		ReadEditorRef.current.insertAdjacentHTML('beforeend', content)
-	}, [props.content])
+	}, [])
 
 	return <div ref={ReadEditorRef} className={clsx('read-editor px-2', props.className)} />
 }

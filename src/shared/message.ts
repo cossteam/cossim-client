@@ -237,3 +237,19 @@ export const hasImageHtml = (html: string) => {
 export const scroll = (element: HTMLElement, isSmooth: boolean = false) => {
 	element.scrollTo({ top: element.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
 }
+
+/**
+ * 比对时间，对比出最新时间的群公告
+ *
+ * @param {Array} data  	群公告列表
+ * @returns
+ */
+export const getLatestGroupAnnouncement = (data: any) => {
+	let result = null
+	for (const item of data) {
+		if (!result || result.create_at < item.create_at) {
+			result = item
+		}
+	}
+	return result
+}

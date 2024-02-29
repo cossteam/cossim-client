@@ -15,7 +15,16 @@ import { useClipboard } from '@reactuses/core'
 
 import './message.scss'
 import { useMessageStore } from '@/stores/message'
-import { $t, TOOLTIP_TYPE, MESSAGE_TYPE, isMe, hasImageHtml, scroll, MessageMore } from '@/shared'
+import {
+	$t,
+	TOOLTIP_TYPE,
+	MESSAGE_TYPE,
+	isMe,
+	hasImageHtml,
+	scroll,
+	MessageMore,
+	getLatestGroupAnnouncement
+} from '@/shared'
 import Chat from '@/components/Message/Chat'
 import { isWebDevice } from '@/utils'
 import clsx from 'clsx'
@@ -64,7 +73,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		const navbarHeight = navbarRef.current.el!.offsetHeight || 56
 		const subnavbarHeight = subnavbarRef.current.el?.offsetHeight || 45
 		const toolbarHeight = toolbarRef.current!.offsetHeight || 56
-
 		const totalHeight = navbarHeight + subnavbarHeight + toolbarHeight
 		BlockRef.current!.el!.style.minHeight = `calc(100vh - ${totalHeight}px)`
 	}
@@ -432,7 +440,9 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			className="coss_message transition-all"
 			onPageInit={onPageInit}
 			ref={pageRef}
-			onPageBeforeOut={() => updateChat(true)}
+			onPageBeforeOut={() =>{  
+				msgStore.clearMessages()
+				updateChat(true) }}
 		>
 			<Navbar
 				title={dialog_name}
@@ -462,8 +472,14 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				{is_group && groupAnnouncement && (
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
 						<div className="w-full h-full flex justify-center items-center">
-							<div className="w-full py-1 bg-bgPrimary rounded-lg px-4">
-								<p>1</p>
+							<div className="w-full py-1 bg-bgPrimary rounded-lg px-4 relative">
+								<p className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[80%] text-textSecondary">
+									{getLatestGroupAnnouncement(groupAnnouncement).content}
+								</p>
+								<Xmark
+									className="text-textTertiary absolute right-3 text-sm top-0 bottom-0 m-auto"
+									onClick={() => setGroupAnnouncement(null)}
+								/>
 							</div>
 						</div>
 					</Subnavbar>
@@ -471,7 +487,11 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			</Navbar>
 
 			{/* pt-5 pb-16 */}
-			<Block className="my-0 px-0 pt-0 pb-16 transition-all duration-300 ease-linear" ref={BlockRef}>
+			<Block
+				className={clsx('my-0 px-0 pt-5 pb-16 transition-all duration-300 ease-linear')}
+				ref={BlockRef}
+				style={{ paddingTop: is_group && groupAnnouncement ? '40px' : '20px' }}
+			>
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (
 						<ListItem
@@ -612,10 +632,13 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						style={{ height: keyboardHeight + 'px' }}
 						ref={moreRef}
 					>
-						{moreType === MessageMore.EMOJI && <Emojis onSelectEmojis={onSelectEmojis} />}
-						{moreType === MessageMore.OTHER && !is_system && (
+						<Emojis
+							onSelectEmojis={onSelectEmojis}
+							className={moreType === MessageMore.EMOJI ? '' : 'hidden'}
+						/>
+						<div className={clsx('w-full', moreType === MessageMore.OTHER ? '' : 'hidden')}>
 							<ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />
-						)}
+						</div>
 					</div>
 				</div>
 

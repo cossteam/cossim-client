@@ -46,7 +46,7 @@ const routes: Router.RouteParameters[] = [
 	},
 	{
 		path: '/message/:id/:dialog_id/',
-		// asyncComponent: () => import('@/pages/Message/Message'),
+		// asyncComponent: () => import('@/pages/Message/Message')
 		// keepAlive: true,
 		component: Message
 	},
@@ -80,7 +80,7 @@ const routes: Router.RouteParameters[] = [
 	},
 	{
 		path: '/group_info/:group_id/',
-		asyncComponent: () => import('@/pages/GroupInfo/GroupInfo'),
+		asyncComponent: () => import('@/pages/GroupInfo/GroupInfo')
 	},
 	{
 		path: '/group_info/:group_id/member/:list_type',

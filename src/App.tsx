@@ -78,7 +78,7 @@ function App() {
 				case SocketEvent.PrivateChatsEvent:
 				case SocketEvent.GroupChatsEvent:
 				case SocketEvent.SelfChatsEvent:
-					handlerMessageSocket(data, msgStore.updateMessage, stateStore)
+					handlerMessageSocket(data, msgStore, stateStore)
 					break
 				case SocketEvent.ApplyListEvent:
 					handlerRequestSocket(data)

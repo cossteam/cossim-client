@@ -1,20 +1,22 @@
 .read-editor {
-    font-size: 1rem;
+    @apply text-[1rem] overflow-hidden;
 
     .read-editor-reply {
-        border-left: 3px solid #fff;
-        padding: 0 0.5rem;
-        margin-bottom: 0.5rem;
+        @apply border-l-[2px] border-l-bgPrimary px-[0.5rem] mb-[0.5rem]  block max-w-[200px] overflow-hidden;
 
         p {
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
+            @apply text-ellipsis whitespace-nowrap overflow-hidden w-full;
         }
 
         .read-editor-reply-name {
             font-weight: bold;
         }
+    }
+}
+
+.read-editor-no-slef {
+    .read-editor-reply {
+        @apply border-l-primary;
     }
 }
 

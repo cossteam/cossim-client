@@ -13,13 +13,17 @@ const device_id = getCookie(DEVICE_ID) ?? ''
  * 处理私聊接收的 socket 的消息
  * @param {*} data  socket 消息
  */
-export const handlerMessageSocket = async (data: any, updateMessage: (msg: any) => void, stateStore: StateStore) => {
+export const handlerMessageSocket = async (data: any, msgStore: MessageStore, stateStore: StateStore) => {
 	try {
 		const message = data.data
 		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
 		if (user_id === message.sender_id && data.driverId === device_id) return
+
+		// 防止重复添加消息
+		const index = msgStore.messages.findIndex((item: any) => item.msg_id === message.msg_id)
+		if (index !== -1) return
 
 		const msg = {
 			dialog_id: message?.dialog_id,
@@ -43,7 +47,7 @@ export const handlerMessageSocket = async (data: any, updateMessage: (msg: any) 
 			is_tips: false
 		}
 
-		updateMessage(msg)
+		msgStore.updateMessage(msg)
 		await UserStore.add(UserStore.tables.messages, msg)
 
 		// 更新会话列表

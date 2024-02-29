@@ -104,7 +104,12 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 								readonly
 							>
 							</ToolEditor> */}
-							<ReadEditor content={msg?.content} />
+							<ReadEditor
+								content={msg?.content}
+								replyContent={reply?.content}
+								replyName={reply?.sender_info?.name}
+								className={clsx(is_self ? '' : 'read-editor-no-slef')}
+							/>
 						</div>
 					</LongPressButton>
 
@@ -126,7 +131,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 					</div>
 
 					{/* 回复消息 */}
-					{reply && (
+					{/* {reply && (
 						<div
 							className={clsx(
 								'mt-2 px-2 bg-gray-200 max-w-[50%] rounded text-[0.75rem] flex items-center text-gray-500 text-ellipsis line-clamp-1 overflow-hidden break-all active:bg-opacity-50"',
@@ -136,14 +141,9 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							<div className="whitespace-nowrap text-[0.75rem] w-fit text-textTertiary">
 								{reply?.sender_info?.nickname}:
 							</div>
-							{/* <ToolEditor
-								className="reply_editor empty:before:text-transparent"
-								initValue={reply?.content}
-								readonly
-							/> */}
 							<ReadEditor content={reply?.content} />
 						</div>
-					)}
+					)} */}
 				</div>
 			</div>
 		</div>
