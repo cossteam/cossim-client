@@ -191,8 +191,7 @@ const DialogList: React.FC<RouterProps> = () => {
 							slot="media"
 							src={`${item?.dialog_avatar}`}
 							loading="lazy"
-							alt={item?.dialog_name}
-							className="w-12 h-12 rounded-full object-cover"
+							className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"
 						/>
 						<div slot="text" className="max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
 							{/* {item?.last_message?.content} */}

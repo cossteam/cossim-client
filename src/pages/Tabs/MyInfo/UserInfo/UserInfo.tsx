@@ -62,7 +62,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 			<List className="coss_list" strong>
 				<ListItem link title="头像">
 					<div slot="after">
-						<img className="w-12 h-12 rounded-full" src={userInfo?.avatar} alt="" />
+						<img className="w-12 h-12 rounded-full bg-black bg-opacity-10" src={userInfo?.avatar} alt="" />
 					</div>
 				</ListItem>
 				{/* <ListItem
