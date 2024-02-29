@@ -5,14 +5,13 @@ import { isEqual } from 'lodash-es'
 import { $t, MessageBurnAfterRead, MessageNoDisturb, RelationStatus, USER_ID } from '@/shared'
 import UserStore from '@/db/user'
 import UserService from '@/api/user'
-import './Profile.scss'
 import { useCallStore } from '@/stores/call'
-// import { useCallStore } from '@/stores/call'
 import RelationService from '@/api/relation'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
 import { getCookie } from '@/utils/cookie'
 import { hasCamera, hasMike } from '@/utils/media'
+import './Profile.scss'
 
 const userId = getCookie(USER_ID) || ''
 
@@ -21,17 +20,13 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const is_from_message_page = f7route.query.from_page === 'message'
 
 	const pageRef = useRef<{ el: HTMLDivElement | null }>({ el: null })
-	const profileAvatarRef = useRef<HTMLDivElement | null>(null)
 
 	const [userInfo, setUserInfo] = useState<any>({})
 
 	const { updateContacts } = useStateStore()
 	const { clearMessages } = useMessageStore()
 
-	// 页面安装时将页面滚动到头像大小的一半
 	const onPageInit = async () => {
-		const profileAvatarHeight = profileAvatarRef.current!.offsetHeight
-		pageRef.current.el!.querySelector('.page-content')!.scrollTop = profileAvatarHeight / 2
 		await updateUserInfo(true)
 	}
 
@@ -210,61 +205,62 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	return (
 		<Page ref={pageRef} className="profile-page bg-bgTertiary" noToolbar onPageInit={onPageInit}>
 			<Navbar title={$t('用户信息')} backLink className="bg-bgPrimary hidden-navbar-bg" />
-			<div className="profile-avatar-block" ref={profileAvatarRef}>
+			{/* <div className="profile-avatar-block" ref={profileAvatarRef}>
 				<img src={userInfo?.avatar} alt="" />
-			</div>
-			<div className="profile-content bg-gray-100">
-				<List strong outline dividers mediaList className="no-margin-top m-0 mb-3 bg-white">
-					<ListItem title={userInfo?.name} text={userInfo?.nickname}>
-						<div slot="after" className="profile-actions-links">
-							{!is_from_message_page && (
-								<Link
-									iconF7="chat_bubble_fill"
-									href={`/message/${f7route.params.id}/${userInfo?.dialog_id}/?is_group=false&dialog_name=${userInfo?.nickname}`}
-								/>
-							)}
-							<Link iconF7="videocam_fill" onClick={() => callUser(true)} />
-							<Link iconF7="phone_fill" onClick={() => callUser(false)} />
-						</div>
-					</ListItem>
-					<ListItem subtitle={userInfo?.signature} text={userInfo?.email} />
-				</List>
+			</div> */}
 
-				<List strong outline dividers className="bg-white m-0 mb-3">
-					<ListItem title={$t('阅后即焚')}>
-						<Toggle
-							slot="after"
-							checked={userInfo?.preferences?.open_burn_after_reading === MessageBurnAfterRead.YES}
-							onChange={burnAfterRead}
+			<div className="mb-3 p-4 bg-white flex flex-col justify-center items-center">
+				<img className="mb-2 size-20 rounded-full bg-black bg-opacity-10" src={userInfo?.avatar} alt="" />
+				<div className="mb-2 flex flex-col items-center">
+					<span className="">{`@${userInfo?.nickname || ''}`}</span>
+					<span className="">{`${userInfo?.email || ''}`}</span>
+				</div>
+				<div className="profile-actions-links">
+					{!is_from_message_page && (
+						<Link
+							iconF7="chat_bubble_fill"
+							href={`/message/${f7route.params.id}/${userInfo?.dialog_id}/?is_group=false&dialog_name=${userInfo?.nickname}`}
 						/>
-					</ListItem>
-					<ListItem title={$t('消息免打扰')}>
-						<Toggle
-							slot="after"
-							checked={userInfo?.preferences?.silent_notification === MessageNoDisturb.YES}
-							onChange={messageDisturb}
-						/>
-					</ListItem>
-					{/* TODO: */}
-					{/* <ListItem title={$t('显示对话')}>
+					)}
+					<Link iconF7="videocam_fill" onClick={() => callUser(true)} />
+					<Link iconF7="phone_fill" onClick={() => callUser(false)} />
+				</div>
+			</div>
+
+			<List strong outline dividers className="bg-white m-0 mb-3">
+				<ListItem title={$t('阅后即焚')}>
+					<Toggle
+						slot="after"
+						checked={userInfo?.preferences?.open_burn_after_reading === MessageBurnAfterRead.YES}
+						onChange={burnAfterRead}
+					/>
+				</ListItem>
+				<ListItem title={$t('消息免打扰')}>
+					<Toggle
+						slot="after"
+						checked={userInfo?.preferences?.silent_notification === MessageNoDisturb.YES}
+						onChange={messageDisturb}
+					/>
+				</ListItem>
+				{/* TODO: */}
+				{/* <ListItem title={$t('显示对话')}>
 						<Toggle slot="after" checked={false} onChange={showDialog} />
 					</ListItem> */}
-					<ListItem title={$t('添加到黑名单')}>
-						<Toggle
-							slot="after"
-							checked={userInfo?.relation_status === RelationStatus.BLACK}
-							onChange={blackList}
-						/>
-					</ListItem>
-				</List>
+				<ListItem title={$t('添加到黑名单')}>
+					<Toggle
+						slot="after"
+						checked={userInfo?.relation_status === RelationStatus.BLACK}
+						onChange={blackList}
+					/>
+				</ListItem>
+			</List>
 
-				<List strong outline dividers className="bg-white m-0 mb-3">
-					<ListButton color="red" onClick={clearAllmessage}>
-						{$t('清除聊天记录')}
-					</ListButton>
-					<ListButton color="red" title={$t('删除好友')} onClick={deleteFriend}></ListButton>
-				</List>
-			</div>
+			<List strong outline dividers className="bg-white m-0 mb-3">
+				<ListButton color="red" onClick={clearAllmessage}>
+					{$t('清除聊天记录')}
+				</ListButton>
+				<ListButton color="red" title={$t('删除好友')} onClick={deleteFriend}></ListButton>
+			</List>
 		</Page>
 	)
 }
