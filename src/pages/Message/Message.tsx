@@ -17,7 +17,7 @@ import './message.scss'
 import { useMessageStore } from '@/stores/message'
 import { $t, TOOLTIP_TYPE, MESSAGE_TYPE, isMe, hasImageHtml, scroll, MessageMore } from '@/shared'
 import Chat from '@/components/Message/Chat'
-import { isWebDevice, platform } from '@/utils'
+import { isWebDevice } from '@/utils'
 import clsx from 'clsx'
 import { useToast } from '@/hooks/useToast'
 import Contact from '@/components/Contact/Contact'
@@ -29,7 +29,10 @@ import { useStateStore } from '@/stores/state'
 import Quill from 'quill'
 import ToolBarMore from '@/components/Message/ToolBarMore'
 import { KeyboardIcon } from '@/components/Icon/Icon'
-import RelationService from '@/api/relation'
+import { Delta } from 'quill/core'
+import { EmitterSource } from 'quill/core/emitter'
+// import MsgService from '@/api/msg'
+// import RelationService from '@/api/relation'
 
 const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
@@ -64,11 +67,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 		const totalHeight = navbarHeight + subnavbarHeight + toolbarHeight
 		BlockRef.current!.el!.style.minHeight = `calc(100vh - ${totalHeight}px)`
-
-		// 设置内容高度
-		// setPageHeight(document.documentElement.clientHeight)
-		// const data = await MsgService.getUserMessageListApi({ user_id: receiver_id, page_num: 1, page_size: 10 })
-		// console.log('data', data)
 	}
 
 	// 当前提示选择的消息类型
@@ -97,9 +95,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				break
 			case TOOLTIP_TYPE.MARK:
 				msg && selectEvent.mark(msg)
-				break
-			case TOOLTIP_TYPE.NOTICE:
-				msg && selectEvent.notice(msg)
 				break
 		}
 	}
@@ -167,17 +162,17 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			setSelectType(TOOLTIP_TYPE.NONE)
 			setSelect([])
 			setSelectMsgs([])
-		},
-		notice: async (msg: any) => {
-			console.log('设置群公告', msg)
-			const { data } = await RelationService.createGroupNoticeApi({
-				group_id: msg?.group_id,
-				content: msg?.content,
-				title: ''
-			})
-
-			console.log('data', data)
 		}
+		// notice: async (msg: any) => {
+		// 	console.log('设置群公告', msg)
+		// 	const { data } = await RelationService.createGroupNoticeApi({
+		// 		group_id: msg?.group_id,
+		// 		content: msg?.content,
+		// 		title: ''
+		// 	})
+
+		// 	console.log('data', data)
+		// }
 	}
 	// 多选时选择的消息
 	const onSelectChange = (e: any, msg: any) => {
@@ -205,8 +200,10 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 		if (type === MessageMore.TEXT) {
 			closeToolBar()
+			BlockRef.current.el!.style.transitionDuration = '0.3s'
+			BlockRef.current.el!.style.paddingBottom = 56 + 'px'
 			setTimeout(() => {
-				focusInput()
+				editorRef.current!.quill.focus()
 			}, 300)
 			return
 		} else {
@@ -228,11 +225,13 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(300)
 	// 控制工具栏的显示
 	useClickOutside(toolbarRef, () => {
-		blurInput()
+		// blurInput()
+		// setEmojs(false)
+		// emojis = false
 		closeToolBar()
 	})
 	// 设备信息
-	const [platformName, setPlatformName] = useState<string>('web')
+	// const [platformName, setPlatformName] = useState<string>('web')
 
 	const [isWeb, setIsWeb] = useState<boolean>(true)
 
@@ -269,60 +268,66 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 			// 判断设备
 			setIsWeb(await isWebDevice())
-
 			// 手机端监听键盘
-			const platformName = await platform()
-			setPlatformName(platformName)
-
+			// const platformName = await platform()
+			// setPlatformName(platformName)
 			if (!isWeb) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
 					setKeyboardHeight(info.keyboardHeight - 15)
-					setMoreType(MessageMore.TEXT)
-					setToolbarBottom(keyboardHeight)
+					// setMoreType(MessageMore.TEXT)
+					// setToolbarBottom(keyboardHeight)
 				})
 				// Keyboard.addListener('keyboardDidShow', () => {
 				// 	setToolbarBottom(keyboardHeight)
 				// })
-				Keyboard.addListener('keyboardDidHide', () => {
-					// if (!moreType) {
-					// 	requestAnimationFrame(() => {
-					// 		setTimeout(() => {
-					// 			setToolbarBottom(0)
-					// 		}, 0)
-					// 	})
-					// } else {
-					// 	setToolbarBottom(0)
-					// }
-					// BlockRef.current.el!.style.paddingBottom = 56 + 'px'
-				})
+				// Keyboard.addListener('keyboardDidHide', () => {
+				// if (!moreType) {
+				// 	requestAnimationFrame(() => {
+				// 		setTimeout(() => {
+				// 			setToolbarBottom(0)
+				// 		}, 0)
+				// 	})
+				// } else {
+				// 	setToolbarBottom(0)
+				// }
+				// BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+				// })
 			}
 
 			const quill = editorRef.current!.quill
 
+			let eventSources: EmitterSource = Quill.sources.API
+
 			/**
 			 * @description 编辑器变化
 			 */
-			quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
-				if (type !== Quill.events.SELECTION_CHANGE) {
-					setShowBtn(quill.getLength() > 1)
+			quill.on(
+				Quill.events.EDITOR_CHANGE,
+				(type: string, _delta: Delta, _oldDelta: Delta, source: EmitterSource) => {
+					if (type !== Quill.events.SELECTION_CHANGE) {
+						setShowBtn(quill.getLength() > 1)
+					}
+					eventSources = source
 				}
-			})
+			)
 
-			// 自定义聚焦事件
-			// TODO：修复键盘弹起
+			/**
+			 * @description 聚焦时需要延时，并把底部内容收起
+			 */
 			quill.root.addEventListener('focus', () => {
-				console.log('聚焦事件')
-				BlockRef.current.el!.style.paddingBottom = 56 + 'px'
-				closeToolBar()
-				// requestAnimationFrame(() => {
-				// 	// quill.readonly = false
-				// 	// if (!moreType) {
-				// 	// 	setTimeout(() => engine.focus(), 300)
-				// 	// } else {
-				// 	// 	setTimeout(() => engine.focus(), 0)
-				// 	// 	return
-				// 	// }
-				// })
+				setTimeout(() => {
+					if (eventSources === Quill.sources.API) return
+
+					BlockRef.current.el!.style.transitionDuration = '0.3s'
+					BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+					closeToolBar()
+				}, 0)
+
+				if (!isWeb && isScrollEnd()) {
+					BlockRef.current.el!.style.transitionDuration = '0s'
+					BlockRef.current.el!.style.paddingBottom = keyboardHeight + 56 + 'px'
+					scroll(contentRef.current!, true)
+				}
 			})
 		},
 		() => {},
@@ -332,7 +337,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const sendMessage = async () => {
 		const isEnd = isScrollEnd()
 		const quill = editorRef.current!.quill
-		// const content = quill.getSemanticHTML()
 
 		let type = msgType
 		const content = quill.getSemanticHTML()
@@ -379,23 +383,23 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		editorRef.current!.quill.insertText(
 			editorRef.current!.quill.getSelection()?.index || 0,
 			emojis.native,
-			Quill.sources.USER
+			Quill.sources.API
 		)
 		editorRef.current!.quill.blur()
 	}
 
-	const focusInput = () => {
-		console.log('键盘显示')
-		if (moreType !== MessageMore.TEXT) return
-		editorRef.current?.quill.enable(true)
-		editorRef.current?.quill.focus()
-	}
+	// const focusInput = () => {
+	// 	console.log('键盘显示')
+	// 	if (moreType !== MessageMore.TEXT) return
+	// 	editorRef.current?.quill.enable(true)
+	// 	editorRef.current?.quill.focus()
+	// }
 
-	const blurInput = () => {
-		console.log('键盘隐藏')
-		editorRef.current?.quill.enable(false)
-		editorRef.current?.quill.blur()
-	}
+	// const blurInput = () => {
+	// 	console.log('键盘隐藏')
+	// 	editorRef.current?.quill.enable(false)
+	// 	editorRef.current?.quill.blur()
+	// }
 
 	// 阅读所有
 	// const readAll = () => {
@@ -412,8 +416,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	// 关闭更多功能
 	const closeToolBar = () => {
 		setMoreType(MessageMore.TEXT)
-		platformName === 'web' && setToolbarBottom(keyboardHeight)
-		// blurInput()
+		setToolbarBottom(keyboardHeight)
 	}
 
 	// 判断是否滚动到底部
@@ -423,9 +426,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - setp
 		)
 	}
-
-	// const listItemRef = useRef<{ el: HTMLDivElement[] }>()
-
 	return (
 		<Page
 			noToolbar
@@ -544,13 +544,10 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 								)}
 							>
 								<div className={clsx('flex-1 rounded pl-2 max-w-[calc(100%-150px)]')}>
-									<div
-										className="py-2 bg-bgSecondary rounded w-full flex items-center"
-										onClick={focusInput}
-									>
+									<div className="py-2 bg-bgSecondary rounded w-full flex items-center">
 										<ToolEditor
 											ref={editorRef}
-											// readonly={false}
+											readonly={false}
 											placeholder={$t('请输入内容')}
 											id={receiver_id}
 											is_group={is_group}
@@ -558,10 +555,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 									</div>
 									{(isReply() || isEdit()) && (
 										<div className="mt-1 bg-bgTertiary relative flex justify-between">
-											{/* <ToolEditor
-												initValue={selectMsgs[0]?.content}
-												className="px-2 py-1 read-editor-1"
-											/> */}
 											<ReadEditor
 												content={selectMsgs[0]?.content}
 												className="reply-read-editor"

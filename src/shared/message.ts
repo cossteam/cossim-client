@@ -170,10 +170,15 @@ export const dillServerInfo = async (user_id: string, userInfo: any) => {
  * @param {number} group_id			当前群聊 id
  * @returns
  */
-export const getMessageFromServer = async (id: string, is_group: boolean) => {
+export const getMessageFromServer = async (
+	id: string,
+	is_group: boolean,
+	page_num: number = 1,
+	page_size: number = 10
+) => {
 	let reslut: any = null
 	try {
-		const params: any = { page_num: 1, page_size: 10 }
+		const params: any = { page_num, page_size }
 
 		if (is_group) params['group_id'] = id
 		else params['user_id'] = id
@@ -222,7 +227,6 @@ export const hasImageHtml = (html: string) => {
 	}
 	return false
 }
-
 
 /**
  * 滚动元素到底部
