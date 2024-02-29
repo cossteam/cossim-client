@@ -68,6 +68,8 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				return
 			}
 			f7.dialog.alert($t(error?.message || '呼叫失败...'))
+		} finally {
+			f7.dialog.close()
 		}
 	}
 
