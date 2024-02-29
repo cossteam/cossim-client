@@ -203,7 +203,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 					</div>
 				</ListItem>
 				{/* <ListItem link title="群二维码"></ListItem> */}
-				<ListItem link={`/group_notice/${GroupId}/`} title="群公告"></ListItem>
+				<ListItem link={`/group_notice/${GroupId}/?identity=${identity}`} title="群公告"></ListItem>
 			</List>
 			<List className="m-0 mb-3 bg-white" strong dividers outline noChevron>
 				<ListItem title="消息免打扰">
