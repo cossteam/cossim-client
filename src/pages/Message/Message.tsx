@@ -29,6 +29,7 @@ import { useStateStore } from '@/stores/state'
 import Quill from 'quill'
 import ToolBarMore from '@/components/Message/ToolBarMore'
 import { KeyboardIcon } from '@/components/Icon/Icon'
+import RelationService from '@/api/relation'
 
 const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
@@ -97,6 +98,9 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			case TOOLTIP_TYPE.MARK:
 				msg && selectEvent.mark(msg)
 				break
+			case TOOLTIP_TYPE.NOTICE:
+				msg && selectEvent.notice(msg)
+				break
 		}
 	}
 
@@ -163,6 +167,16 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			setSelectType(TOOLTIP_TYPE.NONE)
 			setSelect([])
 			setSelectMsgs([])
+		},
+		notice: async (msg: any) => {
+			console.log('设置群公告', msg)
+			const { data } = await RelationService.createGroupNoticeApi({
+				group_id: msg?.group_id,
+				content: msg?.content,
+				title: ''
+			})
+
+			console.log('data', data)
 		}
 	}
 	// 多选时选择的消息
@@ -358,10 +372,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		}
 	}, [messages])
 
-	// useEffect(() => {
-	// 	console.log('dialog', dialog)
-	// }, [dialog])
-
 	// 选择表情
 	const onSelectEmojis = (emojis: any) => {
 		// 先确保编辑器已经聚焦
@@ -451,7 +461,11 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				</NavRight>
 				{is_group && groupAnnouncement && (
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
-						1111
+						<div className="w-full h-full flex justify-center items-center">
+							<div className="w-full py-1 bg-bgPrimary rounded-lg px-4">
+								<p>1</p>
+							</div>
+						</div>
 					</Subnavbar>
 				)}
 			</Navbar>

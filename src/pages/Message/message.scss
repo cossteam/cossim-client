@@ -62,12 +62,22 @@
         background-color: transparent;
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
-        background-color: var(--coss-background-primary);
+        // background-color: var(--coss-background-primary);
         margin-top: 0;
         padding: 0;
-        margin-top: -12px;
+        // margin-top: -12px;
+        font-size: 14px;
+        border-bottom: none;
+        padding-top: 6px;
+        // box-sizing: border-box;
+        height: auto;
+
+        .subnavbar-inner {
+            padding: 0 6px;
+        }
 
         .segmented {
+
             .button {
                 color: var(--coss-text-secondary, #666);
                 padding: 0 !important;
@@ -78,6 +88,10 @@
                 opacity: 0.8;
                 border-radius: 4px;
             }
+        }
+
+        &:after {
+            background: none;
         }
     }
 }
