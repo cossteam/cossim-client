@@ -18,10 +18,10 @@ import { useMessageStore } from '@/stores/message'
 interface ToolTipProps {
 	el: HTMLElement
 	onSelect: (type: TOOLTIP_TYPE, msg_id: number) => void
-	is_group: boolean
+	is_group?: boolean
 }
 
-const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect, is_group = false }) => {
+const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 	const tooltipRef = useRef<HTMLDivElement | null>(null)
 	const triangleRef = useRef<HTMLDivElement | null>(null)
 
@@ -82,16 +82,15 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect, is_group = false }) => 
 			name: TOOLTIP_TYPE.MARK,
 			title: $t('标注'),
 			icon: <Flag className="tooltip__icon" />
-		},
-		is_group
-			? {
-					name: TOOLTIP_TYPE.NOTICE,
-					title: $t('公告'),
-					icon: <Flag className="tooltip__icon" />
-				}
-			: null
+		}
+		// is_group
+		// 	? {
+		// 			name: TOOLTIP_TYPE.NOTICE,
+		// 			title: $t('公告'),
+		// 			icon: <Flag className="tooltip__icon" />
+		// 		}
+		// 	: null
 	])
-
 
 	// 边界控制
 	useEffect(() => {
