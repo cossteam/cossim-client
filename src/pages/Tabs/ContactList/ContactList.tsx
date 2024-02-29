@@ -149,9 +149,9 @@ const ContactList: React.FC<RouterProps> = () => {
 								<span slot="title">{contact?.nickname}</span>
 								<div slot="media" className="w-10 h-10 ">
 									<img
+										className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
 										src={contact?.avatar}
 										alt=""
-										className="w-full h-full object-cover rounded-full"
 									/>
 								</div>
 							</ListItem>

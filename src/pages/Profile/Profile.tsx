@@ -1,4 +1,4 @@
-import { Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react'
+import { Icon, Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react'
 import { useRef, useState } from 'react'
 import { isEqual } from 'lodash-es'
 
@@ -11,7 +11,6 @@ import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
 import { getCookie } from '@/utils/cookie'
 import { hasCamera, hasMike } from '@/utils/media'
-import './Profile.scss'
 
 const userId = getCookie(USER_ID) || ''
 
@@ -205,9 +204,6 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	return (
 		<Page ref={pageRef} className="profile-page bg-bgTertiary" noToolbar onPageInit={onPageInit}>
 			<Navbar title={$t('用户信息')} backLink className="bg-bgPrimary hidden-navbar-bg" />
-			{/* <div className="profile-avatar-block" ref={profileAvatarRef}>
-				<img src={userInfo?.avatar} alt="" />
-			</div> */}
 
 			<div className="mb-3 p-4 bg-white flex flex-col justify-center items-center">
 				<img className="mb-2 size-20 rounded-full bg-black bg-opacity-10" src={userInfo?.avatar} alt="" />
@@ -215,15 +211,55 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					<span className="">{`@${userInfo?.nickname || ''}`}</span>
 					<span className="">{`${userInfo?.email || ''}`}</span>
 				</div>
-				<div className="profile-actions-links">
+				<div className="flex my-4">
 					{!is_from_message_page && (
-						<Link
-							iconF7="chat_bubble_fill"
-							href={`/message/${f7route.params.id}/${userInfo?.dialog_id}/?is_group=false&dialog_name=${userInfo?.nickname}`}
-						/>
+						<div
+							className="size-10 mr-3 flex flex-col justify-center items-center"
+							onClick={() => callUser(true)}
+						>
+							<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
+								<Link
+									iconF7="chat_bubble_fill"
+									iconSize={22}
+									href={`/message/${f7route.params.id}/${userInfo?.dialog_id}/?is_group=false&dialog_name=${userInfo?.nickname}`}
+								/>
+							</div>
+							<span className="text-xs">消息</span>
+						</div>
 					)}
-					<Link iconF7="videocam_fill" onClick={() => callUser(true)} />
-					<Link iconF7="phone_fill" onClick={() => callUser(false)} />
+					<div
+						className="size-10 mr-3 flex flex-col justify-center items-center"
+						onClick={() => callUser(true)}
+					>
+						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
+							<Link iconF7="videocam_fill" iconSize={22} onClick={() => callUser(true)} />
+						</div>
+						<span className="text-xs">视频</span>
+					</div>
+					<div
+						className="size-10 mr-3 flex flex-col justify-center items-center"
+						onClick={() => callUser(true)}
+					>
+						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
+							<Link iconF7="phone_fill" iconSize={22} onClick={() => callUser(false)} />
+						</div>
+						<span className="text-xs">语音</span>
+					</div>
+					<div
+						className="size-10 mr-3 flex flex-col justify-center items-center"
+						onClick={() => callUser(true)}
+					>
+						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
+							<Link iconF7="tag_fill" iconSize={22} onClick={() => {}} />
+						</div>
+						<span className="text-xs">标注</span>
+					</div>
+					<div className="size-10 flex flex-col justify-center items-center" onClick={() => callUser(true)}>
+						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
+							<Link iconF7="phone_fill" iconSize={22} onClick={() => {}} />
+						</div>
+						<span className="text-xs">更多</span>
+					</div>
 				</div>
 			</div>
 

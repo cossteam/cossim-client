@@ -75,9 +75,9 @@ const MyInfo = () => {
 	return (
 		<Page onPageInit={onPageInit} className="bg-bgTertiary coss_info">
 			<Navbar
+				className="bg-bgPrimary hidden-navbar-bg coss_navbar "
 				title={info?.nickname}
 				large
-				className="bg-bgPrimary hidden-navbar-bg coss_navbar"
 				outline={false}
 			/>
 			<List strong mediaList className="coss_list">
@@ -88,7 +88,11 @@ const MyInfo = () => {
 					className="coss_item__button"
 				>
 					<div className="w-12 h-12" slot="media">
-						<img src={info?.avatar} alt="" className="w-full h-full object-cover rounded-full" />
+						<img
+							src={info?.avatar}
+							alt=""
+							className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
+						/>
 					</div>
 					<Qrcode slot="after" className="text-3xl" />
 				</ListItem>
