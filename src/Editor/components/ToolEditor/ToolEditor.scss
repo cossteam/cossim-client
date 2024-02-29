@@ -52,12 +52,19 @@
     }
 
     &.ql-blank::before {
+        content: attr(data-placeholder);
         font-size: 0.9rem;
         left: 10px !important;
         right: auto !important;
         font-style: normal !important;
         top: 1px;
     }
+
+    &.ql-blank:focus:before {
+        content: '';
+    }
+
+
 
     code {
         color: var(--coss-text-primary);
@@ -68,4 +75,3 @@
     }
 
 }
-

@@ -1,6 +1,6 @@
 import type { PrivateChats } from '@/types/db/user-db'
 import clsx from 'clsx'
-import { Exclamationmark, Gobackward, Flag } from 'framework7-icons/react'
+import { Exclamationmark, Flag } from 'framework7-icons/react'
 import { format } from 'timeago.js'
 import { RefObject, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -119,7 +119,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 									<Exclamationmark className="text-red-500" />
 								)}
 
-								{msg?.msg_send_state === MESSAGE_SEND.SEND_FAILED && <Gobackward />}
+								{/* {msg?.msg_send_state === MESSAGE_SEND.SEND_FAILED && <Gobackward />} */}
 							</>
 						)}
 						{msg?.is_label !== 0 && <Flag className="text-primary ml-[2px]" />}

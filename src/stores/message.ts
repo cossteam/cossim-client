@@ -337,7 +337,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 		const params: any = { msg_ids, dialog_id }
 
-		if (!is_group) params['group_id'] = Number(receiver_id)
+		if (is_group) params['group_id'] = Number(receiver_id)
 
 		const { code } = is_group
 			? await MsgService.readGroupMessageApi(params)
@@ -378,7 +378,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			const newMessages = messages.filter((v) => v?.msg_send_state === MESSAGE_SEND.SEND_SUCCESS)
 			const msgFormServer = res?.user_messages?.[0] || res?.group_messages?.[0]
 			const msgFormStore = newMessages?.at(-1)
-
+			
 			console.log('获取服务器上的消息', res, newMessages)
 			if (msgFormServer?.id !== msgFormStore?.msg_id) {
 				console.log('需要加载服务器消息', msgFormServer, msgFormStore)
