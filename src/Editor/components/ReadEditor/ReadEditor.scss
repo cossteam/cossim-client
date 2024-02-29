@@ -1,0 +1,28 @@
+.read-editor {
+    font-size: 1rem;
+
+    .read-editor-reply {
+        border-left: 3px solid #fff;
+        padding: 0 0.5rem;
+        margin-bottom: 0.5rem;
+
+        p {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .read-editor-reply-name {
+            font-weight: bold;
+        }
+    }
+}
+
+.reply-read-editor {
+    font-size: 0.9rem;
+    color: #999;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 80%;
+}

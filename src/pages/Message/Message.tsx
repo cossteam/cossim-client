@@ -26,7 +26,7 @@ import Contact from '@/components/Contact/Contact'
 import Emojis from '@/components/Emojis/Emojis'
 import GroupService from '@/api/group'
 
-import ToolEditor, { ToolEditorMethods } from '@/Editor'
+import ToolEditor, { ToolEditorMethods, ReadEditor } from '@/Editor'
 import { useStateStore } from '@/stores/state'
 import Quill from 'quill'
 import ToolBarMore from '@/components/Message/ToolBarMore'
@@ -129,7 +129,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		type !== TOOLTIP_TYPE.SELECT && setSelectMsgs([msg])
 		setSelectType(type)
 
-		console.log('提示选择', msg_id, type)
+		console.log('提示选择', msg_id, type, msg)
 
 		switch (type) {
 			case TOOLTIP_TYPE.COPY:
@@ -655,9 +655,13 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 									</div>
 									{(isReply() || isEdit()) && (
 										<div className="mt-1 bg-bgTertiary relative flex justify-between">
-											<ToolEditor
+											{/* <ToolEditor
 												initValue={selectMsgs[0]?.content}
 												className="px-2 py-1 read-editor-1"
+											/> */}
+											<ReadEditor
+												content={selectMsgs[0]?.content}
+												className="reply-read-editor"
 											/>
 											<Link
 												className="pr-2"

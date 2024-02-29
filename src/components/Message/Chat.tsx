@@ -9,7 +9,8 @@ import { $t, isMe, MESSAGE_SEND, MESSAGE_TYPE } from '@/shared'
 // import ToolEditor from '@/components/Editor/ToolEditor'
 import ToolTip from './ToolTip'
 import LongPressButton from '@/components/LongPressButton/LongPressButton'
-import ToolEditor from '@/Editor'
+// import ToolEditor from '@/Editor'
+import { ReadEditor } from '@/Editor'
 
 interface ChatProps {
 	msg: PrivateChats
@@ -94,21 +95,14 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							ref={tooltipRef}
 						>
 							{/* <ToolEditor
-								readonly
-								className="select-none text-[1rem]"
-								defaultValue={msg?.content}
-								data-id={msg?.msg_id}
-								data-index={index}
-							/> */}
-							<ToolEditor
 								className="select-none text-[1rem] h-auto empty:before:text-transparent"
 								initValue={msg?.content}
 								data-id={msg?.msg_id}
 								data-index={index}
 								readonly
-								// content={reply?.content ? reply.content : ''}
 							>
-							</ToolEditor>
+							</ToolEditor> */}
+							<ReadEditor content={msg?.content} />
 						</div>
 					</LongPressButton>
 
@@ -140,11 +134,12 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							<div className="whitespace-nowrap text-[0.75rem] w-fit text-textTertiary">
 								{reply?.sender_info?.nickname}:
 							</div>
-							<ToolEditor
+							{/* <ToolEditor
 								className="reply_editor empty:before:text-transparent"
 								initValue={reply?.content}
 								readonly
-							/>
+							/> */}
+							<ReadEditor content={reply?.content} />
 						</div>
 					)}
 				</div>

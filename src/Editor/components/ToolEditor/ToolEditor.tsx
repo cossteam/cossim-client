@@ -3,7 +3,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
 import 'quill/dist/quill.core.css'
 import './ToolEditor.scss'
 import { useFocus } from '@reactuses/core'
-import Quill, { type Data } from '../moudles'
+import Quill, { type Data } from '../../moudles'
 import GroupService from '@/api/group'
 import { useMessageStore } from '@/stores/message'
 
