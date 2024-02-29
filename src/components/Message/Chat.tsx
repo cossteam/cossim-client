@@ -30,11 +30,12 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 	const createTooltip = () => {
 		if (isSelected) return
 		const div = document.createElement('div')
-		createRoot(div).render(<ToolTip onSelect={onSelect} el={tooltipRef.current!} />)
+		createRoot(div).render(<ToolTip onSelect={onSelect} el={tooltipRef.current!} is_group={msg?.group_id !== 0} />)
 		tooltipRef.current!.appendChild(div)
 		return true
 	}
 
+	// 标注信息
 	if (msg?.type === MESSAGE_TYPE.LABEL) {
 		return (
 			<div className="max-w-[70%] w-fit bg-gray-200 px-2 py-[2px] text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap text-[0.75rem] rounded mx-auto text-center cursor-pointer active:bg-opacity-50">
@@ -46,6 +47,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 		)
 	}
 
+	// 错误信息
 	if (msg?.type === MESSAGE_TYPE.ERROR) {
 		return (
 			<div className="max-w-[70%] w-fit bg-gray-200 px-2 py-[2px] flex items-center text-red-500 overflow-hidden text-ellipsis whitespace-nowrap text-[0.75rem] rounded mx-auto text-center cursor-pointer active:bg-opacity-50">

@@ -18,9 +18,10 @@ import { useMessageStore } from '@/stores/message'
 interface ToolTipProps {
 	el: HTMLElement
 	onSelect: (type: TOOLTIP_TYPE, msg_id: number) => void
+	is_group: boolean
 }
 
-const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
+const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect, is_group = false }) => {
 	const tooltipRef = useRef<HTMLDivElement | null>(null)
 	const triangleRef = useRef<HTMLDivElement | null>(null)
 
@@ -46,6 +47,52 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 
 	const [show, setShow] = useState<boolean>(true)
 
+	const [tips, setTips] = useState<any[]>([
+		{
+			name: TOOLTIP_TYPE.COPY,
+			title: $t('复制'),
+			icon: <SquareOnSquare className="tooltip__icon" />
+		},
+		{
+			name: TOOLTIP_TYPE.FORWARD,
+			title: $t('转发'),
+			icon: <ArrowUpRight className="tooltip__icon" />
+		},
+		{
+			name: TOOLTIP_TYPE.EDIT,
+			title: $t('编辑'),
+			icon: <SquarePencil className="tooltip__icon" />
+		},
+		{
+			name: TOOLTIP_TYPE.DELETE,
+			title: $t('删除'),
+			icon: <Trash className="tooltip__icon" />
+		},
+		{
+			name: TOOLTIP_TYPE.SELECT,
+			title: $t('多选'),
+			icon: <TextAlignleft className="tooltip__icon" />
+		},
+		{
+			name: TOOLTIP_TYPE.REPLY,
+			title: $t('回复'),
+			icon: <BubbleLeftBubbleRight className="tooltip__icon" />
+		},
+		{
+			name: TOOLTIP_TYPE.MARK,
+			title: $t('标注'),
+			icon: <Flag className="tooltip__icon" />
+		},
+		is_group
+			? {
+					name: TOOLTIP_TYPE.NOTICE,
+					title: $t('公告'),
+					icon: <Flag className="tooltip__icon" />
+				}
+			: null
+	])
+
+
 	// 边界控制
 	useEffect(() => {
 		if (!el) return
@@ -54,7 +101,9 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		const { id = 0, index = 0, label = 0 } = el.dataset
 		setMsgId(Number(id))
 
-		setTips([...tips.slice(0, -1), { ...tips.at(-1), title: $t(Number(label) === 0 ? '标注' : '取消标注') }])
+		const tip = tips.find((v) => v.name === TOOLTIP_TYPE.MARK)
+		tip.title = $t(Number(label) === 0 ? $t('标注') : $t('取消标注'))
+		setTips(tips)
 
 		const currentEl = lis[Number(index)] as HTMLLIElement
 		currentRef.current = currentEl
@@ -107,49 +156,6 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		}
 	}, [el])
 
-	const [tips, setTips] = useState<any[]>([
-		{
-			name: TOOLTIP_TYPE.COPY,
-			title: $t('复制'),
-			icon: <SquareOnSquare className="tooltip__icon" />
-		},
-		{
-			name: TOOLTIP_TYPE.FORWARD,
-			title: $t('转发'),
-			icon: <ArrowUpRight className="tooltip__icon" />
-		},
-		{
-			name: TOOLTIP_TYPE.EDIT,
-			title: $t('编辑'),
-			icon: <SquarePencil className="tooltip__icon" />
-		},
-		{
-			name: TOOLTIP_TYPE.DELETE,
-			title: $t('删除'),
-			icon: <Trash className="tooltip__icon" />
-		},
-		{
-			name: TOOLTIP_TYPE.SELECT,
-			title: $t('多选'),
-			icon: <TextAlignleft className="tooltip__icon" />
-		},
-		{
-			name: TOOLTIP_TYPE.REPLY,
-			title: $t('回复'),
-			icon: <BubbleLeftBubbleRight className="tooltip__icon" />
-		},
-		{
-			name: TOOLTIP_TYPE.MARK,
-			title: $t('标注'),
-			icon: <Flag className="tooltip__icon" />
-		},
-		{
-			name: TOOLTIP_TYPE.NOTICE,
-			title: $t('设置为群公告'),
-			icon: <Flag className="tooltip__icon" />
-		}
-	])
-
 	useEffect(() => {
 		!visible && (currentRef.current!.style.zIndex = '1')
 	}, [visible])
@@ -193,6 +199,8 @@ const ToolTipView: React.FC<ToolTipViewProps> = ({
 }) => {
 	const { updateTrgger } = useMessageStore()
 
+	console.log('tops', tips)
+
 	const handlerClick = (item: any) => {
 		onSelect(item.name, msgId)
 		setVisible(false)
@@ -202,7 +210,7 @@ const ToolTipView: React.FC<ToolTipViewProps> = ({
 	return (
 		<div
 			className={clsx(
-				'w-[250px] bg-black text-white rounded z-[9999] m-auto left-0 right-0 animate__animated  animate__faster animate__fadeIn',
+				'w-[260px] bg-black text-white rounded z-[9999] m-auto left-0 right-0 animate__animated  animate__faster animate__fadeIn',
 				top ? 'top-[calc(100%+10px)] bottom-auto ' : 'bottom-[calc(100%+10px)] top-auto',
 				className
 			)}
@@ -215,14 +223,14 @@ const ToolTipView: React.FC<ToolTipViewProps> = ({
 				)}
 				ref={triangleRef}
 			/>
-			<div className="h-auto p-4 py-5">
+			<div className="h-auto py-5 px-2">
 				<div className="flex flex-wrap">
 					{tips.map((item, index) => (
-						<div key={item.name} className={clsx('w-1/4 p-2', index > 3 ? 'pb-0' : 'pt-0')}>
+						<div key={item.name} className={clsx('w-1/5 py-3', index > 4 ? 'pb-0' : 'pt-0')}>
 							<Link onClick={() => handlerClick(item)} className="w-full">
 								<div className="flex flex-col items-center justify-center">
 									<div className="mb-[6px]">{item.icon}</div>
-									<span className="text-[0.75rem]">{item.title}</span>
+									<span className="text-[0.75rem] text-center whitespace-nowrap">{item.title}</span>
 								</div>
 							</Link>
 						</div>
