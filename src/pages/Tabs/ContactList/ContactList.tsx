@@ -102,7 +102,7 @@ const ContactList: React.FC<RouterProps> = () => {
 	}, [is_contacts_update])
 
 	return (
-		<Page ptr onPageTabShow={onPageTabShow} onPtrRefresh={onRefresh}>
+		<Page ptr className="coss_contacts bg-gray-200" onPageTabShow={onPageTabShow} onPtrRefresh={onRefresh}>
 			<Navbar title={$t('联系人')} className="hidden-navbar-bg bg-bgPrimary">
 				<Subnavbar inner={false}>
 					<Searchbar
@@ -115,7 +115,7 @@ const ContactList: React.FC<RouterProps> = () => {
 				</Subnavbar>
 			</Navbar>
 
-			<List contactsList noChevron dividers>
+			<List contactsList noChevron dividers className="h-full bg-bgPrimary">
 				<ListItem link="/apply_list/" badge={applyTotal} badgeColor="red">
 					<PersonBadgePlusFill slot="media" className="text-primary text-2xl" />
 					<span slot="title" className="text-color-primary">
