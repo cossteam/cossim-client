@@ -142,7 +142,7 @@ const DialogList: React.FC<RouterProps> = () => {
 	return (
 		<Page
 			ptr
-			className="coss_dialog"
+			className="coss_dialog bg-gray-200"
 			onPageTabShow={getDialogList}
 			onPageBeforeIn={getDialogList}
 			onPtrRefresh={onRefresh}
@@ -177,7 +177,7 @@ const DialogList: React.FC<RouterProps> = () => {
 				</List>
 			</Popover>
 
-			<List contactsList noChevron mediaList className="mb-24">
+			<List contactsList noChevron mediaList className=" h-full bg-bgPrimary">
 				{chats.map((item) => (
 					<ListItem
 						key={item?.dialog_id}

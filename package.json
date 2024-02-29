@@ -19,6 +19,7 @@
 		"@aomao/engine": "^2.10.25",
 		"@aomao/plugin-mention": "^2.10.3",
 		"@capacitor/android": "^5.7.0",
+		"@capacitor/app": "^5.0.7",
 		"@capacitor/camera": "^5.0.9",
 		"@capacitor/core": "^5.7.0",
 		"@capacitor/device": "^5.0.7",

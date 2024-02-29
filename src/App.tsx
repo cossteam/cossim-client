@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { App as AppComponent, View, f7 } from 'framework7-react'
 import { Framework7Parameters } from 'framework7/types'
-
 import '@/utils/notification'
 import routes from './router'
 import Layout from './components/Layout'
@@ -25,10 +24,13 @@ import { useStateStore } from '@/stores/state'
 import { hasMike } from './utils/media'
 import clsx from 'clsx'
 import { PhoneFill } from 'framework7-icons/react'
+import { App as CapApp } from '@capacitor/app'
 
 function App() {
 	const msgStore = useMessageStore()
 	const stateStore = useStateStore()
+
+	const toastRef = useRef(null)
 
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
@@ -176,6 +178,37 @@ function App() {
 
 		return () => {
 			SocketClient.removeListener('onWsMessage', handlerInit)
+		}
+	}, [])
+
+	useEffect(() => {
+		// @ts-ignore
+		toastRef.current = f7.toast.create({
+			text: $t('再按一次退出程序'),
+			closeTimeout: 1000,
+			position: 'center'
+		})
+
+		let backNumber = 0
+
+		const backButtonHandler = () => {
+			backNumber++
+			// @ts-ignore
+			toastRef.current?.open()
+
+			setTimeout(() => {
+				backNumber = 0
+			}, 1000)
+
+			if (backNumber > 1) CapApp.exitApp()
+		}
+
+		// 添加返回按钮事件监听器
+		const backListener = CapApp.addListener('backButton', backButtonHandler)
+
+		return () => {
+			// 移除返回按钮事件监听器
+			backListener.remove()
 		}
 	}, [])
 
