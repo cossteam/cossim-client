@@ -30,7 +30,7 @@ const GroupNotice: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	// 删除群公告
 	const deleteGroupAnnouncement = async (id: number) => {
-		f7.dialog.confirm($t('是否确认取消添加到黑名单?'), $t('加入黑名单'), async () => {
+		f7.dialog.confirm($t('是否确认删除群公告?'), $t('删除'), async () => {
 			try {
 				const { code, msg } = await GroupService.deleteGroupAnnouncementApi({
 					group_id: parseInt(group_id!),

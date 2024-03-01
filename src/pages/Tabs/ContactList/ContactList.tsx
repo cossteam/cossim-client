@@ -102,7 +102,13 @@ const ContactList: React.FC<RouterProps> = () => {
 	}, [is_contacts_update])
 
 	return (
-		<Page ptr className="coss_contacts bg-gray-200" onPageTabShow={onPageTabShow} onPtrRefresh={onRefresh}>
+		<Page
+			ptr
+			className="coss_contacts bg-gray-200"
+			// onPageTabShow={onPageTabShow}
+			onPtrRefresh={onRefresh}
+			onPageInit={onPageTabShow}
+		>
 			<Navbar title={$t('联系人')} className="hidden-navbar-bg bg-bgPrimary">
 				<Subnavbar inner={false}>
 					<Searchbar
