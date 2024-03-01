@@ -176,7 +176,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			setSelect([])
 			setSelectMsgs([])
 		}
-
 	}
 	// 多选时选择的消息
 	const onSelectChange = (e: any, msg: any) => {
@@ -241,6 +240,14 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	// 群成员
 	const [members, setMembers] = useState<any[]>([])
 
+	// 获取群公告
+	const getGroupAnnouncement = () => {
+		const params = { group_id: Number(receiver_id) }
+		GroupService.groupAnnouncementApi(params).then((res) => {
+			setGroupAnnouncement(getLatestGroupAnnouncement(res.data ?? []))
+		})
+	}
+
 	useAsyncEffect(
 		async () => {
 			if (!pageRef.current.el) return
@@ -259,14 +266,13 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			if (is_group) {
 				const params = { group_id: Number(receiver_id) }
 
-				GroupService.groupAnnouncementApi(params).then((res) => {
-					console.log('群公告：', res.data)
-
-					setGroupAnnouncement(getLatestGroupAnnouncement(res.data ?? []))
-				})
+				// GroupService.groupAnnouncementApi(params).then((res) => {
+				// 	setGroupAnnouncement(getLatestGroupAnnouncement(res.data ?? []))
+				// })
+				// getGroupAnnouncement()
 
 				GroupService.groupMemberApi(params).then((res) => {
-					console.log('群成员', res.data)
+					// console.log('群成员', res.data)
 					setMembers(res.data)
 				})
 			}
@@ -425,6 +431,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const setToolbarBottom = (bottom: number) => (toolbarRef.current!.style.transform = `translateY(${bottom}px)`)
 	const setContentHeight = (height: number = 0) =>
 		(BlockRef.current!.el!.style.minHeight = `calc(100vh - ${height + totalHeight}px)`)
+	const isReadGroupAnnouncement = (users: any[]) => users?.some((v) => v?.user_id === user_id)
 
 	// 关闭更多功能
 	const closeToolBar = () => {
@@ -450,6 +457,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				// msgStore.clearMessages()
 				updateChat(true)
 			}}
+			onPageBeforeIn={async () => is_group && getGroupAnnouncement()}
 		>
 			<Navbar
 				title={dialog_name}
@@ -476,7 +484,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						)
 					)}
 				</NavRight>
-				{is_group && groupAnnouncement && groupAnnouncement?.read_user_list?.includes(user_id) && (
+				{is_group && groupAnnouncement && !isReadGroupAnnouncement(groupAnnouncement?.read_user_list) && (
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
 						<Link
 							className="w-full h-full flex justify-center items-center rounded bg-bgPrimary"
@@ -499,9 +507,17 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 			{/* pt-5 pb-16 */}
 			<Block
-				className={clsx('my-0 px-0 pt-5 pb-16 transition-all duration-300 ease-linear')}
+				className={clsx(
+					'my-0 px-0 pb-16 transition-all duration-300 ease-linear'
+					// is_group && groupAnnouncement && '110px'
+				)}
 				ref={BlockRef}
-				style={{ paddingTop: is_group && groupAnnouncement ? '110px' : '60px' }}
+				style={{
+					paddingTop:
+						is_group && groupAnnouncement && !isReadGroupAnnouncement(groupAnnouncement?.read_user_list)
+							? '110px'
+							: '64px'
+				}}
 			>
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (
@@ -512,7 +528,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 							style={{ zIndex: 1 }}
 							checkbox={isSelect() && !item?.tips_msg_id}
 							onChange={(e) => onSelectChange(e, item)}
-
 						>
 							<Chat
 								msg={item}
