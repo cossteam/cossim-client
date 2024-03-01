@@ -1,3 +1,4 @@
+import { data } from '@emoji-mart/data'
 import type { CreateGroupData, groupListParams } from '@/types/api/group'
 import request from '@/utils/request'
 
@@ -256,10 +257,10 @@ class GroupServiceImpl {
 	/**
 	 *  创建群公告
 	 *
-	 * @param {*} param
-	 * @param {*} param.group_id
-	 * @param {*} param.title
-	 * @param {*} param.content
+	 * @param {*} data
+	 * @param {*} data.group_id
+	 * @param {*} data.title
+	 * @param {*} data.content
 	 * @returns
 	 */
 	createGroupAnnouncementApi(data: any): Promise<DataResponse> {
@@ -273,9 +274,9 @@ class GroupServiceImpl {
 	/**
 	 *  删除群公告
 	 *
-	 * @param {*} param
-	 * @param {*} param.group_id
-	 * @param {*} param.id
+	 * @param {*} data
+	 * @param {*} data.group_id
+	 * @param {*} data.id
 	 * @returns
 	 */
 	deleteGroupAnnouncementApi(data: any): Promise<DataResponse> {
@@ -305,16 +306,30 @@ class GroupServiceImpl {
 	/**
 	 *  更新群公告
 	 *
-	 * @param {*} param
-	 * @param {*} param.group_id
-	 * @param {*} param.id
-	 * @param {*} param.title
-	 * @param {*} param.content
+	 * @param {*} data
+	 * @param {*} data.group_id
+	 * @param {*} data.id
+	 * @param {*} data.title
+	 * @param {*} data.content
 	 * @returns
 	 */
 	updateGroupAnnouncementApi(data: any): Promise<DataResponse> {
 		return request({
 			url: this.baseGroupUrl + '/admin/announcement/update',
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 群公告已读
+	 * @param data
+	 * @param {*} data.group_id
+	 * @param {*} data.id
+	 */
+	readGroupAnnouncementApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/announcement/read',
 			method: 'POST',
 			data
 		})

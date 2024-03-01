@@ -70,6 +70,10 @@ const CreateGroupNotice: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						return value
 					})
 				)
+				await GroupService.readGroupAnnouncementApi({
+					group_id: parseInt(group_id!),
+					id: parseInt(id!)
+				})
 			}
 		},
 		() => {},
