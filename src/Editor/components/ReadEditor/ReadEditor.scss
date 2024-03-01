@@ -1,5 +1,5 @@
 .read-editor {
-    @apply text-[1rem] overflow-hidden;
+    @apply text-[1rem] overflow-hidden px-2;
 
     .read-editor-reply {
         @apply border-l-[2px] border-l-bgPrimary px-[0.5rem] mb-[0.5rem]  block max-w-[200px] overflow-hidden;
@@ -27,4 +27,12 @@
     white-space: nowrap;
     overflow: hidden;
     max-width: 80%;
+}
+
+.dialog-read-editor {
+    @apply text-ellipsis whitespace-nowrap overflow-hidden w-full text-[0.925rem] px-0;
+
+    p {
+        @apply text-ellipsis whitespace-nowrap overflow-hidden w-full;
+    }
 }

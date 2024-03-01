@@ -491,7 +491,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
 						<Link
 							className="w-full h-full flex justify-center items-center rounded bg-bgPrimary"
-							href={`/create_group_notice/${receiver_id}/?id=${getLatestGroupAnnouncement(groupAnnouncement).id}&admin=${members.find(v=>v?.identity === user_id)?.identity !== 2}}`}
+							href={`/create_group_notice/${receiver_id}/?id=${getLatestGroupAnnouncement(groupAnnouncement).id}&admin=${members.find(v=>v?.identity === user_id)?.identity === 2}}`}
 						>
 							<div className="w-full py-3 px-4 relative flex items-center">
 								<BellFill className="mr-3 text-orange-400 text-sm" />

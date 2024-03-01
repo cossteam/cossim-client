@@ -1,5 +1,5 @@
 import DOMPurify from 'dompurify'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import './ReadEditor.scss'
 import clsx from 'clsx'
 
@@ -13,7 +13,8 @@ interface ReadEditorProps {
 const ReadEditor: React.FC<ReadEditorProps> = (props) => {
 	const ReadEditorRef = useRef<HTMLDivElement | null>(null)
 
-	const content = useMemo(() => {
+	useEffect(() => {
+		if (!ReadEditorRef.current) return
 		let content = DOMPurify.sanitize(props.content)
 		// 回复
 		if (props.replyContent) {
@@ -24,15 +25,10 @@ const ReadEditor: React.FC<ReadEditorProps> = (props) => {
                 </blockquote>` + content
 			content = newContent
 		}
-		return content
+		ReadEditorRef.current.innerHTML = content
 	}, [props.content])
 
-	useEffect(() => {
-		if (!ReadEditorRef.current) return
-		ReadEditorRef.current.innerHTML = content
-	}, [content])
-
-	return <div ref={ReadEditorRef} className={clsx('read-editor px-2', props.className)} />
+	return <div ref={ReadEditorRef} className={clsx('read-editor', props.className)} />
 }
 
 export default ReadEditor

@@ -19,7 +19,8 @@ import UserStore from '@/db/user'
 import MsgService from '@/api/msg'
 import RelationService from '@/api/relation'
 import './DialogList.scss'
-import ToolEditor from '@/components/Editor/ToolEditor'
+// import ToolEditor from '@/components/Editor/ToolEditor'
+import { ReadEditor } from '@/Editor'
 import { v4 as uuidv4 } from 'uuid'
 
 const getAfterMessage = async () => {
@@ -177,46 +178,52 @@ const DialogList: React.FC<RouterProps> = () => {
 				</List>
 			</Popover>
 
-			<List contactsList noChevron mediaList className=" h-full bg-bgPrimary">
-				{chats.map((item) => (
-					<ListItem
-						key={item?.dialog_id}
-						link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
-						title={item?.dialog_name}
-						badge={item?.dialog_unread_count}
-						badgeColor="red"
-						swipeout
-					>
-						<img
-							slot="media"
-							src={`${item?.dialog_avatar}`}
-							loading="lazy"
-							className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"
-						/>
-						<div slot="text" className="max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
-							{/* {item?.last_message?.content} */}
-							<ToolEditor defaultValue={item?.last_message?.content} readonly className="read_editor" />
-						</div>
-						<div slot="after">
-							<span className=" text-sm text-gray-500">
-								{format(
-									item?.last_message?.send_time
-										? item?.last_message?.send_time
-										: item?.dialog_create_at,
-									'zh_CN'
-								)}
-							</span>
-						</div>
-						<SwipeoutActions right>
-							<SwipeoutButton close overswipe color="blue" onClick={(e) => topDialog(e, item)}>
-								{$t('置顶')}
-							</SwipeoutButton>
-							<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
-								{$t('删除')}
-							</SwipeoutButton>
-						</SwipeoutActions>
-					</ListItem>
-				))}
+			<List contactsList noChevron mediaList dividers className=" h-full bg-bgPrimary">
+				{chats.map((item) => {
+					let content = ''
+					const name = item?.last_message?.sender_info?.name
+					if (item?.group_id) content = name ? name + ': ' : ''
+					content += item?.last_message?.content || $t('[无消息]')
+
+					return (
+						<ListItem
+							key={item?.dialog_id}
+							link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
+							title={item?.dialog_name}
+							badge={item?.dialog_unread_count}
+							badgeColor="red"
+							swipeout
+						>
+							<img
+								slot="media"
+								src={`${item?.dialog_avatar}`}
+								loading="lazy"
+								className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"
+							/>
+							<div slot="text" className="max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
+								<ReadEditor content={content} className="dialog-read-editor" />
+							</div>
+							<div slot="after">
+								<span className=" text-sm text-gray-500">
+									{format(
+										item?.last_message?.send_time
+											? item?.last_message?.send_time
+											: item?.dialog_create_at,
+										'zh_CN'
+									)}
+								</span>
+							</div>
+							<SwipeoutActions right>
+								<SwipeoutButton close overswipe color="blue" onClick={(e) => topDialog(e, item)}>
+									{$t('置顶')}
+								</SwipeoutButton>
+								<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
+									{$t('删除')}
+								</SwipeoutButton>
+							</SwipeoutActions>
+						</ListItem>
+					)
+				})}
 			</List>
 		</Page>
 	)

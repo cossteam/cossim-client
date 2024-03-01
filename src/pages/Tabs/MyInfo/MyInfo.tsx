@@ -99,7 +99,7 @@ const MyInfo = () => {
 			</List>
 
 			{settings.map((item, index) => (
-				<List strong className="coss_list" key={index}>
+				<List strong className="coss_list" key={index} dividers>
 					{item.map((child, current) => (
 						<ListItem title={child.title} className="coss_item__button" link key={current}>
 							<div slot="media">{child.icon}</div>
