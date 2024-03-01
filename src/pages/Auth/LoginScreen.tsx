@@ -18,8 +18,8 @@ interface LoginScreenProps {
 
 const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defaultData }) => {
 	const [fromData, setFromData] = useState<LoginData>({
-		email: '123@qq.com',
-		password: '123456qq'
+		email: '',
+		password: ''
 	})
 
 	// 错误提示

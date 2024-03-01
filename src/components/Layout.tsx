@@ -19,7 +19,7 @@ const Layout: React.FC = () => {
 	}
 
 	return (
-		<Views tabs className="safe-area">
+		<Views tabs className="safe-area app">
 			<Toolbar tabbar icons bottom>
 				<Link
 					tabLink="#view-dialog"

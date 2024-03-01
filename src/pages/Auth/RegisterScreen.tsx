@@ -11,10 +11,10 @@ import UserService from '@/api/user'
 
 const RegisterScreen: React.FC<RouterProps> = ({ f7router }) => {
 	const [fromData, setFromData] = useState<RegisterData>({
-		nickname: '110',
-		email: '110@qq.com',
-		password: '123456qq',
-		confirm_password: '123456qq'
+		nickname: '',
+		email: '',
+		password: '',
+		confirm_password: ''
 	})
 
 	// 错误提示

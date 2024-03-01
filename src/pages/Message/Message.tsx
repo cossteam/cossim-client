@@ -201,6 +201,13 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const showMore = (type: MessageMore) => {
 		const isEnd = isScrollEnd()
 
+		// if (type === moreType) {
+		// 	closeToolBar()
+		// 	BlockRef.current.el!.style.transitionDuration = '0.3s'
+		// 	BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+		// 	return
+		// }
+
 		if (type === MessageMore.TEXT) {
 			closeToolBar()
 			BlockRef.current.el!.style.transitionDuration = '0.3s'
@@ -632,9 +639,15 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 										</Link>
 									)}
 
-									<Link onClick={() => showMore(MessageMore.OTHER)}>
-										<PlusCircle className="text-4xl text-gray-500 mr-2" />
-									</Link>
+									{moreType === MessageMore.OTHER ? (
+										<Link onClick={() => showMore(MessageMore.TEXT)}>
+											<KeyboardIcon className="text-4xl text-gray-500 mr-2" />
+										</Link>
+									) : (
+										<Link onClick={() => showMore(MessageMore.OTHER)}>
+											<PlusCircle className="text-4xl text-gray-500 mr-2" />
+										</Link>
+									)}
 
 									{showBtn ? (
 										<Link onClick={sendMessage}>
@@ -664,7 +677,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 							className={moreType === MessageMore.EMOJI ? '' : 'hidden'}
 						/>
 						<div className={clsx('w-full', moreType === MessageMore.OTHER ? '' : 'hidden')}>
-							<ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />
+							{!is_system && <ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />}
 						</div>
 					</div>
 				</div>

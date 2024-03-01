@@ -238,7 +238,7 @@ function App() {
 								url="/call/"
 								id="view-call"
 								name="call"
-								className={clsx('xm', hideCall ? 'hide-call' : '')}
+								className={clsx(hideCall ? 'hide-call' : '')}
 							/>
 							{hideCall && (
 								<div className=" fixed z-[9999] right-0 top-1/3 bg-slate-300 rounded-l-lg">
