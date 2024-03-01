@@ -23,7 +23,8 @@ import {
 	hasImageHtml,
 	scroll,
 	MessageMore,
-	getLatestGroupAnnouncement
+	getLatestGroupAnnouncement,
+	USER_ID
 } from '@/shared'
 import Chat from '@/components/Message/Chat'
 import { isWebDevice } from '@/utils'
@@ -40,8 +41,11 @@ import ToolBarMore from '@/components/Message/ToolBarMore'
 import { KeyboardIcon } from '@/components/Icon/Icon'
 import { Delta } from 'quill/core'
 import { EmitterSource } from 'quill/core/emitter'
+import { getCookie } from '@/utils/cookie'
 // import MsgService from '@/api/msg'
 // import RelationService from '@/api/relation'
+
+const user_id = getCookie(USER_ID) ?? ''
 
 const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
@@ -77,6 +81,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		const totalHeight = navbarHeight + subnavbarHeight + toolbarHeight
 		setTotalHeight(totalHeight)
 		setContentHeight(totalHeight)
+
 	}
 
 	// 当前提示选择的消息类型
@@ -246,7 +251,9 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	// 群公告
 	const [groupAnnouncement, setGroupAnnouncement] = useState<any>(null)
-
+	// 群成员
+	const [members,setMembers] = useState<any[]>([])
+	
 	useAsyncEffect(
 		async () => {
 			if (!pageRef.current.el) return
@@ -272,6 +279,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 				GroupService.groupMemberApi(params).then((res) => {
 					console.log('群成员', res.data)
+					setMembers(res.data)
 				})
 			}
 
@@ -483,7 +491,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
 						<Link
 							className="w-full h-full flex justify-center items-center rounded bg-bgPrimary"
-							href={`/group_notice/${receiver_id}/`}
+							href={`/create_group_notice/${receiver_id}/?id=${getLatestGroupAnnouncement(groupAnnouncement).id}&admin=${members.find(v=>v?.identity === user_id)?.identity !== 2}}`}
 						>
 							<div className="w-full py-3 px-4 relative flex items-center">
 								<BellFill className="mr-3 text-orange-400 text-sm" />
