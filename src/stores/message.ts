@@ -176,7 +176,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
 		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, tableName } = get()
 
-		console.log('at_all_user', at_all_user, at_users, options?.is_group)
+		// console.log('at_all_user', at_all_user, at_users, options?.is_group)
 
 		let error_message = ''
 
