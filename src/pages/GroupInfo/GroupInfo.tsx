@@ -70,7 +70,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 			const isSilence = data?.preferences?.silent_notification
 			setSilence(isSilence === 1)
 		})()
-	}, [])
+	}, [props])
 
 	// 群成员
 	const [members, setMembers] = useState([])
