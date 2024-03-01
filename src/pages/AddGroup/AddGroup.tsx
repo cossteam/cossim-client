@@ -1,6 +1,6 @@
 import { Page, Navbar, List, ListItem, Card, CardContent, Button, NavRight, f7 } from 'framework7-react'
 import { Xmark } from 'framework7-icons/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { $t } from '@/shared'
 import './AddGroup.scss'
@@ -8,18 +8,44 @@ import Contact from '@/components/Contact/Contact'
 import { CreateGroupData } from '@/types/api/group'
 import GroupService from '@/api/group'
 import UserStore from '@/db/user'
+import { useAsyncEffect } from '@reactuses/core'
+import { pick } from 'lodash-es'
 
-const AddGroup: React.FC<RouterProps> = ({ f7router }) => {
+const AddGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
+	// 群ID
+	const group_id = useMemo(() => {
+		return f7route?.query?.id
+	}, [f7route?.query?.id])
+	// 群信息
 	const [group, setGroup] = useState<CreateGroupData>({
 		name: '',
 		avatar: 'https://cdn.framework7.io/placeholder/nature-1000x600-3.jpg',
 		type: 0,
-		max_members_limit: 100,
+		max_members_limit: 500,
 		member: []
 	})
+	// 获取群信息
+	useAsyncEffect(
+		async () => {
+			try {
+				const { code, data, msg } = await GroupService.groupInfoApi({ group_id })
+				if (code !== 200) {
+					f7.dialog.alert($t(msg || '获取群信息失败'))
+					return
+				}
+				setGroup(pick(data, ['name', 'avatar', 'type', 'max_members_limit', 'member']))
+			} catch (error: any) {
+				f7.dialog.alert($t(error?.message || '获取群信息失败'))
+			} finally {
+				f7.dialog.close()
+			}
+		},
+		() => {},
+		[]
+	)
 
 	const [friends, setFriends] = useState<any[]>([])
-	const [maxMembers] = useState<number[]>([100, 500, 1000])
+	// const [maxMembers] = useState<number[]>([100, 500, 1000])
 
 	// 创建群聊
 	const createGroup = async () => {
@@ -52,9 +78,28 @@ const AddGroup: React.FC<RouterProps> = ({ f7router }) => {
 
 			await UserStore.add(UserStore.tables.dialogs, chat)
 			f7router.back()
-		} catch (error) {
-			console.error('创建群聊失败', error)
-			f7.dialog.alert($t('群聊创建失败'))
+		} catch (error: any) {
+			f7.dialog.alert($t(error?.message || '群聊创建失败'))
+		} finally {
+			f7.dialog.close()
+		}
+	}
+
+	// 编辑群聊
+	const editGroup = async () => {
+		try {
+			f7.dialog.preloader('修改中...')
+			const { code, msg } = await GroupService.groupUpdateApi({
+				...pick(group, ['name', 'avatar', 'type']),
+				group_id: parseInt(group_id!)
+			})
+			if (code !== 200) {
+				f7.dialog.alert($t(msg || '编辑群聊失败'))
+				return
+			}
+			code === 200 && f7router.back()
+		} catch (error: any) {
+			f7.dialog.alert($t(error?.message || '编辑群聊失败'))
 		} finally {
 			f7.dialog.close()
 		}
@@ -68,9 +113,13 @@ const AddGroup: React.FC<RouterProps> = ({ f7router }) => {
 
 	return (
 		<Page noToolbar className="bg-bgTertiary relative">
-			<Navbar backLink title={$t('新建群聊')} className="bg-bgPrimary hidden-navbar-bg">
+			<Navbar
+				backLink
+				title={$t(group_id ? '修改群聊信息' : '新建群聊')}
+				className="bg-bgPrimary hidden-navbar-bg"
+			>
 				<NavRight>
-					<Button large disabled={!group.name} onClick={createGroup}>
+					<Button large disabled={!group.name} onClick={group_id ? editGroup : createGroup}>
 						{$t('完成')}
 					</Button>
 				</NavRight>
@@ -120,7 +169,7 @@ const AddGroup: React.FC<RouterProps> = ({ f7router }) => {
 				</CardContent>
 			</Card>
 
-			<Card title={$t('群人数')} className="coss_card_title">
+			{/* <Card title={$t('群人数')} className="coss_card_title">
 				<CardContent>
 					<List strongIos outlineIos dividersIos>
 						<ListItem
@@ -142,17 +191,19 @@ const AddGroup: React.FC<RouterProps> = ({ f7router }) => {
 						</ListItem>
 					</List>
 				</CardContent>
-			</Card>
+			</Card> */}
 
-			<Card title={$t('群成员')} className="coss_card_title">
-				<CardContent padding={false}>
-					<List>
-						<ListItem link popupOpen=".contact-popup">
-							{$t('从好友列表选取')}
-						</ListItem>
-					</List>
-				</CardContent>
-			</Card>
+			{!group_id && (
+				<Card title={$t('群成员')} className="coss_card_title">
+					<CardContent padding={false}>
+						<List>
+							<ListItem link popupOpen=".contact-popup">
+								{$t('从好友列表选取')}
+							</ListItem>
+						</List>
+					</CardContent>
+				</Card>
+			)}
 
 			<Card title={friends.length && $t('已选择')} className="coss_card_title">
 				<CardContent padding={false}>
