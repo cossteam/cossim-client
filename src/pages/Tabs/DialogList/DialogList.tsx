@@ -9,7 +9,7 @@ import {
 	SwipeoutActions,
 	SwipeoutButton
 } from 'framework7-react'
-import { Plus, Search, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } from 'framework7-icons/react'
+import { Plus, Search, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { format } from 'timeago.js'
@@ -172,10 +172,10 @@ const DialogList: React.FC<RouterProps> = () => {
 						<span className="coss_dialog_list__text">{$t('添加朋友')}</span>
 					</ListItem>
 
-					<ListItem link="/camera/" popoverClose className="coss_dialog_list">
+					{/* <ListItem link="/camera/" popoverClose className="coss_dialog_list">
 						<ViewfinderCircleFill className="coss_dialog_list__icon" />
 						<span className="coss_dialog_list__text">{$t('扫一扫')}</span>
-					</ListItem>
+					</ListItem> */}
 				</List>
 			</Popover>
 
