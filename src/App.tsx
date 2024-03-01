@@ -25,12 +25,17 @@ import { hasMike } from './utils/media'
 import clsx from 'clsx'
 import { PhoneFill } from 'framework7-icons/react'
 import { App as CapApp } from '@capacitor/app'
+import { Router } from 'framework7/types'
 
 function App() {
 	const msgStore = useMessageStore()
 	const stateStore = useStateStore()
 
 	const toastRef = useRef(null)
+
+	// const [router, setRouter] = useState<Router.Router | null>(null)
+
+	let router: Router.Router | null = null
 
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
@@ -46,6 +51,11 @@ function App() {
 		},
 		touch: {
 			tapHold: true
+		},
+		on: {
+			routeChanged: (_newRoute: Router.Route, _previousRoute: Router.Route, _router: Router.Router) => {
+				router = _router
+			}
 		}
 	})
 
@@ -193,14 +203,20 @@ function App() {
 
 		const backButtonHandler = () => {
 			backNumber++
+
 			// @ts-ignore
-			toastRef.current?.open()
+			!router && toastRef.current?.open()
 
 			setTimeout(() => {
 				backNumber = 0
 			}, 1000)
 
 			if (backNumber > 1) CapApp.exitApp()
+
+			if (router && router.history.length > 1) {
+				router.back()
+				router = null
+			}
 		}
 
 		// 添加返回按钮事件监听器

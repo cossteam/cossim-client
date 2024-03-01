@@ -1,4 +1,3 @@
-import { data } from '@emoji-mart/data'
 import type { CreateGroupData, groupListParams } from '@/types/api/group'
 import request from '@/utils/request'
 
