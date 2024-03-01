@@ -21,6 +21,7 @@ import RelationService from '@/api/relation'
 import './DialogList.scss'
 import ToolEditor from '@/components/Editor/ToolEditor'
 import { v4 as uuidv4 } from 'uuid'
+import clsx from 'clsx'
 
 const getAfterMessage = async () => {
 	try {
@@ -136,7 +137,7 @@ const DialogList: React.FC<RouterProps> = () => {
 				...item
 			}
 		})
-		setChats(list)
+		setChats(list.sort((a, b) => b.top_at - a.top_at))
 	}, [dialogs])
 
 	return (
@@ -180,6 +181,7 @@ const DialogList: React.FC<RouterProps> = () => {
 			<List contactsList noChevron mediaList className=" h-full bg-bgPrimary">
 				{chats.map((item) => (
 					<ListItem
+						className={clsx(item.top_at !== 0 && 'bg-gray-200')}
 						key={item?.dialog_id}
 						link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
 						title={item?.dialog_name}
@@ -209,7 +211,7 @@ const DialogList: React.FC<RouterProps> = () => {
 						</div>
 						<SwipeoutActions right>
 							<SwipeoutButton close overswipe color="blue" onClick={(e) => topDialog(e, item)}>
-								{$t('置顶')}
+								{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
 							</SwipeoutButton>
 							<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
 								{$t('删除')}
