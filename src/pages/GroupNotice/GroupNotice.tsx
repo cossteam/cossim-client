@@ -96,7 +96,7 @@ const GroupNotice: React.FC<RouterProps> = ({ f7route, f7router }) => {
 										<span className="">
 											{format(item?.updated_at ? item?.updated_at : item?.created_at, 'zh_CN')}
 										</span>
-										<span>{99}人已读</span>
+										<span>{item.read_user_list ? item.read_user_list.length : 0}人已读</span>
 									</div>
 								</div>
 							</CardContent>
