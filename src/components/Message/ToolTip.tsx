@@ -136,8 +136,12 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 		// 控制上边界
 		elRect.top < tooltipEl.offsetHeight + 156 ? setTop(true) : setTop(false)
 
+
+		console.log('elRect', elRect)
+
 		// 控制左右边界
-		if (elRect.width <= 150) {
+		if (elRect.width <= 200) {
+
 			const isLeft = elRect.left <= 100
 			// 控制弹窗
 			tooltipEl.style.left = isLeft ? '-40px' : 'auto'

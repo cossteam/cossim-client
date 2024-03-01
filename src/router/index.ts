@@ -47,7 +47,6 @@ const routes: Router.RouteParameters[] = [
 	{
 		path: '/message/:id/:dialog_id/',
 		// asyncComponent: () => import('@/pages/Message/Message')
-		// keepAlive: true,
 		component: Message
 	},
 	{

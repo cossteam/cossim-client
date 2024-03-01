@@ -81,7 +81,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		const totalHeight = navbarHeight + subnavbarHeight + toolbarHeight
 		setTotalHeight(totalHeight)
 		setContentHeight(totalHeight)
-
 	}
 
 	// 当前提示选择的消息类型
@@ -177,16 +176,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			setSelect([])
 			setSelectMsgs([])
 		}
-		// notice: async (msg: any) => {
-		// 	console.log('设置群公告', msg)
-		// 	const { data } = await RelationService.createGroupNoticeApi({
-		// 		group_id: msg?.group_id,
-		// 		content: msg?.content,
-		// 		title: ''
-		// 	})
 
-		// 	console.log('data', data)
-		// }
 	}
 	// 多选时选择的消息
 	const onSelectChange = (e: any, msg: any) => {
@@ -239,9 +229,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(300)
 	// 控制工具栏的显示
 	useClickOutside(toolbarRef, () => {
-		// blurInput()
-		// setEmojs(false)
-		// emojis = false
 		closeToolBar()
 	})
 	// 设备信息
@@ -252,8 +239,8 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	// 群公告
 	const [groupAnnouncement, setGroupAnnouncement] = useState<any>(null)
 	// 群成员
-	const [members,setMembers] = useState<any[]>([])
-	
+	const [members, setMembers] = useState<any[]>([])
+
 	useAsyncEffect(
 		async () => {
 			if (!pageRef.current.el) return
@@ -274,7 +261,8 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 				GroupService.groupAnnouncementApi(params).then((res) => {
 					console.log('群公告：', res.data)
-					setGroupAnnouncement(res.data)
+
+					setGroupAnnouncement(getLatestGroupAnnouncement(res.data ?? []))
 				})
 
 				GroupService.groupMemberApi(params).then((res) => {
@@ -451,6 +439,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - setp
 		)
 	}
+
 	return (
 		<Page
 			noToolbar
@@ -487,19 +476,17 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						)
 					)}
 				</NavRight>
-				{is_group && groupAnnouncement && (
+				{is_group && groupAnnouncement && groupAnnouncement?.read_user_list?.includes(user_id) && (
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
 						<Link
 							className="w-full h-full flex justify-center items-center rounded bg-bgPrimary"
-							href={`/create_group_notice/${receiver_id}/?id=${getLatestGroupAnnouncement(groupAnnouncement).id}&admin=${members.find(v=>v?.identity === user_id)?.identity === 2}}`}
+							href={`/create_group_notice/${receiver_id}/?id=${groupAnnouncement.id}&admin=${members.find((v) => v?.identity === user_id)?.identity === 2}}`}
 						>
 							<div className="w-full py-3 px-4 relative flex items-center">
 								<BellFill className="mr-3 text-orange-400 text-sm" />
 								<p className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[86%] text-textSecondary">
-									<span className="font-bold">
-										{getLatestGroupAnnouncement(groupAnnouncement).title}：
-									</span>
-									{getLatestGroupAnnouncement(groupAnnouncement).content}
+									<span className="font-bold">{groupAnnouncement.title}：</span>
+									{groupAnnouncement.content}
 								</p>
 								<div className="absolute right-3">
 									<ChevronRight className="text-textTertiary text-sm" />
@@ -525,6 +512,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 							style={{ zIndex: 1 }}
 							checkbox={isSelect() && !item?.tips_msg_id}
 							onChange={(e) => onSelectChange(e, item)}
+
 						>
 							<Chat
 								msg={item}

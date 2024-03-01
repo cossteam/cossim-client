@@ -1,4 +1,4 @@
-import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
+import { ArrowUpRight, BellFill, ChevronRight, Ellipsis, Trash } from 'framework7-icons/react'
 import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAsyncEffect, useClickOutside } from '@reactuses/core'
@@ -23,7 +23,8 @@ import {
 	hasImageHtml,
 	scroll,
 	MessageMore,
-	getLatestGroupAnnouncement
+	getLatestGroupAnnouncement,
+	USER_ID
 } from '@/shared'
 import Chat from '@/components/Message/Chat'
 import { isWebDevice } from '@/utils'
@@ -40,8 +41,11 @@ import ToolBarMore from '@/components/Message/ToolBarMore'
 import { KeyboardIcon } from '@/components/Icon/Icon'
 import { Delta } from 'quill/core'
 import { EmitterSource } from 'quill/core/emitter'
+import { getCookie } from '@/utils/cookie'
 // import MsgService from '@/api/msg'
 // import RelationService from '@/api/relation'
+
+const user_id = getCookie(USER_ID) ?? ''
 
 const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
@@ -77,6 +81,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		const totalHeight = navbarHeight + subnavbarHeight + toolbarHeight
 		setTotalHeight(totalHeight)
 		setContentHeight(totalHeight)
+
 	}
 
 	// 当前提示选择的消息类型
@@ -85,8 +90,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		const msg = messages.find((v) => v.msg_id === msg_id)
 		type !== TOOLTIP_TYPE.SELECT && setSelectMsgs([msg])
 		setSelectType(type)
-
-		console.log('提示选择', msg_id, type, msg)
 
 		switch (type) {
 			case TOOLTIP_TYPE.COPY:
@@ -136,6 +139,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			try {
 				list.forEach((v) => {
 					const is_group = v?.group_id ? true : false
+
 					msgs.forEach((item) => {
 						msgStore.sendMessage(msgType, item?.content, {
 							is_group,
@@ -247,7 +251,9 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	// 群公告
 	const [groupAnnouncement, setGroupAnnouncement] = useState<any>(null)
-
+	// 群成员
+	const [members,setMembers] = useState<any[]>([])
+	
 	useAsyncEffect(
 		async () => {
 			if (!pageRef.current.el) return
@@ -273,6 +279,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 				GroupService.groupMemberApi(params).then((res) => {
 					console.log('群成员', res.data)
+					setMembers(res.data)
 				})
 			}
 
@@ -342,10 +349,19 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					closeToolBar()
 				}, 0)
 			})
+
+			window.addEventListener('resize', hanlderPageSize)
 		},
-		() => {},
+		() => {
+			window.removeEventListener('resize', hanlderPageSize)
+		},
 		[]
 	)
+
+	const hanlderPageSize = () => {
+		if (!contentRef.current) return
+		scroll(contentRef.current!, false)
+	}
 
 	const sendMessage = async () => {
 		const quill = editorRef.current!.quill
@@ -420,7 +436,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const replyMessage = (msg_id: number) => msgStore.all_meesages.find((v) => v?.msg_id === msg_id)
 	const setToolbarBottom = (bottom: number) => (toolbarRef.current!.style.transform = `translateY(${bottom}px)`)
 	const setContentHeight = (height: number = 0) =>
-		(BlockRef.current!.el!.style.minHeight = `calc(100vh - ${height+totalHeight}px)`)
+		(BlockRef.current!.el!.style.minHeight = `calc(100vh - ${height + totalHeight}px)`)
 
 	// 关闭更多功能
 	const closeToolBar = () => {
@@ -442,7 +458,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			onPageInit={onPageInit}
 			ref={pageRef}
 			onPageBeforeOut={() => {
-				msgStore.clearMessages()
+				// msgStore.clearMessages()
 				updateChat(true)
 			}}
 		>
@@ -473,17 +489,23 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				</NavRight>
 				{is_group && groupAnnouncement && (
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
-						<div className="w-full h-full flex justify-center items-center">
-							<div className="w-full py-1 bg-bgPrimary rounded-lg px-4 relative">
-								<p className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[80%] text-textSecondary">
+						<Link
+							className="w-full h-full flex justify-center items-center rounded bg-bgPrimary"
+							href={`/create_group_notice/${receiver_id}/?id=${getLatestGroupAnnouncement(groupAnnouncement).id}&admin=${members.find(v=>v?.identity === user_id)?.identity === 2}}`}
+						>
+							<div className="w-full py-3 px-4 relative flex items-center">
+								<BellFill className="mr-3 text-orange-400 text-sm" />
+								<p className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[86%] text-textSecondary">
+									<span className="font-bold">
+										{getLatestGroupAnnouncement(groupAnnouncement).title}：
+									</span>
 									{getLatestGroupAnnouncement(groupAnnouncement).content}
 								</p>
-								<Xmark
-									className="text-textTertiary absolute right-3 text-sm top-0 bottom-0 m-auto"
-									onClick={() => setGroupAnnouncement(null)}
-								/>
+								<div className="absolute right-3">
+									<ChevronRight className="text-textTertiary text-sm" />
+								</div>
 							</div>
-						</div>
+						</Link>
 					</Subnavbar>
 				)}
 			</Navbar>
@@ -492,7 +514,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			<Block
 				className={clsx('my-0 px-0 pt-5 pb-16 transition-all duration-300 ease-linear')}
 				ref={BlockRef}
-				style={{ paddingTop: is_group && groupAnnouncement ? '40px' : '20px' }}
+				style={{ paddingTop: is_group && groupAnnouncement ? '110px' : '60px' }}
 			>
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (
