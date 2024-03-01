@@ -2,19 +2,20 @@ import { Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'fram
 import { useRef, useState } from 'react'
 import { isEqual } from 'lodash-es'
 
-import { $t, MessageBurnAfterRead, MessageNoDisturb, RelationStatus, USER_ID } from '@/shared'
+import { $t, MessageBurnAfterRead, MessageNoDisturb, RelationStatus } from '@/shared'
 import UserStore from '@/db/user'
 import UserService from '@/api/user'
 import { useCallStore } from '@/stores/call'
 import RelationService from '@/api/relation'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
-import { getCookie } from '@/utils/cookie'
+// import { getCookie } from '@/utils/cookie'
 import { hasCamera, hasMike } from '@/utils/media'
 
-const userId = getCookie(USER_ID) || ''
+// const userId = getCookie(USER_ID) || ''
 
 const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
+	// const userId = getCookie(USER_ID) || ''
 	const user_id = f7route.params.user_id as string
 	const is_from_message_page = f7route.query.from_page === 'message'
 
@@ -34,7 +35,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		setUserInfo(user)
 
 		// 如不需要从服务器上获取数据，直接返回
-		if (!request) return
+		if (user && !request) return
 
 		const { data } = await UserService.getUserInfoApi({ user_id })
 
@@ -44,7 +45,9 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		if (isEqual(user, updateData)) return
 
 		setUserInfo(updateData)
-		await UserStore.update(UserStore.tables.friends, 'user_id', user_id, updateData)
+		user
+			? await UserStore.update(UserStore.tables.friends, 'user_id', user_id, updateData)
+			: await UserStore.add(UserStore.tables.friends, updateData)
 	}
 
 	// 呼叫
@@ -181,15 +184,18 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	// 黑名单
 	const blackList = async () => {
-		const is_add = userInfo?.preferences?.blacklist === RelationStatus.BLACK
+		console.log('userInfo', userInfo)
+
+		const is_add = userInfo?.relation_status === RelationStatus.BLACK
 
 		// const tips = is_add ? $t('是否确认取消添加到黑名单?') : $t('是否确认添加到黑名单?')
 		const tips_error = is_add ? $t('移除黑名单失败') : $t('添加黑名单失败')
 
 		// f7.dialog.confirm(tips, $t('加入黑名单'), async () => {
 		try {
-			f7.dialog.preloader($t('加入黑名单中...'))
-			const params = { friend_id: user_id, user_id: userId }
+			f7.dialog.preloader(is_add ? $t('移除黑名单中...') : $t('加入黑名单中...'))
+			const params = { user_id }
+
 			const { code } = is_add
 				? await RelationService.deleteBlackListApi(params)
 				: await RelationService.addBlackListApi(params)
@@ -201,10 +207,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 			// 更新本地数据库
 			await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
-				preferences: {
-					...userInfo?.preferences,
-					blacklist: is_add ? RelationStatus.YES : RelationStatus.BLACK
-				}
+				relation_status: is_add ? RelationStatus.YES : RelationStatus.BLACK
 			})
 			await updateUserInfo(false)
 		} catch (error) {
@@ -238,19 +241,13 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 							<span className="text-xs">消息</span>
 						</div>
 					)}
-					<div
-						className="size-10  flex flex-col justify-center items-center"
-						onClick={() => callUser(true)}
-					>
+					<div className="size-10  flex flex-col justify-center items-center" onClick={() => callUser(true)}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 							<Link iconF7="videocam_fill" iconSize={22} onClick={() => callUser(true)} />
 						</div>
 						<span className="text-xs">视频</span>
 					</div>
-					<div
-						className="size-10 flex flex-col justify-center items-center"
-						onClick={() => callUser(false)}
-					>
+					<div className="size-10 flex flex-col justify-center items-center" onClick={() => callUser(false)}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 							<Link iconF7="phone_fill" iconSize={22} />
 						</div>

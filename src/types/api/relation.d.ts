@@ -17,7 +17,7 @@ export interface ManageFriendData {
 
 export interface BlackListData {
     user_id: string
-    friend_id: string
+    // friend_id: string
 }
 
 export interface SilenceData {
