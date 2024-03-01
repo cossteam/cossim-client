@@ -47,7 +47,10 @@ const routes: Router.RouteParameters[] = [
 	{
 		path: '/message/:id/:dialog_id/',
 		// asyncComponent: () => import('@/pages/Message/Message')
-		component: Message
+		component: Message,
+		options: {
+			transition: 'f7-custom'
+		}
 	},
 	{
 		path: '/user_info/:user_id/',

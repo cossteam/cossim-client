@@ -16,20 +16,15 @@ import { StateStore } from '@/stores/state'
 export const handlerMessageSocket = async (data: any, msgStore: MessageStore, stateStore: StateStore) => {
 	try {
 		const message = data.data
-		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-		// debugger
+
+		// console.log('msgStore.messages', msgStore.messages)
+
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
 		if (getCookie(USER_ID) === message.sender_id && data.driverId === getCookie(DEVICE_ID)) return
 
-		// debugger
-
 		// 防止重复添加消息
-		const messages =
-			(await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', message?.dialog_id)) ?? []
-		console.log('messages', messages, message, data, getCookie(DEVICE_ID))
-
-		const index = messages.findIndex((item: any) => item?.msg_id === message?.msg_id)
-		if (index !== -1) return
+		// const index = msgStore.messages.findIndex((item: any) => item?.msg_id === message?.msg_id)
+		// if (index !== -1) return
 
 		const msg = {
 			dialog_id: message?.dialog_id,
