@@ -105,7 +105,7 @@ const ContactList: React.FC<RouterProps> = () => {
 		<Page
 			ptr
 			className="coss_contacts bg-gray-200"
-			// onPageTabShow={onPageTabShow}
+			onPageTabShow={onPageTabShow}
 			onPtrRefresh={onRefresh}
 			onPageInit={onPageTabShow}
 		>
