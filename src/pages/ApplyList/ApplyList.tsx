@@ -200,8 +200,7 @@ const ApplyList = () => {
 							<div slot="media" className="w-12 h-12">
 								<img
 									src={item?.receiver_info?.user_avatar}
-									alt={$t(item?.receiver_info?.user_name)}
-									className="w-full h-full object-cover rounded-full"
+									className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
 								/>
 							</div>
 							<div slot="title">
@@ -236,8 +235,7 @@ const ApplyList = () => {
 							<div slot="media" className="w-12 h-12">
 								<img
 									src={item?.receiver_info?.user_avatar}
-									alt={$t(item?.receiver_info?.user_name)}
-									className="w-full h-full object-cover rounded-full"
+									className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
 								/>
 							</div>
 							<div slot="title">
