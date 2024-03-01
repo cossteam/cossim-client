@@ -14,6 +14,6 @@
     @apply relative;
 
     .item-after {
-        @apply absolute right-[2%] top-[1%] flex flex-col items-end gap-1;
+        @apply absolute right-[2%] top-[1%] flex flex-col items-end gap-1 text-sm text-gray-500;
     }
 }
