@@ -22,10 +22,12 @@ export const handlerMessageSocket = async (data: any, msgStore: MessageStore, st
 		if (user_id === message.sender_id && data.driverId === device_id) return
 
 		// 防止重复添加消息
-		const index = msgStore.messages.findIndex((item: any) => item.msg_id === message.msg_id)
+		const messages =
+			(await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', message?.dialog_id)) ?? []
+		const index = messages.findIndex((item: any) => item.msg_id === message.msg_id)
 		if (index !== -1) return
 
-		// return
+		return
 
 		const msg = {
 			dialog_id: message?.dialog_id,
