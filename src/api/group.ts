@@ -269,6 +269,56 @@ class GroupServiceImpl {
 			data
 		})
 	}
+
+	/**
+	 *  删除群公告
+	 *
+	 * @param {*} param
+	 * @param {*} param.group_id
+	 * @param {*} param.id
+	 * @returns
+	 */
+	deleteGroupAnnouncementApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/admin/announcement/delete',
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 *  获取群公告详情
+	 *
+	 * @param {*} param
+	 * @param {*} param.group_id
+	 * @param {*} param.id
+	 * @returns
+	 */
+	getGroupAnnouncementApi(params: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/announcement/detail',
+			method: 'GET',
+			params
+		})
+	}
+
+	/**
+	 *  更新群公告
+	 *
+	 * @param {*} param
+	 * @param {*} param.group_id
+	 * @param {*} param.id
+	 * @param {*} param.title
+	 * @param {*} param.content
+	 * @returns
+	 */
+	updateGroupAnnouncementApi(data: any): Promise<DataResponse> {
+		return request({
+			url: this.baseGroupUrl + '/admin/announcement/update',
+			method: 'POST',
+			data
+		})
+	}
 }
 
 const GroupService = new GroupServiceImpl()

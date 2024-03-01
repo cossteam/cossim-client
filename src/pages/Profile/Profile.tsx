@@ -117,28 +117,28 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				? MessageBurnAfterRead.NO
 				: MessageBurnAfterRead.YES
 
-		const tips = action === MessageBurnAfterRead.YES ? $t('是否确认阅后即焚?') : $t('是否确认取消阅后即焚?')
+		// const tips = action === MessageBurnAfterRead.YES ? $t('是否确认阅后即焚?') : $t('是否确认取消阅后即焚?')
 		const tips_error = action === MessageBurnAfterRead.YES ? $t('阅后即焚失败') : $t('取消阅后即焚失败')
 
-		f7.dialog.confirm(tips, $t('阅后即焚'), async () => {
-			try {
-				f7.dialog.preloader($t('设置中...'))
-				const { code } = await RelationService.setBurnApi({ action, user_id })
-				if (code !== 200) {
-					f7.dialog.alert(tips_error)
-					return
-				}
-				// 更新本地数据库
-				await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
-					preferences: { ...userInfo?.preferences, open_burn_after_reading: action }
-				})
-				await updateUserInfo(false)
-			} catch (error) {
-				return f7.dialog.alert(tips_error)
-			} finally {
-				f7.dialog.close()
+		// f7.dialog.confirm(tips, $t('阅后即焚'), async () => {
+		try {
+			f7.dialog.preloader($t('设置中...'))
+			const { code } = await RelationService.setBurnApi({ action, user_id })
+			if (code !== 200) {
+				f7.dialog.alert(tips_error)
+				return
 			}
-		})
+			// 更新本地数据库
+			await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
+				preferences: { ...userInfo?.preferences, open_burn_after_reading: action }
+			})
+			await updateUserInfo(false)
+		} catch (error) {
+			return f7.dialog.alert(tips_error)
+		} finally {
+			f7.dialog.close()
+		}
+		// })
 	}
 
 	// 消息免打扰
@@ -148,28 +148,28 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				? MessageNoDisturb.NO
 				: MessageNoDisturb.YES
 
-		const tips = is_silent === MessageNoDisturb.YES ? $t('是否确认消息免打扰?') : $t('是否确认取消消息免打扰?')
+		// const tips = is_silent === MessageNoDisturb.YES ? $t('是否确认消息免打扰?') : $t('是否确认取消消息免打扰?')
 		const tips_error = is_silent === MessageNoDisturb.YES ? $t('消息免打扰失败') : $t('取消消息免打扰失败')
 
-		f7.dialog.confirm(tips, $t('消息免打扰'), async () => {
-			try {
-				f7.dialog.preloader($t('消息免打扰中...'))
-				const { code } = await RelationService.setSilenceApi({ is_silent, user_id })
-				if (code !== 200) {
-					f7.dialog.alert(tips_error)
-					return
-				}
-				// 更新本地数据库
-				await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
-					preferences: { ...userInfo?.preferences, silent_notification: is_silent }
-				})
-				await updateUserInfo(false)
-			} catch (error) {
-				return f7.dialog.alert(tips_error)
-			} finally {
-				f7.dialog.close()
+		// f7.dialog.confirm(tips, $t('消息免打扰'), async () => {
+		try {
+			f7.dialog.preloader($t('消息免打扰中...'))
+			const { code } = await RelationService.setSilenceApi({ is_silent, user_id })
+			if (code !== 200) {
+				f7.dialog.alert(tips_error)
+				return
 			}
-		})
+			// 更新本地数据库
+			await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
+				preferences: { ...userInfo?.preferences, silent_notification: is_silent }
+			})
+			await updateUserInfo(false)
+		} catch (error) {
+			return f7.dialog.alert(tips_error)
+		} finally {
+			f7.dialog.close()
+		}
+		// })
 	}
 
 	// 展示对话
@@ -183,36 +183,36 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const blackList = async () => {
 		const is_add = userInfo?.preferences?.blacklist === RelationStatus.BLACK
 
-		const tips = is_add ? $t('是否确认取消添加到黑名单?') : $t('是否确认添加到黑名单?')
+		// const tips = is_add ? $t('是否确认取消添加到黑名单?') : $t('是否确认添加到黑名单?')
 		const tips_error = is_add ? $t('移除黑名单失败') : $t('添加黑名单失败')
 
-		f7.dialog.confirm(tips, $t('加入黑名单'), async () => {
-			try {
-				f7.dialog.preloader($t('加入黑名单中...'))
-				const params = { friend_id: user_id, user_id: userId }
-				const { code } = is_add
-					? await RelationService.deleteBlackListApi(params)
-					: await RelationService.addBlackListApi(params)
+		// f7.dialog.confirm(tips, $t('加入黑名单'), async () => {
+		try {
+			f7.dialog.preloader($t('加入黑名单中...'))
+			const params = { friend_id: user_id, user_id: userId }
+			const { code } = is_add
+				? await RelationService.deleteBlackListApi(params)
+				: await RelationService.addBlackListApi(params)
 
-				if (code !== 200) {
-					f7.dialog.alert(tips_error)
-					return
-				}
-
-				// 更新本地数据库
-				await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
-					preferences: {
-						...userInfo?.preferences,
-						blacklist: is_add ? RelationStatus.YES : RelationStatus.BLACK
-					}
-				})
-				await updateUserInfo(false)
-			} catch (error) {
-				return f7.dialog.alert(tips_error)
-			} finally {
-				f7.dialog.close()
+			if (code !== 200) {
+				f7.dialog.alert(tips_error)
+				return
 			}
-		})
+
+			// 更新本地数据库
+			await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
+				preferences: {
+					...userInfo?.preferences,
+					blacklist: is_add ? RelationStatus.YES : RelationStatus.BLACK
+				}
+			})
+			await updateUserInfo(false)
+		} catch (error) {
+			return f7.dialog.alert(tips_error)
+		} finally {
+			f7.dialog.close()
+		}
+		// })
 	}
 
 	return (
@@ -227,15 +227,12 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				</div>
 				<div className="flex my-4">
 					{!is_from_message_page && (
-						<div
-							className="size-10 mr-3 flex flex-col justify-center items-center"
-							onClick={() => callUser(true)}
-						>
+						<div className="size-10 mr-3 flex flex-col justify-center items-center">
 							<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 								<Link
 									iconF7="chat_bubble_fill"
 									iconSize={22}
-									href={`/message/${f7route.params.id}/${userInfo?.dialog_id}/?is_group=false&dialog_name=${userInfo?.nickname}`}
+									href={`/message/${user_id}/${userInfo?.dialog_id}/?is_group=false&dialog_name=${userInfo?.nickname}`}
 								/>
 							</div>
 							<span className="text-xs">消息</span>
@@ -265,13 +262,12 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						</div>
 						<span className="text-xs">标注</span>
 					</div>
-					<div className="size-10 flex flex-col justify-center items-center" onClick={() => {}}>
+					{/* <div className="size-10 flex flex-col justify-center items-center" onClick={() => {}}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-							{/* <Link iconF7="ellipsis" iconSize={22} /> */}
 							<Link iconF7="ellipsis" iconSize={22} popoverOpen=".popover-menu" />
 						</div>
 						<span className="text-xs">更多</span>
-					</div>
+					</div> */}
 				</div>
 			</div>
 
