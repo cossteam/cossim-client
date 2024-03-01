@@ -58,6 +58,9 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 		)
 	}
 
+	console.log("msg",msg);
+	
+
 	return (
 		<div
 			className={clsx('flex', is_self ? 'justify-end' : 'justify-start', className)}
@@ -119,7 +122,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 					<div
 						className={clsx('flex text-[0.85rem] items-center', is_self ? 'justify-end' : 'justify-start')}
 					>
-						<span className="text-[0.85rem] mr-1">{format(msg?.created_at, 'zh_CN')}</span>
+						<span className="text-[0.85rem] mr-1">{format(msg?.create_at, 'zh_CN')}</span>
 						{is_self && (
 							<>
 								{msg?.msg_send_state === MESSAGE_SEND.SEND_FAILED && (
