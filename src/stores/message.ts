@@ -176,7 +176,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
 		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, tableName } = get()
 
-		console.log('at_all_user', at_all_user, at_users, options?.is_group)
+		// console.log('at_all_user', at_all_user, at_users, options?.is_group)
 
 		let error_message = ''
 
@@ -397,7 +397,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		// 自己的信息
 		const myInfo = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 
-		console.log('message', messages)
+		// console.log('message', messages)
 
 		set({ messages, tableName, is_group, receiver_id, dialog_id, all_meesages: messages, userInfo, myInfo })
 

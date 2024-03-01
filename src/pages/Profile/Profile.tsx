@@ -225,9 +225,9 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					<span className="">{`@${userInfo?.nickname || ''}`}</span>
 					<span className="">{`${userInfo?.email || ''}`}</span>
 				</div>
-				<div className="flex my-4">
+				<div className="flex my-4 justify-evenly w-full">
 					{!is_from_message_page && (
-						<div className="size-10 mr-3 flex flex-col justify-center items-center">
+						<div className="size-10  flex flex-col justify-center items-center">
 							<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 								<Link
 									iconF7="chat_bubble_fill"
@@ -239,7 +239,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						</div>
 					)}
 					<div
-						className="size-10 mr-3 flex flex-col justify-center items-center"
+						className="size-10  flex flex-col justify-center items-center"
 						onClick={() => callUser(true)}
 					>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
@@ -248,7 +248,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						<span className="text-xs">视频</span>
 					</div>
 					<div
-						className="size-10 mr-3 flex flex-col justify-center items-center"
+						className="size-10 flex flex-col justify-center items-center"
 						onClick={() => callUser(false)}
 					>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
@@ -256,7 +256,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						</div>
 						<span className="text-xs">语音</span>
 					</div>
-					<div className="size-10 mr-3 flex flex-col justify-center items-center" onClick={() => {}}>
+					<div className="size-10  flex flex-col justify-center items-center" onClick={() => {}}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 							<Link iconF7="tag_fill" iconSize={22} />
 						</div>

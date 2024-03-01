@@ -6,8 +6,8 @@ import { MessageStore } from '@/stores/message'
 // import CommonStore from '@/db/common'
 import { StateStore } from '@/stores/state'
 
-const user_id = getCookie(USER_ID) ?? ''
-const device_id = getCookie(DEVICE_ID) ?? ''
+// const user_id = getCookie(USER_ID) ?? ''
+// const device_id = getCookie(DEVICE_ID) ?? ''
 
 /**
  * 处理私聊接收的 socket 的消息
@@ -17,15 +17,19 @@ export const handlerMessageSocket = async (data: any, msgStore: MessageStore, st
 	try {
 		const message = data.data
 		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-
+		// debugger
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
-		if (user_id === message.sender_id && data.driverId === device_id) return
+		if (getCookie(USER_ID) === message.sender_id && data.driverId === getCookie(DEVICE_ID)) return
+
+		// debugger
 
 		// 防止重复添加消息
-		const index = msgStore.messages.findIndex((item: any) => item.msg_id === message.msg_id)
-		if (index !== -1) return
+		const messages =
+			(await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', message?.dialog_id)) ?? []
+		console.log('messages', messages, message, data, getCookie(DEVICE_ID))
 
-		// return
+		const index = messages.findIndex((item: any) => item?.msg_id === message?.msg_id)
+		if (index !== -1) return
 
 		const msg = {
 			dialog_id: message?.dialog_id,
@@ -106,7 +110,7 @@ export const handlerLabelSocket = async (data: any, msgStore: MessageStore) => {
 	try {
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
 		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-		if (user_id === data?.data?.sender_id && data?.driverId === device_id) return
+		if (getCookie(USER_ID) === data?.data?.sender_id && data?.driverId === getCookie(DEVICE_ID)) return
 		const msg = data.data
 
 		let txt = ''
@@ -163,7 +167,7 @@ export const handlerEditSocket = async (data: any, msgStore: MessageStore) => {
 		console.log('data', data, msgStore)
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
 		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-		if (user_id === data?.data?.sender_id && data?.driverId === device_id) return
+		if (getCookie(USER_ID) === data?.data?.sender_id && data?.driverId === getCookie(DEVICE_ID)) return
 
 		const msg = (
 			await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', data?.data?.dialog_id)
