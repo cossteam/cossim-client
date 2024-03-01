@@ -173,10 +173,12 @@ export const callStore = (set: any, get: any): CallStore => ({
 		try {
 			const { callInfo } = get()
 			const isUser = callInfo?.userInfo?.user_id
-			const createRoomParams = {
-				[isUser ? 'user_id' : 'group_id']: isUser ? callInfo?.userInfo?.user_id : callInfo?.groupInfo?.group_id
-			}
-			console.log('createRoomParams', createRoomParams)
+			const createRoomParams: any = {}
+			isUser && (createRoomParams['user_id'] = callInfo?.userInfo?.user_id)
+			!isUser && (createRoomParams['group_id'] = callInfo?.groupInfo?.group_id)
+			!isUser && (createRoomParams['option'] = {})
+
+			console.log(createRoomParams)
 
 			const joinResp = isUser
 				? await CallService.joinLiveUserApi(createRoomParams)

@@ -677,6 +677,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 							className={moreType === MessageMore.EMOJI ? '' : 'hidden'}
 						/>
 						<div className={clsx('w-full', moreType === MessageMore.OTHER ? '' : 'hidden')}>
+							{receiver_id}
 							{!is_system && <ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />}
 						</div>
 					</div>

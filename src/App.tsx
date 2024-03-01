@@ -109,7 +109,7 @@ function App() {
 							}
 						} else {
 							newCallInfo['groupInfo'] = {
-								group_id: data?.data?.sender_id
+								group_id: data?.data?.group_id
 							}
 						}
 						updateCallInfo(newCallInfo)
