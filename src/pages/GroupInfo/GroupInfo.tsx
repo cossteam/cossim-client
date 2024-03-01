@@ -59,16 +59,13 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 	const [silence, setSilence] = useState(false)
 
 	// 群聊信息
-	const [groupInfo, setGroupInfo] = useState({
-		name: ''
-	})
+	const [groupInfo, setGroupInfo] = useState<any>()
 
 	useEffect(() => {
 		;(async () => {
 			// 获取群聊信息
 			const { code, data } = await GroupService.groupInfoApi({ group_id: GroupId })
 			if (code !== 200) return
-			console.log(data)
 			code === 200 && setGroupInfo(data)
 			const isSilence = data?.preferences?.silent_notification
 			setSilence(isSilence === 1)
@@ -197,13 +194,13 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 				</ListItem>
 			</List>
 			<List className="m-0 mb-3 bg-white" strong dividers outline>
-				<ListItem link title="群聊名称">
+				<ListItem title="群聊名称" link={identity === 2 ? `/add_group/?id=${groupInfo?.id}` : identity === 2}>
 					<div slot="after">
-						<span>{groupInfo.name}</span>
+						<span>{groupInfo?.name}</span>
 					</div>
 				</ListItem>
-				{/* <ListItem link title="群二维码"></ListItem> */}
 				<ListItem link={`/group_notice/${GroupId}/?identity=${identity}`} title="群公告"></ListItem>
+				{/* <ListItem link title="群二维码"></ListItem> */}
 			</List>
 			<List className="m-0 mb-3 bg-white" strong dividers outline noChevron>
 				<ListItem title="消息免打扰">

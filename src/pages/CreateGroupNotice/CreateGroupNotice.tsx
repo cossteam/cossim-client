@@ -148,7 +148,7 @@ const CreateGroupNotice: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 			<Card className="coss_card_title">
 				<CardContent className="flex justify-center flex-col items-center">
-					{is_created ? (
+					{is_admin ? (
 						<input
 							className="bg-transparent w-full text-base"
 							name="title"
@@ -164,7 +164,7 @@ const CreateGroupNotice: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 			<Card className="coss_card_content">
 				<CardContent className="flex justify-center flex-col items-center">
-					{is_created ? (
+					{is_admin ? (
 						<textarea
 							className="bg-transparent w-full"
 							name="content"
@@ -174,7 +174,7 @@ const CreateGroupNotice: React.FC<RouterProps> = ({ f7route, f7router }) => {
 							onChange={(e) => setNotification({ ...notification, content: e.target.value })}
 						/>
 					) : (
-						<div className="text-gray-600 w-full min-h-96">{notification?.content}</div>
+						<div className="text-gray-600 w-full break-all">{notification?.content}</div>
 					)}
 				</CardContent>
 			</Card>

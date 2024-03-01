@@ -105,6 +105,20 @@ class GroupServiceImpl {
 	}
 
 	/**
+	 * 修改群聊信息
+	 * @param id
+	 * @param data
+	 * @returns
+	 */
+	groupUpdateApi(data: any): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/update`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
 	 * 获取群成员列表
 	 * @param {*} param
 	 * @param {*} param.group_id
