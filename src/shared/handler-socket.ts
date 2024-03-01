@@ -25,6 +25,8 @@ export const handlerMessageSocket = async (data: any, msgStore: MessageStore, st
 		const index = msgStore.messages.findIndex((item: any) => item.msg_id === message.msg_id)
 		if (index !== -1) return
 
+		// return
+
 		const msg = {
 			dialog_id: message?.dialog_id,
 			content: message?.content,
