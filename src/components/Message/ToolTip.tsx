@@ -1,7 +1,7 @@
 import { useClickOutside } from '@reactuses/core'
 import clsx from 'clsx'
 import { Link } from 'framework7-react'
-import { RefObject, useEffect, useRef, useState } from 'react'
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import { $t, TOOLTIP_TYPE } from '@/shared'
 import {
 	ArrowUpRight,
@@ -24,16 +24,16 @@ interface ToolTipProps {
 const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 	const tooltipRef = useRef<HTMLDivElement | null>(null)
 	const triangleRef = useRef<HTMLDivElement | null>(null)
-
 	// 控制显示隐藏
 	const [visible, setVisible] = useState<boolean>(true)
 	// 是否触发上下边界
 	const [top, setTop] = useState<boolean>(false)
 	// msg_id
 	const [msgId, setMsgId] = useState<number>(0)
-
 	// 当前选中的元素
 	const currentRef = useRef<HTMLLIElement | null>(null)
+
+	const selectChange = useCallback((type: TOOLTIP_TYPE, msg_id: number) => onSelect(type, msg_id), [onSelect])
 
 	useClickOutside(tooltipRef, () => {
 		currentRef.current!.style.zIndex = '1'
@@ -83,13 +83,6 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 			title: $t('标注'),
 			icon: <Flag className="tooltip__icon" />
 		}
-		// is_group
-		// 	? {
-		// 			name: TOOLTIP_TYPE.NOTICE,
-		// 			title: $t('公告'),
-		// 			icon: <Flag className="tooltip__icon" />
-		// 		}
-		// 	: null
 	])
 
 	// 边界控制
@@ -130,7 +123,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect }) => {
 					tooltipRef={tooltipRef}
 					triangleRef={triangleRef}
 					tips={tips}
-					onSelect={onSelect}
+					onSelect={selectChange}
 					setVisible={() => divRef.current?.remove()}
 					msgId={Number(id)}
 					top={top}
@@ -197,8 +190,6 @@ const ToolTipView: React.FC<ToolTipViewProps> = ({
 	top
 }) => {
 	const { updateTrgger } = useMessageStore()
-
-	console.log('tops', tips)
 
 	const handlerClick = (item: any) => {
 		onSelect(item.name, msgId)

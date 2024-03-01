@@ -1,4 +1,4 @@
-import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
+import { ArrowUpRight, BellFill, ChevronRight, Ellipsis, Trash } from 'framework7-icons/react'
 import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAsyncEffect, useClickOutside } from '@reactuses/core'
@@ -69,12 +69,14 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const { messages, ...msgStore } = useMessageStore()
 
 	// 在进入页面前设置内容高度
+	const [totalHeight, setTotalHeight] = useState<number>(0)
 	const onPageInit = async () => {
 		const navbarHeight = navbarRef.current.el!.offsetHeight || 56
 		const subnavbarHeight = subnavbarRef.current.el?.offsetHeight || 45
 		const toolbarHeight = toolbarRef.current!.offsetHeight || 56
 		const totalHeight = navbarHeight + subnavbarHeight + toolbarHeight
-		BlockRef.current!.el!.style.minHeight = `calc(100vh - ${totalHeight}px)`
+		setTotalHeight(totalHeight)
+		setContentHeight(totalHeight)
 	}
 
 	// 当前提示选择的消息类型
@@ -83,8 +85,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		const msg = messages.find((v) => v.msg_id === msg_id)
 		type !== TOOLTIP_TYPE.SELECT && setSelectMsgs([msg])
 		setSelectType(type)
-
-		console.log('提示选择', msg_id, type, msg)
 
 		switch (type) {
 			case TOOLTIP_TYPE.COPY:
@@ -134,6 +134,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			try {
 				list.forEach((v) => {
 					const is_group = v?.group_id ? true : false
+
 					msgs.forEach((item) => {
 						msgStore.sendMessage(msgType, item?.content, {
 							is_group,
@@ -323,6 +324,15 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			 * @description 聚焦时需要延时，并把底部内容收起
 			 */
 			quill.root.addEventListener('focus', () => {
+				// if (timer) clearTimeout(timer)
+				// timer = setTimeout(() => {
+				// 	BlockRef.current.el!.style.transitionDuration = '0.3s'
+				// 	BlockRef.current.el!.style.paddingBottom = keyboardHeight +  56 + 'px'
+				// 	scroll(contentRef.current!, true)
+				// }, 0)
+				// console.log("键盘弹起");
+				setContentHeight(keyboardHeight)
+
 				setTimeout(() => {
 					if (eventSources === Quill.sources.API) return
 
@@ -330,28 +340,27 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					BlockRef.current.el!.style.paddingBottom = 56 + 'px'
 					closeToolBar()
 				}, 0)
-
-				if (!isWeb && isScrollEnd()) {
-					BlockRef.current.el!.style.transitionDuration = '0s'
-					BlockRef.current.el!.style.paddingBottom = keyboardHeight + 56 + 'px'
-					scroll(contentRef.current!, true)
-				}
 			})
+
+			window.addEventListener('resize', hanlderPageSize)
 		},
-		() => {},
+		() => {
+			window.removeEventListener('resize', hanlderPageSize)
+		},
 		[]
 	)
 
+	const hanlderPageSize = () => {
+		if (!contentRef.current) return
+		scroll(contentRef.current!, false)
+	}
+
 	const sendMessage = async () => {
-		const isEnd = isScrollEnd()
 		const quill = editorRef.current!.quill
-
 		let type = msgType
-		const content = quill.getSemanticHTML()
 
-		if (hasImageHtml(content)) {
-			type = MESSAGE_TYPE.IMAGE
-		}
+		const content = quill.getSemanticHTML()
+		if (hasImageHtml(content)) type = MESSAGE_TYPE.IMAGE
 
 		// 发送或编辑消息
 		selectType === TOOLTIP_TYPE.EDIT
@@ -359,7 +368,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			: msgStore.sendMessage(type, content, { replay_id: isReply() ? selectMsgs[0]?.msg_id : 0 })
 
 		setSelectType(TOOLTIP_TYPE.NONE)
-		setTimeout(() => scroll(contentRef.current!, isEnd ? true : false), 100)
 
 		// 发送成功的操作
 		quill.deleteText(0, quill.getLength() - 1)
@@ -374,9 +382,8 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	useEffect(() => {
 		if (!messages.length) return
 
-		if (isScrollEnd(200) && !isMe(messages.at(-1)?.sender_id || '')) {
-			setTimeout(() => scroll(contentRef.current!, true), 100)
-		}
+		// 滚动到底部
+		setTimeout(() => scroll(contentRef.current!, isScrollEnd(200) ? true : false), 100)
 
 		// 如果不是自己的消息，就设置已读
 		if (!isMe(messages.at(-1)?.sender_id || '')) {
@@ -420,6 +427,8 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const isEdit = () => selectType === TOOLTIP_TYPE.EDIT
 	const replyMessage = (msg_id: number) => msgStore.all_meesages.find((v) => v?.msg_id === msg_id)
 	const setToolbarBottom = (bottom: number) => (toolbarRef.current!.style.transform = `translateY(${bottom}px)`)
+	const setContentHeight = (height: number = 0) =>
+		(BlockRef.current!.el!.style.minHeight = `calc(100vh - ${height + totalHeight}px)`)
 
 	// 关闭更多功能
 	const closeToolBar = () => {
@@ -440,9 +449,10 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			className="coss_message transition-all"
 			onPageInit={onPageInit}
 			ref={pageRef}
-			onPageBeforeOut={() =>{  
-				msgStore.clearMessages()
-				updateChat(true) }}
+			onPageBeforeOut={() => {
+				// msgStore.clearMessages()
+				updateChat(true)
+			}}
 		>
 			<Navbar
 				title={dialog_name}
@@ -471,17 +481,23 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				</NavRight>
 				{is_group && groupAnnouncement && (
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
-						<div className="w-full h-full flex justify-center items-center">
-							<div className="w-full py-1 bg-bgPrimary rounded-lg px-4 relative">
-								<p className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[80%] text-textSecondary">
+						<Link
+							className="w-full h-full flex justify-center items-center rounded bg-bgPrimary"
+							href={`/group_notice/${receiver_id}/`}
+						>
+							<div className="w-full py-3 px-4 relative flex items-center">
+								<BellFill className="mr-3 text-orange-400 text-sm" />
+								<p className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[86%] text-textSecondary">
+									<span className="font-bold">
+										{getLatestGroupAnnouncement(groupAnnouncement).title}：
+									</span>
 									{getLatestGroupAnnouncement(groupAnnouncement).content}
 								</p>
-								<Xmark
-									className="text-textTertiary absolute right-3 text-sm top-0 bottom-0 m-auto"
-									onClick={() => setGroupAnnouncement(null)}
-								/>
+								<div className="absolute right-3">
+									<ChevronRight className="text-textTertiary text-sm" />
+								</div>
 							</div>
-						</div>
+						</Link>
 					</Subnavbar>
 				)}
 			</Navbar>
@@ -490,7 +506,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			<Block
 				className={clsx('my-0 px-0 pt-5 pb-16 transition-all duration-300 ease-linear')}
 				ref={BlockRef}
-				style={{ paddingTop: is_group && groupAnnouncement ? '40px' : '20px' }}
+				style={{ paddingTop: is_group && groupAnnouncement ? '110px' : '60px' }}
 			>
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (

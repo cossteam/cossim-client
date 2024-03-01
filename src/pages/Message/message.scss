@@ -8,10 +8,11 @@
     --animate-duration: 0.3s;
 
 
-
     .page-content {
         // padding-top: calc(var(--f7-page-navbar-offset, 0px) + var(--f7-page-toolbar-top-offset, 0px) + var(--f7-page-subnavbar-offset, 0px) + var(--f7-page-searchbar-offset, 0px) + var(--f7-page-content-extra-padding-top, 0px));
         // padding-top: 88px;
+        // test
+        padding: 0;
 
         &::-webkit-scrollbar {
             display: none;

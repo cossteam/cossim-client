@@ -5,7 +5,6 @@ import { useAsyncEffect, useClickOutside } from '@reactuses/core'
 import {
 	FaceSmiling,
 	PlusCircle,
-	// EllipsesBubbleFill,
 	ArrowRightCircleFill,
 	MicCircleFill,
 	Xmark,
@@ -16,10 +15,18 @@ import { useClipboard } from '@reactuses/core'
 
 import './message.scss'
 import { useMessageStore } from '@/stores/message'
-import { $t, TOOLTIP_TYPE, MESSAGE_TYPE, isMe, hasImageHtml } from '@/shared'
+import {
+	$t,
+	TOOLTIP_TYPE,
+	MESSAGE_TYPE,
+	isMe,
+	hasImageHtml,
+	scroll,
+	MessageMore,
+	getLatestGroupAnnouncement
+} from '@/shared'
 import Chat from '@/components/Message/Chat'
-// import ToolEditor } from '@/components/Editor/ToolEditor'
-import { isWebDevice, platform } from '@/utils'
+import { isWebDevice } from '@/utils'
 import clsx from 'clsx'
 import { useToast } from '@/hooks/useToast'
 import Contact from '@/components/Contact/Contact'
@@ -30,54 +37,11 @@ import ToolEditor, { ToolEditorMethods, ReadEditor } from '@/Editor'
 import { useStateStore } from '@/stores/state'
 import Quill from 'quill'
 import ToolBarMore from '@/components/Message/ToolBarMore'
-// import { useLiveQuery } from 'dexie-react-hooks'
-// import UserStore from '@/db/user'
-// import { FixedSizeList } from 'react-window'
-// import AutoSizer from 'react-virtualized-auto-sizer'
-// import VariableSizeList from '@/components/VariableSizeList/VariableSizeList'
-
-/**
- * 滚动元素到底部
- *
- * @param element		滚动元素
- * @param isSmooth		是否平滑滚动
- */
-const scroll = (element: HTMLElement, isSmooth: boolean = false) => {
-	element.scrollTo({ top: element.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
-}
-
-type MoreType = 'emojis' | 'more' | ''
-
-// const rowRender = ({ index, setItemSize }: { index: number; setItemSize: (index: number, height: number) => void }) => {
-// 	const
-
-// 	const item = messages[index]
-
-// 	if (!item) return <></>
-
-// 	return (
-// 		<div ref={itemRef} className="h-auto" style={{ height: 'auto' }}>
-// 			<List noChevron mediaList className="my-0">
-// 				<ListItem
-// 					key={index}
-// 					className="coss_list_item animate__animated  animate__fadeInUp"
-// 					data-index={index}
-// 					style={{ zIndex: 1 }}
-// 					checkbox={isSelect() && !item?.tips_msg_id}
-// 					onChange={(e) => onSelectChange(e, item)}
-// 				>
-// 					<Chat
-// 						msg={item}
-// 						index={index}
-// 						onSelect={onSelect}
-// 						isSelected={isSelect()}
-// 						reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
-// 					/>
-// 				</ListItem>
-// 			</List>
-// 		</div>
-// 	)
-// }
+import { KeyboardIcon } from '@/components/Icon/Icon'
+import { Delta } from 'quill/core'
+import { EmitterSource } from 'quill/core/emitter'
+// import MsgService from '@/api/msg'
+// import RelationService from '@/api/relation'
 
 const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const pageRef = useRef<{ el: HTMLElement | null }>({ el: null })
@@ -104,22 +68,15 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const { updateChat } = useStateStore()
 	const { messages, ...msgStore } = useMessageStore()
 
-	// const [pageHeight, setPageHeight] = useState<number>(0)
-
 	// 在进入页面前设置内容高度
+	const [totalHeight, setTotalHeight] = useState<number>(0)
 	const onPageInit = async () => {
 		const navbarHeight = navbarRef.current.el!.offsetHeight || 56
 		const subnavbarHeight = subnavbarRef.current.el?.offsetHeight || 45
 		const toolbarHeight = toolbarRef.current!.offsetHeight || 56
-
 		const totalHeight = navbarHeight + subnavbarHeight + toolbarHeight
-		BlockRef.current!.el!.style.minHeight = `calc(100vh - ${totalHeight}px)`
-
-		// 设置内容高度
-		// setPageHeight(document.documentElement.clientHeight)
-
-		// const data = await MsgService.getUserMessageListApi({ user_id: receiver_id, page_num: 1, page_size: 10 })
-		// console.log('data', data)
+		setTotalHeight(totalHeight)
+		setContentHeight(totalHeight)
 	}
 
 	// 当前提示选择的消息类型
@@ -139,7 +96,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				setShowSelect(true)
 				break
 			case TOOLTIP_TYPE.EDIT:
-				// editorRef.current?.engine.insertElement(msg?.content || '', { isFocus: true })
 				editorRef.current!.quill.root.innerHTML = msg?.content || ''
 				break
 			case TOOLTIP_TYPE.DELETE:
@@ -217,6 +173,16 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			setSelect([])
 			setSelectMsgs([])
 		}
+		// notice: async (msg: any) => {
+		// 	console.log('设置群公告', msg)
+		// 	const { data } = await RelationService.createGroupNoticeApi({
+		// 		group_id: msg?.group_id,
+		// 		content: msg?.content,
+		// 		title: ''
+		// 	})
+
+		// 	console.log('data', data)
+		// }
 	}
 	// 多选时选择的消息
 	const onSelectChange = (e: any, msg: any) => {
@@ -237,32 +203,28 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	)
 
 	// 表情/更多切换
-	const [moreType, setMoreType] = useState<MoreType>('')
+	const [moreType, setMoreType] = useState<MessageMore>(MessageMore.TEXT)
 	const moreRef = useRef<HTMLDivElement | null>(null)
-	const showMore = (type: MoreType) => {
+	const showMore = (type: MessageMore) => {
 		const isEnd = isScrollEnd()
 
-		// isWeb
-		if (type === moreType) {
-			setMoreType('')
-			setToolbarBottom(keyboardHeight)
-			// setTimeout(() => {
+		if (type === MessageMore.TEXT) {
+			closeToolBar()
 			BlockRef.current.el!.style.transitionDuration = '0.3s'
-			isWeb && (BlockRef.current.el!.style.paddingBottom = 56 + 'px')
-			// }, 300)
+			BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+			setTimeout(() => {
+				editorRef.current!.quill.focus()
+			}, 300)
 			return
+		} else {
+			setMoreType(type)
+			setToolbarBottom(0)
 		}
-		// !isWeb ? Keyboard?.hide() : setToolbarBottom(0)
-		setToolbarBottom(0)
-
-		setMoreType(type)
 
 		BlockRef.current.el!.style.transitionDuration = '0s'
 		BlockRef.current.el!.style.paddingBottom = keyboardHeight + 56 + 'px'
 		requestAnimationFrame(() => {
-			// setTimeout(()=>{
 			isEnd && scroll(contentRef.current!, true)
-			// },300)
 		})
 	}
 
@@ -272,11 +234,14 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	// 键盘弹起
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(300)
 	// 控制工具栏的显示
-	useClickOutside(toolbarRef, () => closeToolBar())
+	useClickOutside(toolbarRef, () => {
+		// blurInput()
+		// setEmojs(false)
+		// emojis = false
+		closeToolBar()
+	})
 	// 设备信息
-	const [platformName, setPlatformName] = useState<string>('web')
-	// 键盘显示
-	// const [keyboardShow, setKeyboardShow] = useState<boolean>(false)
+	// const [platformName, setPlatformName] = useState<string>('web')
 
 	const [isWeb, setIsWeb] = useState<boolean>(true)
 
@@ -313,113 +278,69 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 			// 判断设备
 			setIsWeb(await isWebDevice())
-
 			// 手机端监听键盘
-			const platformName = await platform()
-			setPlatformName(platformName)
-
+			// const platformName = await platform()
+			// setPlatformName(platformName)
 			if (!isWeb) {
 				Keyboard.addListener('keyboardWillShow', (info) => {
 					setKeyboardHeight(info.keyboardHeight - 15)
-					setMoreType('')
-					setToolbarBottom(keyboardHeight)
-					// requestAnimationFrame(() => {
-					// 	Keyboard.show()
-					// })
+					// setMoreType(MessageMore.TEXT)
+					// setToolbarBottom(keyboardHeight)
 				})
 				// Keyboard.addListener('keyboardDidShow', () => {
 				// 	setToolbarBottom(keyboardHeight)
 				// })
-				Keyboard.addListener('keyboardDidHide', () => {
-					// if (!moreType) {
-					// 	requestAnimationFrame(() => {
-					// 		setTimeout(() => {
-					// 			setToolbarBottom(0)
-					// 		}, 0)
-					// 	})
-					// } else {
-					// 	setToolbarBottom(0)
-					// }
-					// BlockRef.current.el!.style.paddingBottom = 56 + 'px'
-				})
+				// Keyboard.addListener('keyboardDidHide', () => {
+				// if (!moreType) {
+				// 	requestAnimationFrame(() => {
+				// 		setTimeout(() => {
+				// 			setToolbarBottom(0)
+				// 		}, 0)
+				// 	})
+				// } else {
+				// 	setToolbarBottom(0)
+				// }
+				// BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+				// })
 			}
-
-			// let members: any = []
-			// try {
-			// 	const { data } = await GroupService.groupMemberApi({ group_id: Number(receiver_id) })
-			// 	// members = data
-			// } catch (error) {
-			// 	// members = []
-			// }
-
-			// const engine = editorRef.current!.engine
-			// engine.on(EventType.CHANGE, () => setShowBtn(!engine.isEmpty()))
-
-			// // 自定义聚焦事件
-			// engine.on(EventType.FOCUS, () => {
-			// 	BlockRef.current.el!.style.paddingBottom = 56 + 'px'
-			// 	closeToolBar()
-			// 	requestAnimationFrame(() => {
-			// 		engine.readonly = false
-			// 		if (!moreType) {
-			// 			setTimeout(() => engine.focus(), 300)
-			// 		} else {
-			// 			setTimeout(() => engine.focus(), 0)
-			// 			return
-			// 		}
-			// 	})
-			// })
-
-			// // @ 事件
-			// let is_at = false
-			// is_group &&
-			// 	engine.on(EventType.AITE, (e) => {
-			// 		console.log('e,', e.target)
-			// 		const rect = e.target?.getBoundingClientRect()
-			// 		console.log('rect', rect)
-			// 		const div = document.createElement('div')
-			// 		div.id = 'tooltips'
-			// 		div.style.left = `${rect.left}px`
-			// 		div.style.top = `${rect.top - e.target.offsetHeight}px`
-			// 		div.innerHTML = '暂不支持'
-			// 		document.body.appendChild(div)
-			// 		is_at = true
-			// 	})
-
-			// is_group &&
-			// 	engine.on(EventType.AITE_END, () => {
-			// 		console.log('@ 结束')
-
-			// 		if (is_at) {
-			// 			const el = document.getElementById('tooltips')
-			// 			if (el) el.remove()
-			// 			is_at = false
-			// 		}
-			// 	})
 
 			const quill = editorRef.current!.quill
 
-			quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
-				if (type !== Quill.events.SELECTION_CHANGE) {
-					setShowBtn(quill.getLength() > 1)
-				}
-				// console.log('type', type, oldDelta, source)
-			})
+			let eventSources: EmitterSource = Quill.sources.API
 
-			// 自定义聚焦事件
-			// TODO：修复键盘弹起
+			/**
+			 * @description 编辑器变化
+			 */
+			quill.on(
+				Quill.events.EDITOR_CHANGE,
+				(type: string, _delta: Delta, _oldDelta: Delta, source: EmitterSource) => {
+					if (type !== Quill.events.SELECTION_CHANGE) {
+						setShowBtn(quill.getLength() > 1)
+					}
+					eventSources = source
+				}
+			)
+
+			/**
+			 * @description 聚焦时需要延时，并把底部内容收起
+			 */
 			quill.root.addEventListener('focus', () => {
-				BlockRef.current.el!.style.paddingBottom = 56 + 'px'
-				closeToolBar()
-				// requestAnimationFrame(() => {
-				// 	// quill.readonly = false
-				// 	// if (!moreType) {
-				// 	// 	setTimeout(() => engine.focus(), 300)
-				// 	// } else {
-				// 	// 	setTimeout(() => engine.focus(), 0)
-				// 	// 	return
-				// 	// }
-				// })
+				// if (timer) clearTimeout(timer)
+				// timer = setTimeout(() => {
+				// 	BlockRef.current.el!.style.transitionDuration = '0.3s'
+				// 	BlockRef.current.el!.style.paddingBottom = keyboardHeight +  56 + 'px'
+				// 	scroll(contentRef.current!, true)
+				// }, 0)
+				// console.log("键盘弹起");
+				setContentHeight(keyboardHeight)
+
+				setTimeout(() => {
+					if (eventSources === Quill.sources.API) return
+
+					BlockRef.current.el!.style.transitionDuration = '0.3s'
+					BlockRef.current.el!.style.paddingBottom = 56 + 'px'
+					closeToolBar()
+				}, 0)
 			})
 		},
 		() => {},
@@ -427,16 +348,11 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	)
 
 	const sendMessage = async () => {
-		const isEnd = isScrollEnd()
 		const quill = editorRef.current!.quill
-		// const content = quill.getSemanticHTML()
-
 		let type = msgType
-		const content = quill.getSemanticHTML()
 
-		if (hasImageHtml(content)) {
-			type = MESSAGE_TYPE.IMAGE
-		}
+		const content = quill.getSemanticHTML()
+		if (hasImageHtml(content)) type = MESSAGE_TYPE.IMAGE
 
 		// 发送或编辑消息
 		selectType === TOOLTIP_TYPE.EDIT
@@ -444,7 +360,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			: msgStore.sendMessage(type, content, { replay_id: isReply() ? selectMsgs[0]?.msg_id : 0 })
 
 		setSelectType(TOOLTIP_TYPE.NONE)
-		setTimeout(() => scroll(contentRef.current!, isEnd ? true : false), 100)
 
 		// 发送成功的操作
 		quill.deleteText(0, quill.getLength() - 1)
@@ -459,19 +374,14 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	useEffect(() => {
 		if (!messages.length) return
 
-		if (isScrollEnd(200) && !isMe(messages.at(-1)?.sender_id || '')) {
-			setTimeout(() => scroll(contentRef.current!, true), 100)
-		}
+		// 滚动到底部
+		setTimeout(() => scroll(contentRef.current!, isScrollEnd(200) ? true : false), 100)
 
 		// 如果不是自己的消息，就设置已读
 		if (!isMe(messages.at(-1)?.sender_id || '')) {
 			msgStore.readMessage(messages)
 		}
 	}, [messages])
-
-	// useEffect(() => {
-	// 	console.log('dialog', dialog)
-	// }, [dialog])
 
 	// 选择表情
 	const onSelectEmojis = (emojis: any) => {
@@ -480,10 +390,23 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		editorRef.current!.quill.insertText(
 			editorRef.current!.quill.getSelection()?.index || 0,
 			emojis.native,
-			Quill.sources.USER
+			Quill.sources.API
 		)
 		editorRef.current!.quill.blur()
 	}
+
+	// const focusInput = () => {
+	// 	console.log('键盘显示')
+	// 	if (moreType !== MessageMore.TEXT) return
+	// 	editorRef.current?.quill.enable(true)
+	// 	editorRef.current?.quill.focus()
+	// }
+
+	// const blurInput = () => {
+	// 	console.log('键盘隐藏')
+	// 	editorRef.current?.quill.enable(false)
+	// 	editorRef.current?.quill.blur()
+	// }
 
 	// 阅读所有
 	// const readAll = () => {
@@ -496,11 +419,13 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const isEdit = () => selectType === TOOLTIP_TYPE.EDIT
 	const replyMessage = (msg_id: number) => msgStore.all_meesages.find((v) => v?.msg_id === msg_id)
 	const setToolbarBottom = (bottom: number) => (toolbarRef.current!.style.transform = `translateY(${bottom}px)`)
+	const setContentHeight = (height: number = 0) =>
+		(BlockRef.current!.el!.style.minHeight = `calc(100vh - ${height+totalHeight}px)`)
 
 	// 关闭更多功能
 	const closeToolBar = () => {
-		setMoreType('')
-		platformName === 'web' && setToolbarBottom(keyboardHeight)
+		setMoreType(MessageMore.TEXT)
+		setToolbarBottom(keyboardHeight)
 	}
 
 	// 判断是否滚动到底部
@@ -510,16 +435,16 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			contentRef.current!.scrollTop + contentRef.current!.offsetHeight >= contentRef.current!.scrollHeight - setp
 		)
 	}
-
-	// const listItemRef = useRef<{ el: HTMLDivElement[] }>()
-
 	return (
 		<Page
 			noToolbar
 			className="coss_message transition-all"
 			onPageInit={onPageInit}
 			ref={pageRef}
-			onPageBeforeOut={() => updateChat(true)}
+			onPageBeforeOut={() => {
+				msgStore.clearMessages()
+				updateChat(true)
+			}}
 		>
 			<Navbar
 				title={dialog_name}
@@ -548,13 +473,27 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				</NavRight>
 				{is_group && groupAnnouncement && (
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster" ref={subnavbarRef}>
-						1111
+						<div className="w-full h-full flex justify-center items-center">
+							<div className="w-full py-1 bg-bgPrimary rounded-lg px-4 relative">
+								<p className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[80%] text-textSecondary">
+									{getLatestGroupAnnouncement(groupAnnouncement).content}
+								</p>
+								<Xmark
+									className="text-textTertiary absolute right-3 text-sm top-0 bottom-0 m-auto"
+									onClick={() => setGroupAnnouncement(null)}
+								/>
+							</div>
+						</div>
 					</Subnavbar>
 				)}
 			</Navbar>
 
 			{/* pt-5 pb-16 */}
-			<Block className="my-0 px-0 pt-0 pb-16 transition-all duration-300 ease-linear" ref={BlockRef}>
+			<Block
+				className={clsx('my-0 px-0 pt-5 pb-16 transition-all duration-300 ease-linear')}
+				ref={BlockRef}
+				style={{ paddingTop: is_group && groupAnnouncement ? '40px' : '20px' }}
+			>
 				<List noChevron mediaList className="my-0">
 					{messages.map((item, index) => (
 						<ListItem
@@ -615,7 +554,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 								<Button fill className="w-full h-9 mx-2 animate__animated animate__zoomIn" round>
 									{$t('长按说话')}
 								</Button>
-								<Link onClick={() => showMore('more')}>
+								<Link onClick={() => showMore(MessageMore.TEXT)}>
 									<PlusCircle className="text-4xl text-gray-500 mr-2" />
 								</Link>
 							</div>
@@ -638,10 +577,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 									</div>
 									{(isReply() || isEdit()) && (
 										<div className="mt-1 bg-bgTertiary relative flex justify-between">
-											{/* <ToolEditor
-												initValue={selectMsgs[0]?.content}
-												className="px-2 py-1 read-editor-1"
-											/> */}
 											<ReadEditor
 												content={selectMsgs[0]?.content}
 												className="reply-read-editor"
@@ -662,10 +597,17 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 									)}
 								</div>
 								<div className="flex items-center px-2 w-[150px]">
-									<Link onClick={() => showMore('emojis')}>
-										<FaceSmiling className="text-4xl text-gray-500 mr-2" />
-									</Link>
-									<Link onClick={() => showMore('more')}>
+									{moreType === MessageMore.EMOJI ? (
+										<Link onClick={() => showMore(MessageMore.TEXT)}>
+											<KeyboardIcon className="text-4xl text-gray-500 mr-2" />
+										</Link>
+									) : (
+										<Link onClick={() => showMore(MessageMore.EMOJI)}>
+											<FaceSmiling className="text-4xl text-gray-500 mr-2" />
+										</Link>
+									)}
+
+									<Link onClick={() => showMore(MessageMore.OTHER)}>
 										<PlusCircle className="text-4xl text-gray-500 mr-2" />
 									</Link>
 
@@ -692,11 +634,13 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						style={{ height: keyboardHeight + 'px' }}
 						ref={moreRef}
 					>
-						{moreType === 'emojis' ? (
-							<Emojis onSelectEmojis={onSelectEmojis} />
-						) : (
-							!is_system && <ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />
-						)}
+						<Emojis
+							onSelectEmojis={onSelectEmojis}
+							className={moreType === MessageMore.EMOJI ? '' : 'hidden'}
+						/>
+						<div className={clsx('w-full', moreType === MessageMore.OTHER ? '' : 'hidden')}>
+							<ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />
+						</div>
 					</div>
 				</div>
 

@@ -174,20 +174,20 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
-		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users } = get()
+		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, tableName } = get()
 
-		console.log('at_all_user', at_all_user, at_users)
+		console.log('at_all_user', at_all_user, at_users, options?.is_group)
 
 		let error_message = ''
 
 		// 判断是否是群聊
-		let { is_group, tableName } = get()
-		if (options?.is_group) {
-			is_group = options?.is_group
-			tableName = is_group ? UserStore.tables.group_chats : UserStore.tables.private_chats
-		}
+		let { is_group } = get()
+
+		is_group = options?.is_group ?? is_group
 
 		const { is_forward = false } = options
+
+		const isUpdate = (is_forward && receiver_id === options?.receiver_id) || !options?.receiver_id
 
 		const msg: any = {
 			dialog_id: options?.dialog_id ?? dialog_id,
@@ -214,7 +214,10 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			uid: uuidv4(),
 			is_tips: false
 		}
-		set({ messages: [...messages, msg] })
+		// 如果是群聊
+		if (!msg.group_id) msg.group_id = 0
+
+		isUpdate && set({ messages: [...messages, msg] })
 
 		try {
 			const params: any = {
@@ -250,7 +253,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		} finally {
 			const msgs: any[] = []
 			msgs.push(msg)
-			!is_forward && (await updateDatabaseMessage(tableName, msg.uid, msg))
+			await updateDatabaseMessage(tableName, msg.uid, msg)
 
 			// 如果有错误信息
 			if (error_message) {
@@ -262,13 +265,14 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 					type: MESSAGE_TYPE.ERROR,
 					uid: uuidv4()
 				})
-				!is_forward && (await updateDatabaseMessage(tableName, msgs[1].uid, msgs[1]))
+				isUpdate && (await updateDatabaseMessage(tableName, msgs[1].uid, msgs[1]))
 			} else {
 				// 更新会话
 				await updateDialogs(msg.dialog_id, msg)
 			}
 
-			set((state) => ({ messages: [...state.messages.slice(0, -1), ...msgs], at_all_user: 0, at_users: [] }))
+			isUpdate &&
+				set((state) => ({ messages: [...state.messages.slice(0, -1), ...msgs], at_all_user: 0, at_users: [] }))
 		}
 	},
 	editMessage: async (msg: PrivateChats, content: string) => {

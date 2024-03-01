@@ -2,10 +2,10 @@ import type { PrivateChats } from '@/types/db/user-db'
 import clsx from 'clsx'
 import { Exclamationmark, Flag } from 'framework7-icons/react'
 import { format } from 'timeago.js'
-import { RefObject, useRef } from 'react'
+import { RefObject, useCallback, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { $t, isMe, MESSAGE_SEND, MESSAGE_TYPE } from '@/shared'
+import { $t, isMe, MESSAGE_SEND, MESSAGE_TYPE, TOOLTIP_TYPE } from '@/shared'
 // import ToolEditor from '@/components/Editor/ToolEditor'
 import ToolTip from './ToolTip'
 import LongPressButton from '@/components/LongPressButton/LongPressButton'
@@ -27,10 +27,12 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 
 	const is_self = isMe(msg?.sender_id)
 
+	const selectChange = useCallback((type: TOOLTIP_TYPE, msg_id: number) => onSelect(type, msg_id), [onSelect])
+
 	const createTooltip = () => {
 		if (isSelected) return
 		const div = document.createElement('div')
-		createRoot(div).render(<ToolTip onSelect={onSelect} el={tooltipRef.current!} is_group={msg?.group_id !== 0} />)
+		createRoot(div).render(<ToolTip onSelect={selectChange} el={tooltipRef.current!} is_group={msg?.group_id !== 0} />)
 		tooltipRef.current!.appendChild(div)
 		return true
 	}
@@ -107,7 +109,7 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 							<ReadEditor
 								content={msg?.content}
 								replyContent={reply?.content}
-								replyName={reply?.sender_info?.name}
+								replyName={reply?.sender_info?.name ?? reply?.sender_info?.nickname ?? ''}
 								className={clsx(is_self ? '' : 'read-editor-no-slef')}
 							/>
 						</div>
