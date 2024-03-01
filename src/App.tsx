@@ -39,7 +39,7 @@ function App() {
 
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
-		theme: 'ios',
+		theme: 'auto',
 		routes,
 		colors: {
 			primary: '#33a854'
