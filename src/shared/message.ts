@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { PrivateChats } from '@/types/db/user-db'
 import { $t, MESSAGE_TYPE } from '.'
 import MsgService from '@/api/msg'
+import CommonStore from '@/db/common'
 
 interface CommonOptions {
 	tableName: string
@@ -75,6 +76,7 @@ export const addMarkMessage = async (tableName: string, msg: PrivateChats, is_la
 		}
 
 		const user_id = getCookie(USER_ID) || ''
+		const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 
 		const marks = {
 			tips_msg_id: msg.id,
@@ -83,7 +85,11 @@ export const addMarkMessage = async (tableName: string, msg: PrivateChats, is_la
 			pid: msg.uid,
 			uid: uuidv4(),
 			is_label: is_label,
-			sender_info: msg.sender_info,
+			sender_info: {
+				name: user?.user_info?.nickname,
+				avatar: user?.user_info?.avatar,
+				user_id
+			},
 			sender_id: msg.sender_id,
 			type: MESSAGE_TYPE.LABEL,
 			label_id: user_id
@@ -174,7 +180,7 @@ export const getMessageFromServer = async (
 	id: string,
 	is_group: boolean,
 	page_num: number = 1,
-	page_size: number = 10
+	page_size: number = 100
 ) => {
 	let reslut: any = null
 	try {

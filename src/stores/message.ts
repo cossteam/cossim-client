@@ -17,7 +17,7 @@ import { getCookie } from '@/utils/cookie'
 import { updateDatabaseMessage } from '@/shared'
 import CommonStore from '@/db/common'
 import { v4 as uuidv4 } from 'uuid'
-import { isEqual, omitBy, isEmpty } from 'lodash-es'
+import { isEqual, omitBy, isEmpty, differenceBy } from 'lodash-es'
 
 const user_id = getCookie(USER_ID) || ''
 
@@ -379,14 +379,39 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 		// 获取服务器上的消息
 		getMessageFromServer(receiver_id, is_group).then((res: any) => {
-			const newMessages = messages.filter((v) => v?.msg_send_state === MESSAGE_SEND.SEND_SUCCESS)
-			const msgFormServer = res?.user_messages?.[0] || res?.group_messages?.[0]
-			const msgFormStore = newMessages?.at(-1)
+			// const newMessages = messages.filter((v) => v?.msg_send_state === MESSAGE_SEND.SEND_SUCCESS)
+			// const msgFormServer = res?.user_messages?.[0] || res?.group_messages?.[0]
+			// const msgFormStore = newMessages?.at(-1)
+			// console.log('new', messages)
 
-			console.log('获取服务器上的消息', res, newMessages)
-			if (msgFormServer?.id !== msgFormStore?.msg_id) {
-				console.log('需要加载服务器消息', msgFormServer, msgFormStore)
+			const data = res?.group_messages || res?.user_messages || []
+			const newData:any[] = data.map((v: any) => ({
+				...v,
+				msg_id: v?.id,
+				at_all_user: v?.at_all_user ?? 0,
+				at_users: v?.at_users ?? []
+			}))
+
+			if (!messages?.length) {
+				if (!data.length) return
+				set({ messages: data?.reverse() })
+				UserStore.bulkAdd(UserStore.tables.messages, data)
+				return
 			}
+
+			// TODO: 对比两个数组的差异，更新本地数据库
+			const diffData = differenceBy(newData || [], messages, 'msg_id')
+			console.log('diff', diffData, newData, messages)
+
+			// if (msgFormServer?.id === msgFormStore?.msg_id) return
+
+			// const diffData = differenceBy(res?.user_messages || [], newMessages, 'msg_id')
+			// console.log('diff', diffData)
+
+			// console.log('获取服务器上的消息', res, newMessages)
+			// if (msgFormServer?.id !== msgFormStore?.msg_id) {
+			// 	console.log('需要加载服务器消息', msgFormServer, msgFormStore)
+			// }
 		})
 
 		// 当前会话的信息，如果是私聊就是好友信息，如果是群聊就是群信息
