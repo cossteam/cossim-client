@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { MessageStore } from '@/stores/message'
 // import CommonStore from '@/db/common'
 import { StateStore } from '@/stores/state'
+import localNotification, { LocalNotificationType } from '@/utils/notification'
 
 // const user_id = getCookie(USER_ID) ?? ''
 // const device_id = getCookie(DEVICE_ID) ?? ''
@@ -47,6 +48,10 @@ export const handlerMessageSocket = async (data: any, msgStore: MessageStore, st
 			uid: uuidv4(),
 			is_tips: false
 		}
+
+		const dom = document.createElement('p')
+		dom.innerHTML = msg.content || ''
+		localNotification(LocalNotificationType.MESSAGE, msg.sender_info.name, dom.innerText)
 
 		msgStore.updateMessage(msg)
 		await UserStore.add(UserStore.tables.messages, msg)

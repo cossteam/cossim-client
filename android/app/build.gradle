@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         debug {
-            storeFile file('/Users/mac-os12/Documents/project/im/coss/COSS_KEYS')
+            storeFile file('G:\\im\\coss\\COSS_KEYS')
             storePassword 'hitosea.coss'
             keyPassword 'hitosea.coss'
             keyAlias 'hitosea_coss'
@@ -31,19 +31,19 @@ android {
         }
     }
 
-    android.applicationVariants.all {
-        variant -> variant.outputs.all { output ->
-                def date = new Date().format("yyyy-MM-dd HH:mm:ss",
-                        TimeZone.getTimeZone("GMT+08"))
-                if (variant.buildType.name == 'debug') {
-                    output.outputFileName = "coss_" +
-                            "${android.defaultConfig.versionName}_${date}_debug.apk"
-                }else if (variant.buildType.name == 'release'){
-                    output.outputFileName = "coss_" +
-                            "${android.defaultConfig.versionName}_${date}_release.apk"
-                }
-            }
-    }
+//    android.applicationVariants.all {
+//        variant -> variant.outputs.all { output ->
+//                def date = new Date().format("yyyy-MM-dd HH:mm:ss",
+//                        TimeZone.getTimeZone("GMT+08"))
+//                if (variant.buildType.name == 'debug') {
+//                    output.outputFileName = "coss_" +
+//                            "${android.defaultConfig.versionName}_${date}_debug.apk"
+//                }else if (variant.buildType.name == 'release'){
+//                    output.outputFileName = "coss_" +
+//                            "${android.defaultConfig.versionName}_${date}_release.apk"
+//                }
+//            }
+//    }
 }
 
 repositories {
