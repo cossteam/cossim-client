@@ -24,6 +24,8 @@ const ContactList: React.FC<RouterProps> = () => {
 		return friends
 	}
 
+	// 全局状态（未读消息）
+	const stateStore = useStateStore()
 	const updateApplyTotal = async () => {
 		// 获取申请列表
 		const group = await GroupService.groupRequestListApi({ user_id })
@@ -32,7 +34,10 @@ const ContactList: React.FC<RouterProps> = () => {
 		group.data && applyList.push(...group.data)
 		friend.data && applyList.push(...friend.data)
 		const len = applyList.filter((v) => [0, 4].includes(v?.status) && v?.sender_id !== user_id).length
-
+		stateStore.updateUnread({
+			...stateStore.unread,
+			apply: len
+		})
 		setApplyTotal(len)
 	}
 

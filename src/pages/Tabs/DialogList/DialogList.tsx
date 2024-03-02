@@ -23,6 +23,7 @@ import './DialogList.scss'
 import { ReadEditor } from '@/Editor'
 import { v4 as uuidv4 } from 'uuid'
 import clsx from 'clsx'
+import { useStateStore } from '@/stores/state'
 
 const getAfterMessage = async () => {
 	try {
@@ -79,6 +80,8 @@ const DialogList: React.FC<RouterProps> = () => {
 	const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
 	const [chats, setChats] = useState<any[]>(dialogs)
 
+	// 全局状态(消息未读)
+	const stateStore = useStateStore()
 	// 获取对话列表
 	const getDialogList = async () => {
 		try {
@@ -94,7 +97,9 @@ const DialogList: React.FC<RouterProps> = () => {
 				return
 			}
 
+			let unreadMsgCount = 0 // 统计未读消息数量
 			data.forEach(async (item: any) => {
+				unreadMsgCount += Number(item.dialog_unread_count) // 统计未读消息数量
 				const dialog = await UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', item.dialog_id)
 
 				if (!dialog) return await UserStore.add(UserStore.tables.dialogs, item)
@@ -105,6 +110,10 @@ const DialogList: React.FC<RouterProps> = () => {
 						...item
 					})
 				}
+			})
+			stateStore.updateUnread({
+				...stateStore.unread,
+				msg: unreadMsgCount
 			})
 		} catch {
 			console.log('错误')

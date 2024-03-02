@@ -1,6 +1,7 @@
 import { Link, Toolbar, View, Views } from 'framework7-react'
 import { useRef, useState } from 'react'
 import $ from 'dom7'
+import { useStateStore } from '@/stores/state'
 
 const Layout: React.FC = () => {
 	const [tabActive, setTabActive] = useState<string>('dialog')
@@ -18,13 +19,22 @@ const Layout: React.FC = () => {
 		previousTab.current = tabName
 	}
 
+	// 全局状态（未读消息）
+	const stateStore = useStateStore()
+
 	return (
 		<Views tabs className="safe-area app">
+			<View id="view-dialog" onTabShow={() => setTabActive('dialog')} tabActive tab url="/dialog/" main />
+			<View id="view-contacts" onTabShow={() => setTabActive('contacts')} tab url="/contacts/" />
+			<View id="view-my" onTabShow={() => setTabActive('my')} tab url="/my/" />
+
 			<Toolbar tabbar icons bottom>
 				<Link
 					tabLink="#view-dialog"
 					iconF7="chat_bubble_2"
 					text="聊天"
+					badge={stateStore?.unread?.msg || 0}
+					badgeColor="red"
 					tabLinkActive
 					onClick={() => onTabLinkClick('dialog')}
 				/>
@@ -32,14 +42,12 @@ const Layout: React.FC = () => {
 					tabLink="#view-contacts"
 					iconF7="phone"
 					text="联系人"
+					badge={stateStore?.unread?.apply || 0}
+					badgeColor="red"
 					onClick={() => onTabLinkClick('contacts')}
 				/>
 				<Link tabLink="#view-my" iconF7="person" text="我的" onClick={() => onTabLinkClick('my')} />
 			</Toolbar>
-
-			<View id="view-dialog" onTabShow={() => setTabActive('dialog')} tabActive tab url="/dialog/" main />
-			<View id="view-contacts" onTabShow={() => setTabActive('contacts')} tab url="/contacts/" />
-			<View id="view-my" onTabShow={() => setTabActive('my')} tab url="/my/" />
 		</Views>
 	)
 }

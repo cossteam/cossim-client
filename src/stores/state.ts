@@ -19,17 +19,29 @@ import { create } from 'zustand'
 export interface StateStore {
 	is_chat_update: boolean
 	is_contacts_update: boolean
+	unread: {
+		msg: number
+		apply: number
+	}
 	updateChat: (update: boolean) => void
 	updateContacts: (update: boolean) => void
+	updateUnread: (data: any) => void
 }
 
 export const useStateStore = create<StateStore>((set) => ({
 	is_chat_update: true,
 	is_contacts_update: false,
+	unread: {
+		msg: 0,
+		apply: 0
+	},
 	updateChat: (update) => {
 		set({ is_chat_update: update })
 	},
 	updateContacts: (update) => {
 		set({ is_contacts_update: update })
+	},
+	updateUnread: (unread) => {
+		set({ unread })
 	}
 }))

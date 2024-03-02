@@ -1,36 +1,43 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "./variables.scss";
-@import "./f7-custom.scss";
+@import './variables.scss';
+@import './f7-custom.scss';
 
 // body {
 //     transition: all 0.3s ease-in;
 //     background: #f36;
 // }
 
+.app {
+	.toolbar {
+		.badge {
+			position: absolute;
+			top: -30px;
+		}
+	}
+}
 /** 防止消息页显示底部导航栏 */
 .toolbar-hidden {
-    display: none;
+	display: none;
 }
 
 .hidden-navbar-bg {
-
-    & .navbar-bg {
-        display: none;
-    }
+	& .navbar-bg {
+		display: none;
+	}
 }
 
 .read_editor {
-    @apply text-ellipsis overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1 max-w-[300px];
+	@apply text-ellipsis overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1 max-w-[300px];
 
-    p {
-        @apply text-ellipsis overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1 max-w-[300px];
-    }
+	p {
+		@apply text-ellipsis overflow-hidden text-[0.75rem] w-fit text-textTertiary line-clamp-1 max-w-[300px];
+	}
 }
 
 .hidden-toolbar {
-    .toolbar.toolbar-bottom {
-        display: none;
-    }
+	.toolbar.toolbar-bottom {
+		display: none;
+	}
 }

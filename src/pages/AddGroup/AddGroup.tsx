@@ -125,7 +125,7 @@ const AddGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				</NavRight>
 			</Navbar>
 
-			<Card title={$t('群头像和群名称')} className="coss_card_title">
+			<Card className="coss_card_title pt-6">
 				<CardContent className="flex justify-center flex-col items-center">
 					<img className="w-20 h-20 rounded-full mb-5" src={group.avatar} />
 					<input
