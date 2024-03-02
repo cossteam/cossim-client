@@ -483,7 +483,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 								href={
 									is_group
 										? `/group_info/${receiver_id}/`
-										: `/profile/${receiver_id}/?from_page=message`
+										: `/profile/${receiver_id}/?from_page=message&dialog_id=${dialog_id}`
 								}
 							>
 								<Ellipsis className="w-6 h-6 mr-2" />

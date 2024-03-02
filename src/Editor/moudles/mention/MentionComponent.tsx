@@ -16,30 +16,32 @@ const MentionComponent: React.FC<MentionProps> = (props) => {
 	const MentionRef = useRef<HTMLDivElement | null>(null)
 	const ItemsRef = useRef<HTMLDivElement[]>([])
 
-	const handlerKeyDown = (e: KeyboardEvent) => {
-		const length = (props.data?.length ?? 0) - 1
-		if (length <= 0) return
-
-		switch (e.key) {
-			case 'ArrowUp':
-				e.preventDefault()
-				setActiveIndex((prevIndex) => {
-					if (prevIndex === -1) return length
-					return prevIndex - 1
-				})
-				break
-			case 'ArrowDown':
-				e.preventDefault()
-				setActiveIndex((prevIndex) => {
-					if (prevIndex === length) return -1
-					return prevIndex + 1
-				})
-				break
-		}
-	}
-
 	useEffect(() => {
 		props.data && setLoading(false)
+
+		const handlerKeyDown = (e: KeyboardEvent) => {
+			console.log('key', e)
+			const length = (props.data?.length ?? 0) - 1
+			if (length <= 0) return
+
+			switch (e.key) {
+				case 'ArrowUp':
+					e.preventDefault()
+					setActiveIndex((prevIndex) => {
+						if (prevIndex === -1) return length
+						return prevIndex - 1
+					})
+					break
+				case 'ArrowDown':
+					e.preventDefault()
+					setActiveIndex((prevIndex) => {
+						if (prevIndex === length) return -1
+						return prevIndex + 1
+					})
+					break
+			}
+		}
+
 		props.el?.addEventListener('keydown', handlerKeyDown)
 
 		return () => {

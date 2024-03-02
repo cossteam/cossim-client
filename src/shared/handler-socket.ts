@@ -105,8 +105,12 @@ export const handlerLabelSocket = async (data: any, msgStore: MessageStore) => {
 	try {
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
 		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-		if (getCookie(USER_ID) === data?.data?.sender_id && data?.driverId === getCookie(DEVICE_ID)) return
+		console.log('data', data, getCookie(USER_ID), getCookie(DEVICE_ID))
+
+		if (data?.driverId === getCookie(DEVICE_ID)) return
 		const msg = data.data
+
+		// const
 
 		let txt = ''
 		if (msg?.type === MESSAGE_TYPE.IMAGE) {
@@ -134,12 +138,13 @@ export const handlerLabelSocket = async (data: any, msgStore: MessageStore) => {
 		}
 
 		await UserStore.add(UserStore.tables.messages, marks)
+
 		msgStore.updateMessage(marks)
 
 		const message = await UserStore.findOneById(UserStore.tables.messages, 'uid', uid)
 		// 更新数据库
 		if (message) {
-			const data = { ...message, is_label: msg.is_label }
+			const data = { ...message, is_label: marks.is_label }
 			await msgStore.updateMessageById(data as any)
 			await UserStore.update(UserStore.tables.messages, 'uid', uid, data)
 		}
@@ -162,7 +167,7 @@ export const handlerEditSocket = async (data: any, msgStore: MessageStore) => {
 		console.log('data', data, msgStore)
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
 		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-		if (getCookie(USER_ID) === data?.data?.sender_id && data?.driverId === getCookie(DEVICE_ID)) return
+		if (data?.driverId === getCookie(DEVICE_ID)) return
 
 		const msg = (
 			await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', data?.data?.dialog_id)

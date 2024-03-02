@@ -18,6 +18,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	// const userId = getCookie(USER_ID) || ''
 	const user_id = f7route.params.user_id as string
 	const is_from_message_page = f7route.query.from_page === 'message'
+	const dialog_id = Number(f7route.query.dialog_id) ?? 0
 
 	const pageRef = useRef<{ el: HTMLDivElement | null }>({ el: null })
 
@@ -47,7 +48,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		setUserInfo(updateData)
 		user
 			? await UserStore.update(UserStore.tables.friends, 'user_id', user_id, updateData)
-			: await UserStore.add(UserStore.tables.friends, updateData)
+			: await UserStore.add(UserStore.tables.friends, { ...updateData, dialog_id, group: '#' })
 	}
 
 	// 呼叫

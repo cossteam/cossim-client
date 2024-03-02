@@ -58,8 +58,6 @@ const Chat: React.FC<ChatProps> = ({ msg, index, onSelect, className, isSelected
 		)
 	}
 
-	console.log("msg",msg);
-	
 
 	return (
 		<div

@@ -52,6 +52,12 @@ class Mention {
 		document.body.addEventListener('click', () => this.clearContainer())
 
 		this.quill.root.addEventListener('keydown', this.handleEnter.bind(this), true)
+		// this.quill.keyboard.addBinding(
+		// 	{
+		// 		key: 13
+		// 	},
+		// 	this.handleEnter.bind(this)
+		// )
 	}
 
 	/**
@@ -120,7 +126,6 @@ class Mention {
 	 */
 	handleEnter(e: KeyboardEvent) {
 		if (e.key !== 'Enter') return
-
 		if (!this.isEnter) e.preventDefault()
 		else return
 
@@ -131,11 +136,12 @@ class Mention {
 			name: '全体成员',
 			id: 0
 		}
-		this.options.onSelect?.(item)
 
-		this.insert({ ...item, name: `@${item.name}` })
-		this.clearContainer()
-		this.isEnter = true
+		this.onSelect(item)
+		// this.options.onSelect?.(item)
+		// this.insert({ ...item, name: `@${item.name}` })
+		// this.clearContainer()
+		// this.isEnter = true
 	}
 
 	/**
@@ -220,13 +226,20 @@ class Mention {
 		}
 	}
 
+	onSelect(data: Data) {
+		this.options.onSelect?.(data)
+		this.insert({ ...data, name: `@${data.name}` })
+		this.clearContainer()
+		this.isEnter = true
+	}
+
 	createMentionNode(data?: Data[]) {
 		this.mentionComponent = this.options.render
 			? this.options.render(data)
 			: createElement(MentionComponent, {
 					data: data ?? null,
 					el: this.quill.root,
-					onSelect: this.options.onSelect ?? defaultOptions.onSelect
+					onSelect: this.onSelect.bind(this)
 				})
 		return this.mentionComponent
 	}
