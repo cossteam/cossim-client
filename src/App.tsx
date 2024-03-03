@@ -26,6 +26,7 @@ import clsx from 'clsx'
 import { PhoneFill } from 'framework7-icons/react'
 import { App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
+import localNotification, { LocalNotificationType } from '@/utils/notification'
 
 function App() {
 	const msgStore = useMessageStore()
@@ -88,6 +89,17 @@ function App() {
 				case SocketEvent.PrivateChatsEvent:
 				case SocketEvent.GroupChatsEvent:
 				case SocketEvent.SelfChatsEvent:
+					try {
+						// TODO：校验当前是否在会话中
+						// 本地通知
+						const dom = document.createElement('p')
+						const msg = data?.data || {}
+						dom.innerHTML = msg.content || ''
+						localNotification(LocalNotificationType.MESSAGE, msg.sender_info.name, dom.innerText)
+						// 本地通知 END
+					} catch {
+						console.log('发送本地通知失败')
+					}
 					handlerMessageSocket(data, msgStore, stateStore)
 					break
 				case SocketEvent.ApplyListEvent:
