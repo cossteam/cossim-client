@@ -3,9 +3,11 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
 import 'quill/dist/quill.core.css'
 import './ToolEditor.scss'
 import { useFocus } from '@reactuses/core'
-import Quill, { type Data } from '../../moudles'
+// import Quill from '../../moudles'
 import GroupService from '@/api/group'
 import { useMessageStore } from '@/stores/message'
+import 'quill-mention-react'
+import Quill from 'quill'
 
 interface ToolEditorProps {
 	className?: string
@@ -46,15 +48,17 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 				source: async () => {
 					try {
 						const { data } = await GroupService.groupMemberApi({ group_id: Number(props.id ?? 0) })
-						const members = data.map((v: any) => ({ ...v, name: v.nickname }))
+						const members = [{ id: 0, name: '全体成员' }].concat(
+							data.map((v: any) => ({ ...v, name: v.nickname }))
+						)
 						return members
 					} catch (error) {
 						return []
 					}
 				},
-				onSelect: (item: Data) => {
+				onSelect: (item: any) => {
 					console.log('index', item)
-					if(item.id === 0) {
+					if (item.id === 0) {
 						msgStore.updateAtAllUser(true)
 					} else {
 						msgStore.updateAtAllUser(false)
