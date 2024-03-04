@@ -365,20 +365,18 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	initMessage: async (is_group: boolean, dialog_id: number, receiver_id: string) => {
-		const { shareKey, readMessage } = get()
+		const { readMessage } = get()
 
 		// TODO: 移除
 		// const tableName = is_group ? UserStore.tables.group_chats : UserStore.tables.private_chats
 		const tableName = UserStore.tables.messages
 
-		const messages = await initMessage({
-			tableName,
-			dialog_id,
-			shareKey
-		})
-
-		console.log("dialog_id",dialog_id);
-		
+		// const messages = await initMessage({
+		// 	tableName,
+		// 	dialog_id,
+		// 	shareKey
+		// })
+		const messages = await UserStore.findOneAllById(tableName, 'dialog_id', dialog_id)
 
 		// 获取服务器上的消息
 		getMessageFromServer(receiver_id, is_group).then((res: any) => {
@@ -388,7 +386,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			// console.log('new', messages)
 
 			const data = res?.group_messages || res?.user_messages || []
-			const newData:any[] = data.map((v: any) => ({
+			const newData: any[] = data.map((v: any) => ({
 				...v,
 				msg_id: v?.id,
 				at_all_user: v?.at_all_user ?? 0,
@@ -405,23 +403,10 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			// TODO: 对比两个数组的差异，更新本地数据库
 			const diffData = differenceBy(newData || [], messages, 'msg_id')
 			console.log('diff', diffData, newData, messages)
-
-			// if (msgFormServer?.id === msgFormStore?.msg_id) return
-
-			// const diffData = differenceBy(res?.user_messages || [], newMessages, 'msg_id')
-			// console.log('diff', diffData)
-
-			// console.log('获取服务器上的消息', res, newMessages)
-			// if (msgFormServer?.id !== msgFormStore?.msg_id) {
-			// 	console.log('需要加载服务器消息', msgFormServer, msgFormStore)
-			// }
 		})
 
 		// 当前会话的信息，如果是私聊就是好友信息，如果是群聊就是群信息
 		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', receiver_id)
-
-		// TODO: 获取好友信息
-
 		// 自己的信息
 		const myInfo = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 
@@ -447,12 +432,12 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	clearMessages: async () => {
+		console.log('clearMessages')
 		set({ messages: [], all_meesages: [], dialog_id: 0 })
 	},
 	updateMessageById: async (msg: PrivateChats) => {
 		const { messages } = get()
 		const newMessages = messages.map((item) => (item.msg_id === msg.msg_id ? { ...item, ...msg } : item))
-		console.log('newMessages', msg, newMessages)
 		set({ messages: newMessages })
 	},
 	updateAtAllUser: (updateAllUser: boolean) => {

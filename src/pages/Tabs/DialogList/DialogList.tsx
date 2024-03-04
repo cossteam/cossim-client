@@ -24,7 +24,7 @@ import { ReadEditor } from '@/Editor'
 import { v4 as uuidv4 } from 'uuid'
 import clsx from 'clsx'
 import { useStateStore } from '@/stores/state'
-// import { useMessageStore } from '@/stores/message'
+import { useMessageStore } from '@/stores/message'
 
 const getAfterMessage = async () => {
 	try {
@@ -77,14 +77,14 @@ const getAfterMessage = async () => {
 	}
 }
 
-const DialogList: React.FC<RouterProps> = () => {
+const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
 	const [chats, setChats] = useState<any[]>(dialogs)
 
 	// 全局状态(消息未读)
 	const stateStore = useStateStore()
 	// 消息列表
-	// const msgStore = useMessageStore()
+	const msgStore = useMessageStore()
 
 	// 获取对话列表
 	const getDialogList = async () => {
@@ -216,7 +216,7 @@ const DialogList: React.FC<RouterProps> = () => {
 						<ListItem
 							className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
 							key={item?.dialog_id}
-							link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
+							// link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
 							title={item?.dialog_name}
 							badge={item?.dialog_unread_count}
 							badgeColor="red"
@@ -225,17 +225,17 @@ const DialogList: React.FC<RouterProps> = () => {
 								item?.last_message?.send_time ? item?.last_message?.send_time : item?.dialog_create_at,
 								'zh_CN'
 							)}
-							// link
-							// onClick={async () => {
-							// 	msgStore.initMessage(
-							// 		item?.group_id ? true : false,
-							// 		item?.dialog_id,
-							// 		item?.user_id ?? item?.group_id
-							// 	)
-							// 	f7router.navigate(
-							// 		`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
-							// 	)
-							// }}
+							link
+							onClick={async () => {
+								await msgStore.initMessage(
+									item?.group_id ? true : false,
+									item?.dialog_id,
+									item?.user_id ?? item?.group_id
+								)
+								f7router.navigate(
+									`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
+								)
+							}}
 						>
 							<img
 								slot="media"
