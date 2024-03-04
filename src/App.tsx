@@ -15,9 +15,10 @@ import {
 	handlerLabelSocket,
 	handlerRequestResultSocket,
 	handlerEditSocket,
-	DEVICE_ID
+	DEVICE_ID,
+	USER_ID
 } from '@/shared'
-import { hasCookie, setCookie } from '@/utils/cookie'
+import { getCookie, hasCookie, setCookie } from '@/utils/cookie'
 import { useCallStore } from '@/stores/call'
 import { useMessageStore } from './stores/message'
 import { useStateStore } from '@/stores/state'
@@ -32,6 +33,7 @@ import DOMPurify from 'dompurify'
 function App() {
 	const msgStore = useMessageStore()
 	const stateStore = useStateStore()
+	const user_id = getCookie(USER_ID) || ''
 
 	const toastRef = useRef(null)
 
@@ -91,11 +93,10 @@ function App() {
 				case SocketEvent.GroupChatsEvent:
 				case SocketEvent.SelfChatsEvent:
 					try {
-						// TODO：校验当前是否在会话中
 						const msg = data?.data || {}
-						console.log(msgStore, msg.sender_id)
-
-						if (msgStore.dialog_id && Number(msgStore.dialog_id) !== msg.dialog_id) {
+						// msg 的发送者不是自己并且当前不在会话中
+						console.log(msg.receiver_id, user_id, msg.receiver_id !== user_id && Number(msgStore.dialog_id))
+						if (msg.receiver_id !== user_id && Number(msgStore.dialog_id)) {
 							// 本地通知
 							const dom = document.createElement('p')
 							dom.innerHTML = DOMPurify.sanitize(msg.content || '')
