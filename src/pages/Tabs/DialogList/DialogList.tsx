@@ -24,6 +24,7 @@ import { ReadEditor } from '@/Editor'
 import { v4 as uuidv4 } from 'uuid'
 import clsx from 'clsx'
 import { useStateStore } from '@/stores/state'
+import { useMessageStore } from '@/stores/message'
 
 const getAfterMessage = async () => {
 	try {
@@ -76,12 +77,14 @@ const getAfterMessage = async () => {
 	}
 }
 
-const DialogList: React.FC<RouterProps> = () => {
+const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
 	const [chats, setChats] = useState<any[]>(dialogs)
 
 	// 全局状态(消息未读)
 	const stateStore = useStateStore()
+	const msgStore = useMessageStore()
+
 	// 获取对话列表
 	const getDialogList = async () => {
 		try {
@@ -150,6 +153,10 @@ const DialogList: React.FC<RouterProps> = () => {
 		setChats(list.sort((a, b) => b.top_at - a.top_at))
 	}, [dialogs])
 
+	useEffect(() => {
+		console.log('chatt', chats)
+	}, [chats])
+
 	return (
 		<Page
 			ptr
@@ -157,6 +164,7 @@ const DialogList: React.FC<RouterProps> = () => {
 			onPageTabShow={getDialogList}
 			onPageBeforeIn={getDialogList}
 			onPtrRefresh={onRefresh}
+			noSwipeback={false}
 		>
 			<Navbar title="COSS" className="hidden-navbar-bg bg-bgPrimary">
 				<NavRight>
@@ -190,16 +198,13 @@ const DialogList: React.FC<RouterProps> = () => {
 
 			<List contactsList noChevron mediaList dividers className="h-full bg-bgPrimary">
 				{chats.map((item) => {
-					let content = ''
-					const name = item?.last_message?.sender_info?.name
-					if (item?.group_id) content = name ? name + ': ' : ''
-					content += item?.last_message?.content || $t('[无消息]')
+					console.log(item.last_message)
 
 					return (
 						<ListItem
 							className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
 							key={item?.dialog_id}
-							link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
+							// link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
 							title={item?.dialog_name}
 							badge={item?.dialog_unread_count}
 							badgeColor="red"
@@ -208,6 +213,17 @@ const DialogList: React.FC<RouterProps> = () => {
 								item?.last_message?.send_time ? item?.last_message?.send_time : item?.dialog_create_at,
 								'zh_CN'
 							)}
+							link
+							onClick={async () => {
+								msgStore.initMessage(
+									item?.group_id ? true : false,
+									item?.dialog_id,
+									item?.user_id ?? item?.group_id
+								)
+								f7router.navigate(
+									`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
+								)
+							}}
 						>
 							<img
 								slot="media"
@@ -216,7 +232,13 @@ const DialogList: React.FC<RouterProps> = () => {
 								className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"
 							/>
 							<div slot="text" className="max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
-								<ReadEditor content={content} className="dialog-read-editor" />
+								<ReadEditor
+									content={
+										(item?.group_id ? item?.last_message?.sender_info?.name + ':' : '') +
+										item?.last_message?.content
+									}
+									className="dialog-read-editor"
+								/>
 							</div>
 							<SwipeoutActions right>
 								<SwipeoutButton close overswipe color="blue" onClick={(e) => topDialog(e, item)}>
