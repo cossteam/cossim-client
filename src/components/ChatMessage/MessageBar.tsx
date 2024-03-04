@@ -21,6 +21,7 @@ import Quill from 'quill'
 // import { Delta } from 'quill/core'
 // import { EmitterSource } from 'quill/core/emitter'
 import { useResizeObserver } from '@reactuses/core'
+import { debounce } from 'lodash-es'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
@@ -34,9 +35,10 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, isScrollEnd, selectI
 	const editorRef = useRef<ToolEditorMethods>(null)
 
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(0)
-	useResizeObserver(contentEl, () => {
+	useResizeObserver(contentEl, () => pageSizeChange)
+	const pageSizeChange = debounce(() => {
 		isScrollEnd(300) && scroll(contentEl.current!, false)
-	})
+	}, 500)
 
 	const [msgType, setMsgType] = useState(MESSAGE_TYPE.TEXT)
 	const [moreType, setMoreType] = useState(MessageMore.TEXT)
@@ -81,22 +83,51 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, isScrollEnd, selectI
 
 	const onSelectEmojis = () => {}
 
+	// useEffect(() => {
+	// 	if (!editorRef.current?.quill) return
+
+	// 	const quill = editorRef.current.quill
+
+	// 	console.log(quill)
+
+	// 	quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
+	// 		console.log('type', type)
+
+	// 		if (type !== Quill.events.SELECTION_CHANGE) {
+	// 			setShowBtn(quill.getLength() > 1)
+	// 		}
+	// 	})
+
+	// 	quill.root.addEventListener('focus', () => {
+	// 		setKeyboardHeight(0)
+	// 	})
+	// }, [editorRef])
+
 	useEffect(() => {
-		if (!editorRef.current?.quill) return
+		requestAnimationFrame(() => {
+			const timer = setTimeout(() => {
+				if (!editorRef.current || !editorRef.current.quill) return
 
-		const quill = editorRef.current.quill
+				const quill = editorRef.current.quill
 
+				quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
+					if (type !== Quill.events.SELECTION_CHANGE) {
+						setShowBtn(quill.getLength() > 1)
+					}
+				})
 
-		quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
-			if (type !== Quill.events.SELECTION_CHANGE) {
-				setShowBtn(quill.getLength() > 1)
-			}
+				quill.root.addEventListener('focus', () => {
+					setKeyboardHeight(0)
+				})
+
+				clearTimeout(timer)
+			}, 0)
 		})
 
-		quill.root.addEventListener('focus', () => {
-            setKeyboardHeight(0)
-		})
-	}, [editorRef.current])
+		return () => {
+			editorRef.current?.quill?.off(Quill.events.EDITOR_CHANGE)
+		}
+	}, [])
 
 	return (
 		<div className={clsx('message-toolbar bg-bgPrimary bottom-0 w-full h-auto z-[99]')} ref={toolbarRef}>

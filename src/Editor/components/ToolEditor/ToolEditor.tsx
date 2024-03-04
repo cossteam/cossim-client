@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import 'quill/dist/quill.core.css'
 import './ToolEditor.scss'
-import { useFocus } from '@reactuses/core'
+// import { useFocus } from '@reactuses/core'
 // import Quill from '../../moudles'
 import GroupService from '@/api/group'
 import { useMessageStore } from '@/stores/message'
@@ -24,18 +24,12 @@ interface ToolEditorProps {
 
 // 暴露给父组件的方法类型
 export interface ToolEditorMethods {
-	focus: () => void
 	quill: Quill
 }
 
 const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorProps> = (props, ref) => {
 	const EditorRef = useRef<HTMLDivElement | null>(null)
-
-	// const [engine, setEngine] = useState<Editor>()
-	const [, setEditorFocus] = useFocus(EditorRef, true)
-
 	const [quill, setQuill] = useState<Quill>()
-
 	const msgStore = useMessageStore()
 
 	useEffect(() => {
@@ -89,7 +83,6 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 	}, [quill, props.initValue])
 
 	useImperativeHandle(ref, () => ({
-		focus: () => setEditorFocus(true),
 		quill: quill!
 	}))
 
