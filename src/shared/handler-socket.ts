@@ -20,7 +20,7 @@ export const handlerMessageSocket = async (data: any, msgStore: MessageStore, st
 		// console.log('msgStore.messages', msgStore.messages)
 
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
-		if (getCookie(USER_ID) === message.sender_id && data.driverId === getCookie(DEVICE_ID)) return
+		if (data.driverId === getCookie(DEVICE_ID)) return
 
 		// 防止重复添加消息
 		// const index = msgStore.messages.findIndex((item: any) => item?.msg_id === message?.msg_id)

@@ -24,7 +24,7 @@ import { ReadEditor } from '@/Editor'
 import { v4 as uuidv4 } from 'uuid'
 import clsx from 'clsx'
 import { useStateStore } from '@/stores/state'
-import { useMessageStore } from '@/stores/message'
+// import { useMessageStore } from '@/stores/message'
 
 const getAfterMessage = async () => {
 	try {
@@ -77,13 +77,14 @@ const getAfterMessage = async () => {
 	}
 }
 
-const DialogList: React.FC<RouterProps> = ({ f7router }) => {
+const DialogList: React.FC<RouterProps> = () => {
 	const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
 	const [chats, setChats] = useState<any[]>(dialogs)
 
 	// 全局状态(消息未读)
 	const stateStore = useStateStore()
-	const msgStore = useMessageStore()
+	// 消息列表
+	// const msgStore = useMessageStore()
 
 	// 获取对话列表
 	const getDialogList = async () => {
@@ -215,7 +216,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 						<ListItem
 							className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
 							key={item?.dialog_id}
-							// link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
+							link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
 							title={item?.dialog_name}
 							badge={item?.dialog_unread_count}
 							badgeColor="red"
@@ -224,17 +225,17 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 								item?.last_message?.send_time ? item?.last_message?.send_time : item?.dialog_create_at,
 								'zh_CN'
 							)}
-							link
-							onClick={async () => {
-								msgStore.initMessage(
-									item?.group_id ? true : false,
-									item?.dialog_id,
-									item?.user_id ?? item?.group_id
-								)
-								f7router.navigate(
-									`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
-								)
-							}}
+							// link
+							// onClick={async () => {
+							// 	msgStore.initMessage(
+							// 		item?.group_id ? true : false,
+							// 		item?.dialog_id,
+							// 		item?.user_id ?? item?.group_id
+							// 	)
+							// 	f7router.navigate(
+							// 		`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
+							// 	)
+							// }}
 						>
 							<img
 								slot="media"
@@ -245,8 +246,9 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 							<div slot="text" className="max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
 								<ReadEditor
 									content={
-										(item?.group_id ? item?.last_message?.sender_info?.name + ':' : '') +
-										item?.last_message?.content
+										(item?.group_id && item?.last_message?.sender_info?.name
+											? item?.last_message?.sender_info?.name + ':'
+											: '') + item?.last_message?.content
 									}
 									className="dialog-read-editor"
 								/>

@@ -377,6 +377,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			shareKey
 		})
 
+		console.log("dialog_id",dialog_id);
+		
+
 		// 获取服务器上的消息
 		getMessageFromServer(receiver_id, is_group).then((res: any) => {
 			// const newMessages = messages.filter((v) => v?.msg_send_state === MESSAGE_SEND.SEND_SUCCESS)
@@ -444,7 +447,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	clearMessages: async () => {
-		set({ messages: [], all_meesages: [] })
+		set({ messages: [], all_meesages: [], dialog_id: 0 })
 	},
 	updateMessageById: async (msg: PrivateChats) => {
 		const { messages } = get()
