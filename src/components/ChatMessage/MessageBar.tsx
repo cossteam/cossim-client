@@ -20,8 +20,10 @@ import Emojis from '@/components/Emojis/Emojis'
 import Quill from 'quill'
 // import { Delta } from 'quill/core'
 // import { EmitterSource } from 'quill/core/emitter'
-import { useResizeObserver } from '@reactuses/core'
-import { debounce } from 'lodash-es'
+import { useClickOutside, useResizeObserver } from '@reactuses/core'
+import { EmitterSource } from 'quill/core/emitter'
+import { Delta } from 'quill/core'
+// import { debounce } from 'lodash-es'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
@@ -29,16 +31,21 @@ interface MessageBarProps {
 	selectItem?: any
 }
 
-const MessageBar: React.FC<MessageBarProps> = ({ contentEl, isScrollEnd, selectItem }) => {
+const MessageBar: React.FC<MessageBarProps> = ({ contentEl, selectItem }) => {
 	const msgStore = useMessageStore()
 	const toolbarRef = useRef<HTMLDivElement | null>(null)
 	const editorRef = useRef<ToolEditorMethods>(null)
+	const moreRef = useRef<HTMLDivElement | null>(null)
 
+	// 键盘高度
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(0)
-	useResizeObserver(contentEl, () => pageSizeChange)
-	const pageSizeChange = debounce(() => {
-		isScrollEnd(300) && scroll(contentEl.current!, false)
-	}, 500)
+
+	useResizeObserver(contentEl, () => scroll(contentEl.current!, false))
+	useClickOutside(toolbarRef, () => {
+		editorRef.current?.quill?.blur()
+		setKeyboardHeight(0)
+		setMoreType(MessageMore.TEXT)
+	})
 
 	const [msgType, setMsgType] = useState(MESSAGE_TYPE.TEXT)
 	const [moreType, setMoreType] = useState(MessageMore.TEXT)
@@ -48,6 +55,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, isScrollEnd, selectI
 			setKeyboardHeight(300)
 		} else {
 			setKeyboardHeight(0)
+			requestAnimationFrame(() => {
+				setTimeout(() => editorRef.current?.quill?.focus(), 100)
+			})
 		}
 		setMoreType(type)
 	}, [])
@@ -81,27 +91,16 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, isScrollEnd, selectI
 		if (!moreType) quill.focus()
 	}
 
-	const onSelectEmojis = () => {}
-
-	// useEffect(() => {
-	// 	if (!editorRef.current?.quill) return
-
-	// 	const quill = editorRef.current.quill
-
-	// 	console.log(quill)
-
-	// 	quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
-	// 		console.log('type', type)
-
-	// 		if (type !== Quill.events.SELECTION_CHANGE) {
-	// 			setShowBtn(quill.getLength() > 1)
-	// 		}
-	// 	})
-
-	// 	quill.root.addEventListener('focus', () => {
-	// 		setKeyboardHeight(0)
-	// 	})
-	// }, [editorRef])
+	const onSelectEmojis = (emojis: any) => {
+		// 先确保编辑器已经聚焦
+		editorRef.current?.quill?.focus()
+		editorRef.current?.quill?.insertText(
+			editorRef.current?.quill.getSelection()?.index || 0,
+			emojis.native,
+			Quill.sources.API
+		)
+		editorRef.current?.quill?.blur()
+	}
 
 	useEffect(() => {
 		requestAnimationFrame(() => {
@@ -110,13 +109,20 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, isScrollEnd, selectI
 
 				const quill = editorRef.current.quill
 
-				quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
-					if (type !== Quill.events.SELECTION_CHANGE) {
-						setShowBtn(quill.getLength() > 1)
+				let eventSources: EmitterSource = Quill.sources.API
+
+				quill.on(
+					Quill.events.EDITOR_CHANGE,
+					(type: string, _delta: Delta, _oldDelta: Delta, source: EmitterSource) => {
+						if (type !== Quill.events.SELECTION_CHANGE) {
+							setShowBtn(quill.getLength() > 1)
+						}
+						eventSources = source
 					}
-				})
+				)
 
 				quill.root.addEventListener('focus', () => {
+					if (eventSources === Quill.sources.API) return
 					setKeyboardHeight(0)
 				})
 
@@ -130,9 +136,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, isScrollEnd, selectI
 	}, [])
 
 	return (
-		<div className={clsx('message-toolbar bg-bgPrimary bottom-0 w-full h-auto z-[99]')} ref={toolbarRef}>
+		<div className={clsx('message-toolbar bg-bgPrimary bottom-0 w-full h-auto z-[99] relative')} ref={toolbarRef}>
 			<div className="flex flex-col justify-center items-center">
-				<div className="w-full rounded-2xl flex items-end relative h-full py-2 transition-all duration-300 ease-in">
+				<div className="w-full rounded-2xl flex items-end relative h-full py-2">
 					<div className={clsx('w-full', isSelect ? 'flex' : 'hidden')}>
 						<div className="w-full flex bg-bgPrimary">
 							<Link
@@ -238,8 +244,11 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, isScrollEnd, selectI
 					</div>
 				</div>
 				<div
-					className={clsx('w-full overflow-hidden transition-all duration-300 ease-linear')}
-					style={{ height: keyboardHeight + 'px' }}
+					className={clsx('w-full overflow-hidden')}
+					style={{
+						height: keyboardHeight + 'px'
+					}}
+					ref={moreRef}
 				>
 					<Emojis
 						onSelectEmojis={onSelectEmojis}

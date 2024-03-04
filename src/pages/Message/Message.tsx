@@ -15,7 +15,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const dialog_name = f7route.query.dialog_name
 
 	const contentRef = useRef<HTMLDivElement | null>(null)
-	const footerRef = useRef<HTMLDivElement | null>(null)
+	// const footerRef = useRef<HTMLDivElement | null>(null)
 
 	const { messages, ...msgStore } = useMessageStore()
 	const { updateChat } = useStateStore()
@@ -59,14 +59,13 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 					<MessageItem />
 				</div>
 
-				<div
+				{/* <div
 					className="bg-bgPrimary relative z-[999999] transition-all duration-300 ease-linear"
 					ref={footerRef}
-				>
-					<div className="w-full h-full">
-						<MessageBar contentEl={contentRef} isScrollEnd={isScrollEnd} />
-					</div>
-				</div>
+				> */}
+				<MessageBar contentEl={contentRef} isScrollEnd={isScrollEnd} />
+
+				{/* </div> */}
 			</div>
 
 			{/* <Contact completed={setSelect} opened={showSelect} setOpened={setShowSelect} group /> */}
