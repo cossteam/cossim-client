@@ -2,6 +2,8 @@
 <manifest xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-sdk  android:minSdkVersion="19"/>
+
     <!-- Permissions -->
     <!-- 连接网络权限 -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -63,6 +65,33 @@
             </intent-filter>
 
         </activity>
+
+        <!--
+       如果应用需要解析和处理Push消息（如透传消息），则继承PushService来处理，并在此申明
+       如果不需要处理Push消息，则直接申明PsuhService即可
+       -->
+<!--        <service-->
+<!--            android:name=".service.PushMessageService"-->
+<!--            android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
+
+<!--        <service android:name=".service.AppPushMessageService"-->
+<!--            android:permission="com.heytap.mcs.permission.SEND_PUSH_MESSAGE"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE"/>-->
+<!--                <action android:name="com.heytap.msp.push.RECEIVE_MCS_MESSAGE" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
+<!--        <service android:name=".service.DemoService" >-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.heytap.push.demo.action"/>-->
+<!--            </intent-filter>-->
+<!--        </service>-->
 
         <provider
             android:name="androidx.core.content.FileProvider"

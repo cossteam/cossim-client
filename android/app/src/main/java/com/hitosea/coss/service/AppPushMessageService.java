@@ -1,13 +1,10 @@
-package com.heytap.push.demo.component.service;
+package com.hitosea.coss.service;
 
 import android.content.Context;
+import android.util.Log;
 
-import com.heytap.msp.push.constant.ConfigConstant;
 import com.heytap.msp.push.mode.DataMessage;
 import com.heytap.msp.push.service.DataMessageCallbackService;
-import com.heytap.push.demo.component.ConfigManager;
-import com.heytap.push.demo.util.NotificationUtil;
-import com.heytap.push.demo.util.TestModeUtil;
 
 public class AppPushMessageService extends DataMessageCallbackService {
 
@@ -20,9 +17,7 @@ public class AppPushMessageService extends DataMessageCallbackService {
     @Override
     public void processMessage(Context context, DataMessage message) {
         super.processMessage(context, message);
-        TestModeUtil.addLogString(PushMessageService.class.getSimpleName(), "Receive SptDataMessage:" + message.toString());
-        NotificationUtil.showNotification(context,message.getTitle(),message.getContent()
-                , message.getNotifyID(), ConfigManager.getInstant().isRedBadge(), ConfigConstant.NotificationSort.MESSAGE_IMPORTANCE_LEVEL_HIGH);
+        Log.i(PushMessageService.class.getSimpleName(), "processMessage: " + message.toString());
     }
 
 }

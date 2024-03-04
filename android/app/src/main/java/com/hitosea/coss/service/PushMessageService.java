@@ -1,15 +1,10 @@
-package com.heytap.push.demo.component.service;
+package com.hitosea.coss.service;
 
 import android.content.Context;
+import android.util.Log;
 
-import com.heytap.msp.push.constant.ConfigConstant;
 import com.heytap.msp.push.mode.DataMessage;
 import com.heytap.msp.push.service.CompatibleDataMessageCallbackService;
-import com.heytap.push.demo.component.ConfigManager;
-import com.heytap.push.demo.component.MessageDispatcher;
-import com.heytap.push.demo.util.LogUtil;
-import com.heytap.push.demo.util.NotificationUtil;
-import com.heytap.push.demo.util.TestModeUtil;
 
 /**
  * <p>Title:${Title} </p>
@@ -37,10 +32,6 @@ public class PushMessageService extends CompatibleDataMessageCallbackService {
     public void processMessage(Context context, DataMessage message) {
         super.processMessage(context.getApplicationContext(), message);
         String content = message.getContent();
-        TestModeUtil.addLogString(PushMessageService.class.getSimpleName(), "Receive SptDataMessage:" + message.toString());
-        MessageDispatcher.dispatch(context, content);//统一处理
-        LogUtil.d("processMessage  message" +message.toString());
-        NotificationUtil.showNotification(context,message.getTitle(),message.getContent(),message.getNotifyID()
-                , ConfigManager.getInstant().isRedBadge(), ConfigConstant.NotificationSort.MESSAGE_IMPORTANCE_LEVEL_HIGH);
+        Log.i(PushMessageService.class.getSimpleName(), "processMessage: " + message);
     }
 }
