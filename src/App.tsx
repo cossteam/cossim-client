@@ -27,6 +27,7 @@ import { PhoneFill } from 'framework7-icons/react'
 import { App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
+import DOMPurify from 'dompurify'
 
 function App() {
 	const msgStore = useMessageStore()
@@ -91,12 +92,16 @@ function App() {
 				case SocketEvent.SelfChatsEvent:
 					try {
 						// TODO：校验当前是否在会话中
-						// 本地通知
-						const dom = document.createElement('p')
 						const msg = data?.data || {}
-						dom.innerHTML = msg.content || ''
-						localNotification(LocalNotificationType.MESSAGE, msg.sender_info.name, dom.innerText)
-						// 本地通知 END
+						console.log(msgStore, msg.sender_id)
+
+						if (msgStore.dialog_id && Number(msgStore.dialog_id) !== msg.dialog_id) {
+							// 本地通知
+							const dom = document.createElement('p')
+							dom.innerHTML = DOMPurify.sanitize(msg.content || '')
+							localNotification(LocalNotificationType.MESSAGE, msg.sender_info.name, dom.innerText)
+							// 本地通知 END
+						}
 					} catch {
 						console.log('发送本地通知失败')
 					}
