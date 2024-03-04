@@ -6,17 +6,16 @@ import LongPressButton from '@/components/LongPressButton/LongPressButton'
 import { ReadEditor } from '@/Editor'
 import { format } from 'timeago.js'
 import { Exclamationmark, Flag } from 'framework7-icons/react'
-import { createElement, useCallback, useEffect, useRef } from 'react'
+import { createElement, useCallback, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import ToolTip from '@/components/Message/ToolTip'
 interface MessageItemProps {
-	el?: HTMLDivElement | null
+    
 }
 
 const MessageItem: React.FC<MessageItemProps> = () => {
 	const { messages } = useMessageStore()
 	const tooltipRefs = useRef<(HTMLDivElement | null)[]>([])
-
 
 	const createTooltip = useCallback((index: number) => {
 		const div = document.createElement('div')
@@ -35,10 +34,6 @@ const MessageItem: React.FC<MessageItemProps> = () => {
 		console.log('selectChange', type, msg_id)
 	}, [])
 
-	useEffect(() => {
-		if (!messages.length) return
-	}, [messages])
-
 	return (
 		<List noChevron mediaList className="my-0">
 			{messages.map((msg, index) => {
@@ -46,7 +41,7 @@ const MessageItem: React.FC<MessageItemProps> = () => {
 				return (
 					<ListItem
 						key={index}
-						className="coss_list_item animate__animated"
+						className="coss_list_item animate__animated animate__fadeInUp"
 						data-index={index}
 						style={{ zIndex: 1 }}
 					>

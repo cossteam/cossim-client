@@ -1,4 +1,4 @@
-/**  eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // @ts-nocheck
 import { Navbar, Page } from 'framework7-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -38,10 +38,9 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 
 	useEffect(() => {
 		if (!messages.length) return
-		// isScroll && scroll(contentRef.current!, isScrollEnd() ? true : false)
-		requestAnimationFrame(() => {
-			scroll(contentRef.current!, isScrollEnd() ? true : false)
-		})
+		// requestAnimationFrame(() => {
+		// 	scroll(contentRef.current!, isScrollEnd() ? true : false)
+		// })
 	}, [messages])
 
 	const [newPageSize, setNewPageSize] = useState<number>(0)
@@ -71,10 +70,6 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 		setKeyboardShow(keyboardShow)
 	}, [newPageSize])
 
-	// const onPageInit = useCallback(async () => {
-	// 	scroll(contentRef.current!, false)
-	// }, [])
-
 	const onPageBeforeIn = useCallback(async () => {
 		msgStore.initMessage(is_group, dialog_id, receiver_id)
 	}, [])
@@ -85,13 +80,12 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 			className="coss_message transition-all"
 			// onPageInit={onPageInit}
 			onPageBeforeOut={async () => {
-				await msgStore.clearMessages()
+				msgStore.clearMessages()
 				updateChat(true)
 			}}
 			onPageBeforeIn={onPageBeforeIn}
 			onPageAfterIn={() => {
-				// scroll(contentRef.current!, false)
-				setIsScroll(true)
+				scroll(contentRef.current!, false)
 			}}
 		>
 			<div className="h-screen overflow-hidden flex flex-col">
@@ -106,27 +100,7 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 				</div>
 
 				<div className="flex-1 overflow-y-auto overflow-x-hidden" ref={contentRef}>
-					<MessageItem el={contentRef.current} />
-					{/* <List noChevron mediaList className="my-0">
-						{messages.map((item, index) => (
-							<ListItem
-								key={index}
-								className="coss_list_item animate__animated"
-								data-index={index}
-								style={{ zIndex: 1 }}
-								checkbox={isSelect() && !item?.tips_msg_id}
-								onChange={(e) => onSelectChange(e, item)}
-							>
-								<Chat
-									msg={item}
-									index={index}
-									onSelect={onSelect}
-									isSelected={isSelect()}
-									reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
-								/>
-							</ListItem>
-						))}
-					</List> */}
+					<MessageItem />
 				</div>
 
 				<div
@@ -146,3 +120,4 @@ const Message: React.FC<RouterProps> = ({ f7route }) => {
 }
 
 export default Message
+
