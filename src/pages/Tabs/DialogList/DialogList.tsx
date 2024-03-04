@@ -170,10 +170,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		setChats(list.sort(customSort))
 	}, [dialogs])
 
-	useEffect(() => {
-		console.log('chatt', chats)
-	}, [chats])
-
 	return (
 		<Page
 			ptr
@@ -215,8 +211,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 
 			<List contactsList noChevron mediaList dividers className="h-full bg-bgPrimary">
 				{chats.map((item) => {
-					console.log(item.last_message)
-
 					return (
 						<ListItem
 							className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
