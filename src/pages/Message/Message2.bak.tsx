@@ -1,52 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/**  eslint/no-unused-vars */
 // @ts-nocheck
-import { ArrowUpRight, Ellipsis, Trash } from 'framework7-icons/react'
-import { Block, Button, Link, List, ListItem, NavRight, Navbar, Page, Subnavbar, f7 } from 'framework7-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useAsyncEffect, useClickOutside } from '@reactuses/core'
-import {
-	FaceSmiling,
-	PlusCircle,
-	ArrowRightCircleFill,
-	MicCircleFill,
-	Xmark,
-	XmarkCircle
-} from 'framework7-icons/react'
-import { Keyboard } from '@capacitor/keyboard'
-import { useClipboard } from '@reactuses/core'
-
+import { Navbar, Page } from 'framework7-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import './message.scss'
 import { useMessageStore } from '@/stores/message'
-import {
-	$t,
-	TOOLTIP_TYPE,
-	MESSAGE_TYPE,
-	isMe,
-	hasImageHtml,
-	scroll,
-	MessageMore,
-	getLatestGroupAnnouncement
-} from '@/shared'
-import Chat from '@/components/Message/Chat'
-import { isWebDevice } from '@/utils'
-import clsx from 'clsx'
-import { useToast } from '@/hooks/useToast'
-import Contact from '@/components/Contact/Contact'
-import Emojis from '@/components/Emojis/Emojis'
-import GroupService from '@/api/group'
-
-import ToolEditor, { ToolEditorMethods, ReadEditor } from '@/Editor'
+import { scroll } from '@/shared'
 import { useStateStore } from '@/stores/state'
-import Quill from 'quill'
-import ToolBarMore from '@/components/Message/ToolBarMore'
-import { KeyboardIcon } from '@/components/Icon/Icon'
-import { Delta } from 'quill/core'
-import { EmitterSource } from 'quill/core/emitter'
 import { debounce } from 'lodash-es'
-// import MsgService from '@/api/msg'
-// import RelationService from '@/api/relation'
+import MessageItem from '@/components/ChatMessage/MessageItem'
 
-const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
+const Message: React.FC<RouterProps> = ({ f7route }) => {
 	const is_group = f7route.query.is_group === 'true'
 	const receiver_id = f7route.params.id as string
 	const dialog_id = Number(f7route.params.dialog_id as string)
@@ -56,6 +19,9 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const footerRef = useRef<HTMLDivElement | null>(null)
 
 	const { messages, ...msgStore } = useMessageStore()
+	const { updateChat } = useStateStore()
+
+	const [isScroll, setIsScroll] = useState<boolean>(false)
 
 	/**
 	 * 当前距离距离是否在允许范围内
@@ -72,13 +38,24 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	useEffect(() => {
 		if (!messages.length) return
-		scroll(contentRef.current!, isScrollEnd() ? true : false)
+		// isScroll && scroll(contentRef.current!, isScrollEnd() ? true : false)
+		requestAnimationFrame(() => {
+			scroll(contentRef.current!, isScrollEnd() ? true : false)
+		})
 	}, [messages])
 
+	const [newPageSize, setNewPageSize] = useState<number>(0)
+	const [oldPageSize, setOldPageSize] = useState<number>(0)
+	// 键盘是否弹出
+	const [keyboardShow, setKeyboardShow] = useState<boolean>(false)
 	useEffect(() => {
+		const pageSize = document.documentElement.clientHeight
+		setOldPageSize(pageSize)
+
 		const handlerPageSize = () => {
 			if (!contentRef.current) return
 			isScrollEnd(300) && scroll(contentRef.current!, true)
+			setNewPageSize(contentRef.current!.scrollHeight)
 		}
 
 		const fn = debounce(handlerPageSize, 100)
@@ -87,18 +64,35 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		return () => {
 			window.removeEventListener('resize', fn)
 		}
-	})
+	}, [])
+
+	useEffect(() => {
+		const keyboardShow = newPageSize - oldPageSize > 0
+		setKeyboardShow(keyboardShow)
+	}, [newPageSize])
+
+	// const onPageInit = useCallback(async () => {
+	// 	scroll(contentRef.current!, false)
+	// }, [])
+
+	const onPageBeforeIn = useCallback(async () => {
+		msgStore.initMessage(is_group, dialog_id, receiver_id)
+	}, [])
 
 	return (
 		<Page
 			noToolbar
 			className="coss_message transition-all"
-			onPageInit={async () => msgStore.initMessage(is_group, dialog_id, receiver_id)}
-			// ref={pageRef}
-			// onPageBeforeOut={() => {
-			// msgStore.clearMessages()
-			// updateChat(true)
-			// }}
+			// onPageInit={onPageInit}
+			onPageBeforeOut={async () => {
+				await msgStore.clearMessages()
+				updateChat(true)
+			}}
+			onPageBeforeIn={onPageBeforeIn}
+			onPageAfterIn={() => {
+				// scroll(contentRef.current!, false)
+				setIsScroll(true)
+			}}
 		>
 			<div className="h-screen overflow-hidden flex flex-col">
 				<div className="min-h-12 bg-bgPrimary">
@@ -112,26 +106,27 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				</div>
 
 				<div className="flex-1 overflow-y-auto overflow-x-hidden" ref={contentRef}>
-					<List noChevron mediaList className="my-0">
+					<MessageItem el={contentRef.current} />
+					{/* <List noChevron mediaList className="my-0">
 						{messages.map((item, index) => (
 							<ListItem
 								key={index}
 								className="coss_list_item animate__animated"
 								data-index={index}
 								style={{ zIndex: 1 }}
-								// checkbox={isSelect() && !item?.tips_msg_id}
-								// onChange={(e) => onSelectChange(e, item)}
+								checkbox={isSelect() && !item?.tips_msg_id}
+								onChange={(e) => onSelectChange(e, item)}
 							>
 								<Chat
 									msg={item}
 									index={index}
-									// onSelect={onSelect}
-									// isSelected={isSelect()}
-									// reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
+									onSelect={onSelect}
+									isSelected={isSelect()}
+									reply={item?.reply_id !== 0 ? replyMessage(item.reply_id) : null}
 								/>
 							</ListItem>
 						))}
-					</List>
+					</List> */}
 				</div>
 
 				<div

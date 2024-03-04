@@ -20,7 +20,11 @@ const routes: Router.RouteParameters[] = [
 	{
 		path: '/dialog/',
 		component: DialogList,
-		keepAlive: true
+		keepAlive: true,
+		// options: {
+		// 	animate: false,
+		// 	transition: 'f7-push'
+		// }
 	},
 	{
 		path: '/contacts/',
@@ -49,8 +53,10 @@ const routes: Router.RouteParameters[] = [
 		// asyncComponent: () => import('@/pages/Message/Message')
 		component: Message,
 		options: {
-			transition: 'f7-custom'
-		}
+			// animate: false,
+			transition: 'f7-push',
+		},
+		// keepAlive: true
 	},
 	{
 		path: '/user_info/:user_id/',

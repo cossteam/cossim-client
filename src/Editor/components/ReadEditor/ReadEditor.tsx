@@ -15,7 +15,11 @@ const ReadEditor: React.FC<ReadEditorProps> = (props) => {
 
 	useEffect(() => {
 		if (!ReadEditorRef.current) return
+		console.log("content",props.content);
 		let content = DOMPurify.sanitize(props.content)
+
+		
+
 		// 回复
 		if (props.replyContent) {
 			const newContent =
