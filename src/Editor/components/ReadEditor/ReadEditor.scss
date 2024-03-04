@@ -30,7 +30,7 @@
 }
 
 .dialog-read-editor {
-    @apply text-ellipsis whitespace-nowrap overflow-hidden w-full text-[0.925rem] px-0;
+    @apply text-ellipsis whitespace-nowrap overflow-hidden w-full text-[0.925rem] px-0 flex;
 
     p {
         @apply text-ellipsis whitespace-nowrap overflow-hidden w-full text-[0.925rem] px-0;

@@ -676,7 +676,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 							onSelectEmojis={onSelectEmojis}
 							className={moreType === MessageMore.EMOJI ? '' : 'hidden'}
 						/>
-						<div className={clsx('w-full', moreType === MessageMore.OTHER ? '' : 'hidden')}>
+						<div className={clsx('w-full h-full overflow-y-auto', moreType === MessageMore.OTHER ? '' : 'hidden')}>
 							{!is_system && <ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />}
 						</div>
 					</div>

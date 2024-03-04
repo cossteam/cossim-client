@@ -7,7 +7,7 @@ import {
 	USER_ID,
 	addMarkMessage,
 	getMessageFromServer,
-	initMessage,
+	// initMessage,
 	updateDialogs
 } from '@/shared'
 import UserStore from '@/db/user'
