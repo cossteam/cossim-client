@@ -25,7 +25,10 @@ const ApplyList = () => {
 		const applyList = await UserStore.findAll(UserStore.tables.apply_list)
 		const newApplyList = applyList.filter((v) => (type === ApplyType.FRIEND ? v?.sender_id : !v?.sender_id))
 		// console.log(newApplyList)
-		setApplyList(newApplyList)
+		setApplyList(
+			newApplyList.sort((a, b) => b.request_at - a.request_at)
+			// newApplyList
+		)
 		return newApplyList
 	}
 

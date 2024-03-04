@@ -65,28 +65,28 @@ const ToolBarMore: React.FC<ToolBarMoreProps> = (props) => {
 	const [tools] = useState<Tool[]>([
 		{
 			f7Icon: 'phone',
-			// text: '语音',
+			text: '语音',
 			// func: () => callTool(false)
 			params: false
 		},
 		{
 			f7Icon: 'videocam',
-			// text: '视频',
+			text: '视频',
 			// func: () => callTool(true)
 			params: true
 		}
 	])
 	return (
-		<div className="toolbar-more w-full max-h-full overflow-y-auto grid grid-cols-4">
+		<div className="toolbar-more w-full p-5 overflow-y-scroll grid grid-cols-5 gap-5">
 			{tools.map((tool, toolIdx) => {
 				return (
 					<div
 						key={toolIdx}
-						className="toolbar-more__item size-11  my-4 mx-auto text-black-500 flex flex-col justify-center items-center"
+						className="toolbar-more__item size-16 bg-gray-50 rounded-lg text-black-500 flex flex-col justify-center items-center"
 						onClick={() => callTool(tool.params)}
 					>
-						<Icon f7={tool.f7Icon} className=" text-4xl" />
-						<span className=" text-xs">{tool.text}</span>
+						<Icon f7={tool.f7Icon} className="text-3xl mb-1" />
+						<span className="text-xs">{tool.text}</span>
 					</div>
 				)
 			})}

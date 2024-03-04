@@ -140,6 +140,23 @@ const DialogList: React.FC<RouterProps> = () => {
 		await getDialogList()
 	}
 
+	const customSort = (a: any, b: any) => {
+		if (a.top_at !== 0 && b.top_at === 0) {
+			return -1 // a应该先于b
+		} else if (a.top_at === 0 && b.top_at !== 0) {
+			return 1 // b应该在a之前
+		} else {
+			// 如果两者都将top_at设为0，或者两者都具有非零的top_at
+			if (a.top_at !== 0) {
+				// 如果两者都有非零的top_at，则按top_at排序
+				return b.top_at - a.top_at
+			} else {
+				// 如果两者的top_at都为0，则按dialog_create_at排序
+				return b?.last_message?.send_time - a?.last_message?.send_time
+			}
+		}
+	}
+
 	useEffect(() => {
 		if (!dialogs.length) return
 		const list = dialogs.map((item) => {
@@ -147,7 +164,7 @@ const DialogList: React.FC<RouterProps> = () => {
 				...item
 			}
 		})
-		setChats(list.sort((a, b) => b.top_at - a.top_at))
+		setChats(list.sort(customSort))
 	}, [dialogs])
 
 	return (

@@ -207,19 +207,20 @@ function App() {
 		// @ts-ignore
 		toastRef.current = f7.toast.create({
 			text: $t('再按一次退出程序'),
-			closeTimeout: 1000,
+			closeTimeout: 800,
 			position: 'center'
 		})
 
 		let backNumber = 0
-
+		let timer: any = null
 		const backButtonHandler = () => {
 			backNumber++
 
 			// @ts-ignore
-			!router && toastRef.current?.open()
+			toastRef.current?.open()
 
-			setTimeout(() => {
+			timer && clearTimeout(timer)
+			timer = setTimeout(() => {
 				backNumber = 0
 			}, 1000)
 
