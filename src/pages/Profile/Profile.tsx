@@ -1,16 +1,16 @@
-import { Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react'
+import { Icon, Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react'
 import { useRef, useState } from 'react'
 import { isEqual } from 'lodash-es'
 
 import { $t, MessageBurnAfterRead, MessageNoDisturb, RelationStatus } from '@/shared'
 import UserStore from '@/db/user'
 import UserService from '@/api/user'
-import { useCallStore } from '@/stores/call'
+// import { useCallStore } from '@/stores/call'
 import RelationService from '@/api/relation'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
 // import { getCookie } from '@/utils/cookie'
-import { hasCamera, hasMike } from '@/utils/media'
+// import { hasCamera, hasMike } from '@/utils/media'
 
 // const userId = getCookie(USER_ID) || ''
 
@@ -52,30 +52,30 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}
 
 	// 呼叫
-	const { call, updateEnablesVideo } = useCallStore()
-	const callUser = async (enableVideo: boolean) => {
-		try {
-			// 检查设备是否可用
-			await hasMike()
-			enableVideo && (await hasCamera())
-			f7.dialog.preloader($t('呼叫中...'))
-			// 是否开启摄像头
-			updateEnablesVideo(enableVideo)
-			await call({ userInfo })
-			f7.dialog.close()
-			f7router.navigate('/call/')
-		} catch (error: any) {
-			console.log(error?.code, error?.code === 8)
-			console.dir(error)
-			if (error?.code === 8) {
-				f7.dialog.alert($t('当前媒体设备不可用，无法接听来电'))
-				return
-			}
-			f7.dialog.alert($t(error?.message || '呼叫失败...'))
-		} finally {
-			f7.dialog.close()
-		}
-	}
+	// const { call, updateEnablesVideo } = useCallStore()
+	// const callUser = async (enableVideo: boolean) => {
+	// 	try {
+	// 		// 检查设备是否可用
+	// 		await hasMike()
+	// 		enableVideo && (await hasCamera())
+	// 		f7.dialog.preloader($t('呼叫中...'))
+	// 		// 是否开启摄像头
+	// 		updateEnablesVideo(enableVideo)
+	// 		await call({ userInfo })
+	// 		f7.dialog.close()
+	// 		f7router.navigate('/call/')
+	// 	} catch (error: any) {
+	// 		console.log(error?.code, error?.code === 8)
+	// 		console.dir(error)
+	// 		if (error?.code === 8) {
+	// 			f7.dialog.alert($t('当前媒体设备不可用，无法接听来电'))
+	// 			return
+	// 		}
+	// 		f7.dialog.alert($t(error?.message || '呼叫失败...'))
+	// 	} finally {
+	// 		f7.dialog.close()
+	// 	}
+	// }
 
 	const deleteFriend = async () => {
 		f7.dialog.confirm($t('是否确认删除好友?'), $t('删除好友'), async () => {
@@ -242,18 +242,30 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 							<span className="text-xs">消息</span>
 						</div>
 					)}
-					<div className="size-10  flex flex-col justify-center items-center" onClick={() => callUser(true)}>
-						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-							<Link iconF7="videocam_fill" iconSize={22} onClick={() => callUser(true)} />
+					<Link popupOpen="#call-popup">
+						<div
+							className="size-10  flex flex-col justify-center items-center"
+							// onClick={() => callUser(true)}
+						>
+							<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
+								{/* <Link iconF7="videocam_fill" iconSize={22} /> */}
+								<Icon f7="videocam_fill" size={22} />
+							</div>
+							<span className="text-xs">视频</span>
 						</div>
-						<span className="text-xs">视频</span>
-					</div>
-					<div className="size-10 flex flex-col justify-center items-center" onClick={() => callUser(false)}>
-						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-							<Link iconF7="phone_fill" iconSize={22} />
+					</Link>
+					<Link popupOpen="#call-popup">
+						<div
+							className="size-10 flex flex-col justify-center items-center"
+							// onClick={() => callUser(false)}
+						>
+							<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
+								{/* <Link iconF7="phone_fill" iconSize={22} /> */}
+								<Icon f7="phone_fill" size={22} />
+							</div>
+							<span className="text-xs">语音</span>
 						</div>
-						<span className="text-xs">语音</span>
-					</div>
+					</Link>
 					<div className="size-10  flex flex-col justify-center items-center" onClick={() => {}}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 							<Link iconF7="tag_fill" iconSize={22} />

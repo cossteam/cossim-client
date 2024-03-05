@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { App as AppComponent, View, f7 } from 'framework7-react'
+import { App as AppComponent, Popup, View, f7 } from 'framework7-react'
 import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
@@ -23,8 +23,6 @@ import { useCallStore } from '@/stores/call'
 import { useMessageStore } from './stores/message'
 import { useStateStore } from '@/stores/state'
 import { hasMike } from './utils/media'
-import clsx from 'clsx'
-import { PhoneFill } from 'framework7-icons/react'
 import { App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
@@ -63,15 +61,7 @@ function App() {
 		}
 	})
 
-	const {
-		status: callStatus,
-		hideCall,
-		updateHideCall,
-		callInfo,
-		updateCallInfo,
-		updateStatus,
-		reject
-	} = useCallStore()
+	const { callInfo, updateCallInfo, updateStatus, reject } = useCallStore()
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -251,7 +241,7 @@ function App() {
 		<AppComponent {...f7params}>
 			{hasCookie(TOKEN) ? (
 				<>
-					{callStatus !== CallStatus.IDLE && (
+					{/* {callStatus !== CallStatus.IDLE && (
 						<>
 							<View
 								url="/call/"
@@ -268,8 +258,11 @@ function App() {
 								</div>
 							)}
 						</>
-					)}
+					)} */}
 					<Layout />
+					<Popup id="call-popup" opened={false}>
+						<View url="/new_call/" />
+					</Popup>
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />
