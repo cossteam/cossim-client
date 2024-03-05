@@ -203,7 +203,7 @@ function App() {
 		// @ts-ignore
 		toastRef.current = f7.toast.create({
 			text: $t('再按一次退出程序'),
-			closeTimeout: 800,
+			closeTimeout: 1000,
 			position: 'center'
 		})
 
@@ -213,7 +213,7 @@ function App() {
 			backNumber++
 
 			// @ts-ignore
-			toastRef.current?.open()
+			!router && toastRef.current?.open()
 
 			timer && clearTimeout(timer)
 			timer = setTimeout(() => {
