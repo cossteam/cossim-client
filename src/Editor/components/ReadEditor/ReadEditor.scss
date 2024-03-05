@@ -12,6 +12,10 @@
             font-weight: bold;
         }
     }
+
+    img {
+        @apply max-h-[220px] w-auto object-cover;
+    }
 }
 
 .read-editor-no-slef {

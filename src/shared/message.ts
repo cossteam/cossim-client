@@ -202,21 +202,21 @@ export const getMessageFromServer = async (
 	return reslut
 }
 
-/**
- * 检索数组中是否包含有图片类型
- *
- * @param {Array} data
- * @returns
- */
-export const hasImage = (data: any) => {
-	const ops = data.ops
-	for (const item of ops) {
-		if (item.insert && typeof item.insert === 'object' && 'image' in item.insert) {
-			return true
-		}
-	}
-	return false
-}
+// /**
+//  * 检索数组中是否包含有图片类型
+//  *
+//  * @param {Array} data
+//  * @returns
+//  */
+// export const hasImage = (data: any) => {
+// 	const ops = data.ops
+// 	for (const item of ops) {
+// 		if (item.insert && typeof item.insert === 'object' && 'image' in item.insert) {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
 
 /**
  * 检查给定的 HTML 字符串是否包含图像标签。
@@ -238,10 +238,36 @@ export const hasImageHtml = (html: string) => {
  * 滚动元素到底部
  *
  * @param element		滚动元素
- * @param isSmooth		是否平滑滚动
+ * @param smoothScroll		是否平滑滚动
  */
-export const scroll = (element: HTMLElement, isSmooth: boolean = false) => {
-	element?.scrollTo({ top: element.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
+export const scroll = (element: HTMLElement, smoothScroll: boolean = false, scrollSpeed: number = 500) => {
+	// element?.scrollTo({ top: element.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
+	if(!element) return
+	if (smoothScroll) {
+		const distance = element.scrollHeight - element.clientHeight
+		const duration = scrollSpeed
+		const start = element.scrollTop
+		let startTime: number = 0
+
+		const animation = (currentTime: number) => {
+			if (startTime === null) startTime = currentTime
+			const timeElapsed = currentTime - startTime
+			const scrollAmount = easeInOutQuad(timeElapsed, start, distance, duration)
+			element.scrollTop = scrollAmount
+			if (timeElapsed < duration) requestAnimationFrame(animation)
+		}
+
+		const easeInOutQuad = (t: number, b: number, c: number, d: number) => {
+			t /= d / 2
+			if (t < 1) return (c / 2) * t * t + b
+			t--
+			return (-c / 2) * (t * (t - 2) - 1) + b
+		}
+
+		requestAnimationFrame(animation)
+	} else {
+		element.scrollTop = element.scrollHeight - element.clientHeight
+	}
 }
 
 /**

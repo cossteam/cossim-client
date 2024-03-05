@@ -9,13 +9,13 @@ import MessageBar from '@/components/ChatMessage/MessageBar'
 import Contact from '@/components/Contact/Contact'
 import { useTooltipsStore } from '@/stores/tooltips'
 import { Ellipsis } from 'framework7-icons/react'
+// import clsx from 'clsx'
 
 const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const dialog_id = Number(f7route.query.dialog_id)
 	const receiver_id = f7route.params.id as string
 	const dialog_name = f7route.query.dialog_name
 	const is_group = f7route.query.is_group === 'true'
-
 	const contentRef = useRef<HTMLDivElement | null>(null)
 
 	const msgStore = useMessageStore()
@@ -33,6 +33,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		return scrollTop + offsetHeight >= scrollHeight - setp
 	}, [])
 
+	// const [bgShow, setBgShow] = useState<boolean>(true)
 	// useEffect(() => {
 	// 	if (!messages.length) return
 	// 	let timer: NodeJS.Timeout | null = null
@@ -46,16 +47,31 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	// 	})
 	// }, [messages])
 
+	// const onPageAfterIn = async () => {
+	// 	requestAnimationFrame(() => {
+	// 		// console.log('onPageAfterIn') 
+	// 		setTimeout(() => scroll(contentRef.current!, false), 0)
+	// 	})
+	// }
+
 	return (
 		<Page
 			noToolbar
-			className="coss_message transition-all"
+			className="coss_message transition-all relative"
 			onPageBeforeRemove={async () => {
 				msgStore.clearMessages()
 				tooltipStore.clear()
 				updateChat(true)
 			}}
+			// onPageAfterIn={onPageAfterIn}
 		>
+			{/* <div
+				className={clsx(
+					'w-full h-screen bg-bgTertiary absolute z-[99] animate__animated animate__fadeIn',
+					!bgShow && 'message-bg'
+				)}
+			></div> */}
+
 			<div className="h-screen overflow-hidden flex flex-col">
 				<div className="min-h-12 bg-bgPrimary">
 					<Navbar
