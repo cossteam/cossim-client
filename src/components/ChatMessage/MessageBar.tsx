@@ -18,12 +18,11 @@ import ToolEditor, { ReadEditor, type ToolEditorMethods } from '@/Editor'
 import Emojis from '@/components/Emojis/Emojis'
 import Quill from 'quill'
 import { useClickOutside, useResizeObserver } from '@reactuses/core'
-import { EmitterSource } from 'quill/core/emitter'
-import { Delta } from 'quill/core'
+// import { EmitterSource } from 'quill/core/emitter'
+// import { Delta } from 'quill/core'
 import { useTooltipsStore } from '@/stores/tooltips'
 import MessageMoreComponent from './MessageMore'
 import { Router } from 'framework7/types'
-// import { debounce } from 'lodash-es'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
@@ -71,6 +70,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	// 切换按钮
 	const [showBtn, setShowBtn] = useState<boolean>(false)
 
+	// 发送消息
 	const sendMessage = () => {
 		const quill = editorRef.current!.quill
 		let type = msgType
@@ -92,6 +92,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		if (!moreType) quill.focus()
 	}
 
+	// 发送表情
 	const onSelectEmojis = (emojis: any) => {
 		// 先确保编辑器已经聚焦
 		editorRef.current?.quill?.focus()
@@ -110,22 +111,22 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 				const quill = editorRef.current.quill
 
-				let eventSources: EmitterSource = Quill.sources.API
+				// let eventSources: EmitterSource = Quill.sources.API
 
-				quill.on(
-					Quill.events.EDITOR_CHANGE,
-					(type: string, _delta: Delta, _oldDelta: Delta, source: EmitterSource) => {
-						if (type !== Quill.events.SELECTION_CHANGE) {
-							setShowBtn(quill.getLength() > 1)
-						}
-						eventSources = source
+				quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
+					if (type !== Quill.events.SELECTION_CHANGE) {
+						setShowBtn(quill.getLength() > 1)
 					}
-				)
-
-				quill.root.addEventListener('focus', () => {
-					if (eventSources === Quill.sources.API) return
-					setKeyboardHeight(0)
+					// eventSources = source
 				})
+
+				// quill.root.addEventListener('focus', () => {
+				// if (eventSources === Quill.sources.API) return
+				// setKeyboardHeight(0)
+				// setMoreType(MessageMore.TEXT)
+				// quill.blur()
+				// setTimeout(() => quill.focus(), 300)
+				// })
 
 				clearTimeout(timer)
 			}, 0)
@@ -142,6 +143,12 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		editorRef.current?.quill.deleteText(0, editorRef.current?.quill.getLength())
 	}
 
+	const handlerInputClick = () => {
+		setKeyboardHeight(0)
+		setMoreType(MessageMore.TEXT)
+		// setTimeout(() => editorRef.current?.quill?.focus(), 300)
+	}
+
 	return (
 		<div className={clsx('message-toolbar bg-bgPrimary bottom-0 w-full h-auto z-[99] relative')} ref={toolbarRef}>
 			<div className="flex flex-col justify-center items-center">
@@ -150,7 +157,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 						<div className="w-full flex bg-bgPrimary">
 							<Link
 								className="flex flex-col flex-1 items-center justify-center"
-								// onClick={() => setShowSelect(true)}
+								onClick={() => tooltipStore.updateShowSelect(true)}
 							>
 								<ArrowUpRight className="text-xl mb-1" />
 								<span className="text-[0.75rem]">{$t('转发')}</span>
@@ -185,7 +192,10 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 							)}
 						>
 							<div className={clsx('flex-1 rounded pl-2')}>
-								<div className="py-2 bg-bgSecondary rounded w-full flex items-center">
+								<div
+									className="py-2 bg-bgSecondary rounded w-full flex items-center"
+									onClick={handlerInputClick}
+								>
 									<ToolEditor
 										ref={editorRef}
 										readonly={false}

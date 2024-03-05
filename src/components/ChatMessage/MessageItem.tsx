@@ -28,16 +28,30 @@ const Row = ({
 	const replyMessage = useCallback((msg_id: number) => msgStore.messages.find((v) => v?.msg_id === msg_id), [])
 
 	useEffect(() => {
+		const doc = new DOMParser().parseFromString(msg?.content ?? '', 'text/html')
+		const imgs = doc.querySelectorAll('img')
 		const elementHeight = itemRef.current?.offsetHeight
-		setItemSize(index, elementHeight!)
+		// 替换图片
+		if (imgs.length) {
+			const image = new Image()
+			for (let i = 0; i < imgs.length; i++) {
+				image.src = imgs[i].src
+				image.onload = () => {
+					const elementHeight = itemRef.current?.offsetHeight
+					setItemSize(index, elementHeight!)
+				}
+			}
+		} else {
+			setItemSize(index, elementHeight!)
+		}
 	}, [])
 
 	return (
-		<div ref={itemRef} className="h-auto" style={{ zIndex: 1 }}>
+		<div ref={itemRef} className="h-auto " style={{ zIndex: 1 }}>
 			<List noChevron mediaList className="my-0">
 				<ListItem
 					key={index}
-					className="coss_list_item animate__animated"
+					className="coss_list_item "
 					data-index={index}
 					style={{ zIndex: 1 }}
 					checkbox={tooltipStore.showSelect && !msg?.tips_msg_id}
@@ -176,8 +190,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el }) => {
 			Row={({ index, style, setItemSize }) =>
 				Row({ index, style, setItemSize, selectChange, onSelect: selectEvent.selectChange })
 			}
-			// itemCount={messages.length}
 			height={height}
+			el={el}
 		/>
 	)
 }

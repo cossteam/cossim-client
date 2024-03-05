@@ -25,7 +25,9 @@ const ReadEditor: React.FC<ReadEditorProps> = (props) => {
                 </blockquote>` + content
 			content = newContent
 		}
+
 		ReadEditorRef.current.innerHTML = content
+
 	}, [props.content])
 
 	return <div ref={ReadEditorRef} className={clsx('read-editor', props.className)} />

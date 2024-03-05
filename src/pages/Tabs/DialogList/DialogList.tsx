@@ -11,7 +11,7 @@ import {
 } from 'framework7-react'
 import { Plus, Search, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { format } from 'timeago.js'
 import { isEqual } from 'lodash-es'
 import { $t, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND } from '@/shared'
@@ -171,6 +171,23 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		setChats(list.sort(customSort))
 	}, [dialogs])
 
+	const handlerContent = useCallback((content: string) => {
+		const doc = new DOMParser().parseFromString(content, 'text/html')
+		const imgs = doc.querySelectorAll('img')
+
+		// 替换图片
+		if (imgs.length) {
+			const span = document.createElement('span')
+			span.textContent = $t('[图片]')
+			// 全部替换为 文字
+			for (let i = 0; i < imgs.length; i++) {
+				imgs[i].replaceWith(span)
+			}
+			content = doc.body.innerHTML
+		}
+		return content
+	}, [])
+
 	return (
 		<Page
 			ptr
@@ -243,12 +260,12 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 								loading="lazy"
 								className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"
 							/>
-							<div slot="text" className="max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
+							<div slot="text" className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap">
 								<ReadEditor
 									content={
 										(item?.group_id && item?.last_message?.sender_info?.name
 											? item?.last_message?.sender_info?.name + ':'
-											: '') + item?.last_message?.content
+											: '') + handlerContent(item?.last_message?.content ?? '')
 									}
 									className="dialog-read-editor"
 								/>

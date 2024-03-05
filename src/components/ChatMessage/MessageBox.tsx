@@ -30,8 +30,6 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 
 	// 创建工具提示
 	const createTooltip = useCallback(() => {
-		console.log('listItemRef', listItemRef)
-
 		if (tooltipStore.type === TOOLTIP_TYPE.SELECT) return
 		const div = document.createElement('div')
 		const root = createRoot(div)
