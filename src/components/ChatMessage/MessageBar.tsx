@@ -16,26 +16,30 @@ import {
 import { KeyboardIcon } from '@/components/Icon/Icon'
 import ToolEditor, { ReadEditor, type ToolEditorMethods } from '@/Editor'
 import Emojis from '@/components/Emojis/Emojis'
-// import ToolBarMore from '@/components/Message/ToolBarMore'
 import Quill from 'quill'
-// import { Delta } from 'quill/core'
-// import { EmitterSource } from 'quill/core/emitter'
 import { useClickOutside, useResizeObserver } from '@reactuses/core'
 import { EmitterSource } from 'quill/core/emitter'
 import { Delta } from 'quill/core'
+import { useTooltipsStore } from '@/stores/tooltips'
+import MessageMoreComponent from './MessageMore'
+import { Router } from 'framework7/types'
 // import { debounce } from 'lodash-es'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
 	isScrollEnd: (setp?: number) => boolean
-	selectItem?: any
+	receiver_id: string
+	is_group: boolean
+	is_system?: boolean
+	f7router?: Router.Router
 }
 
-const MessageBar: React.FC<MessageBarProps> = ({ contentEl, selectItem }) => {
+const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_group, is_system, f7router }) => {
 	const msgStore = useMessageStore()
 	const toolbarRef = useRef<HTMLDivElement | null>(null)
 	const editorRef = useRef<ToolEditorMethods>(null)
 	const moreRef = useRef<HTMLDivElement | null>(null)
+	const tooltipStore = useTooltipsStore()
 
 	// 键盘高度
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(0)
@@ -62,14 +66,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, selectItem }) => {
 		setMoreType(type)
 	}, [])
 
-	const [selectType, setSelectType] = useState<TOOLTIP_TYPE>(TOOLTIP_TYPE.NONE)
 	// 是否处于多选状态
-	const isSelect = useMemo(() => selectType === TOOLTIP_TYPE.SELECT, [selectType])
-	// 是否处于回复状态
-	const isReply = useMemo(() => selectType === TOOLTIP_TYPE.REPLY, [selectType])
-	// 是否处于编辑状态
-	const isEdit = useMemo(() => selectType === TOOLTIP_TYPE.EDIT, [selectType])
-
+	const isSelect = useMemo(() => tooltipStore.type === TOOLTIP_TYPE.SELECT, [tooltipStore.type])
+	// 切换按钮
 	const [showBtn, setShowBtn] = useState<boolean>(false)
 
 	const sendMessage = () => {
@@ -80,11 +79,13 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, selectItem }) => {
 		if (hasImageHtml(content)) type = MESSAGE_TYPE.IMAGE
 
 		// 发送或编辑消息
-		selectType === TOOLTIP_TYPE.EDIT
-			? msgStore.editMessage(selectItem, content)
-			: msgStore.sendMessage(type, content, { replay_id: isReply ? selectItem?.msg_id : 0 })
+		tooltipStore.type === TOOLTIP_TYPE.EDIT
+			? msgStore.editMessage(tooltipStore.selectItem, content)
+			: msgStore.sendMessage(type, content, {
+					replay_id: tooltipStore.type === TOOLTIP_TYPE.REPLY ? tooltipStore.selectItem?.msg_id : 0
+				})
 
-		setSelectType(TOOLTIP_TYPE.NONE)
+		tooltipStore.updateType(TOOLTIP_TYPE.NONE)
 
 		// 发送成功的操作
 		quill.deleteText(0, quill.getLength() - 1)
@@ -135,6 +136,12 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, selectItem }) => {
 		}
 	}, [])
 
+	// 删除编辑状态或回复状态
+	const clear = () => {
+		tooltipStore.updateType(TOOLTIP_TYPE.NONE)
+		editorRef.current?.quill.deleteText(0, editorRef.current?.quill.getLength())
+	}
+
 	return (
 		<div className={clsx('message-toolbar bg-bgPrimary bottom-0 w-full h-auto z-[99] relative')} ref={toolbarRef}>
 			<div className="flex flex-col justify-center items-center">
@@ -150,7 +157,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, selectItem }) => {
 							</Link>
 							<Link
 								className="flex flex-col flex-1 items-center justify-center"
-								// onClick={selectEvent.delete}
+								onClick={() => tooltipStore.updateSelectDelete(true)}
 							>
 								<Trash className="text-xl mb-1" />
 								<span className="text-[0.75rem]">{$t('删除')}</span>
@@ -183,23 +190,17 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, selectItem }) => {
 										ref={editorRef}
 										readonly={false}
 										placeholder={$t('请输入内容')}
-										// id={receiver_id}
-										is_group={false}
+										id={receiver_id}
+										is_group={is_group}
 									/>
 								</div>
-								{(isReply || isEdit) && (
+								{[TOOLTIP_TYPE.EDIT, TOOLTIP_TYPE.REPLY].includes(tooltipStore.type) && (
 									<div className="mt-1 bg-bgTertiary relative flex justify-between">
-										<ReadEditor content={selectItem?.content} className="reply-read-editor" />
-										<Link
-											className="pr-2"
-											onClick={() => {
-												setSelectType(TOOLTIP_TYPE.NONE)
-												editorRef.current?.quill.deleteText(
-													0,
-													editorRef.current?.quill.getLength()
-												)
-											}}
-										>
+										<ReadEditor
+											content={tooltipStore.selectItem?.content ?? ''}
+											className="reply-read-editor"
+										/>
+										<Link className="pr-2" onClick={clear}>
 											<XmarkCircle className="text-textTertiary" />
 										</Link>
 									</div>
@@ -260,7 +261,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, selectItem }) => {
 							moreType === MessageMore.OTHER ? '' : 'hidden'
 						)}
 					>
-						{/* {!is_system && <ToolBarMore is_group={is_group} id={receiver_id} f7router={f7router} />} */}
+						{!is_system && (
+							<MessageMoreComponent is_group={is_group} id={receiver_id} f7router={f7router!} />
+						)}
 					</div>
 				</div>
 			</div>

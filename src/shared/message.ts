@@ -241,7 +241,7 @@ export const hasImageHtml = (html: string) => {
  * @param isSmooth		是否平滑滚动
  */
 export const scroll = (element: HTMLElement, isSmooth: boolean = false) => {
-	element.scrollTo({ top: element.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
+	element?.scrollTo({ top: element.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
 }
 
 /**

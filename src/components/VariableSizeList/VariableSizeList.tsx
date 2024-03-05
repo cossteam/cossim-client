@@ -24,15 +24,7 @@ const Row: React.FC<RowProps> = ({ index, style, setItemSize, ...props }) => {
 	const itemRef = useRef<HTMLDivElement | null>(null)
 
 	useEffect(() => {
-		// const elementHeight = itemRef.current?.offsetHeight
-		// console.log("elementHeight",elementHeight);
-		// const chatEl = itemRef.current?.querySelector('.chat') as HTMLDivElement
-		// console.log("chatEl",chatEl.offsetHeight);
-		// setItemSize(index, elementHeight!)
 		const elementHeight = itemRef.current?.offsetHeight
-		// console.log('elementHeight', elementHeight)
-		// const chatEl = itemRef.current?.querySelector('.chat') as HTMLDivElement
-		// console.log('chatEl', chatEl.offsetHeight)
 		setItemSize(index, elementHeight!)
 	}, [])
 
@@ -121,7 +113,7 @@ const VariableSizeList: React.FC<VariableSizeListProps> = ({ pageHeight, ...prop
 			</div>
 		)
 	}, [])
-
+ 
 	return (
 		<>
 			{
@@ -131,8 +123,7 @@ const VariableSizeList: React.FC<VariableSizeListProps> = ({ pageHeight, ...prop
 					itemSize={getItemSize}
 					width={'100%'}
 					ref={listRef}
-
-					// initialScrollOffset={props.messages.length * props.messages.length}
+					initialScrollOffset={props.messages.length * props.messages.length}
 				>
 					{rowRender}
 				</VariableSList>

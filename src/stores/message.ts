@@ -432,7 +432,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	clearMessages: async () => {
-		console.log('clearMessages')
 		set({ messages: [], all_meesages: [], dialog_id: 0 })
 	},
 	updateMessageById: async (msg: PrivateChats) => {

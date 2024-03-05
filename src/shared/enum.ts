@@ -74,6 +74,7 @@ export enum TOOLTIP_TYPE {
 	NOTICE = 'notice'
 }
 
+
 /** 平台 */
 export enum PLATFORM {
 	/** web */
