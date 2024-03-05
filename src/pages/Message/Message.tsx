@@ -1,15 +1,20 @@
-import { Link, NavRight, Navbar, Page } from 'framework7-react'
-import { useCallback, useMemo, useRef } from 'react'
+import { Link, NavRight, Navbar, Page, Subnavbar } from 'framework7-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './message.scss'
 import { useMessageStore } from '@/stores/message'
-import { $t, TOOLTIP_TYPE } from '@/shared'
+import { $t, TOOLTIP_TYPE, USER_ID, getLatestGroupAnnouncement } from '@/shared'
 import { useStateStore } from '@/stores/state'
 import MessageItem from '@/components/ChatMessage/MessageItem'
 import MessageBar from '@/components/ChatMessage/MessageBar'
 import Contact from '@/components/Contact/Contact'
 import { useTooltipsStore } from '@/stores/tooltips'
-import { Ellipsis } from 'framework7-icons/react'
-// import clsx from 'clsx'
+import { BellFill, ChevronRight, Ellipsis } from 'framework7-icons/react'
+import GroupService from '@/api/group'
+import { getCookie } from '@/utils/cookie'
+import clsx from 'clsx'
+import { App } from '@capacitor/app'
+
+const user_id = getCookie(USER_ID) ?? ''
 
 const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const dialog_id = Number(f7route.query.dialog_id)
@@ -21,6 +26,10 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const msgStore = useMessageStore()
 	const { updateChat } = useStateStore()
 	const { showSelectMember, updateShowSelectMember, updateSelectMember, ...tooltipStore } = useTooltipsStore()
+	// 群公告
+	const [groupAnnouncement, setGroupAnnouncement] = useState<any>(null)
+	// 群成员
+	const [members, setMembers] = useState<any[]>([])
 
 	// 是否是系统通知
 	const is_system = useMemo(() => receiver_id === '10001', [receiver_id])
@@ -33,45 +42,48 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		return scrollTop + offsetHeight >= scrollHeight - setp
 	}, [])
 
-	// const [bgShow, setBgShow] = useState<boolean>(true)
-	// useEffect(() => {
-	// 	if (!messages.length) return
-	// 	let timer: NodeJS.Timeout | null = null
-	// 	requestAnimationFrame(() => {
-	// 		// 如果处于当前状态就不需要做滚动
-	// 		if ([TOOLTIP_TYPE.DELETE, TOOLTIP_TYPE.EDIT].includes(tooltipStore.type)) {
-	// 			return
-	// 		}
-	// 		if (timer) clearTimeout(timer)
-	// 		timer = setTimeout(() => scroll(contentRef.current!, isScrollEnd() ? true : false), 0)
-	// 	})
-	// }, [messages])
+	const getGroupAnnouncement = () => {
+		const params = { group_id: Number(receiver_id) }
+		GroupService.groupAnnouncementApi(params).then((res) => {
+			setGroupAnnouncement(getLatestGroupAnnouncement(res.data ?? []))
+		})
+	}
 
-	// const onPageAfterIn = async () => {
-	// 	requestAnimationFrame(() => {
-	// 		// console.log('onPageAfterIn') 
-	// 		setTimeout(() => scroll(contentRef.current!, false), 0)
-	// 	})
-	// }
+	useEffect(() => {
+		getGroupAnnouncement()
+		GroupService.groupMemberApi({ group_id: Number(receiver_id) }).then((res) => {
+			setMembers(res.data)
+		})
+	}, [])
+
+	const isReadGroupAnnouncement = useCallback((users: any[]) => users?.some((v) => v?.user_id === user_id), [])
+	const isShowGroupAnnouncement = useMemo(
+		() => is_group && groupAnnouncement && !isReadGroupAnnouncement(groupAnnouncement?.read_user_list),
+		[groupAnnouncement]
+	)
+
+	const remove = () => {
+		msgStore.clearMessages()
+		tooltipStore.clear()
+		updateChat(true)
+	}
+
+	useEffect(() => {
+		// 添加返回按钮事件监听
+		const backListener = App.addListener('backButton', remove)
+		
+		return () => {
+			// 移除返回按钮事件监听器
+			backListener.remove()
+		}
+	}, [])
 
 	return (
 		<Page
 			noToolbar
 			className="coss_message transition-all relative"
-			onPageBeforeRemove={async () => {
-				msgStore.clearMessages()
-				tooltipStore.clear()
-				updateChat(true)
-			}}
-			// onPageAfterIn={onPageAfterIn}
+			onPageBeforeIn={async () => is_group && getGroupAnnouncement()}
 		>
-			{/* <div
-				className={clsx(
-					'w-full h-screen bg-bgTertiary absolute z-[99] animate__animated animate__fadeIn',
-					!bgShow && 'message-bg'
-				)}
-			></div> */}
-
 			<div className="h-screen overflow-hidden flex flex-col">
 				<div className="min-h-12 bg-bgPrimary">
 					<Navbar
@@ -80,6 +92,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						backLink
 						outline={false}
 						className="coss_message_navbar"
+						onClickBack={remove}
 					>
 						<NavRight>
 							{tooltipStore.type === TOOLTIP_TYPE.SELECT ? (
@@ -105,10 +118,32 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 								)
 							)}
 						</NavRight>
+						{isShowGroupAnnouncement && (
+							<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster">
+								<Link
+									className="w-full h-full flex justify-center items-center rounded bg-bgPrimary"
+									href={`/create_group_notice/${receiver_id}/?id=${groupAnnouncement.id}&admin=${members.find((v) => v?.identity === user_id)?.identity === 2}}`}
+								>
+									<div className="w-full py-3 px-4 relative flex items-center">
+										<BellFill className="mr-3 text-orange-400 text-sm" />
+										<p className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[86%] text-textSecondary">
+											<span className="font-bold">{groupAnnouncement.title}：</span>
+											{groupAnnouncement.content}
+										</p>
+										<div className="absolute right-3">
+											<ChevronRight className="text-textTertiary text-sm" />
+										</div>
+									</div>
+								</Link>
+							</Subnavbar>
+						)}
 					</Navbar>
 				</div>
 
-				<div className="flex-1 overflow-y-auto overflow-x-hidden" ref={contentRef}>
+				<div
+					className={clsx('flex-1 overflow-y-auto overflow-x-hidden', isShowGroupAnnouncement ? 'pt-16' : '')}
+					ref={contentRef}
+				>
 					<MessageItem dialog_id={dialog_id} el={contentRef} />
 				</div>
 
