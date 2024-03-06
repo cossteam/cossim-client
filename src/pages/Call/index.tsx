@@ -14,7 +14,9 @@ const Call: React.FC<RouterProps> = (props) => {
 	const [audioEnable, setAudioEnable] = useState(true)
 	const imgRul = 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
 
-	useEffect(() => {}, [])
+	useEffect(() => {
+		setIsGroup(false)
+	}, [])
 
 	return (
 		<Page noNavbar noToolbar>

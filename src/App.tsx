@@ -27,6 +27,7 @@ import { App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
 import DOMPurify from 'dompurify'
+import { useNewCallStore } from './stores/new_call'
 
 let store: MessageStore | null = null
 
@@ -36,7 +37,7 @@ function App() {
 	const user_id = getCookie(USER_ID) || ''
 
 	const toastRef = useRef(null)
-	
+
 	let router: Router.Router | null = null
 
 	const [f7params] = useState<Framework7Parameters>({
@@ -62,6 +63,7 @@ function App() {
 	})
 
 	const { callInfo, updateCallInfo, updateStatus, reject } = useCallStore()
+	const { visible } = useNewCallStore()
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -203,7 +205,7 @@ function App() {
 		// @ts-ignore
 		toastRef.current = f7.toast.create({
 			text: $t('再按一次退出程序'),
-			closeTimeout: 800,
+			closeTimeout: 1000,
 			position: 'center'
 		})
 
@@ -213,7 +215,7 @@ function App() {
 			backNumber++
 
 			// @ts-ignore
-			toastRef.current?.open()
+			!router && toastRef.current?.open()
 
 			timer && clearTimeout(timer)
 			timer = setTimeout(() => {
@@ -264,7 +266,7 @@ function App() {
 						</>
 					)} */}
 					<Layout />
-					<Popup id="call-popup" opened={true}>
+					<Popup id="call-popup" opened={visible}>
 						<View url="/new_call/" />
 					</Popup>
 				</>
