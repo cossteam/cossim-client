@@ -49,11 +49,13 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		})
 	}
 
+	// 获取群聊人员
 	useEffect(() => {
-		getGroupAnnouncement()
-		GroupService.groupMemberApi({ group_id: Number(receiver_id) }).then((res) => {
-			setMembers(res.data)
-		})
+		if (is_group) {
+			GroupService.groupMemberApi({ group_id: Number(receiver_id) }).then((res) => {
+				setMembers(res.data)
+			})
+		}
 	}, [])
 
 	const isReadGroupAnnouncement = useCallback((users: any[]) => users?.some((v) => v?.user_id === user_id), [])
@@ -71,7 +73,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	useEffect(() => {
 		// 添加返回按钮事件监听
 		const backListener = App.addListener('backButton', remove)
-		
+
 		return () => {
 			// 移除返回按钮事件监听器
 			backListener.remove()
@@ -154,6 +156,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					is_group={is_group}
 					is_system={is_system}
 					f7router={f7router}
+					members={members}
 				/>
 			</div>
 

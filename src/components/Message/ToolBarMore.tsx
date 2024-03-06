@@ -10,6 +10,7 @@ interface ToolBarMoreProps {
 	id: string
 	is_group: boolean
 	f7router: Router.Router
+	members: any[]
 }
 
 interface Tool {

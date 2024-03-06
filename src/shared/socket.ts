@@ -6,7 +6,7 @@ import { TOKEN } from '.'
 
 class Socket {
 	private serverAddress: string
-	private socket: WebSocket | null
+	public socket: WebSocket | null
 	private listeners: any
 	// 重连次数
 	private reconnectTimes = 0
@@ -39,8 +39,8 @@ class Socket {
 			})
 
 			this.socket.addEventListener('message', (event) => {
-
 				this.triggerEvent('onWsMessage', event)
+				
 			})
 
 			this.socket.addEventListener('close', (event) => {

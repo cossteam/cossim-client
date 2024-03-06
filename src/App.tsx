@@ -20,7 +20,7 @@ import {
 } from '@/shared'
 import { getCookie, hasCookie, setCookie } from '@/utils/cookie'
 import { useCallStore } from '@/stores/call'
-import { useMessageStore } from './stores/message'
+import { useMessageStore, MessageStore } from './stores/message'
 import { useStateStore } from '@/stores/state'
 import { hasMike } from './utils/media'
 import { App as CapApp } from '@capacitor/app'
@@ -28,15 +28,15 @@ import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
 import DOMPurify from 'dompurify'
 
+let store: MessageStore | null = null
+
 function App() {
 	const msgStore = useMessageStore()
 	const stateStore = useStateStore()
 	const user_id = getCookie(USER_ID) || ''
 
 	const toastRef = useRef(null)
-
-	// const [router, setRouter] = useState<Router.Router | null>(null)
-
+	
 	let router: Router.Router | null = null
 
 	const [f7params] = useState<Framework7Parameters>({
@@ -85,8 +85,8 @@ function App() {
 					try {
 						const msg = data?.data || {}
 						// msg 的发送者不是自己并且当前不在会话中
-						console.log(msg.receiver_id, user_id, msg.receiver_id !== user_id && Number(msgStore.dialog_id))
-						if (msg.receiver_id !== user_id && Number(msgStore.dialog_id)) {
+						console.log(msg.receiver_id, user_id, msg.receiver_id !== user_id && Number(store!.dialog_id))
+						if (msg.receiver_id !== user_id && Number(store!.dialog_id)) {
 							// 本地通知
 							const dom = document.createElement('p')
 							dom.innerHTML = DOMPurify.sanitize(msg.content || '')
@@ -96,7 +96,7 @@ function App() {
 					} catch {
 						console.log('发送本地通知失败')
 					}
-					handlerMessageSocket(data, msgStore, stateStore)
+					handlerMessageSocket(data, store!, stateStore)
 					break
 				case SocketEvent.ApplyListEvent:
 					handlerRequestSocket(data)
@@ -178,12 +178,12 @@ function App() {
 					}
 					break
 				case SocketEvent.MessageLabelEvent:
-					handlerLabelSocket(data, msgStore)
+					handlerLabelSocket(data, store!)
 					break
 				case SocketEvent.MessageEditEvent:
 					console.log('消息编辑', data)
 
-					handlerEditSocket(data, msgStore)
+					handlerEditSocket(data, store!)
 					break
 			}
 		}
@@ -237,6 +237,10 @@ function App() {
 		}
 	}, [])
 
+	useEffect(() => {
+		store = msgStore
+	}, [msgStore])
+
 	return (
 		<AppComponent {...f7params}>
 			{hasCookie(TOKEN) ? (
@@ -244,7 +248,7 @@ function App() {
 					{/* {callStatus !== CallStatus.IDLE && (
 						<>
 							<View
-								url="/call/"
+								url="/call/" 
 								id="view-call"
 								name="call"
 								className={clsx(hideCall ? 'hide-call' : '')}
