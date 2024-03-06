@@ -9,7 +9,6 @@ import {
 	TOKEN,
 	SocketClient,
 	handlerRequestSocket,
-	CallStatus,
 	handlerMessageSocket,
 	SocketEvent,
 	handlerLabelSocket,
@@ -19,10 +18,8 @@ import {
 	USER_ID
 } from '@/shared'
 import { getCookie, hasCookie, setCookie } from '@/utils/cookie'
-import { useCallStore } from '@/stores/call'
 import { useMessageStore, MessageStore } from './stores/message'
 import { useStateStore } from '@/stores/state'
-import { hasMike } from './utils/media'
 import { App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
@@ -62,8 +59,7 @@ function App() {
 		}
 	})
 
-	const { callInfo, updateCallInfo, updateStatus, reject } = useCallStore()
-	const { visible } = useNewCallStore()
+	const newCallStore = useNewCallStore()
 
 	useEffect(() => {
 		// 修复手机上的视口比例
@@ -106,85 +102,19 @@ function App() {
 				case SocketEvent.ApplyAcceptEvent:
 					handlerRequestResultSocket(data)
 					break
-				case SocketEvent.UserCallReqEvent:
-				case SocketEvent.GroupCallReqEvent:
-					// 来电
-					try {
-						// 更新通话信息
-						const newCallInfo = { ...callInfo, evrntInfo: data }
-						console.log('来电', data)
-						if (event === SocketEvent.UserCallReqEvent) {
-							newCallInfo['userInfo'] = {
-								user_id: data?.data?.sender_id
-							}
-						} else {
-							newCallInfo['groupInfo'] = {
-								group_id: data?.data?.group_id
-							}
-						}
-						updateCallInfo(newCallInfo)
-						// 检查设备是否可用
-						await hasMike()
-						// 更新通话状态
-						updateStatus(CallStatus.WAITING)
-					} catch (error: any) {
-						console.dir(error)
-						if (error?.code === 8) {
-							f7.dialog.alert($t('当前媒体设备不可用，无法接听来电'))
-							reject()
-							return
-						}
-						f7.dialog.alert($t(error?.message || '接听失败...'))
-					}
-					break
-				case SocketEvent.UserCallRejectEvent:
-				case SocketEvent.GroupCallRejectEvent:
-					// 拒绝
-					{
-						const newCallInfo = { ...callInfo, evrntInfo: data }
-						if (event === SocketEvent.UserCallReqEvent) {
-							newCallInfo['userInfo'] = {
-								user_id: data?.data?.sender_id
-							}
-						} else {
-							newCallInfo['groupInfo'] = {
-								group_id: data?.data?.sender_id
-							}
-						}
-						updateCallInfo(newCallInfo)
-						updateStatus(CallStatus.REFUSE)
-						setTimeout(() => {
-							updateStatus(CallStatus.IDLE)
-						}, 3000)
-					}
-					break
-				case SocketEvent.UserCallHangupEvent:
-				case SocketEvent.GroupCallHangupEvent:
-					// 挂断
-					{
-						const newCallInfo = { ...callInfo, evrntInfo: data }
-						if (event === SocketEvent.UserCallReqEvent) {
-							newCallInfo['userInfo'] = {
-								user_id: data?.data?.sender_id
-							}
-						} else {
-							newCallInfo['groupInfo'] = {
-								group_id: data?.data?.sender_id
-							}
-						}
-						updateCallInfo(newCallInfo)
-						updateStatus(CallStatus.HANGUP)
-						setTimeout(() => {
-							updateStatus(CallStatus.IDLE)
-						}, 3000)
-					}
+				case SocketEvent.UserCallReqEvent: // 用户来电
+				case SocketEvent.GroupCallReqEvent: // 群聊来电
+				case SocketEvent.UserCallRejectEvent: // 用户拒绝
+				case SocketEvent.GroupCallRejectEvent: // 群聊拒绝
+				case SocketEvent.UserCallHangupEvent: // 用户挂断
+				case SocketEvent.GroupCallHangupEvent: // 群聊挂断
+					newCallStore.handlerCallEvent(event, data)
 					break
 				case SocketEvent.MessageLabelEvent:
 					handlerLabelSocket(data, store!)
 					break
 				case SocketEvent.MessageEditEvent:
 					console.log('消息编辑', data)
-
 					handlerEditSocket(data, store!)
 					break
 			}
@@ -247,26 +177,8 @@ function App() {
 		<AppComponent {...f7params}>
 			{hasCookie(TOKEN) ? (
 				<>
-					{/* {callStatus !== CallStatus.IDLE && (
-						<>
-							<View
-								url="/call/" 
-								id="view-call"
-								name="call"
-								className={clsx(hideCall ? 'hide-call' : '')}
-							/>
-							{hideCall && (
-								<div className=" fixed z-[9999] right-0 top-1/3 bg-slate-300 rounded-l-lg">
-									<PhoneFill
-										className="size-[40px] box-content p-2"
-										onClick={() => updateHideCall(false)}
-									/>
-								</div>
-							)}
-						</>
-					)} */}
 					<Layout />
-					<Popup id="call-popup" opened={visible}>
+					<Popup opened={newCallStore.visible}>
 						<View url="/new_call/" />
 					</Popup>
 				</>

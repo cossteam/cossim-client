@@ -242,30 +242,26 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 							<span className="text-xs">消息</span>
 						</div>
 					)}
-					<Link popupOpen="#call-popup">
-						<div
-							className="size-10  flex flex-col justify-center items-center"
-							// onClick={() => callUser(true)}
-						>
-							<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-								{/* <Link iconF7="videocam_fill" iconSize={22} /> */}
-								<Icon f7="videocam_fill" size={22} />
-							</div>
-							<span className="text-xs">视频</span>
+					<div
+						className="size-10  flex flex-col justify-center items-center"
+						// onClick={() => callUser(true)}
+					>
+						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
+							{/* <Link iconF7="videocam_fill" iconSize={22} /> */}
+							<Icon f7="videocam_fill" size={22} />
 						</div>
-					</Link>
-					<Link popupOpen="#call-popup">
-						<div
-							className="size-10 flex flex-col justify-center items-center"
-							// onClick={() => callUser(false)}
-						>
-							<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-								{/* <Link iconF7="phone_fill" iconSize={22} /> */}
-								<Icon f7="phone_fill" size={22} />
-							</div>
-							<span className="text-xs">语音</span>
+						<span className="text-xs">视频</span>
+					</div>
+					<div
+						className="size-10 flex flex-col justify-center items-center"
+						// onClick={() => callUser(false)}
+					>
+						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
+							{/* <Link iconF7="phone_fill" iconSize={22} /> */}
+							<Icon f7="phone_fill" size={22} />
 						</div>
-					</Link>
+						<span className="text-xs">语音</span>
+					</div>
 					<div className="size-10  flex flex-col justify-center items-center" onClick={() => {}}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 							<Link iconF7="tag_fill" iconSize={22} />

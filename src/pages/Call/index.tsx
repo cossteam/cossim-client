@@ -1,3 +1,4 @@
+import { useNewCallStore } from '@/stores/new_call'
 import clsx from 'clsx'
 import { Icon, Link, Page, PageContent } from 'framework7-react'
 import { useEffect, useState } from 'react'
@@ -13,6 +14,11 @@ const Call: React.FC<RouterProps> = (props) => {
 	const [frontCamera, setFrontCamera] = useState(true)
 	const [audioEnable, setAudioEnable] = useState(true)
 	const imgRul = 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+
+	const newCallStore = useNewCallStore()
+	useEffect(() => {
+		console.log(newCallStore.status)
+	}, [newCallStore.status])
 
 	useEffect(() => {
 		setIsGroup(false)
