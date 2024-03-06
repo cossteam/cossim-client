@@ -60,7 +60,6 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 			f7.dialog.close()
 		}
 	}
-	console.log(callTool)
 
 	// 工具
 	const [tools] = useState<Tool[]>([
@@ -81,11 +80,14 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		<div className="toolbar-more w-full p-5 overflow-y-scroll grid grid-cols-5 gap-5">
 			{tools.map((tool, toolIdx) => {
 				return (
-					<Link popupOpen="#call-popup">
+					<Link key={toolIdx} popupOpen="#call-popup">
 						<div
-							key={toolIdx}
 							className="toolbar-more__item size-16 bg-gray-50 rounded-lg text-black-500 flex flex-col justify-center items-center"
-							// onClick={() => callTool(tool.params)}
+							onClick={() => {
+								if (toolIdx < -1) {
+									callTool(tool.params)
+								}
+							}}
 						>
 							<Icon f7={tool.f7Icon} className="text-3xl mb-1" />
 							<span className="text-xs">{tool.text}</span>
