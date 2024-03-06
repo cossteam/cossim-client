@@ -203,7 +203,7 @@ function App() {
 		// @ts-ignore
 		toastRef.current = f7.toast.create({
 			text: $t('再按一次退出程序'),
-			closeTimeout: 1000,
+			closeTimeout: 800,
 			position: 'center'
 		})
 
@@ -213,7 +213,7 @@ function App() {
 			backNumber++
 
 			// @ts-ignore
-			!router && toastRef.current?.open()
+			toastRef.current?.open()
 
 			timer && clearTimeout(timer)
 			timer = setTimeout(() => {
@@ -260,7 +260,7 @@ function App() {
 						</>
 					)} */}
 					<Layout />
-					<Popup id="call-popup" opened={false}>
+					<Popup id="call-popup" opened={true}>
 						<View url="/new_call/" />
 					</Popup>
 				</>
