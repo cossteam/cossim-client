@@ -50,9 +50,9 @@ export interface TooltipsStore {
 
 	/**
 	 * 更新选中的多条消息
-	 * @param  {PrivateChats[]}  selectItems 选中的多条消息
+	 * @param  {PrivateChats}  selectItems 选中的多条消息
 	 */
-	updateSelectItems: (selectItems: PrivateChats[]) => void
+	updateSelectItems: (selectItems: PrivateChats, isAdd?: boolean) => void
 
 	/**
 	 * 更新多选删除状态
@@ -67,7 +67,7 @@ export interface TooltipsStore {
 	clear: () => void
 }
 
-export const useTooltipsStore = create<TooltipsStore>((set) => ({
+export const useTooltipsStore = create<TooltipsStore>((set, get) => ({
 	type: TOOLTIP_TYPE.NONE,
 	selectItem: null,
 	selectMember: [],
@@ -76,12 +76,19 @@ export const useTooltipsStore = create<TooltipsStore>((set) => ({
 	selectItems: [],
 	selectDelete: false,
 
-	updateType: (type: TOOLTIP_TYPE) => set({ type }),
-	updateSelectItem: (item: PrivateChats | null) => set({ selectItem: item }),
-	updateSelectMember: (member: any[]) => set({ selectMember: member }),
-	updateShowSelectMember: (showSelectMember: boolean) => set({ showSelectMember }),
-	updateShowSelect: (showSelect: boolean) => set({ showSelect }),
-	updateSelectItems: (selectItems: PrivateChats[]) => set({ selectItems }),
+	updateType: (type) => set({ type }),
+	updateSelectItem: (item) => set({ selectItem: item }),
+	updateSelectMember: (member) => set({ selectMember: member }),
+	updateShowSelectMember: (showSelectMember) => set({ showSelectMember }),
+	updateShowSelect: (showSelect) => set({ showSelect }),
+	updateSelectItems: (selectItem, isAdd = false) => {
+		const { selectItems: oldSelectItems } = get()
+		if (isAdd) {
+			set({ selectItems: [...oldSelectItems, selectItem] })
+		} else {
+			set({ selectItems: oldSelectItems.filter((item) => item.msg_id !== selectItem.msg_id) })
+		}
+	},
 	clear: () =>
 		set({
 			type: TOOLTIP_TYPE.NONE,
@@ -90,8 +97,8 @@ export const useTooltipsStore = create<TooltipsStore>((set) => ({
 			showSelectMember: false,
 			showSelect: false,
 			selectItems: [],
-            selectDelete: false
+			selectDelete: false
 		}),
 
-	updateSelectDelete: (selectDelete: boolean) => set({ selectDelete })
+	updateSelectDelete: (selectDelete) => set({ selectDelete })
 }))

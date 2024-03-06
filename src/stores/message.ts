@@ -168,7 +168,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		const { tableName, messages } = get()
 		try {
 			set({ messages: messages.filter((item) => item.msg_id !== msg_id) })
-			await UserStore.delete(tableName, 'msg_id', msg_id)
+			const id = messages.find((item) => item.msg_id === msg_id)?.id ?? 0
+			await UserStore.delete(tableName, 'id', id)
 		} catch (error) {
 			console.log('删除消息失败', error)
 		}
@@ -365,26 +366,13 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	initMessage: async (is_group: boolean, dialog_id: number, receiver_id: string) => {
-		const { readMessage } = get()
-
 		// TODO: 移除
 		// const tableName = is_group ? UserStore.tables.group_chats : UserStore.tables.private_chats
 		const tableName = UserStore.tables.messages
-
-		// const messages = await initMessage({
-		// 	tableName,
-		// 	dialog_id,
-		// 	shareKey
-		// })
 		const messages = await UserStore.findOneAllById(tableName, 'dialog_id', dialog_id)
 
 		// 获取服务器上的消息
 		getMessageFromServer(receiver_id, is_group).then((res: any) => {
-			// const newMessages = messages.filter((v) => v?.msg_send_state === MESSAGE_SEND.SEND_SUCCESS)
-			// const msgFormServer = res?.user_messages?.[0] || res?.group_messages?.[0]
-			// const msgFormStore = newMessages?.at(-1)
-			// console.log('new', messages)
-
 			const data = res?.group_messages || res?.user_messages || []
 			const newData: any[] = data.map((v: any) => ({
 				...v,
@@ -395,14 +383,22 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 			if (!messages?.length) {
 				if (!data.length) return
-				set({ messages: data?.reverse() })
-				UserStore.bulkAdd(UserStore.tables.messages, data)
+				const messages: any[] = data
+					.map((v: any) => ({
+						...v,
+						msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
+						uid: uuidv4()
+					}))
+					?.reverse()
+				set({ messages })
+				UserStore.bulkAdd(UserStore.tables.messages, messages)
 				return
 			}
 
 			// TODO: 对比两个数组的差异，更新本地数据库
-			const diffData = differenceBy(newData || [], messages, 'msg_id')
-			console.log('diff', diffData, newData, messages)
+			differenceBy(newData || [], messages, 'msg_id')
+			// console.log('diff', diffData, newData, messages)
+			console.log('messages', messages)
 		})
 
 		// 当前会话的信息，如果是私聊就是好友信息，如果是群聊就是群信息
@@ -412,10 +408,12 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 		// console.log('message', messages)
 
+		console.log('message', messages)
+
 		set({ messages, tableName, is_group, receiver_id, dialog_id, all_meesages: messages, userInfo, myInfo })
 
 		// 设置已读
-		readMessage(messages)
+		// readMessage(messages)
 	},
 	updateMessages: async (msgs) => {
 		try {

@@ -31,9 +31,10 @@ interface MessageBarProps {
 	is_group: boolean
 	is_system?: boolean
 	f7router?: Router.Router
+	members: any[]
 }
 
-const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_group, is_system, f7router }) => {
+const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_group, is_system, f7router, members }) => {
 	const msgStore = useMessageStore()
 	const toolbarRef = useRef<HTMLDivElement | null>(null)
 	const editorRef = useRef<ToolEditorMethods>(null)
@@ -272,7 +273,12 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 						)}
 					>
 						{!is_system && (
-							<MessageMoreComponent is_group={is_group} id={receiver_id} f7router={f7router!} />
+							<MessageMoreComponent
+								is_group={is_group}
+								id={receiver_id}
+								f7router={f7router!}
+								members={members}
+							/>
 						)}
 					</div>
 				</div>

@@ -16,7 +16,9 @@ import { App } from '@capacitor/app'
 
 const user_id = getCookie(USER_ID) ?? ''
 
-const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
+
+
+const Message: React.FC<RouterProps > = ({ f7route, f7router }) => {
 	const dialog_id = Number(f7route.query.dialog_id)
 	const receiver_id = f7route.params.id as string
 	const dialog_name = f7route.query.dialog_name
@@ -50,7 +52,6 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}
 
 	useEffect(() => {
-		getGroupAnnouncement()
 		GroupService.groupMemberApi({ group_id: Number(receiver_id) }).then((res) => {
 			setMembers(res.data)
 		})
@@ -154,6 +155,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					is_group={is_group}
 					is_system={is_system}
 					f7router={f7router}
+					members={members}
 				/>
 			</div>
 
