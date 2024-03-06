@@ -46,7 +46,7 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 		setSizes((prevSize) => {
 			return {
 				...prevSize,
-				[index]: size 
+				[index]: size
 			}
 		})
 		// 根据索引，重置缓存位置。

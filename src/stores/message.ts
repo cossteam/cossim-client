@@ -175,9 +175,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
-		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, tableName } = get()
+		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, tableName, userInfo } = get()
 
-		// console.log('at_all_user', at_all_user, at_users, options?.is_group)
+		console.log('at_all_user')
 
 		let error_message = ''
 
@@ -194,7 +194,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			dialog_id: options?.dialog_id ?? dialog_id,
 			content,
 			create_at: Date.now(),
-			is_burn_after_reading: options?.is_burn_after_reading ?? 0,
+			is_burn_after_reading:
+				options?.is_burn_after_reading ?? userInfo?.preferences?.open_burn_after_reading ?? 0,
 			is_label: MESSAGE_MARK.NOT_MARK,
 			is_read: MESSAGE_READ.READ,
 			msg_id: 0,
@@ -226,7 +227,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 				content,
 				dialog_id: msg.dialog_id,
 				replay_id: msg.reply_id,
-				is_burn_after_reading: 0
+				is_burn_after_reading: msg.is_burn_after_reading
 			}
 
 			if (is_group) {
@@ -273,7 +274,11 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			}
 
 			isUpdate &&
-				set((state) => ({ messages: [...state.messages.slice(0, -1), ...msgs], at_all_user: 0, at_users: [] }))
+				set((state) => ({
+					messages: [...state.messages.slice(0, -1), ...msgs],
+					at_all_user: 0,
+					at_users: []
+				}))
 		}
 	},
 	editMessage: async (msg: PrivateChats, content: string) => {
@@ -366,10 +371,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	initMessage: async (is_group: boolean, dialog_id: number, receiver_id: string) => {
-		// TODO: 移除
-		// const tableName = is_group ? UserStore.tables.group_chats : UserStore.tables.private_chats
 		const tableName = UserStore.tables.messages
-		const messages = await UserStore.findOneAllById(tableName, 'dialog_id', dialog_id)
+		const messages = await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', dialog_id)
 
 		// 获取服务器上的消息
 		getMessageFromServer(receiver_id, is_group).then((res: any) => {
@@ -398,7 +401,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			// TODO: 对比两个数组的差异，更新本地数据库
 			differenceBy(newData || [], messages, 'msg_id')
 			// console.log('diff', diffData, newData, messages)
-			console.log('messages', messages)
+			// console.log('messages', messages)
 		})
 
 		// 当前会话的信息，如果是私聊就是好友信息，如果是群聊就是群信息
@@ -406,9 +409,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		// 自己的信息
 		const myInfo = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 
-		// console.log('message', messages)
-
-		console.log('message', messages)
+		// console.log('message', userInfo, myInfo)
+		console.log('dialog_id', dialog_id)
 
 		set({ messages, tableName, is_group, receiver_id, dialog_id, all_meesages: messages, userInfo, myInfo })
 

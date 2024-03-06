@@ -16,9 +16,7 @@ import { App } from '@capacitor/app'
 
 const user_id = getCookie(USER_ID) ?? ''
 
-
-
-const Message: React.FC<RouterProps > = ({ f7route, f7router }) => {
+const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const dialog_id = Number(f7route.query.dialog_id)
 	const receiver_id = f7route.params.id as string
 	const dialog_name = f7route.query.dialog_name
@@ -51,10 +49,13 @@ const Message: React.FC<RouterProps > = ({ f7route, f7router }) => {
 		})
 	}
 
+	// 获取群聊人员
 	useEffect(() => {
-		GroupService.groupMemberApi({ group_id: Number(receiver_id) }).then((res) => {
-			setMembers(res.data)
-		})
+		if (is_group) {
+			GroupService.groupMemberApi({ group_id: Number(receiver_id) }).then((res) => {
+				setMembers(res.data)
+			})
+		}
 	}, [])
 
 	const isReadGroupAnnouncement = useCallback((users: any[]) => users?.some((v) => v?.user_id === user_id), [])
@@ -72,7 +73,7 @@ const Message: React.FC<RouterProps > = ({ f7route, f7router }) => {
 	useEffect(() => {
 		// 添加返回按钮事件监听
 		const backListener = App.addListener('backButton', remove)
-		
+
 		return () => {
 			// 移除返回按钮事件监听器
 			backListener.remove()

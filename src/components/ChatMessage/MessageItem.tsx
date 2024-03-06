@@ -58,8 +58,10 @@ const Row = ({
 			if (entry.isIntersecting) {
 				msgStore.readMessage([msg])
 
+				console.log('msg', msg)
 				// 如果消息是阅后即焚
 				if (msg?.is_burn_after_reading === MessageBurnAfterRead.YES) {
+					console.log('阅后即焚')
 					const timer = setTimeout(() => {
 						msgStore.deleteMessage(msg.msg_id)
 						clearTimeout(timer)
@@ -162,7 +164,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el }) => {
 							is_group,
 							receiver_id: v?.user_id,
 							dialog_id: v?.dialog_id,
-							is_forward: v?.dialog_id !== dialog_id
+							is_forward: v?.dialog_id !== dialog_id,
+							is_burn_after_reading: v?.preferences?.open_burn_after_reading ?? 0
 						})
 					})
 				})
