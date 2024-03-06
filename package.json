@@ -60,6 +60,9 @@
 		"timeago.js": "^4.0.2",
 		"tweetnacl": "^1.0.3",
 		"uuid": "^9.0.1",
+		"workbox-routing": "^7.0.0",
+		"workbox-strategies": "^7.0.0",
+		"workbox-window": "^7.0.0",
 		"zustand": "^4.5.0"
 	},
 	"devDependencies": {

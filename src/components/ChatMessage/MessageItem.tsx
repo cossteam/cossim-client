@@ -57,15 +57,13 @@ const Row = ({
 		entries.forEach(async (entry) => {
 			if (entry.isIntersecting) {
 				msgStore.readMessage([msg])
-
-				console.log('msg', msg)
 				// 如果消息是阅后即焚
 				if (msg?.is_burn_after_reading === MessageBurnAfterRead.YES) {
 					console.log('阅后即焚')
 					const timer = setTimeout(() => {
 						msgStore.deleteMessage(msg.msg_id)
 						clearTimeout(timer)
-					}, 5000)
+					}, 30000)
 				}
 
 				// 取消监听
