@@ -155,8 +155,11 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 				// 如果两者都有非零的top_at，则按top_at排序
 				return b.top_at - a.top_at
 			} else {
-				// 如果两者的top_at都为0，则按dialog_create_at排序
-				return b?.last_message?.send_time - a?.last_message?.send_time
+				// 如果两者的top_at都为0，则按last_message?.send_time 或 dialog_create_at排序
+				return (
+					(b?.last_message?.send_time || b?.dialog_create_at) -
+					(a?.last_message?.send_time || a?.dialog_create_at)
+				)
 			}
 		}
 	}
