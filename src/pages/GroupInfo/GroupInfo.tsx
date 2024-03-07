@@ -90,7 +90,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 		f7.dialog.confirm('退出群聊', '确定要退出群聊吗？', async () => {
 			try {
 				f7.dialog.preloader('正在退出...')
-				const { code, msg } = await GroupService.groupQuitApi({ group_id: parseInt(GroupId) })
+				const { code, msg } = await GroupService.groupQuitApi({ group_id: Number(GroupId) })
 				code === 200 && f7router.back()
 				code !== 200 && f7.dialog.alert(msg)
 			} catch (error: any) {
@@ -106,7 +106,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 		f7.dialog.confirm('解散群聊', '确定要解散群聊吗？', async () => {
 			try {
 				f7.dialog.preloader('正在解散...')
-				const { code, msg } = await GroupService.groupDissolve({ group_id: GroupId })
+				const { code, msg } = await GroupService.groupDissolve({ group_id: Number(GroupId) })
 				code === 200 && f7router.back()
 				code !== 200 && f7.dialog.alert(msg)
 			} catch (error: any) {
@@ -123,7 +123,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 		try {
 			f7.dialog.preloader('请稍候...')
 			const { code } = await GroupService.setGroupSilenceApi({
-				group_id: parseInt(GroupId),
+				group_id: Number(GroupId),
 				is_silent: isSilence ? 1 : 0
 			})
 			if (code !== 200) return
