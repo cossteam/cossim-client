@@ -177,9 +177,10 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
 		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, tableName, userInfo } = get()
 
-		console.log('at_all_user')
-
 		let error_message = ''
+
+		console.log("userInfo", userInfo,userInfo?.preferences?.open_burn_after_reading)
+		
 
 		// 判断是否是群聊
 		let { is_group } = get()

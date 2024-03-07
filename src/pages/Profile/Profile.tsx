@@ -1,5 +1,5 @@
 import { Icon, Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { isEqual } from 'lodash-es'
 
 import { $t, MessageBurnAfterRead, MessageNoDisturb, RelationStatus } from '@/shared'
@@ -132,9 +132,18 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				f7.dialog.alert(tips_error)
 				return
 			}
+			await RelationService.setBurnTimeApi({
+				friend_id: user_id,
+				open_burn_after_reading_time_out: 10
+			})
+
 			// 更新本地数据库
 			await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
-				preferences: { ...userInfo?.preferences, open_burn_after_reading: action }
+				preferences: {
+					...userInfo?.preferences,
+					open_burn_after_reading: action,
+					open_burn_after_reading_time_out: 10
+				}
 			})
 			await updateUserInfo(false)
 		} catch (error) {
@@ -219,6 +228,41 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		// })
 	}
 
+	const [times, setTimes] = useState<{ label: string; value: number; checked?: boolean }[]>([
+		{ label: $t('10秒'), value: 10, checked: true },
+		{ label: $t('30秒'), value: 30, checked: false },
+		{ label: $t('1分钟'), value: 60, checked: false },
+		{ label: $t('5分钟'), value: 300, checked: false },
+		{ label: $t('10分钟'), value: 600, checked: false }
+	])
+
+	const changeTime = async (index: number) => {
+		const items = [...times]
+		items.forEach((item) => {
+			item.checked = false
+		})
+		items[index].checked = true
+		setTimes(items)
+
+		const { code } = await RelationService.setBurnTimeApi({
+			friend_id: user_id,
+			open_burn_after_reading_time_out: items[index].value
+		})
+
+		if (code === 200) {
+			// 更新本地数据库
+			await UserStore.update(UserStore.tables.friends, 'user_id', user_id, {
+				preferences: { ...userInfo?.preferences, open_burn_after_reading_time_out: items[index].value }
+			})
+			await updateUserInfo(false)
+		}
+	}
+
+	const is_burn_after_reading = useMemo(
+		() => userInfo?.preferences?.open_burn_after_reading === MessageBurnAfterRead.YES,
+		[userInfo?.preferences?.open_burn_after_reading]
+	)
+
 	return (
 		<Page ref={pageRef} className="profile-page bg-bgTertiary" noToolbar onPageInit={onPageInit}>
 			<Navbar title={$t('用户信息')} backLink className="bg-bgPrimary hidden-navbar-bg" />
@@ -279,29 +323,20 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 			<List strong outline dividers className="bg-white m-0 mb-3">
 				<ListItem title={$t('阅后即焚')}>
-					<Toggle
-						slot="after"
-						checked={userInfo?.preferences?.open_burn_after_reading === MessageBurnAfterRead.YES}
-						onChange={burnAfterRead}
-					/>
+					<Toggle slot="after" checked={is_burn_after_reading} onChange={burnAfterRead} />
 				</ListItem>
-
-				<ListItem title={$t('自焚时间')} />
-				<li>
-					<ul>
-						<ListItem link="#" title="Ivan Petrov" after="CEO">
-							<Icon slot="media" icon="icon-f7" />
-						</ListItem>
-						<ListItem link="#" title="Two icons here">
-							<Icon slot="media" icon="icon-f7" />
-							<Icon slot="media" icon="icon-f7" />
-						</ListItem>
-						<ListItem title="With toggle">
-							<Icon slot="media" icon="icon-f7" />
-							<Toggle slot="after" />
-						</ListItem>
-					</ul>
-				</li>
+				{/* <ListItem title={$t('自焚时间')} /> */}
+				{is_burn_after_reading && (
+					<li>
+						<ul>
+							{times.map((item, index) => (
+								<ListItem title={item.label} key={index}>
+									<Toggle slot="after" onChange={() => changeTime(index)} checked={item.checked} />
+								</ListItem>
+							))}
+						</ul>
+					</li>
+				)}
 
 				<ListItem title={$t('消息免打扰')}>
 					<Toggle

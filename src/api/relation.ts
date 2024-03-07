@@ -200,6 +200,22 @@ class RelationServiceImpl {
 			data
 		})
 	}
+
+	/**
+	 * 设置阅后即焚的时间
+	 * 
+	 * @param data
+	 * @param {string} data.friend_id
+	 * @param {number} data.open_burn_after_reading_time_out
+	 * @returns
+	 */
+	setBurnTimeApi(data: { friend_id: string; open_burn_after_reading_time_out: number }): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/burn/timeout/set`,
+			method: 'POST',
+			data
+		})
+	}
 }
 
 const RelationService = new RelationServiceImpl()

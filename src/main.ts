@@ -13,8 +13,8 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 
 import 'animate.css'
-// import { Workbox } from 'workbox-window'
-// import url from './worker?url'
+// 注册 service worker
+// import './worker'
 
 dayjs.locale('zh-cn')
 
@@ -24,16 +24,4 @@ Framework7.use(Framework7React)
 const root = createRoot(document.getElementById('root')!)
 root.render(React.createElement(App))
 
-// if ('serviceWorker' in navigator) {
-// 	window.addEventListener('load', async () => {
-// 		const wb = new Workbox(url)
-// 		wb.register().then(
-// 			() => {
-// 				console.log('Service Worker Registered')
-// 			},
-// 			(err) => {
-// 				console.log('Service Worker registration failed: ', err)
-// 			}
-// 		)
-// 	})
-// }
+

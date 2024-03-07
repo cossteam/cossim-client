@@ -1,47 +1,32 @@
-import { registerRoute, Route } from 'workbox-routing'
-import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies'
+// import { Workbox } from 'workbox-window'
+// import url from './server-work?url'
+// import { App as CapApp, AppState } from '@capacitor/app'
 
-self.addEventListener('activate', function (event) {
-	console.log('ServiceWorker activated.', event)
-})
+// let worker: Workbox
 
-self.addEventListener('message', (event) => {
-	console.log('接收消息', event)
-})
+// if ('serviceWorker' in navigator) {
+// 	worker = new Workbox(url)
+// 	worker.register().then(
+// 		() => {
+// 			console.log('Service Worker Registered', worker)
+// 		},
+// 		(err) => {
+// 			console.log('Service Worker registration failed: ', err)
+// 		}
+// 	)
 
-console.log('Service Worker Loaded')
+// 	/**
+// 	 * 页面激活变化
+// 	 *
+// 	 * @param {AppState} state 页面激活状态
+// 	 */
+// 	const appChange = async (state: AppState) => {
+// 		console.log('isActive', state, worker)
 
-// Handle images:
-const imageRoute = new Route(
-	({ request }) => {
-		return request.destination === 'image'
-	},
-	new StaleWhileRevalidate({
-		cacheName: 'images'
-	})
-)
+// 		worker.messageSW({ type: 'AppState', data: { isActive: state.isActive } })
+// 	}
 
-// Handle scripts:
-const scriptsRoute = new Route(
-	({ request }) => {
-		return request.destination === 'script'
-	},
-	new CacheFirst({
-		cacheName: 'scripts'
-	})
-)
+// 	CapApp.addListener('appStateChange', appChange)
+// }
 
-// Handle styles:
-const stylesRoute = new Route(
-	({ request }) => {
-		return request.destination === 'style'
-	},
-	new CacheFirst({
-		cacheName: 'styles'
-	})
-)
-
-// Register routes
-registerRoute(imageRoute)
-registerRoute(scriptsRoute)
-registerRoute(stylesRoute)
+// export { worker as default }

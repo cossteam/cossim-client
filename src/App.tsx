@@ -15,16 +15,19 @@ import {
 	handlerRequestResultSocket,
 	handlerEditSocket,
 	DEVICE_ID,
-	USER_ID
+	USER_ID,
+	burnAfterReading
 } from '@/shared'
 import { getCookie, hasCookie, setCookie } from '@/utils/cookie'
 import { useMessageStore, MessageStore } from './stores/message'
 import { useStateStore } from '@/stores/state'
-import { App as CapApp } from '@capacitor/app'
+import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
 import DOMPurify from 'dompurify'
 import { useNewCallStore } from './stores/new_call'
+import { useAsyncEffect } from '@reactuses/core'
+import { PluginListenerHandle } from '@capacitor/core'
 
 let store: MessageStore | null = null
 
@@ -131,43 +134,52 @@ function App() {
 		}
 	}, [])
 
-	useEffect(() => {
-		// @ts-ignore
-		toastRef.current = f7.toast.create({
-			text: $t('再按一次退出程序'),
-			closeTimeout: 1000,
-			position: 'center'
-		})
-
-		let backNumber = 0
-		let timer: any = null
-		const backButtonHandler = () => {
-			backNumber++
-
+	let backListener: PluginListenerHandle
+	let appStateListener: PluginListenerHandle
+	useAsyncEffect(
+		async () => {
 			// @ts-ignore
-			!router && toastRef.current?.open()
+			toastRef.current = f7.toast.create({
+				text: $t('再按一次退出程序'),
+				closeTimeout: 1000,
+				position: 'center'
+			})
 
-			timer && clearTimeout(timer)
-			timer = setTimeout(() => {
-				backNumber = 0
-			}, 1000)
+			let backNumber = 0
+			let timer: any = null
+			const backButtonHandler = () => {
+				backNumber++
 
-			if (backNumber > 1) CapApp.exitApp()
+				// @ts-ignore
+				!router && toastRef.current?.open()
 
-			if (router && router.history.length > 1) {
-				router.back()
-				router = null
+				timer && clearTimeout(timer)
+				timer = setTimeout(() => {
+					backNumber = 0
+				}, 1000)
+
+				if (backNumber > 1) CapApp.minimizeApp()
+
+				if (router && router.history.length > 1) {
+					router.back()
+					router = null
+				}
 			}
-		}
 
-		// 添加返回按钮事件监听器
-		const backListener = CapApp.addListener('backButton', backButtonHandler)
+			const appChange = async (state: AppState) => {
+				if (state.isActive) burnAfterReading()
+			}
 
-		return () => {
-			// 移除返回按钮事件监听器
-			backListener.remove()
-		}
-	}, [])
+			// 添加返回按钮事件监听器
+			backListener = await CapApp.addListener('backButton', backButtonHandler)
+			appStateListener = await CapApp.addListener('appStateChange', appChange)
+		},
+		() => {
+			backListener && backListener.remove()
+			appStateListener && appStateListener.remove()
+		},
+		[]
+	)
 
 	useEffect(() => {
 		store = msgStore

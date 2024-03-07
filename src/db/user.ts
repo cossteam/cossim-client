@@ -6,7 +6,8 @@ import type {
 	Groups,
 	ClientPGPKeys,
 	Messages,
-	GroupMembers
+	GroupMembers,
+	ReadDestroy
 } from '@/types/db/user-db'
 import { ServiceImpl, USER_ID, COMMON_DATA_BASE_NAME } from '@/shared'
 import { getCookie } from '@/utils/cookie'
@@ -25,6 +26,7 @@ class UserStoreImpl extends Dexie {
 	messages!: Table<Messages>
 	group_members!: Table<GroupMembers>
 	// group_notice
+	read_destroy!: Table<ReadDestroy>
 
 	constructor(name: string, version: number = 1) {
 		super(name)
@@ -38,7 +40,8 @@ class UserStoreImpl extends Dexie {
 			apply_list: '++id',
 			client_pgp_keys: '++id, &dialog_id, server_public_Key, private_key, public_key, revocation_certificate',
 			messages: '++id, dialog_id, msg_id, &uid, pid',
-			group_members: '++id, user_id, identity, group_id'
+			group_members: '++id, user_id, identity, group_id',
+			read_destroy: '++id, msg_id, uid, read_time, self_destruct_time'
 
 		})
 	}

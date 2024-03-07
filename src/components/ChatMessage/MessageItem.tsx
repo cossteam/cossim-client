@@ -1,114 +1,20 @@
-import { $t, MESSAGE_READ, MessageBurnAfterRead, TOOLTIP_TYPE } from '@/shared'
+import { $t, TOOLTIP_TYPE } from '@/shared'
 import { useMessageStore } from '@/stores/message'
-import { List, ListItem, f7 } from 'framework7-react'
-import React, { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { f7 } from 'framework7-react'
+import React, { RefObject, useCallback, useEffect, useState } from 'react'
 import { useTooltipsStore } from '@/stores/tooltips'
 import { useAsyncEffect, useClipboard } from '@reactuses/core'
 import { useToast } from '@/hooks/useToast'
-import MessageBox from './MessageBox'
-import MessageVariableSizeList, { RowProps } from './MessageVariableSizeList'
+import MessageVariableSizeList from './MessageVariableSizeList'
+import MessageRow from './MessageRow'
 
 interface MessageItemProps {
 	dialog_id: number
 	el: RefObject<HTMLDivElement | null>
+	isScrollEnd: (setp?: number) => boolean
 }
 
-const Row = ({
-	index,
-	setItemSize,
-	selectChange,
-	onSelect,
-	el
-}: RowProps & {
-	selectChange: (...args: any[]) => void
-	onSelect: (...args: any[]) => void
-	el: RefObject<HTMLDivElement | null>
-}) => {
-	const msgStore = useMessageStore()
-	const tooltipStore = useTooltipsStore()
-	const msg = useMemo(() => msgStore.messages[index], [index])
-	const itemRef = useRef<HTMLDivElement | null>(null)
-
-	// 查找回复消息
-	const replyMessage = useCallback((msg_id: number) => msgStore.messages.find((v) => v?.msg_id === msg_id), [])
-
-	// 计算每条消息的高度
-	useEffect(() => {
-		const doc = new DOMParser().parseFromString(msg?.content ?? '', 'text/html')
-		const imgs = doc.querySelectorAll('img')
-		const elementHeight = itemRef.current?.offsetHeight
-		// 替换图片
-		if (imgs.length) {
-			const image = new Image()
-			for (let i = 0; i < imgs.length; i++) {
-				image.src = imgs[i].src
-				image.onload = () => {
-					const elementHeight = itemRef.current?.offsetHeight
-					setItemSize(index, elementHeight!)
-				}
-			}
-		} else {
-			setItemSize(index, elementHeight!)
-		}
-	}, [])
-
-	// 处理显示区域的消息，做已读、阅后即焚的操作
-	const handlerObserver = (entries: IntersectionObserverEntry[]) => {
-		entries.forEach(async (entry) => {
-			if (entry.isIntersecting) {
-				msgStore.readMessage([msg])
-				// 如果消息是阅后即焚
-				if (msg?.is_burn_after_reading === MessageBurnAfterRead.YES) {
-					console.log('阅后即焚')
-					const timer = setTimeout(() => {
-						msgStore.deleteMessage(msg.msg_id)
-						clearTimeout(timer)
-					}, 30000)
-				}
-
-				// 取消监听
-				itemRef.current && ob.unobserve(itemRef.current)
-			}
-		})
-	}
-	const ob = useMemo(() => new IntersectionObserver(handlerObserver, { root: el.current! }), [])
-
-	useEffect(() => {
-		// 已读就不需要再多做处理, 下面是处理未读的消息
-		if (msg.is_read === MESSAGE_READ.NOT_READ) {
-			requestAnimationFrame(() => {
-				setTimeout(() => {
-					itemRef.current && ob.observe(itemRef.current)
-				}, 1000)
-			})
-		}
-	}, [])
-
-	return (
-		<div ref={itemRef} className="h-auto " style={{ zIndex: 1 }}>
-			<List noChevron mediaList className="my-0">
-				<ListItem
-					key={index}
-					className="coss_list_item "
-					data-index={index}
-					style={{ zIndex: 1 }}
-					checkbox={tooltipStore.showSelect && !msg?.tips_msg_id}
-					onChange={(e) => onSelect(e, msg)}
-				>
-					<MessageBox
-						msg={msg}
-						index={index}
-						onSelect={selectChange}
-						reply={msg?.reply_id !== 0 ? replyMessage(msg?.reply_id) : null}
-						listItemRef={itemRef}
-					/>
-				</ListItem>
-			</List>
-		</div>
-	)
-}
-
-const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el }) => {
+const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el, isScrollEnd }) => {
 	const { messages, ...msgStore } = useMessageStore()
 	const tooltipStore = useTooltipsStore()
 	const [, copy] = useClipboard()
@@ -226,11 +132,19 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el }) => {
 
 	return (
 		<MessageVariableSizeList
-			Row={({ index, style, setItemSize }) =>
-				Row({ index, style, setItemSize, selectChange, onSelect: selectEvent.selectChange, el })
-			}
+			Row={({ index, style, setItemSize }) => (
+				<MessageRow
+					index={index}
+					style={style}
+					setItemSize={setItemSize}
+					selectChange={selectChange}
+					onSelect={selectEvent.selectChange}
+					el={el}
+				/>
+			)}
 			height={height}
 			el={el}
+			isScrollEnd={isScrollEnd}
 		/>
 	)
 }
