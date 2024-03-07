@@ -13,6 +13,8 @@ import GroupService from '@/api/group'
 import { getCookie } from '@/utils/cookie'
 import clsx from 'clsx'
 import { App } from '@capacitor/app'
+import { useAsyncEffect } from '@reactuses/core'
+import { PluginListenerHandle } from '@capacitor/core'
 
 const user_id = getCookie(USER_ID) ?? ''
 
@@ -70,15 +72,18 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		updateChat(true)
 	}
 
-	useEffect(() => {
-		// 添加返回按钮事件监听
-		const backListener = App.addListener('backButton', remove)
-
-		return () => {
+	let backListener: PluginListenerHandle
+	useAsyncEffect(
+		async () => {
+			// 添加返回按钮事件监听
+			backListener = await App.addListener('backButton', remove)
+		},
+		() => {
 			// 移除返回按钮事件监听器
 			backListener.remove()
-		}
-	}, [])
+		},
+		[]
+	)
 
 	return (
 		<Page

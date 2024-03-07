@@ -285,6 +285,24 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						onChange={burnAfterRead}
 					/>
 				</ListItem>
+
+				<ListItem title={$t('自焚时间')} />
+				<li>
+					<ul>
+						<ListItem link="#" title="Ivan Petrov" after="CEO">
+							<Icon slot="media" icon="icon-f7" />
+						</ListItem>
+						<ListItem link="#" title="Two icons here">
+							<Icon slot="media" icon="icon-f7" />
+							<Icon slot="media" icon="icon-f7" />
+						</ListItem>
+						<ListItem title="With toggle">
+							<Icon slot="media" icon="icon-f7" />
+							<Toggle slot="after" />
+						</ListItem>
+					</ul>
+				</li>
+
 				<ListItem title={$t('消息免打扰')}>
 					<Toggle
 						slot="after"
