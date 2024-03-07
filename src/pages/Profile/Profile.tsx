@@ -229,9 +229,9 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}
 
 	const [times, setTimes] = useState<{ label: string; value: number; checked?: boolean }[]>([
-		{ label: $t('10秒'), value: 10, checked: true },
-		{ label: $t('30秒'), value: 30, checked: false },
-		{ label: $t('1分钟'), value: 60, checked: false },
+		{ label: $t('10秒'), value: 10, checked: false },
+		// { label: $t('30秒'), value: 30, checked: false },
+		{ label: $t('1分钟'), value: 60, checked: true },
 		{ label: $t('5分钟'), value: 300, checked: false },
 		{ label: $t('10分钟'), value: 600, checked: false }
 	])

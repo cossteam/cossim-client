@@ -179,8 +179,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 		let error_message = ''
 
-		console.log("userInfo", userInfo,userInfo?.preferences?.open_burn_after_reading)
-		
+		console.log('userInfo', userInfo, userInfo?.preferences?.open_burn_after_reading)
 
 		// 判断是否是群聊
 		let { is_group } = get()
@@ -409,9 +408,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', receiver_id)
 		// 自己的信息
 		const myInfo = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-
-		// console.log('message', userInfo, myInfo)
-		console.log('dialog_id', dialog_id)
 
 		set({ messages, tableName, is_group, receiver_id, dialog_id, all_meesages: messages, userInfo, myInfo })
 

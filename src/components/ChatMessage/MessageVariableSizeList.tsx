@@ -43,7 +43,7 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 			setIsFristIn(false)
 		}
 
-		isScrollEnd(300) && scrollEnd(true, 300)
+		!isFristIn && isScrollEnd(300) && scrollEnd(true, 300)
 	}, [messages])
 
 	// 根据索引，设置Item高度

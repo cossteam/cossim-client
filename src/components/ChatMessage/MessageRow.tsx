@@ -6,6 +6,7 @@ import { MESSAGE_READ, MessageBurnAfterRead } from '@/shared'
 import { List, ListItem } from 'framework7-react'
 import MessageBox from './MessageBox'
 import clsx from 'clsx'
+import UserStore from '@/db/user'
 
 interface MessageRowProps {
 	selectChange: (...args: any[]) => void
@@ -18,7 +19,7 @@ const MessageRow: React.FC<RowProps & MessageRowProps> = ({ index, setItemSize, 
 	const tooltipStore = useTooltipsStore()
 	const msg = useMemo(() => msgStore.messages[index], [index])
 	const itemRef = useRef<HTMLDivElement | null>(null)
-	const [read, setRead] = useState<boolean>(false)
+	const [read, setRead] = useState<boolean>(true)
 
 	// 查找回复消息
 	const replyMessage = useCallback((msg_id: number) => msgStore.messages.find((v) => v?.msg_id === msg_id), [])
@@ -53,9 +54,16 @@ const MessageRow: React.FC<RowProps & MessageRowProps> = ({ index, setItemSize, 
 				// 如果消息是阅后即焚
 				if (msg?.is_burn_after_reading === MessageBurnAfterRead.YES) {
 					const time = msgStore.userInfo?.preferences?.open_burn_after_reading_time_out ?? 10
-					console.log('阅后即焚', time)
+					// 添加进去
+					UserStore.add(UserStore.tables.read_destroy, {
+						uid: msg.uid,
+						msg_id: msg?.msg_id,
+						read_time: Date.now(),
+						self_destruct_time: time
+					})
 					const timer = setTimeout(() => {
 						msgStore.deleteMessage(msg.msg_id)
+						UserStore.delete(UserStore.tables.read_destroy, 'uid', msg.uid)
 						clearTimeout(timer)
 					}, time * 1000)
 				}
@@ -67,21 +75,23 @@ const MessageRow: React.FC<RowProps & MessageRowProps> = ({ index, setItemSize, 
 	}
 	const ob = useMemo(() => new IntersectionObserver(handlerObserver, { root: el.current! }), [])
 
-	const is_read = useMemo(() => msg?.is_read === MESSAGE_READ.READ || read, [read])
+	const is_read = useMemo(() => msg?.is_read === MESSAGE_READ.READ, [read])
 
 	useEffect(() => {
 		// 已读就不需要再多做处理, 下面是处理未读的消息 || isMe(msg.sender_id)
 		if (!is_read) {
+			setRead(false)
 			requestAnimationFrame(() => {
 				setTimeout(() => {
 					itemRef.current && ob.observe(itemRef.current)
 				}, 1000)
 			})
 		}
+        
 	}, [])
 
 	return (
-		<div ref={itemRef} className={clsx('h-auto', !is_read && 'bg-gray-200')} style={{ zIndex: 1 }}>
+		<div ref={itemRef} className={clsx('h-auto', !msg?.is_tips && !is_read && !read && 'bg-gray-200')} style={{ zIndex: 1 }}>
 			<List noChevron mediaList className="my-0">
 				<ListItem
 					key={index}
