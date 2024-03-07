@@ -4,6 +4,7 @@ import {
 	MESSAGE_READ,
 	MESSAGE_SEND,
 	MESSAGE_TYPE,
+	MessageBurnAfterRead,
 	USER_ID,
 	addMarkMessage,
 	getMessageFromServer,
@@ -45,6 +46,8 @@ export interface MessageStore {
 	myInfo: any
 	at_all_user: number
 	at_users: string[]
+	/** 需要设置已读消息 */
+	reads: PrivateChats[]
 	/**
 	 * 触发 手机触摸事件
 	 */
@@ -142,6 +145,18 @@ export interface MessageStore {
 	 * @param updateAtUsers
 	 */
 	updateAtUsers: (updateAtUsers: string) => void
+	/**
+	 * 更新设置已读消息
+	 *
+	 * @param msg
+	 */
+	updateReads: (msg: PrivateChats) => void
+	/**
+	 * 清空已读消息
+	 *
+	 * @returns
+	 */
+	clearReads: (msgs: PrivateChats[]) => void
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -158,6 +173,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	trgger: false,
 	at_all_user: 0,
 	at_users: [],
+	reads: [],
 	updateTrgger: (trgger: boolean) => set({ trgger }),
 
 	updateMessage: async (msg: PrivateChats) => {
@@ -193,7 +209,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		const msg: any = {
 			dialog_id: options?.dialog_id ?? dialog_id,
 			content,
-			create_at: Date.now(),
+			created_at: Date.now(),
 			is_burn_after_reading:
 				options?.is_burn_after_reading ?? userInfo?.preferences?.open_burn_after_reading ?? 0,
 			is_label: MESSAGE_MARK.NOT_MARK,
@@ -337,13 +353,13 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		return true
 	},
 	readMessage: async (msgs) => {
+		const { is_group, dialog_id, tableName, receiver_id, clearReads, messages } = get()
+
 		// 未读消息
 		const unReadMsgs = msgs.filter((item) => item?.is_read === MESSAGE_READ.NOT_READ)
 		const msg_ids = unReadMsgs.map((item) => item.msg_id)
 
 		if (!msg_ids.length) return
-
-		const { is_group, dialog_id, tableName, receiver_id } = get()
 
 		const params: any = { msg_ids, dialog_id }
 
@@ -357,6 +373,18 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		if (code === 200) {
 			unReadMsgs.map((item) => {
 				updateDatabaseMessage(tableName, item.uid, { ...item, is_read: MESSAGE_READ.READ }, true)
+			})
+
+			clearReads(msgs)
+
+			// 更新消息
+			set({
+				messages: messages.map((item) => {
+					if (msg_ids.includes(item.msg_id)) {
+						return { ...item, is_read: MESSAGE_READ.READ }
+					}
+					return item
+				})
 			})
 
 			// 更新会话
@@ -442,5 +470,31 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	updateAtUsers: (atUsers: string) => {
 		const { at_users } = get()
 		set({ at_users: [...at_users, atUsers] })
+	},
+	updateReads: (msg) => {
+		const { reads, userInfo } = get()
+		const index = reads.findIndex((item) => item.msg_id === msg.msg_id)
+		if (index === -1) {
+			set({ reads: [...reads, msg] })
+		} else {
+			const newReads = reads.filter((item) => item.msg_id !== msg.msg_id)
+			set({ reads: newReads })
+		}
+
+		// 判断消息是否阅后即焚
+		if (msg?.is_burn_after_reading === MessageBurnAfterRead.YES) {
+			UserStore.add(UserStore.tables.read_destroy, {
+				uid: msg.uid,
+				msg_id: msg?.msg_id,
+				read_time: Date.now(),
+				// TODO: 等待后端把每条消息的阅后即焚时间传过来
+				self_destruct_time: userInfo?.preferences?.open_burn_after_reading_time_out ?? 10
+			})
+		}
+	},
+	clearReads: (msgs) => {
+		const { reads } = get()
+		const newReads = differenceBy(reads, msgs, 'msg_id')
+		set({ reads: newReads })
 	}
 }))

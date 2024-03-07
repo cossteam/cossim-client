@@ -35,6 +35,12 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		const user = await UserStore.findOneById(UserStore.tables.friends, 'user_id', user_id)
 		setUserInfo(user)
 
+		const index = times.findIndex((item) => item.value === user?.preferences?.open_burn_after_reading_time_out)
+		if (index !== -1) {
+			times[index].checked = true
+			setTimes([...times])
+		}
+
 		// 如不需要从服务器上获取数据，直接返回
 		if (user && !request) return
 
@@ -230,9 +236,8 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	const [times, setTimes] = useState<{ label: string; value: number; checked?: boolean }[]>([
 		{ label: $t('10秒'), value: 10, checked: false },
-		// { label: $t('30秒'), value: 30, checked: false },
-		{ label: $t('1分钟'), value: 60, checked: true },
-		{ label: $t('5分钟'), value: 300, checked: false },
+		{ label: $t('1分钟'), value: 60, checked: false },
+		// { label: $t('5分钟'), value: 300, checked: false },
 		{ label: $t('10分钟'), value: 600, checked: false }
 	])
 
