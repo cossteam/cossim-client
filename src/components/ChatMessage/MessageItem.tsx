@@ -1,4 +1,4 @@
-import { $t, TOOLTIP_TYPE } from '@/shared'
+import { $t, TOOLTIP_TYPE, burnAfterReading } from '@/shared'
 import { useMessageStore } from '@/stores/message'
 import { f7 } from 'framework7-react'
 import React, { RefObject, useCallback, useEffect, useState } from 'react'
@@ -7,6 +7,7 @@ import { useAsyncEffect, useClipboard } from '@reactuses/core'
 import { useToast } from '@/hooks/useToast'
 import MessageVariableSizeList from './MessageVariableSizeList'
 import MessageRow from './MessageRow'
+import { debounce } from 'lodash-es'
 
 interface MessageItemProps {
 	dialog_id: number
@@ -129,6 +130,26 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el, isScrollEnd })
 		if (!el.current) return
 		setHeight(el.current?.clientHeight ?? 700)
 	}, [el])
+
+	const clearReadMessage = () => {
+		msgStore.readMessage(msgStore.reads)
+		burnAfterReading(msgStore)
+	}
+
+	const fn = debounce(clearReadMessage, 3000)
+	useEffect(() => {
+		if (!msgStore.reads) return
+		console.log('msgStore.reads', msgStore.reads)
+		fn()
+		return () => {
+			// 在组件卸载或下一次 effect 运行之前取消 debounce 函数
+			fn.cancel()
+		}
+	}, [msgStore.reads])
+
+	useEffect(() => {
+		burnAfterReading(msgStore)
+	}, [])
 
 	return (
 		<MessageVariableSizeList

@@ -10,10 +10,12 @@ import UserStore from '@/db/user'
  *
  * @returns
  */
-export const burnAfterReading = async () => {
+export const burnAfterReading = async (msgStore?: any) => {
 	// 查看需要焚毁的消息
 	const readDestroy = await UserStore.findAll(UserStore.tables.read_destroy)
 	if (readDestroy.length === 0) return
+
+	console.log('阅后即焚消息', readDestroy)
 
 	// 创建销毁队列
 	readDestroy.map((msg) => {
@@ -24,12 +26,14 @@ export const burnAfterReading = async () => {
 		// 用当前时间去减去创建时间，
 		// 如果超过设置的自毁的设置时间，那么就删除该消息
 		if (nowTime - readTime > setTime) {
-			return UserStore.delete(UserStore.tables.read_destroy, 'uid', msg.uid)
+			UserStore.delete(UserStore.tables.read_destroy, 'uid', msg.uid)
+			msgStore && msgStore.deleteMessage(msg.msg_id)
 		} else {
 			const time = setTime - nowTime
 			const timer = setTimeout(() => {
 				UserStore.delete(UserStore.tables.read_destroy, 'uid', msg.uid)
 				clearTimeout(timer)
+				msgStore && msgStore.deleteMessage(msg.msg_id)
 			}, time)
 		}
 	})

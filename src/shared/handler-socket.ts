@@ -27,7 +27,7 @@ export const handlerMessageSocket = async (data: any, msgStore: MessageStore, st
 		const msg = {
 			dialog_id: message?.dialog_id,
 			content: message?.content,
-			create_at: message?.send_at,
+			created_at: message?.send_at,
 			is_burn_after_reading: message?.is_burn_after_reading,
 			is_label: MESSAGE_MARK.NOT_MARK,
 			is_read: MESSAGE_READ.NOT_READ,
@@ -58,7 +58,7 @@ export const handlerMessageSocket = async (data: any, msgStore: MessageStore, st
 						...chat.last_message,
 						content: msg.content,
 						msg_id: msg.msg_id,
-						send_time: msg.create_at,
+						send_time: msg.created_at,
 						sender_id: msg.sender_id
 					},
 					dialog_unread_count: chat.dialog_unread_count + 1
