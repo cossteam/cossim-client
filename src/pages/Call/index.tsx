@@ -4,6 +4,7 @@ import { Icon, Link, Page, PageContent } from 'framework7-react'
 import { useEffect, useState } from 'react'
 import { CallStatus } from './enums'
 import { Room } from 'livekit-client'
+import { useLiveKitRoom } from '@livekit/components-react'
 
 const Call: React.FC<RouterProps> = (props) => {
 	useEffect(() => {
@@ -16,6 +17,7 @@ const Call: React.FC<RouterProps> = (props) => {
 	const [videoEnable, setVideoEnable] = useState(false)
 	const [frontCamera, setFrontCamera] = useState(true)
 	const imgRul = 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+	const [room, setRoom] = useState<Room | null>(null)
 
 	const newCallStore = useNewCallStore()
 	useEffect(() => {
@@ -25,15 +27,28 @@ const Call: React.FC<RouterProps> = (props) => {
 		if (newCallStore.status === CallStatus.CALL && newCallStore.room !== null) {
 			setCallActive(true)
 			try {
-				const room = new Room()
+				if (!room) {
+					const options = {}
+					setRoom(new Room(options))
+					return
+				}
 				room.connect(newCallStore.room.url, newCallStore.room.token).then(() => {
-					room.localParticipant.enableCameraAndMicrophone()
+					room.localParticipant.setMicrophoneEnabled(newCallStore.room?.option?.audioEnabled ?? false)
+					room.localParticipant.setCameraEnabled(newCallStore.room?.option?.videoEnabled ?? false)
 				})
+				room.localParticipant.setTrackSubscriptionPermissions(false, [
+					{
+						participantIdentity: 'allowed-identity',
+						allowAll: true
+					}
+				])
 			} catch (error) {
 				console.dir(error)
 			}
 		}
 	}, [newCallStore.status])
+
+	useEffect(() => {}, [newCallStore.room?.option])
 
 	// const root = useLiveKitRoom()
 
