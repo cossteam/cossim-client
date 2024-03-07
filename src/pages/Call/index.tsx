@@ -2,6 +2,8 @@ import { useNewCallStore } from '@/stores/new_call'
 import clsx from 'clsx'
 import { Icon, Link, Page, PageContent } from 'framework7-react'
 import { useEffect, useState } from 'react'
+import { CallStatus } from './enums'
+import { Room } from 'livekit-client'
 
 const Call: React.FC<RouterProps> = (props) => {
 	useEffect(() => {
@@ -10,26 +12,43 @@ const Call: React.FC<RouterProps> = (props) => {
 
 	const [isCallActive, setCallActive] = useState(false)
 	const [isGroup, setIsGroup] = useState(false)
+	const [audioEnable, setAudioEnable] = useState(true)
 	const [videoEnable, setVideoEnable] = useState(false)
 	const [frontCamera, setFrontCamera] = useState(true)
-	const [audioEnable, setAudioEnable] = useState(true)
 	const imgRul = 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
 
 	const newCallStore = useNewCallStore()
 	useEffect(() => {
-		console.log(newCallStore.status)
+		setAudioEnable(newCallStore.room?.option?.audioEnabled ?? false)
+		setVideoEnable(newCallStore.room?.option?.videoEnabled ?? false)
+		setIsGroup(newCallStore.room?.isGroup ?? false)
+		if (newCallStore.status === CallStatus.CALL && newCallStore.room !== null) {
+			setCallActive(true)
+			try {
+				const room = new Room()
+				room.connect(newCallStore.room.url, newCallStore.room.token).then(() => {
+					room.localParticipant.enableCameraAndMicrophone()
+				})
+			} catch (error) {
+				console.dir(error)
+			}
+		}
 	}, [newCallStore.status])
 
-	useEffect(() => {
-		setIsGroup(false)
-	}, [])
+	// const root = useLiveKitRoom()
 
 	return (
 		<Page noNavbar noToolbar>
 			<PageContent className="h-full relative flex flex-col ">
 				<div className={clsx('p-2 flex justify-end', isGroup ? 'w-full' : 'fixed top-0 right-0')}>
 					{/* <Button onClick={() => setIsGroup(!isGroup)}>切换群聊模式</Button> */}
-					<Link className="" iconF7="arrow_up_right_square" iconSize={30} popupClose />
+					<Link
+						className=""
+						iconF7="arrow_up_right_square"
+						iconSize={30}
+						popupClose
+						onClick={() => newCallStore.updateVisible(false)}
+					/>
 				</div>
 				<div
 					className={clsx(
@@ -104,11 +123,12 @@ const Call: React.FC<RouterProps> = (props) => {
 				{/* bg-[rgba(0,0,0,0.75)] text-white */}
 				<div className={clsx('text-gray-400', isGroup ? '' : 'w-full fixed bottom-0')}>
 					<div className="p-4 flex flex-col justify-center items-center">
-						<span className="font-bold">{isCallActive ? '通话中' : '空闲'}</span>
-						<span className="font-bold">{isCallActive ? '20:00' : '00:00'}</span>
+						<span className="font-bold">{newCallStore.statusText(newCallStore.status)}</span>
+						<span className="font-bold">{'00:00'}</span>
 					</div>
 					<div className="pt-4 pb-10 grid grid-cols-5 gap-x-0 gap-y-5">
 						<div className="col-span-2 flex justify-center">
+							{/* 开启语音 */}
 							<div className="flex flex-col justify-center items-center">
 								<div
 									className="p-4 rounded-full bg-[#F9BAA7] text-white"
@@ -120,6 +140,7 @@ const Call: React.FC<RouterProps> = (props) => {
 						</div>
 						<div className="flex justify-center">
 							{videoEnable && (
+								// 切换摄像头
 								<div className="flex flex-col justify-center items-center">
 									<div
 										className="p-4 rounded-full bg-[#F9BAA7] text-white"
@@ -131,6 +152,7 @@ const Call: React.FC<RouterProps> = (props) => {
 							)}
 						</div>
 						<div className="col-span-2 flex justify-center">
+							{/* 开启视频 */}
 							<div className="flex flex-col justify-center items-center">
 								<div
 									className="p-4 rounded-full bg-[#B9B3DD] text-white"
@@ -142,10 +164,14 @@ const Call: React.FC<RouterProps> = (props) => {
 						</div>
 						<div className="col-span-2 flex justify-center">
 							{!isCallActive && (
+								// 拒绝
 								<div className="flex flex-col justify-center items-center">
 									<div
 										className="p-4 rounded-full text-white bg-[#F9BAA7] rotate-90"
-										onClick={() => setCallActive(false)}
+										onClick={() =>
+											newCallStore.room !== null &&
+											newCallStore.refuseJoinRoom(newCallStore.room?.id)
+										}
 									>
 										<Icon f7="phone_fill" size={30} />
 									</div>
@@ -154,10 +180,13 @@ const Call: React.FC<RouterProps> = (props) => {
 						</div>
 						<div className="flex justify-center">
 							{isCallActive && (
+								// 挂断
 								<div className="flex flex-col justify-center items-center">
 									<div
 										className="p-4 rounded-full text-white bg-[#F9BAA7] rotate-90"
-										onClick={() => setCallActive(false)}
+										onClick={() =>
+											newCallStore.room !== null && newCallStore.leaveRoom(newCallStore.room?.id)
+										}
 									>
 										<Icon f7="phone_fill" size={30} />
 									</div>
@@ -166,10 +195,16 @@ const Call: React.FC<RouterProps> = (props) => {
 						</div>
 						<div className="col-span-2 flex justify-center">
 							{!isCallActive && (
+								// 接听
 								<div className="flex flex-col justify-center items-center">
 									<div
 										className="p-4 rounded-full text-white bg-[#65C6B0]"
-										onClick={() => setCallActive(true)}
+										onClick={() =>
+											newCallStore.room !== null &&
+											newCallStore.joinRoom(newCallStore.room?.id, {
+												audioEnabled: true
+											})
+										}
 									>
 										<Icon f7="phone_fill" size={30} />
 									</div>
@@ -178,6 +213,7 @@ const Call: React.FC<RouterProps> = (props) => {
 						</div>
 					</div>
 				</div>
+				{/* {[CallStatus.REFUSE, CallStatus.HANGUP].includes(newCallStore.status) && ()} */}
 			</PageContent>
 		</Page>
 	)

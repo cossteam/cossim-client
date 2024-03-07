@@ -146,14 +146,13 @@ function App() {
 			})
 
 			let backNumber = 0
-			let timer: any = null
+			let timer: NodeJS.Timeout | null = null
 			const backButtonHandler = () => {
+				timer && clearTimeout(timer)
 				backNumber++
-
 				// @ts-ignore
 				!router && toastRef.current?.open()
 
-				timer && clearTimeout(timer)
 				timer = setTimeout(() => {
 					backNumber = 0
 				}, 1000)

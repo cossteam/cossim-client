@@ -21,7 +21,7 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 
 	useEffect(() => {
 		console.log('props', props)
-	}, [])
+	}, [props.members])
 
 	// 呼叫
 	// const { call, updateEnablesVideo } = useCallStore()
@@ -50,14 +50,15 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 	// 	}
 	// }
 	const callTool = (enableVideo: boolean) => {
-		console.log(enableVideo ? '视频已开启' : '视频已关闭')
-		const id = Number(props.id)
+		console.log(enableVideo ? '视频已开启' : '视频已关闭', props)
+		const id = props?.id
 		const option = {
-			video_enabled: enableVideo
+			audioEnabled: true,
+			videoEnabled: enableVideo
 		}
 		const isGroup = Boolean(props.is_group)
 		const member = props?.members || []
-		newCallStore.createRoom(id, option, isGroup, member)
+		newCallStore.call(id, option, isGroup, member)
 	}
 
 	// 工具
