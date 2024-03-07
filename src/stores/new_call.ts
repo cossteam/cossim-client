@@ -9,11 +9,11 @@ import { f7 } from 'framework7-react'
 // import CallService from '@/api/call'
 
 interface Room {
-	id: string | number
+	id: string | number // 对方ID（好友或者群）
 	isGroup: boolean
-	member?: Array<string>
-	option?: CallOption
-	url: string
+	members?: Array<string> // 群成员ID
+	option?: CallOption // 我的通话选项
+	serverUrl: string
 	token: string
 }
 
@@ -21,8 +21,6 @@ interface newCallStore {
 	// 是否可见
 	visible: boolean
 	updateVisible: (visible: boolean) => void
-	// 是否呼叫者
-	isCaller: boolean
 	// 通话状态
 	status: CallStatus
 	// updateStatus: (status: CallStatus) => void
@@ -32,11 +30,11 @@ interface newCallStore {
 	// 处理通话事件
 	handlerCallEvent: (event: SocketEvent, data: any) => void
 	// 创建房间
-	createRoom: (id: string | number, option?: CallOption, isGroup?: boolean, member?: Array<string>) => Promise<any>
+	createRoom: (id: string | number, option: CallOption, isGroup: boolean, members?: Array<string>) => Promise<any>
 	// 加入房间
 	joinRoom: (id: string | number, option?: CallOption) => Promise<any>
 	// 呼叫
-	call: (id: string | number, option?: CallOption, isGroup?: boolean, member?: Array<string>) => Promise<any>
+	call: (id: string | number, option: CallOption, isGroup: boolean, members?: Array<any>) => Promise<any>
 	// 离开房间
 	leaveRoom: (id: string | number) => Promise<any>
 	// 拒绝加入房间
@@ -49,8 +47,6 @@ export const callStore = (set: any, get: any): newCallStore => ({
 	updateVisible: (visible) => {
 		set({ visible })
 	},
-	// 是否呼叫者
-	isCaller: false,
 	// 通话状态
 	status: CallStatus.IDLE,
 	// updateStatus: (status: CallStatus) => {
@@ -84,11 +80,10 @@ export const callStore = (set: any, get: any): newCallStore => ({
 					const isGroup = event === SocketEvent.GroupCallReqEvent
 					set({
 						status: CallStatus.WAITING,
-						isCaller: false,
 						room: {
 							id: !isGroup ? data?.data?.sender_id : data?.data?.group_id,
 							isGroup
-							// member: [],
+							// members: [],
 							// option: null
 						},
 						visible: true
@@ -112,13 +107,13 @@ export const callStore = (set: any, get: any): newCallStore => ({
 		}
 	},
 	// 创建房间
-	createRoom: (id: string | number, option?: CallOption, isGroup?: boolean, member?: Array<string>) => {
+	createRoom: (id: string | number, option: CallOption, isGroup: boolean, members?: Array<any>) => {
 		return new Promise<any>((resolve, reject) => {
 			// 创建通话参数
 			const createRoomParams: any = {}
 			!isGroup && (createRoomParams['user_id'] = id)
 			isGroup && (createRoomParams['group_id'] = Number(id))
-			isGroup && (createRoomParams['member'] = member ?? [])
+			isGroup && (createRoomParams['member'] = members?.map((i: any) => i.user_id) ?? [])
 			createRoomParams['option'] = {
 				// audio_enabled: true,
 				// codec: 'vp8',
@@ -136,7 +131,7 @@ export const callStore = (set: any, get: any): newCallStore => ({
 						room: {
 							id,
 							isGroup,
-							member,
+							members,
 							option
 						}
 					})
@@ -188,7 +183,7 @@ export const callStore = (set: any, get: any): newCallStore => ({
 								id,
 								isGroup,
 								option,
-								url: data?.url,
+								serverUrl: data?.url,
 								token: data?.token
 							}
 						})
@@ -209,8 +204,7 @@ export const callStore = (set: any, get: any): newCallStore => ({
 		})
 	},
 	// 呼叫
-	call: async (id: string | number, option?: CallOption, isGroup?: boolean, member?: Array<string>) => {
-		// console.log('呼叫', id, option, isGroup, member)
+	call: async (id: string | number, option: CallOption, isGroup: boolean, members?: Array<any>) => {
 		// 权限检查
 		try {
 			await checkMedia(option?.videoEnabled)
@@ -220,8 +214,11 @@ export const callStore = (set: any, get: any): newCallStore => ({
 			return
 		}
 		try {
+			set({
+				room: {}
+			})
 			const { createRoom, joinRoom } = get()
-			await createRoom(id, option, isGroup, member)
+			await createRoom(id, option, isGroup, members)
 			await joinRoom(id, option)
 		} catch (error: any) {
 			console.dir(error)

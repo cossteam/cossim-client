@@ -132,7 +132,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 
 	// 置顶对话
 	const topDialog = async (e: any, item: any) => {
-		console.log('top', e, item)
 		await RelationService.topDialogApi({ dialog_id: item.dialog_id, action: item?.top_at ? 0 : 1 })
 		await getDialogList()
 	}

@@ -139,7 +139,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el, isScrollEnd })
 	const fn = debounce(clearReadMessage, 3000)
 	useEffect(() => {
 		if (!msgStore.reads) return
-		console.log('msgStore.reads', msgStore.reads)
+		// console.log('msgStore.reads', msgStore.reads)
 		fn()
 		return () => {
 			// 在组件卸载或下一次 effect 运行之前取消 debounce 函数

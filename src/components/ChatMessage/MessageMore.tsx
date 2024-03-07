@@ -10,17 +10,14 @@ interface MessageMoreProps {
 	members: any[]
 }
 
-interface Tool {
-	f7Icon: string
-	text?: string
-	func?: () => void
-}
-
 const MessageMore: React.FC<MessageMoreProps> = (props) => {
 	const newCallStore = useNewCallStore()
+	const [members, setMembers] = useState<any>()
 
 	useEffect(() => {
-		console.log('props', props)
+		if (props?.members?.length > 0) {
+			setMembers(props?.members)
+		}
 	}, [props.members])
 
 	// 呼叫
@@ -50,19 +47,17 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 	// 	}
 	// }
 	const callTool = (enableVideo: boolean) => {
-		console.log(enableVideo ? '视频已开启' : '视频已关闭', props)
 		const id = props?.id
 		const option = {
 			audioEnabled: true,
 			videoEnabled: enableVideo
 		}
 		const isGroup = Boolean(props.is_group)
-		const member = props?.members || []
-		newCallStore.call(id, option, isGroup, member)
+		newCallStore.call(id, option, isGroup, members)
 	}
 
 	// 工具
-	const [tools] = useState<Tool[]>([
+	const tools = [
 		{
 			f7Icon: 'phone',
 			text: '语音',
@@ -73,7 +68,7 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 			text: '视频',
 			func: () => callTool(true)
 		}
-	])
+	]
 	return (
 		<div className="toolbar-more w-full p-5 overflow-y-scroll grid grid-cols-5 gap-5">
 			{tools.map((tool, toolIdx) => {
