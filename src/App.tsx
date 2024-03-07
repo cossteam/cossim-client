@@ -166,7 +166,12 @@ function App() {
 			}
 
 			const appChange = async (state: AppState) => {
-				if (state.isActive) burnAfterReading()
+				if (state.isActive) {
+					burnAfterReading()
+					if (hasCookie(TOKEN) && SocketClient.isDisconnect()) {
+						SocketClient.connect()
+					}
+				}
 			}
 
 			// 添加返回按钮事件监听器

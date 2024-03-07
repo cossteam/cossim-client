@@ -86,12 +86,18 @@ const MessageRow: React.FC<RowProps & MessageRowProps> = ({ index, setItemSize, 
 					itemRef.current && ob.observe(itemRef.current)
 				}, 1000)
 			})
+		} else if (msg.is_burn_after_reading === MessageBurnAfterRead.YES) {
+			msgStore.deleteMessage(msg.msg_id)
+			UserStore.delete(UserStore.tables.read_destroy, 'uid', msg.uid)
 		}
-        
 	}, [])
 
 	return (
-		<div ref={itemRef} className={clsx('h-auto', !msg?.is_tips && !is_read && !read && 'bg-gray-200')} style={{ zIndex: 1 }}>
+		<div
+			ref={itemRef}
+			className={clsx('h-auto', !msg?.is_tips && !is_read && !read && 'bg-gray-200')}
+			style={{ zIndex: 1 }}
+		>
 			<List noChevron mediaList className="my-0">
 				<ListItem
 					key={index}

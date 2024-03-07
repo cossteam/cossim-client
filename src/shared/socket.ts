@@ -107,6 +107,15 @@ class Socket {
 			}, time)
 		}
 	}
+
+	/**
+	 * 判断连接是否断开
+	 * 
+	 * @returns
+	 */
+	isDisconnect() {
+		return this.socket && this.socket.readyState !== WebSocket.OPEN
+	}
 }
 
 const socketUrl = import.meta.env.VITE_WS_URL + `?token=${getCookie(TOKEN)}`
