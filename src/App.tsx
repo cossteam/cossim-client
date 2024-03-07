@@ -15,10 +15,9 @@ import {
 	handlerRequestResultSocket,
 	handlerEditSocket,
 	DEVICE_ID,
-	USER_ID,
 	burnAfterReading
 } from '@/shared'
-import { getCookie, hasCookie, setCookie } from '@/utils/cookie'
+import { hasCookie, setCookie } from '@/utils/cookie'
 import { useMessageStore, MessageStore } from './stores/message'
 import { useStateStore } from '@/stores/state'
 import { AppState, App as CapApp } from '@capacitor/app'
@@ -34,7 +33,7 @@ let store: MessageStore | null = null
 function App() {
 	const msgStore = useMessageStore()
 	const stateStore = useStateStore()
-	const user_id = getCookie(USER_ID) || ''
+	// const user_id = getCookie(USER_ID) || ''
 
 	const toastRef = useRef(null)
 
@@ -86,8 +85,8 @@ function App() {
 					try {
 						const msg = data?.data || {}
 						// msg 的发送者不是自己并且当前不在会话中
-						console.log(msg.receiver_id, user_id, msg.receiver_id !== user_id && Number(store!.dialog_id))
-						if (msg.receiver_id !== user_id && Number(store!.dialog_id)) {
+						// console.log(Number(msg.dialog_id), Number(store!.dialog_id))
+						if (Number(msg.dialog_id) !== Number(store!.dialog_id)) {
 							// 本地通知
 							const dom = document.createElement('p')
 							dom.innerHTML = DOMPurify.sanitize(msg.content || '')

@@ -15,19 +15,45 @@ import { $t } from './i18n'
  * formatTime(1507704148210)    // 2023年2月11日
  */
 export const formatTime = (time: number | string) => {
-	const timestamp = typeof time === 'string' ? Date.parse(time) : time
-	const now = Date.now()
-	const diff = now - timestamp
+	// const timestamp = typeof time === 'string' ? Date.parse(time) : time
+	// const now = Date.now()
+	// const diff = now - timestamp
 
-	if (diff < 60 * 1000) {
+	// if (diff < 60 * 1000) {
+	// 	return $t('刚刚')
+	// } else if (diff < 60 * 60 * 1000) {
+	// 	return `${Math.floor(diff / (60 * 1000))}${$t('分钟前')}`
+	// } else if (diff < 24 * 60 * 60 * 1000) {
+	// 	return `${Math.floor(diff / (60 * 60 * 1000))}${$t('小时前')}`
+	// } else if (diff < 365 * 24 * 60 * 60 * 1000) {
+	// 	return dayjs(timestamp).format(`M${$t('月')}D${$t('日')}`)
+	// } else {
+	// 	return dayjs(timestamp).format(`YYYY${$t('年')}M${$t('月')}D${$t('日')}`)
+	// }
+
+	// console.log(time)
+	// console.log(new Date(time))
+	// console.log(dayjs(time).format('YYYY-M-D HH:mm:ss'))
+
+	const targetTime = dayjs(time)
+	const currentTime = dayjs()
+	const difference = currentTime.diff(targetTime, 'minute') // 相差几分钟
+	// return dayjs(time).format('YYYY-M-D HH:mm:ss')
+	if (difference < 3) {
 		return $t('刚刚')
-	} else if (diff < 60 * 60 * 1000) {
-		return `${Math.floor(diff / (60 * 1000))}${$t('分钟前')}`
-	} else if (diff < 24 * 60 * 60 * 1000) {
-		return `${Math.floor(diff / (60 * 60 * 1000))}${$t('小时前')}`
-	} else if (diff < 365 * 24 * 60 * 60 * 1000) {
-		return dayjs(timestamp).format(`M${$t('月')}D${$t('日')}`)
+	} else if (difference < 60) {
+		return `${difference}${$t('分钟前')}`
+	} else if (difference < 60 * 24) {
+		return `${Math.floor(difference / 60)}${$t('小时前')}`
+	} else if (difference < 60 * 24 * 2) {
+		return $t('昨天') + ' ' + dayjs(time).format('HH:mm')
+	} else if (difference < 60 * 24 * 3) {
+		return $t('前天') + ' ' + dayjs(time).format('HH:mm')
+	} else if (difference < 60 * 24 * 7) {
+		return dayjs(time).format('MM-DD HH:mm')
+	} else if (difference < 60 * 24 * 30) {
+		return dayjs(time).format('MM-DD')
 	} else {
-		return dayjs(timestamp).format(`YYYY${$t('年')}M${$t('月')}D${$t('日')}`)
+		return dayjs(time).format('YYYY-MM-DD')
 	}
 }

@@ -5,7 +5,7 @@ import { format } from 'timeago.js'
 import { createElement, RefObject, useCallback, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { $t, isMe, MESSAGE_SEND, MESSAGE_TYPE, TOOLTIP_TYPE } from '@/shared'
+import { $t, formatTime, isMe, MESSAGE_SEND, MESSAGE_TYPE, TOOLTIP_TYPE } from '@/shared'
 import ToolTip from './MessageToolTips'
 import LongPressButton from '@/components/LongPressButton/LongPressButton'
 import { ReadEditor } from '@/Editor'
@@ -114,7 +114,10 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 					<div
 						className={clsx('flex text-[0.85rem] items-center', is_self ? 'justify-end' : 'justify-start')}
 					>
-						<span className="text-[0.85rem] mr-1">{format(msg?.create_at, 'zh_CN')}</span>
+						{/* <span className="text-[0.85rem] mr-1">
+							{format(msg?.created_at ?? msg?.create_at, 'zh_CN')}
+						</span> */}
+						<span className="text-[0.85rem] mr-1">{formatTime(msg?.created_at ?? msg?.create_at)}</span>
 						{is_self && (
 							<>
 								{msg?.msg_send_state === MESSAGE_SEND.SEND_FAILED && (
