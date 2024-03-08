@@ -1,0 +1,298 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.hitosea.coss"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="22"
+8-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml
+9        android:targetSdkVersion="33" />
+9-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml
+10
+11    <!-- Permissions -->
+12    <!-- 连接网络权限 -->
+13    <uses-permission android:name="android.permission.INTERNET" />
+13-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:7:5-66
+13-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:7:22-64
+14    <!-- 读取网络信息状态 -->
+15    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+15-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:9:5-78
+15-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:9:22-76
+16    <!-- 获取当前wifi状态 -->
+17    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+17-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:11:5-75
+17-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:11:22-73
+18    <!-- 允许程序改变网络连接状态 -->
+19    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+19-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:13:5-78
+19-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:13:22-76
+20    <!-- 读取手机信息权限 -->
+21    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+21-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:15:5-74
+21-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:15:22-72
+22    <!-- 存储权限用于读取/保存照片文件 -->
+23    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+23-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:17:5-75
+23-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:17:22-73
+24    <!-- 外存储写权限 -->
+25    <uses-permission
+25-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:19:5-21:40
+26        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+26-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:19:22-78
+27        android:maxSdkVersion="32" />
+27-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:20:9-35
+28    <!-- 外存储读权限 -->
+29    <uses-permission
+29-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:23:5-24:38
+30        android:name="android.permission.READ_EXTERNAL_STORAGE"
+30-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:23:22-77
+31        android:maxSdkVersion="32" />
+31-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:24:9-35
+32    <!-- 本地通知权限 -->
+33    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+33-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:26:5-27:40
+33-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:26:22-76
+34    <!-- 录制音频 -->
+35    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+35-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:29:5-71
+35-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:29:22-68
+36    <!-- 修改音频设置 -->
+37    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+37-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:31:5-79
+37-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:31:22-77
+38    <!-- 相机 -->
+39    <uses-feature android:name="android.hardware.camera" />
+39-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:33:5-60
+39-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:33:19-57
+40    <uses-feature android:name="android.hardware.IMAGE_CAPTURE" />
+40-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:34:5-67
+40-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:34:19-64
+41
+42    <uses-permission android:name="android.permission.CAMERA" />
+42-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:35:5-65
+42-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:35:22-62
+43
+44    <queries>
+44-->[:capacitor-camera] G:\im\coss-client\node_modules\.pnpm\@capacitor+camera@5.0.9_@capacitor+core@5.7.0\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:7:5-11:15
+45        <intent>
+45-->[:capacitor-camera] G:\im\coss-client\node_modules\.pnpm\@capacitor+camera@5.0.9_@capacitor+core@5.7.0\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:8:9-10:18
+46            <action android:name="android.media.action.IMAGE_CAPTURE" />
+46-->[:capacitor-camera] G:\im\coss-client\node_modules\.pnpm\@capacitor+camera@5.0.9_@capacitor+core@5.7.0\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:9:13-73
+46-->[:capacitor-camera] G:\im\coss-client\node_modules\.pnpm\@capacitor+camera@5.0.9_@capacitor+core@5.7.0\node_modules\@capacitor\camera\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:9:21-70
+47        </intent>
+48    </queries>
+49
+50    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+50-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:7:5-81
+50-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:7:22-78
+51    <uses-permission android:name="android.permission.WAKE_LOCK" />
+51-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:8:5-68
+51-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:8:22-65
+52    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+52-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-77
+52-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:9:22-74
+53
+54    <permission
+54-->[androidx.core:core:1.10.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\4084e7bcb4a1738e1ff26326a1997c6e\transformed\core-1.10.0\AndroidManifest.xml:22:5-24:47
+55        android:name="com.hitosea.coss.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+55-->[androidx.core:core:1.10.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\4084e7bcb4a1738e1ff26326a1997c6e\transformed\core-1.10.0\AndroidManifest.xml:23:9-81
+56        android:protectionLevel="signature" />
+56-->[androidx.core:core:1.10.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\4084e7bcb4a1738e1ff26326a1997c6e\transformed\core-1.10.0\AndroidManifest.xml:24:9-44
+57
+58    <uses-permission android:name="com.hitosea.coss.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+58-->[androidx.core:core:1.10.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\4084e7bcb4a1738e1ff26326a1997c6e\transformed\core-1.10.0\AndroidManifest.xml:26:5-97
+58-->[androidx.core:core:1.10.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\4084e7bcb4a1738e1ff26326a1997c6e\transformed\core-1.10.0\AndroidManifest.xml:26:22-94
+59
+60    <application
+60-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:37:5-93:19
+61        android:allowBackup="true"
+61-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:38:9-35
+62        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+62-->[androidx.core:core:1.10.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\4084e7bcb4a1738e1ff26326a1997c6e\transformed\core-1.10.0\AndroidManifest.xml:28:18-86
+63        android:debuggable="true"
+64        android:icon="@mipmap/ic_launcher"
+64-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:39:9-43
+65        android:label="@string/app_name"
+65-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:40:9-41
+66        android:roundIcon="@mipmap/ic_launcher_round"
+66-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:41:9-54
+67        android:supportsRtl="true"
+67-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:42:9-35
+68        android:testOnly="true"
+69        android:theme="@style/AppTheme" >
+69-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:43:9-40
+70        <activity
+70-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:45:9-65:20
+71            android:name="com.hitosea.coss.MainActivity"
+71-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:47:13-41
+72            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
+72-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:46:13-129
+73            android:exported="true"
+73-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:51:13-36
+74            android:label="@string/title_activity_main"
+74-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:48:13-56
+75            android:launchMode="singleTask"
+75-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:50:13-44
+76            android:theme="@style/AppTheme.NoActionBarLaunch" >
+76-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:49:13-62
+77            <intent-filter>
+77-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:53:13-56:29
+78                <action android:name="android.intent.action.MAIN" />
+78-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:54:17-69
+78-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:54:25-66
+79
+80                <category android:name="android.intent.category.LAUNCHER" />
+80-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:55:17-77
+80-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:55:27-74
+81            </intent-filter>
+82            <intent-filter>
+82-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:58:13-63:29
+83                <action android:name="android.intent.action.VIEW" />
+83-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:59:17-69
+83-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:59:25-66
+84
+85                <category android:name="android.intent.category.DEFAULT" />
+85-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:60:17-76
+85-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:60:27-73
+86                <category android:name="android.intent.category.BROWSABLE" />
+86-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:61:17-78
+86-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:61:27-75
+87
+88                <data android:scheme="@string/custom_url_scheme" />
+88-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:62:17-68
+88-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:62:23-65
+89            </intent-filter>
+90        </activity>
+91
+92        <!-- Push 开放平台中应用的 appid 和 api key -->
+93        <!-- <meta-data -->
+94        <!-- android:name="api_key" -->
+95        <!-- android:value="xxxxxxxx"/> -->
+96        <!-- <meta-data -->
+97        <!-- android:name="app_id" -->
+98        <!-- android:value="xxxx"/> -->
+99
+100
+101        <!-- push 应用定义消息 receiver 声明 -->
+102        <!-- <receiver android:name="xxx.xxx.xxx.PushMessageReceiverImpl(自定义类名)" -->
+103        <!-- android:exported="false"> -->
+104        <!-- <intent-filter> -->
+105        <!-- &lt;!&ndash;接收 push 消息&ndash;&gt; -->
+106        <!-- <action android:name="com.vivo.pushclient.action.RECEIVE"/> -->
+107        <!-- </intent-filter> -->
+108        <!-- </receiver> -->
+109
+110        <provider
+111            android:name="androidx.core.content.FileProvider"
+111-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:85:13-62
+112            android:authorities="com.hitosea.coss.fileprovider"
+112-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:86:13-64
+113            android:exported="false"
+113-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:87:13-37
+114            android:grantUriPermissions="true" >
+114-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:88:13-47
+115            <meta-data
+115-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:89:13-91:53
+116                android:name="android.support.FILE_PROVIDER_PATHS"
+116-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:90:17-67
+117                android:resource="@xml/file_paths" />
+117-->G:\im\coss-client\android\app\src\main\AndroidManifest.xml:91:17-51
+118        </provider>
+119
+120        <receiver android:name="com.capacitorjs.plugins.localnotifications.TimedNotificationPublisher" />
+120-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:12:9-106
+120-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:12:19-103
+121        <receiver android:name="com.capacitorjs.plugins.localnotifications.NotificationDismissReceiver" />
+121-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:13:9-107
+121-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:13:19-104
+122        <receiver
+122-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:14:9-23:20
+123            android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver"
+123-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:15:13-103
+124            android:directBootAware="true"
+124-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:16:13-43
+125            android:exported="false" >
+125-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:17:13-37
+126            <intent-filter>
+126-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:18:13-22:29
+127                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+127-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:19:17-86
+127-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:19:25-83
+128                <action android:name="android.intent.action.BOOT_COMPLETED" />
+128-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:20:17-79
+128-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:20:25-76
+129                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+129-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:21:17-82
+129-->[:capacitor-local-notifications] G:\im\coss-client\node_modules\.pnpm\@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0\node_modules\@capacitor\local-notifications\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:21:25-79
+130            </intent-filter>
+131        </receiver>
+132
+133        <provider
+133-->[androidx.emoji2:emoji2:1.2.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\bc4e404d2e4e27a8333e074e645fe6c4\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+134            android:name="androidx.startup.InitializationProvider"
+134-->[androidx.emoji2:emoji2:1.2.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\bc4e404d2e4e27a8333e074e645fe6c4\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
+135            android:authorities="com.hitosea.coss.androidx-startup"
+135-->[androidx.emoji2:emoji2:1.2.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\bc4e404d2e4e27a8333e074e645fe6c4\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
+136            android:exported="false" >
+136-->[androidx.emoji2:emoji2:1.2.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\bc4e404d2e4e27a8333e074e645fe6c4\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
+137            <meta-data
+137-->[androidx.emoji2:emoji2:1.2.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\bc4e404d2e4e27a8333e074e645fe6c4\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+138                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+138-->[androidx.emoji2:emoji2:1.2.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\bc4e404d2e4e27a8333e074e645fe6c4\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
+139                android:value="androidx.startup" />
+139-->[androidx.emoji2:emoji2:1.2.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\bc4e404d2e4e27a8333e074e645fe6c4\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
+140            <meta-data
+140-->[androidx.lifecycle:lifecycle-process:2.6.1] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\6965ddfd7c9bb67e76de74f23369d3cb\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
+141                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+141-->[androidx.lifecycle:lifecycle-process:2.6.1] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\6965ddfd7c9bb67e76de74f23369d3cb\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
+142                android:value="androidx.startup" />
+142-->[androidx.lifecycle:lifecycle-process:2.6.1] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\6965ddfd7c9bb67e76de74f23369d3cb\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
+143            <meta-data
+143-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+144                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+144-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+145                android:value="androidx.startup" />
+145-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+146        </provider>
+147
+148        <receiver
+148-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+149            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+149-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+150            android:directBootAware="false"
+150-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+151            android:enabled="true"
+151-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+152            android:exported="true"
+152-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+153            android:permission="android.permission.DUMP" >
+153-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+154            <intent-filter>
+154-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+155                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+155-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+155-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+156            </intent-filter>
+157            <intent-filter>
+157-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+158                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+158-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+158-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+159            </intent-filter>
+160            <intent-filter>
+160-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+161                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+161-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+161-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+162            </intent-filter>
+163            <intent-filter>
+163-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+164                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+164-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+164-->[androidx.profileinstaller:profileinstaller:1.3.0] D:\gradle\gradle-7.6.1\repository\caches\transforms-3\a916dcd0a76c646859857390ab72a1c7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+165            </intent-filter>
+166        </receiver>
+167    </application>
+168
+169</manifest>

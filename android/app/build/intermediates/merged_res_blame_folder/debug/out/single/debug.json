@@ -1,0 +1,134 @@
+[
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/layout_activity_main.xml.flat",
+        "source": "com.hitosea.coss.app-main-35:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-anydpi-v24_ic_launcher_foreground.xml.flat",
+        "source": "com.hitosea.coss.app-pngs-29:/drawable-anydpi-v24/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-land-hdpi_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable-land-hdpi/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-port-xxxhdpi_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable-port-xxxhdpi/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-land-xhdpi_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable-land-xhdpi/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-hdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-xxxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-xxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-xhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-port-xxhdpi_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable-port-xxhdpi/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-land-xxhdpi_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable-land-xxhdpi/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-port-xhdpi_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable-port-xhdpi/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/xml_config.xml.flat",
+        "source": "com.hitosea.coss.app-main-35:/xml/config.xml"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-hdpi_ic_launcher_foreground.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-hdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/xml_file_paths.xml.flat",
+        "source": "com.hitosea.coss.app-main-35:/xml/file_paths.xml"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-port-hdpi_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable-port-hdpi/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-land-mdpi_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable-land-mdpi/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-port-mdpi_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable-port-mdpi/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-xxxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/drawable-land-xxxhdpi_splash.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/drawable-land-xxxhdpi/splash.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-xhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-mdpi_ic_launcher_foreground.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-mdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.hitosea.coss.app-merged_res-33:/mipmap-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.hitosea.coss.app-main-35:/mipmap-xxhdpi/ic_launcher_foreground.png"
+    }
+]
