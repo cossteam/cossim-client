@@ -15,7 +15,8 @@ import {
 	handlerRequestResultSocket,
 	handlerEditSocket,
 	DEVICE_ID,
-	burnAfterReading
+	burnAfterReading,
+	handlerRecallSocket
 } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 import { useMessageStore, MessageStore } from './stores/message'
@@ -28,14 +29,15 @@ import { useNewCallStore } from './stores/new_call'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 import MessagePopup from './components/ChatMessage/MessagePopup'
-import { useChatStore } from './stores/chat'
+// import { useChatStore } from './stores/chat'
+import Message from '@/components/Message/Message'
 
 let store: MessageStore | null = null
 
 function App() {
 	const msgStore = useMessageStore()
 	const stateStore = useStateStore()
-	const chatStore = useChatStore()
+	// const chatStore = useChatStore()
 	// const user_id = getCookie(USER_ID) || ''
 
 	const toastRef = useRef(null)
@@ -122,6 +124,9 @@ function App() {
 					console.log('消息编辑', data)
 					handlerEditSocket(data, store!)
 					break
+				case SocketEvent.MessageRecallEvent:
+					handlerRecallSocket(data, store!)
+					break
 			}
 		}
 
@@ -191,7 +196,6 @@ function App() {
 		store = msgStore
 	}, [msgStore])
 
-
 	return (
 		<AppComponent {...f7params}>
 			{hasCookie(TOKEN) ? (
@@ -200,7 +204,8 @@ function App() {
 					<Popup opened={newCallStore.visible}>
 						<View url="/new_call/" />
 					</Popup>
-					<MessagePopup opened={chatStore.opened}/>
+					<MessagePopup opened={msgStore.opened} />
+					<Message />
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />

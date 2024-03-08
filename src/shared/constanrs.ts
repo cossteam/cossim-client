@@ -12,3 +12,5 @@ export const ACCOUNT = '__ACCOUNT__'
 export const DEVICE_ID = '__DEVICE_ID__'
 /** Rid */
 export const RID = '__RID__'
+/** 消息内容 id, 滚动需要 */
+export const MESSAGE_CONTENT_ID = '__MESSAGE_CONTENT_ID__'

@@ -7,6 +7,8 @@ export interface ChatStore {
 	receiver_info: ReceiverInfo
 	/** 消息列表 */
 	messages: PrivateChats[]
+	/** 显示前 */
+	beforeOpened: boolean
 
 	/**
 	 * 更新显示隐藏
@@ -37,6 +39,13 @@ export interface ChatStore {
 	 * @param receiver_id
 	 */
 	initMessage: (is_group: boolean, dialog_id: number, receiver_id: string) => Promise<void>
+
+	/**
+	 * 显示前
+	 * 
+	 * @param beforeOpened
+	 */
+	updateBeforeOpened: (beforeOpened: boolean) => void
 }
 
 export interface ReceiverInfo {
@@ -45,6 +54,6 @@ export interface ReceiverInfo {
 	dialog_id: number
 	status?: number
 	receiver_id: string | number
-    is_group: boolean
-	other_info?: { [key: string]: any },
+	is_group: boolean
+	other_info?: { [key: string]: any }
 }

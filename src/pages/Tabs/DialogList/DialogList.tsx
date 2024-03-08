@@ -86,7 +86,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const stateStore = useStateStore()
 	// 消息列表
 	const msgStore = useMessageStore()
-
+	// 消息更新
 	// const chatStore = useChatStore()
 
 	// 获取对话列表
@@ -176,6 +176,13 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		setChats(list.sort(customSort))
 	}, [dialogs])
 
+	useEffect(() => {
+		if (stateStore.is_chat_update) {
+			getDialogList()
+			stateStore.updateChat(false)
+		}
+	}, [stateStore.is_chat_update])
+
 	const handlerContent = useCallback((content: string) => {
 		const doc = new DOMParser().parseFromString(content, 'text/html')
 		const imgs = doc.querySelectorAll('img')
@@ -249,12 +256,19 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 							)}
 							link
 							onClick={async () => {
-								// chatStore.updateOpened(true)
+								// await chatStore.initMessage(
+								// 	item?.group_id ? true : false,
+								// 	item?.dialog_id,
+								// 	item?.user_id ?? item?.group_id
+								// )
+								// chatStore.updateBeforeOpened(true)
+
 								await msgStore.initMessage(
 									item?.group_id ? true : false,
 									item?.dialog_id,
 									item?.user_id ?? item?.group_id
 								)
+
 								f7router.navigate(
 									`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
 								)

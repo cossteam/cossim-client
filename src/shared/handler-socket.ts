@@ -162,7 +162,6 @@ export const handlerLabelSocket = async (data: any, msgStore: MessageStore) => {
  */
 export const handlerEditSocket = async (data: any, msgStore: MessageStore) => {
 	try {
-		console.log('data', data, msgStore)
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
 		// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 		if (data?.driverId === getCookie(DEVICE_ID)) return
@@ -175,6 +174,29 @@ export const handlerEditSocket = async (data: any, msgStore: MessageStore) => {
 
 		await UserStore.update(UserStore.tables.messages, 'id', msg.id, { ...msg })
 		await msgStore.updateMessageById(msg)
+	} catch (error) {
+		console.log('error', error)
+	}
+}
+
+/**
+ * 撤回消息
+ *
+ * @param {*} data  socket 消息
+ * @param {MessageStore} msgStore 消息存储
+ * @returns
+ */
+export const handlerRecallSocket = async (data: any, msgStore: MessageStore) => {
+	try {
+		console.log('data', data, msgStore)
+		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
+		if (data?.driverId === getCookie(DEVICE_ID)) return
+
+		const msg = (
+			await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', data?.data?.dialog_id)
+		).find((m: any) => m.msg_id === data.data.id)
+		await UserStore.delete(UserStore.tables.messages, 'id', msg.id)
+		await msgStore.deleteMessage(msg?.msg_id)
 	} catch (error) {
 		console.log('error', error)
 	}

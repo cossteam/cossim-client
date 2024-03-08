@@ -76,7 +76,6 @@ export enum TOOLTIP_TYPE {
 	RECALL = 'recall'
 }
 
-
 /** 平台 */
 export enum PLATFORM {
 	/** web */
@@ -210,6 +209,8 @@ export enum SocketEvent {
 	MessageLabelEvent = 23,
 	/** 编辑消息事件 */
 	MessageEditEvent = 24,
+	/** 消息撤回 */
+	MessageRecallEvent = 25,
 	/** 推送好友在线状态 */
 	FriendOnlineEvent = 27,
 	/** 推送好友离线状态 */

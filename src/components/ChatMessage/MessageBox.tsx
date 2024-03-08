@@ -1,6 +1,6 @@
 import type { PrivateChats } from '@/types/db/user-db'
 import clsx from 'clsx'
-import { Exclamationmark, Flag } from 'framework7-icons/react'
+import { Exclamationmark, Flag, Gobackward } from 'framework7-icons/react'
 import { createElement, RefObject, useCallback, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 
@@ -29,7 +29,10 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 
 	// 创建工具提示
 	const createTooltip = useCallback(() => {
+		// 如果当前状态为多选状态，就不给创建工具提示
 		if (tooltipStore.type === TOOLTIP_TYPE.SELECT) return
+		// 如果没有发生完毕
+		if (msg?.msg_send_state === MESSAGE_SEND.SENDING) return
 		const div = document.createElement('div')
 		const root = createRoot(div)
 		root.render(
@@ -113,12 +116,12 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 					<div
 						className={clsx('flex text-[0.85rem] items-center', is_self ? 'justify-end' : 'justify-start')}
 					>
-						{/* <span className="text-[0.85rem] mr-1">
-							{format(msg?.created_at ?? msg?.create_at, 'zh_CN')}
-						</span> */}
 						<span className="text-[0.85rem] mr-1">{formatTime(msg?.created_at ?? msg?.create_at)}</span>
 						{is_self && (
 							<>
+								{msg?.msg_send_state === MESSAGE_SEND.SENDING && (
+									<Gobackward className="animate-spin" />
+								)}
 								{msg?.msg_send_state === MESSAGE_SEND.SEND_FAILED && (
 									<Exclamationmark className="text-red-500" />
 								)}

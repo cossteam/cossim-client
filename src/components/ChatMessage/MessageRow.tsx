@@ -56,8 +56,6 @@ const MessageRow: React.FC<RowProps & MessageRowProps> = ({ index, setItemSize, 
 	const is_read = useMemo(() => msg?.is_read === MESSAGE_READ.READ, [msg])
 
 	useEffect(() => {
-		console.log('is', is_read)
-
 		// 已读就不需要再多做处理, 下面是处理未读的消息 || isMe(msg.sender_id)
 		if (!is_read) {
 			// requestAnimationFrame(() => {

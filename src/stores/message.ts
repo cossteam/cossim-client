@@ -52,6 +52,7 @@ export interface MessageStore {
 	 * 触发 手机触摸事件
 	 */
 	trgger: boolean
+	opened: boolean
 	/**
 	 * 更新触发
 	 *
@@ -162,7 +163,13 @@ export interface MessageStore {
 	 *
 	 * @param {PrivateChats} msg
 	 */
-	recallMessage: (msg: PrivateChats) => Promise<boolean>
+	recallMessage: (msg: PrivateChats) => Promise<{ success: boolean; msg: string }>
+	/**
+	 * 更新显示
+	 * 
+	 * @param {boolean} opened
+	 */
+	updateOpened: (opened: boolean) => void
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -180,6 +187,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	at_all_user: 0,
 	at_users: [],
 	reads: [],
+	opened: false,
 	updateTrgger: (trgger: boolean) => set({ trgger }),
 
 	updateMessage: async (msg: PrivateChats) => {
@@ -200,8 +208,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, tableName, userInfo } = get()
 
 		let error_message = ''
-
-		console.log('userInfo', userInfo, userInfo?.preferences?.open_burn_after_reading)
 
 		// 判断是否是群聊
 		let { is_group } = get()
@@ -238,6 +244,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			uid: uuidv4(),
 			is_tips: false
 		}
+
 		// 如果是群聊
 		if (!msg.group_id) msg.group_id = 0
 
@@ -507,19 +514,18 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		const { messages, is_group } = get()
 		try {
 			const params = { msg_id: msg.msg_id }
-			const { code } = is_group
+			const { code, msg: error_msg } = is_group
 				? await MsgService.revokeGroupMessageApi(params)
 				: await MsgService.revokeUserMessageApi(params)
-			if (code !== 200) return false
+			if (code !== 200) return { success: false, msg: error_msg }
 			const newMessages: any = messages.filter((item: any) => item.msg_id !== msg.msg_id)
-			console.log('newMessages', newMessages)
-
 			UserStore.delete(UserStore.tables.messages, 'id', msg.id)
 			set({ messages: newMessages })
-			return true
+			return { success: false, msg: '撤回消息成功' }
 		} catch (error) {
 			console.error(error)
-			return false
+			return { success: false, msg: '撤回消息失败' }
 		}
-	}
+	},
+	updateOpened: (opened) => set({ opened }),
 }))
