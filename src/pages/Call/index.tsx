@@ -4,8 +4,6 @@ import { Icon, Link, Page, PageContent } from 'framework7-react'
 import { useEffect, useState } from 'react'
 import { CallStatus } from './enums'
 import { CallRoom } from './CallRoom'
-import { GridLayout, ParticipantTile, RoomAudioRenderer, useTracks } from '@livekit/components-react'
-import { Track } from 'livekit-client'
 
 const Call: React.FC<RouterProps> = () => {
 	const [isCallActive, setCallActive] = useState(false)
@@ -13,23 +11,33 @@ const Call: React.FC<RouterProps> = () => {
 	const [audioEnable, setAudioEnable] = useState(true)
 	const [videoEnable, setVideoEnable] = useState(false)
 	const [frontCamera, setFrontCamera] = useState(true)
+	const callRoom: CallRoom = new CallRoom()
 
 	const imgRul = 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
 	const newCallStore = useNewCallStore()
 
 	// 监听本地状态
 	useEffect(() => {
-		if (newCallStore.status === CallStatus.CALL && newCallStore.room !== null) {
-			setCallActive(true)
-		}
+		setCallActive(newCallStore.status === CallStatus.CALL && newCallStore.room !== null)
 		setIsGroup(newCallStore.room?.isGroup ?? false)
 		setAudioEnable(newCallStore.room?.option?.audioEnabled ?? false)
 		setVideoEnable(newCallStore.room?.option?.videoEnabled ?? false)
-	}, [newCallStore.status])
-
-	useEffect(() => {}, [newCallStore.room?.option])
-
-	// const root = useLiveKitRoom()
+		console.log('监听本地状态', newCallStore.statusText(newCallStore.status))
+		switch (newCallStore.status) {
+			case CallStatus.WAITING:
+				break
+			case CallStatus.CALL:
+				console.log('进入房间', callRoom)
+				callRoom.join({
+					serverUrl: newCallStore.room?.serverUrl,
+					token: newCallStore.room?.token,
+					audio: audioEnable,
+					video: videoEnable,
+					parentElement: document.getElementById('call') as HTMLElement
+				})
+				break
+		}
+	}, [newCallStore?.status])
 
 	// 开启摄像头
 	const openCamera = () => {
@@ -58,34 +66,29 @@ const Call: React.FC<RouterProps> = () => {
 
 	// 加入通话
 	const joinRoom = () => {
-		newCallStore.room &&
+		console.log('即将进入房间', callRoom)
+		if (newCallStore.room) {
 			newCallStore.joinRoom(newCallStore.room?.id, {
 				audioEnabled: true
 			})
+		}
 	}
 
 	return (
 		<Page noNavbar noToolbar>
 			<PageContent className="h-full relative flex flex-col ">
-				<CallRoom
-					serverUrl={newCallStore.room?.serverUrl}
-					token={newCallStore.room?.token}
-					audio={true}
-					video={true}
-				>
-					<MyVideoConference />
-					<RoomAudioRenderer />
-				</CallRoom>
 				<div className={clsx('p-2 flex justify-end', isGroup ? 'w-full' : 'fixed top-0 right-0')}>
 					<Link
 						className=""
 						iconF7="arrow_up_right_square"
 						iconSize={30}
 						popupClose
-						onClick={() => newCallStore.updateVisible(false)}
+						// onClick={() => newCallStore.updateVisible(false)}
+						onClick={() => {}}
 					/>
 				</div>
 				<div
+					id="call"
 					className={clsx(
 						'w-full relative',
 						isGroup
@@ -120,8 +123,14 @@ const Call: React.FC<RouterProps> = () => {
 				</div>
 				<div className={clsx('text-gray-400', isGroup ? '' : 'w-full fixed bottom-0')}>
 					<div className="p-4 flex flex-col justify-center items-center">
-						<span className="font-bold">{newCallStore.statusText(newCallStore.status)}</span>
-						<span className="font-bold">{'00:00'}</span>
+						<span className="font-bold">
+							{/* 设置超时时间为10秒 */}
+							{newCallStore.status === CallStatus.WAITING ? (
+								<Timer timeout={10 * 1000} onTimeout={() => refuseJoinRoom()} msg="等待中 " />
+							) : (
+								newCallStore.statusText(newCallStore.status)
+							)}
+						</span>
 					</div>
 					<div className="pt-4 pb-10 grid grid-cols-5 gap-x-0 gap-y-5">
 						<div className="col-span-2 flex justify-center">
@@ -193,22 +202,25 @@ const Call: React.FC<RouterProps> = () => {
 	)
 }
 
-function MyVideoConference() {
-	// const { enablesVideo } = useCallStore()
-	// console.log('MyVideoConference', enablesVideo)
+function Timer({ timeout, onTimeout, msg }: { timeout: number; onTimeout?: () => void; msg?: string }) {
+	const [remainingTime, setRemainingTime] = useState(timeout / 1000)
 
-	const tracks = useTracks(
-		[
-			{ source: Track.Source.Camera, withPlaceholder: true },
-			{ source: Track.Source.ScreenShare, withPlaceholder: false }
-		],
-		{ onlySubscribed: false }
-	)
-	return (
-		<GridLayout tracks={tracks} style={{ height: 'calc(100% - var(--lk-control-bar-height))' }}>
-			<ParticipantTile />
-		</GridLayout>
-	)
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setRemainingTime((prevTime) => prevTime - 1)
+		}, 1000)
+
+		// 当剩余时间为0时，清除定时器
+		if (remainingTime === 0) {
+			clearTimeout(timer)
+			onTimeout && onTimeout()
+		}
+
+		// 清除定时器，确保在组件卸载时不再触发
+		return () => clearTimeout(timer)
+	}, [remainingTime])
+
+	return <span>{remainingTime > 0 && `${msg ?? ''}${remainingTime}`}</span>
 }
 
 export default Call

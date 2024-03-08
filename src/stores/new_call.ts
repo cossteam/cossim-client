@@ -26,7 +26,7 @@ interface newCallStore {
 	// updateStatus: (status: CallStatus) => void
 	statusText: (status: CallStatus) => string
 	// 房间信息
-	room: Room | null
+	room: Room
 	// 处理通话事件
 	handlerCallEvent: (event: SocketEvent, data: any) => void
 	// 创建房间
@@ -69,7 +69,17 @@ export const callStore = (set: any, get: any): newCallStore => ({
 		}
 	},
 	// 房间信息
-	room: null,
+	room: {
+		id: '',
+		isGroup: false,
+		members: [],
+		option: {
+			audioEnabled: true,
+			videoEnabled: false
+		},
+		serverUrl: '',
+		token: ''
+	},
 	// 处理通话事件
 	handlerCallEvent: (event: SocketEvent, data: any) => {
 		console.log('处理通话事件', event, data)
@@ -143,14 +153,6 @@ export const callStore = (set: any, get: any): newCallStore => ({
 						resolve(data)
 						return
 					}
-					if (code === 400) {
-						// 通话中
-						set({
-							status: CallStatus.CALL,
-							visible: true
-						})
-						return
-					}
 					reject(msg)
 				})
 				.catch((error) => {
@@ -175,7 +177,6 @@ export const callStore = (set: any, get: any): newCallStore => ({
 				: CallService.joinLiveGroupApi(joinRoomParams)
 			joinResp
 				.then(({ code, data, msg }) => {
-					console.log('加入房间', code, data, msg)
 					if (code === 200) {
 						set({
 							status: CallStatus.CALL,
@@ -213,16 +214,13 @@ export const callStore = (set: any, get: any): newCallStore => ({
 			f7.dialog.alert(error, '请检查媒体设备权限')
 			return
 		}
+		const { createRoom, joinRoom, leaveRoom } = get()
 		try {
-			set({
-				room: {}
-			})
-			const { createRoom, joinRoom } = get()
 			await createRoom(id, option, isGroup, members)
 			await joinRoom(id, option)
 		} catch (error: any) {
 			console.dir(error)
-			f7.dialog.alert(error, '呼叫失败')
+			f7.dialog.alert(error?.message || error?.msg || error, '呼叫失败', () => leaveRoom(id))
 		}
 	},
 	// 离开房间
