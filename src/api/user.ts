@@ -149,6 +149,26 @@ class UserServiceImpl {
 		})
 	}
 
+	/**
+	 * 修改用户头像
+	 * @param {*} data
+	 * @param {*} data.file - 用户头像文件
+	 * @returns {Promise<DataResponse>}
+	 */
+	updateAvatarApi(data: { file: File }): Promise<DataResponse> {
+		const formData = new FormData();
+		formData.append('file', data.file);
+	
+		return request({
+			url: `${this.baseUrl}/avatar/modify`,
+			method: 'POST',
+			data: formData,
+			headers: {
+				'Content-Type': 'multipart/form-data'
+			}
+		});
+	}
+
 	// /**
 	//  * 获取用户的公钥
 	//  * @param {*} params
