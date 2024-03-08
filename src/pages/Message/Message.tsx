@@ -19,7 +19,7 @@ import { PluginListenerHandle } from '@capacitor/core'
 const user_id = getCookie(USER_ID) ?? ''
 
 const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
-	const dialog_id = Number(f7route.query.dialog_id)
+	const dialog_id = Number(f7route.params.dialog_id)
 	const receiver_id = f7route.params.id as string
 	const dialog_name = f7route.query.dialog_name
 	const is_group = f7route.query.is_group === 'true'
@@ -151,7 +151,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					className={clsx('flex-1 overflow-y-auto overflow-x-hidden', isShowGroupAnnouncement ? 'pt-16' : '')}
 					ref={contentRef}
 				>
-					<MessageItem dialog_id={dialog_id} el={contentRef} isScrollEnd={isScrollEnd}/>
+					<MessageItem dialog_id={dialog_id} el={contentRef} isScrollEnd={isScrollEnd} />
 				</div>
 
 				<MessageBar

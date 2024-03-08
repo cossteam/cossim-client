@@ -22,10 +22,6 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el, isScrollEnd })
 	const { toast } = useToast()
 	const [height, setHeight] = useState<number>(700)
 
-	useEffect(() => {
-		console.log(dialog_id)
-	}, [dialog_id])
-
 	const selectChange = useCallback(async (type: TOOLTIP_TYPE, msg_id: number) => {
 		const msg = messages.find((item) => item?.msg_id === msg_id)
 		tooltipStore.updateType(type)

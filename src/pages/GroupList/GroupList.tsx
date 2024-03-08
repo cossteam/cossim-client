@@ -1,10 +1,13 @@
 import GroupService from '@/api/group'
 import { $t } from '@/shared'
+import { useMessageStore } from '@/stores/message'
 import { useAsyncEffect } from '@reactuses/core'
 import { List, ListGroup, ListItem, NavTitle, Navbar, Page, f7 } from 'framework7-react'
 import { useState } from 'react'
 
-const GroupListList: React.FC<RouterProps> = () => {
+const GroupListList: React.FC<RouterProps> = ({ f7router }) => {
+	// 消息列表
+	const msgStore = useMessageStore()
 	const [groups, setGroups] = useState({})
 	useAsyncEffect(
 		async () => {
@@ -38,9 +41,19 @@ const GroupListList: React.FC<RouterProps> = () => {
 							groups[groupKey].map((group: any) => (
 								<ListItem
 									key={group.group_id}
-									link={`/message/${group?.group_id}/${group?.dialog_id}/?is_group=${group?.user_id ? 'false' : 'true'}&dialog_name=${group?.name}`}
+									// link={`/message/${group?.group_id}/${group?.dialog_id}/?is_group=${group?.user_id ? 'false' : 'true'}&dialog_name=${group?.name}`}
 									title={group.name}
 									popupClose
+									onClick={async () => {
+										await msgStore.initMessage(
+											group?.group_id ? true : false,
+											group?.dialog_id,
+											group?.user_id ?? group?.group_id
+										)
+										f7router.navigate(
+											`/message/${group?.group_id}/${group?.dialog_id}/?is_group=${group?.user_id ? 'false' : 'true'}&dialog_name=${group?.name}`
+										)
+									}}
 								>
 									<img
 										slot="media"
