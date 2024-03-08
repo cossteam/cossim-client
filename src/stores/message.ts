@@ -157,6 +157,12 @@ export interface MessageStore {
 	 * @returns
 	 */
 	clearReads: (msgs: PrivateChats[]) => void
+	/**
+	 * 撤回消息
+	 *
+	 * @param {PrivateChats} msg
+	 */
+	recallMessage: (msg: PrivateChats) => Promise<boolean>
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -496,5 +502,24 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		const { reads } = get()
 		const newReads = differenceBy(reads, msgs, 'msg_id')
 		set({ reads: newReads })
+	},
+	recallMessage: async (msg: any) => {
+		const { messages, is_group } = get()
+		try {
+			const params = { msg_id: msg.msg_id }
+			const { code } = is_group
+				? await MsgService.revokeGroupMessageApi(params)
+				: await MsgService.revokeUserMessageApi(params)
+			if (code !== 200) return false
+			const newMessages: any = messages.filter((item: any) => item.msg_id !== msg.msg_id)
+			console.log('newMessages', newMessages)
+
+			UserStore.delete(UserStore.tables.messages, 'id', msg.id)
+			set({ messages: newMessages })
+			return true
+		} catch (error) {
+			console.error(error)
+			return false
+		}
 	}
 }))

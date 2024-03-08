@@ -71,7 +71,9 @@ export enum TOOLTIP_TYPE {
 	/** 无操作 */
 	NONE = 'none',
 	/** 设置为群公告 */
-	NOTICE = 'notice'
+	NOTICE = 'notice',
+	/** 设置撤回 */
+	RECALL = 'recall'
 }
 
 

@@ -41,6 +41,7 @@
 		"dexie-react-hooks": "^1.1.7",
 		"dom7": "^4.0.6",
 		"dompurify": "^3.0.9",
+		"framer-motion": "^11.0.8",
 		"framework7": "^8.3.0",
 		"framework7-icons": "^5.0.5",
 		"framework7-react": "^8.3.0",

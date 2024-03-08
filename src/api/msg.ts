@@ -1,4 +1,16 @@
-import type { EditMessage, GetBehindMessage, GetGroupMessage, GetMessage, LabelMessage, MessageListParams, ReadGroupMessage, ReadMessage, SendGroupMessage, SendMessage } from '@/types/api/msg'
+import type {
+	EditMessage,
+	GetBehindMessage,
+	GetGroupMessage,
+	GetMessage,
+	LabelMessage,
+	MessageListParams,
+	ReadGroupMessage,
+	ReadMessage,
+	RevokeMessage,
+	SendGroupMessage,
+	SendMessage
+} from '@/types/api/msg'
 import request from '@/utils/request'
 
 class MsgServiceImpl {
@@ -149,7 +161,7 @@ class MsgServiceImpl {
 
 	/**
 	 * 获取指定对话落后的消息
-	 * 
+	 *
 	 * @param {*} data
 	 * @param {*} data.dialog_id
 	 * @param {*} data.msg_id
@@ -164,7 +176,7 @@ class MsgServiceImpl {
 
 	/**
 	 * 获取私聊消息
-	 * 
+	 *
 	 * @param {GetMessage} params
 	 */
 	getUserMessageApi(params: GetMessage): Promise<DataResponse> {
@@ -176,13 +188,41 @@ class MsgServiceImpl {
 
 	/**
 	 * 获取群聊消息
-	 * 
+	 *
 	 * @param {GetGroupMessage} params
 	 */
 	getGroupMessageApi(params: GetGroupMessage): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/list/group`,
 			params
+		})
+	}
+
+	/**
+	 * 撤销用户消息
+	 *
+	 * @param {*} data
+	 * @param {*} data.msg_id
+	 */
+	revokeUserMessageApi(data: RevokeMessage): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/recall/user`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 撤销群聊消息
+	 *
+	 * @param {*} data
+	 * @param {*} data.msg_id
+	 */
+	revokeGroupMessageApi(data: RevokeMessage): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/recall/group`,
+			method: 'POST',
+			data
 		})
 	}
 }

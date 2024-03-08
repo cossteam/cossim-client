@@ -14,7 +14,7 @@ interface MessageRowProps {
 	el: RefObject<HTMLDivElement | null>
 }
 
-const MessageRow: React.FC<RowProps & MessageRowProps> = ({ index, setItemSize, selectChange, onSelect, el }) => {
+const MessageRow: React.FC<RowProps & MessageRowProps> = ({ index, setItemSize, selectChange, onSelect }) => {
 	const msgStore = useMessageStore()
 	const tooltipStore = useTooltipsStore()
 	const msg = useMemo(() => msgStore.messages[index], [msgStore.messages, index])
@@ -44,27 +44,30 @@ const MessageRow: React.FC<RowProps & MessageRowProps> = ({ index, setItemSize, 
 	}, [])
 
 	// 处理显示区域的消息，做已读、阅后即焚的操作
-	const handlerObserver = (entries: IntersectionObserverEntry[]) => {
-		entries.forEach(async (entry) => {
-			if (entry.isIntersecting) {
-				msgStore.updateReads(msg)
-			}
-		})
-	}
-	const ob = useMemo(() => new IntersectionObserver(handlerObserver, { root: el.current! }), [])
+	// const handlerObserver = (entries: IntersectionObserverEntry[]) => {
+	// 	entries.forEach(async (entry) => {
+	// 		if (entry.isIntersecting) {
+	// 			msgStore.updateReads(msg)
+	// 		}
+	// 	})
+	// }
+	// const ob = useMemo(() => new IntersectionObserver(handlerObserver, { root: el.current! }), [])
 
 	const is_read = useMemo(() => msg?.is_read === MESSAGE_READ.READ, [msg])
 
 	useEffect(() => {
+		console.log('is', is_read)
+
 		// 已读就不需要再多做处理, 下面是处理未读的消息 || isMe(msg.sender_id)
 		if (!is_read) {
-			requestAnimationFrame(() => {
-				setTimeout(() => {
-					itemRef.current && ob.observe(itemRef.current)
-				}, 1000)
-			})
+			// requestAnimationFrame(() => {
+			// setTimeout(() => {
+			// itemRef.current && ob.observe(itemRef.current)
+			msgStore.updateReads(msg)
+			// }, 1000)
+			// })
 		}
-		//  防止有漏掉的消息
+		//  防止有漏掉的阅后即焚消息
 		if (is_read && msg.is_burn_after_reading === MessageBurnAfterRead.YES) {
 			msgStore.deleteMessage(msg.msg_id)
 			UserStore.delete(UserStore.tables.read_destroy, 'uid', msg.uid)
