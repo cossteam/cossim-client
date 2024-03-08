@@ -63,13 +63,10 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
 
-    // implementation files("libs/vivo_pushSDK_v4.0.0.0_500.aar")
-    // implementation(name: 'push3.4.0', ext: 'aar')
     // 以下依赖都需要添加
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'commons-codec:commons-codec:1.6'
     implementation 'androidx.annotation:annotation:1.1.0'
-    // implementation 'com.google.android.gms:play-services-auth:19.2.0'
 }
 
 apply from: 'capacitor.build.gradle'
