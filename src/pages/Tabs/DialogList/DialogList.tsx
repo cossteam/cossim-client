@@ -131,7 +131,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	}
 
 	// 置顶对话
-	const topDialog = async (e: any, item: any) => {
+	const topDialog = async (item: any) => {
 		await RelationService.topDialogApi({ dialog_id: item.dialog_id, action: item?.top_at ? 0 : 1 })
 		await getDialogList()
 	}
@@ -273,7 +273,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 								/>
 							</div>
 							<SwipeoutActions right>
-								<SwipeoutButton close overswipe color="blue" onClick={(e) => topDialog(e, item)}>
+								<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
 									{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
 								</SwipeoutButton>
 								<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>

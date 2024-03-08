@@ -9,14 +9,18 @@ import { useEffect, useState } from 'react'
 import GroupService from '@/api/group'
 import { useStateStore } from '@/stores/state'
 import { isEmpty } from 'lodash-es'
+import { useMessageStore } from '@/stores/message'
 
 const user_id = getCookie(USER_ID) || ''
 
-const ContactList: React.FC<RouterProps> = () => {
+const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 	const [contact, setContact] = useState<any[]>([])
 	const [applyTotal, setApplyTotal] = useState<number>(0)
 
 	const { is_contacts_update, updateContacts } = useStateStore()
+
+	// 消息列表
+	const msgStore = useMessageStore()
 
 	const updateContact = async () => {
 		const friends = await UserStore.findAll(UserStore.tables.friends)
@@ -155,7 +159,15 @@ const ContactList: React.FC<RouterProps> = () => {
 								key={index}
 								footer={contact?.signature}
 								popupClose
-								link={`/profile/${contact.user_id}/`}
+								// link={`/profile/${contact.user_id}/`}
+								onClick={async () => {
+									await msgStore.initMessage(
+										contact?.group_id ? true : false,
+										contact?.dialog_id,
+										contact?.user_id ?? contact?.group_id
+									)
+									f7router.navigate(`/profile/${contact.user_id}/`)
+								}}
 							>
 								<span slot="title">{contact?.nickname}</span>
 								<div slot="media" className="w-10 h-10 ">
