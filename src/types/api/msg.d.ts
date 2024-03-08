@@ -56,3 +56,7 @@ export interface GetMessage {
 }
 
 export type GetGroupMessage = { group_id?: number } & GetMessage
+
+export interface RevokeMessage {
+	msg_id: number
+}

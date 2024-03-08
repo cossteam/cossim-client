@@ -10,7 +10,8 @@ import {
 	Flag,
 	SquarePencil,
 	BubbleLeftBubbleRight,
-	TextAlignleft
+	TextAlignleft,
+	ArrowUturnLeft
 } from 'framework7-icons/react'
 import { createRoot } from 'react-dom/client'
 import { useMessageStore } from '@/stores/message'
@@ -83,6 +84,11 @@ const ToolTip: React.FC<ToolTipProps> = ({ el, onSelect, parentEl }) => {
 			name: TOOLTIP_TYPE.MARK,
 			title: $t('标注'),
 			icon: <Flag className="tooltip__icon" />
+		},
+		{
+			name: TOOLTIP_TYPE.RECALL,
+			title: $t('撤回'),
+			icon: <ArrowUturnLeft className="tooltip__icon" />
 		}
 	])
 

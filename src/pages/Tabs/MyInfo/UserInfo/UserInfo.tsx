@@ -56,12 +56,56 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 		}
 	}
 
+	const handleAvatarClick = () => {
+        // 点击头像时触发文件选择器
+        const fileInput = document.getElementById('avatar-input') as HTMLInputElement;
+		
+        if (fileInput) {
+            fileInput.click();
+        }
+		
+    };
+
+    const handleFileChange =  (event: React.ChangeEvent<HTMLInputElement>) => {
+		
+        // 处理文件选择器的文件变化事件
+        const selectedFile = event.target.files?.[0];
+        if (selectedFile) {
+            UserService.updateAvatarApi({file:selectedFile}).then(async (res) => {
+                if (res) {
+                    f7.dialog.alert($t('修改成功'))
+					const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', f7route.params.user_id as string)
+					CommonStore.update(CommonStore.tables.users, 'user_id', f7route.params.user_id as string, {
+						...user,
+						user_info: {
+							...user?.user_info,
+							avatar: res.data.avatar
+						}
+					})
+					setUserInfo({
+						...userInfo,
+						avatar: res.data
+					})
+                } else {
+                    f7.dialog.alert($t('修改失败'))
+                }
+            })
+        }
+    };
+
 	return (
 		<Page className="bg-bgTertiary" noToolbar>
 			<Navbar className="bg-bgPrimary hidden-navbar-bg" backLink outline={false} title={$t('个人信息')} />
 			<List className="coss_list" strong>
-				<ListItem link title="头像">
+				<ListItem title="头像" onClick={handleAvatarClick} >
 					<div slot="after">
+						<input
+							type="file"
+							id="avatar-input"
+							style={{ display: 'none' }}
+							onChange={handleFileChange}
+							accept="image/*"
+						/>
 						<img className="w-12 h-12 rounded-full bg-black bg-opacity-10" src={userInfo?.avatar} alt="" />
 					</div>
 				</ListItem>

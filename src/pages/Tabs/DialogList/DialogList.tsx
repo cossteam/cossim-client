@@ -25,6 +25,7 @@ import { v4 as uuidv4 } from 'uuid'
 import clsx from 'clsx'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
+// import { useChatStore } from '@/stores/chat'
 
 const getAfterMessage = async () => {
 	try {
@@ -85,6 +86,8 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const stateStore = useStateStore()
 	// 消息列表
 	const msgStore = useMessageStore()
+
+	// const chatStore = useChatStore()
 
 	// 获取对话列表
 	const getDialogList = async () => {
@@ -246,6 +249,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 							)}
 							link
 							onClick={async () => {
+								// chatStore.updateOpened(true)
 								await msgStore.initMessage(
 									item?.group_id ? true : false,
 									item?.dialog_id,

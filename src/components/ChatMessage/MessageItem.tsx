@@ -44,6 +44,9 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el, isScrollEnd })
 			case TOOLTIP_TYPE.MARK:
 				msg && selectEvent.mark(msg)
 				break
+			case TOOLTIP_TYPE.RECALL:
+				msg && selectEvent.recall(msg)
+				break
 			default:
 				break
 		}
@@ -90,6 +93,19 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el, isScrollEnd })
 		},
 		clear: () => {
 			tooltipStore.clear()
+		},
+		recall: async (msg: any) => {
+			f7.dialog.confirm(
+				$t('确认撤回消息？'),
+				async () => {
+					const success = await msgStore.recallMessage(msg)
+					console.log('msg', success)
+					selectEvent.clear()
+				},
+				() => {
+					selectEvent.clear()
+				}
+			)
 		}
 	}
 

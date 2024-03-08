@@ -27,12 +27,15 @@ import DOMPurify from 'dompurify'
 import { useNewCallStore } from './stores/new_call'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
+import MessagePopup from './components/ChatMessage/MessagePopup'
+import { useChatStore } from './stores/chat'
 
 let store: MessageStore | null = null
 
 function App() {
 	const msgStore = useMessageStore()
 	const stateStore = useStateStore()
+	const chatStore = useChatStore()
 	// const user_id = getCookie(USER_ID) || ''
 
 	const toastRef = useRef(null)
@@ -188,6 +191,7 @@ function App() {
 		store = msgStore
 	}, [msgStore])
 
+
 	return (
 		<AppComponent {...f7params}>
 			{hasCookie(TOKEN) ? (
@@ -196,6 +200,7 @@ function App() {
 					<Popup opened={newCallStore.visible}>
 						<View url="/new_call/" />
 					</Popup>
+					<MessagePopup opened={chatStore.opened}/>
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />
