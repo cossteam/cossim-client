@@ -12,10 +12,7 @@ const MessageHeader = () => {
 				backLink
 				outline={false}
 				className="coss_message_navbar"
-				onClickBack={() => {
-					chatStore.updateBeforeOpened(false)
-					chatStore.updateOpened(false)
-				}}
+				onClickBack={() => chatStore.updateOpened(false)}
 			></Navbar>
 		</div>
 	)

@@ -1,11 +1,28 @@
 import { create } from 'zustand'
 import UserStore from '@/db/user'
 import type { PrivateChats } from '@/types/db/user-db'
-import { ChatStore } from '@/types/store/chat'
+import { ChatStore, ChatStoreValue } from '@/types/store/chat'
+import { messageFromServer } from '@/shared'
+import { v4 as uuidv4 } from 'uuid'
 
-// const user_id = getCookie(USER_ID) || ''
+// const defaultMessage: PrivateChats = {
+// 	msg_id: 0,
+// 	sender_id: '',
+// 	sender_name: '',
+// 	sender_avatar: '',
+// 	content: '',
+// 	created_at: 0,
+// 	dialog_id: 0,
+// 	is_burn_after_reading: 0,
+// 	is_label: 0,
+// 	is_read: 0,
+// 	read_at: 0,
+// 	receiver_id: '',
+// 	replay_id: 0,
+// 	type: 0
+// }
 
-export const useChatStore = create<ChatStore>((set, get) => ({
+const defaultStore: ChatStoreValue = {
 	opened: false,
 	receiver_info: {
 		name: '',
@@ -17,9 +34,25 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 	},
 	messages: [],
 	beforeOpened: false,
+	beforeJump: false,
+	isAtBottom: false,
+	allMessages: []
+}
 
-	updateOpened: (opened: boolean) => set({ opened }),
-	updateReceiverInfo: (info: any) => set({ receiver_info: { ...get().receiver_info, ...info } }),
+export const useChatStore = create<ChatStore>((set, get) => ({
+	...defaultStore,
+
+	updateBeforeOpened: (beforeOpened) => set({ beforeOpened }),
+	updateIsAtBottom: (isAtBottom) => set({ isAtBottom }),
+	updateReceiverInfo: (info: any) => set((state) => ({ receiver_info: { ...state.receiver_info, ...info } })),
+
+	updateOpened: (opened: boolean) => {
+		set({ opened })
+		if (!opened) {
+			const { updateBeforeOpened } = get()
+			updateBeforeOpened(false)
+		}
+	},
 	updateMessages: (message: PrivateChats) => {
 		const { messages } = get()
 		const index = messages.findIndex((v) => v.msg_id === message.msg_id)
@@ -29,21 +62,30 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 			set({ messages: messages.map((v) => (v.msg_id === message.msg_id ? message : v)) })
 		}
 	},
-	initMessage: async (is_group, dialog_id, receiver_id) => {
-		// console.log('initMessage', is_group, dialog_id, receiver_id)
-		const messages = await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', dialog_id)
-		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', receiver_id)
+	initMessage: async (options) => {
+		const messages = await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', options.dialog_id)
+		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', options.receiver_id)
+		const receiver_info = Object.assign({}, options, userInfo)
 
-		const receiver_info = {
-			...get().receiver_info,
-			...userInfo,
-			dialog_id,
-			is_group
-		}
+		// 从服务器上拉取消息
+		messageFromServer({ id: options.receiver_id, is_group: options.is_group }).then((res: any) => {
+			const data = res?.group_messages || res?.user_messages || []
+			if (!messages.length) {
+				const newData = data.reverse().map((v: PrivateChats) => ({
+					...v,
+					uid: uuidv4()
+				}))
+				set({ messages: newData })
+				UserStore.bulkAdd(UserStore.tables.messages, newData)
+			} else {
+				// TODO: 对比两个数组的差异，更新本地数据库
+			}
+		})
 
-		// console.log('messages', messages, dialog_id, receiver_id)
-
-		set({ messages, receiver_info })
+		set({ messages: messages.slice(-15), allMessages: messages, receiver_info, beforeOpened: true })
 	},
-	updateBeforeOpened: (beforeOpened) => set({ beforeOpened })
+	addMessages: (messages: PrivateChats[]) => {
+		set((state) => ({ messages: [...state.messages, ...messages] }))
+	},
+	destroy: () => set({ ...defaultStore })
 }))

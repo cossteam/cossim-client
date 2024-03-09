@@ -264,5 +264,7 @@ export enum MessageMore {
 	/** 表情 */
 	EMOJI = 1,
 	/** 更多 */
-	OTHER = 2
+	OTHER = 2,
+	/** 语音 */
+	AUDIO = 3
 }

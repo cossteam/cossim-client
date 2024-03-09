@@ -256,19 +256,19 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 							)}
 							link
 							onClick={async () => {
-								// await chatStore.initMessage(
-								// 	item?.group_id ? true : false,
-								// 	item?.dialog_id,
-								// 	item?.user_id ?? item?.group_id
-								// )
-								// chatStore.updateBeforeOpened(true)
+								// await chatStore.initMessage({
+								// 	is_group: item?.group_id ? true : false,
+								// 	dialog_id: item?.dialog_id,
+								// 	receiver_id: item?.user_id ?? item?.group_id,
+								// 	name: item?.dialog_name,
+								// 	avatar: item?.dialog_avatar
+								// })
 
 								await msgStore.initMessage(
 									item?.group_id ? true : false,
 									item?.dialog_id,
 									item?.user_id ?? item?.group_id
 								)
-
 								f7router.navigate(
 									`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
 								)

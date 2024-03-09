@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual List</title>
+    <style>
+        .list-container {
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            height: 50px;
+            border-bottom: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="list-container" id="listContainer">
+    </div>
+
+    <script>
+        const totalItems = 1000; // Total number of items in the list
+        const itemHeight = 50; // Height of each item in pixels
+        const container = document.getElementById('listContainer');
+
+        function createListItem(index) {
+            const listItem = document.createElement('div');
+            listItem.classList.add('list-item');
+            listItem.innerText = `Item ${index}`;
+            return listItem;
+        }
+
+        function renderItems(startIndex, endIndex) {
+            for (let i = startIndex; i <= endIndex; i++) {
+                const item = createListItem(i);
+                container.appendChild(item);
+            }
+        }
+
+        function handleScroll() {
+            const scrollTop = container.scrollTop;
+            const startIndex = Math.floor(scrollTop / itemHeight);
+            const endIndex = Math.min(startIndex + Math.ceil(container.clientHeight / itemHeight), totalItems - 1);
+
+            container.innerHTML = '';
+            renderItems(startIndex, endIndex);
+        }
+
+        container.addEventListener('scroll', handleScroll);
+        handleScroll(); // Initial rendering
+    </script>
+
+</body>
+
+</html>

@@ -6,7 +6,7 @@ import MessageContent from './MessageContent'
 import MessageFooter from './MessageFooter'
 import { useChatStore } from '@/stores/chat'
 import { useWindowSize } from '@reactuses/core'
-import { useState } from 'react'
+import {  useState } from 'react'
 import './styles/Message.scss'
 
 const Message: React.FC = () => {
@@ -19,6 +19,11 @@ const Message: React.FC = () => {
 		console.log('动画过渡完成')
 		!opacity && setOpacity(true)
 	}
+
+	// useEffect(() => {
+	// 	if (!chatStore.opened) return
+	// 	chatStore.destroy()
+	// }, [chatStore.opened])
 
 	return (
 		<motion.div

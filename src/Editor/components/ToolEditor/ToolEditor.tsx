@@ -12,8 +12,6 @@ import Quill from 'quill'
 interface ToolEditorProps {
 	className?: string
 	readonly?: boolean
-	focus?: () => void
-	blur?: () => void
 	initValue?: string
 	content?: string
 	children?: React.ReactNode
@@ -61,9 +59,8 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 				}
 			}
 		}
-
 		const quill = new Quill(EditorRef.current, {
-			readOnly: props?.readonly ?? true,
+			readOnly: true,
 			placeholder: props?.placeholder,
 			modules: props.is_group ? modules : {}
 		})
@@ -82,20 +79,17 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 		}
 	}, [quill, props.initValue])
 
+	useEffect(() => {
+		if (!quill) return
+		quill.enable(props.readonly)
+		if (props.readonly) quill?.focus()
+	}, [props.readonly])
+
 	useImperativeHandle(ref, () => ({
 		quill: quill!
 	}))
 
-	return (
-		<div
-			className={clsx('w-full text-[1rem]', props.className)}
-			ref={EditorRef}
-			onFocus={props.focus}
-			onBlur={props.blur}
-		>
-			{props?.children}
-		</div>
-	)
+	return <div className={clsx('w-full text-[1rem]', props.className)} ref={EditorRef} />
 }
 
 export const EditorComponent = forwardRef(ToolEditor)

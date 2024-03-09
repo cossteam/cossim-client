@@ -166,7 +166,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el, isScrollEnd })
 		burnAfterReading(msgStore)
 	}
 
-	const fn = debounce(clearReadMessage, 3000)
+	const fn = debounce(clearReadMessage, 1000)
 	useEffect(() => {
 		if (!msgStore.reads) return
 		// console.log('msgStore.reads', msgStore.reads)
