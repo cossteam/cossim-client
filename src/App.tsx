@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { App as AppComponent, Popup, View, f7 } from 'framework7-react'
+import { App as AppComponent, View, f7 } from 'framework7-react'
 import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
@@ -25,12 +25,13 @@ import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
 import DOMPurify from 'dompurify'
-import { useNewCallStore } from './stores/new_call'
+import { useLiveStore } from './stores/live'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 import MessagePopup from './components/ChatMessage/MessagePopup'
 // import { useChatStore } from './stores/chat'
 import Message from '@/components/Message/Message'
+import LiveRoom from './pages/Live/LiveRoom'
 
 let store: MessageStore | null = null
 
@@ -66,8 +67,7 @@ function App() {
 		}
 	})
 
-	const newCallStore = useNewCallStore()
-
+	const liveStore = useLiveStore() // 通话状态
 	useEffect(() => {
 		// 修复手机上的视口比例
 		if ((f7.device.ios || f7.device.android) && f7.device.standalone) {
@@ -109,13 +109,13 @@ function App() {
 				case SocketEvent.ApplyAcceptEvent:
 					handlerRequestResultSocket(data)
 					break
-				case SocketEvent.UserCallReqEvent: // 用户来电
-				case SocketEvent.GroupCallReqEvent: // 群聊来电
-				case SocketEvent.UserCallRejectEvent: // 用户拒绝
-				case SocketEvent.GroupCallRejectEvent: // 群聊拒绝
-				case SocketEvent.UserCallHangupEvent: // 用户挂断
-				case SocketEvent.GroupCallHangupEvent: // 群聊挂断
-					newCallStore.handlerCallEvent(event, data)
+				case SocketEvent.UserCallReqEvent:
+				case SocketEvent.GroupCallReqEvent:
+				case SocketEvent.UserCallRejectEvent:
+				case SocketEvent.GroupCallRejectEvent:
+				case SocketEvent.UserCallHangupEvent:
+				case SocketEvent.GroupCallHangupEvent:
+					liveStore.updateEvent(event, data)
 					break
 				case SocketEvent.MessageLabelEvent:
 					handlerLabelSocket(data, store!)
@@ -201,11 +201,9 @@ function App() {
 			{hasCookie(TOKEN) ? (
 				<>
 					<Layout />
-					<Popup opened={newCallStore.visible}>
-						<View url="/new_call/" />
-					</Popup>
 					<MessagePopup opened={msgStore.opened} />
 					<Message />
+					<LiveRoom />
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />

@@ -1,4 +1,4 @@
-import { useNewCallStore } from '@/stores/new_call'
+import { useLiveStore } from '@/stores/live'
 import { Icon } from 'framework7-react'
 import { Router } from 'framework7/types'
 import { useEffect, useState } from 'react'
@@ -11,7 +11,7 @@ interface MessageMoreProps {
 }
 
 const MessageMore: React.FC<MessageMoreProps> = (props) => {
-	const newCallStore = useNewCallStore()
+	const liveStore = useLiveStore()
 	const [members, setMembers] = useState<any>()
 
 	useEffect(() => {
@@ -20,53 +20,17 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		}
 	}, [props.members])
 
-	// 呼叫
-	// const { call, updateEnablesVideo } = useCallStore()
-	// const callTool = async (enableVideo: boolean) => {
-	// 	try {
-	// 		// 检查设备是否可用
-	// 		await hasMike()
-	// 		enableVideo && (await hasCamera())
-	// 		f7.dialog.preloader($t('呼叫中...'))
-	// 		// 是否开启摄像头
-	// 		updateEnablesVideo(enableVideo)
-	// 		const { code } = !is_group
-	// 			? await call({ userInfo: { user_id: id } })
-	// 			: await call({ groupInfo: { group_id: parseInt(id), member: members } })
-	// 		console.log('call status', code)
-	// 		code === 200 && props.f7router.navigate('/call/')
-	// 	} catch (error: any) {
-	// 		console.dir(error)
-	// 		if (error?.code === 8) {
-	// 			f7.dialog.alert($t('当前媒体设备不可用，无法接听来电'))
-	// 			return
-	// 		}
-	// 		f7.dialog.alert($t(error?.message || '呼叫失败...'))
-	// 	} finally {
-	// 		f7.dialog.close()
-	// 	}
-	// }
-	const callTool = (enableVideo: boolean) => {
-		const id = props?.id
-		const option = {
-			audioEnabled: true,
-			videoEnabled: enableVideo
-		}
-		const isGroup = Boolean(props.is_group)
-		newCallStore.call(id, option, isGroup, members)
-	}
-
 	// 工具
 	const tools = [
 		{
 			f7Icon: 'phone',
 			text: '语音',
-			func: () => callTool(false)
+			func: () => liveStore.call({ id: props.id, isGroup: props.is_group, members, audio: true, video: false })
 		},
 		{
 			f7Icon: 'videocam',
 			text: '视频',
-			func: () => callTool(true)
+			func: () => liveStore.call({ id: props.id, isGroup: props.is_group, members, audio: true, video: true })
 		}
 	]
 	return (

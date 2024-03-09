@@ -84,6 +84,7 @@ const Call: React.FC<RouterProps> = () => {
 						iconSize={30}
 						popupClose
 						// onClick={() => newCallStore.updateVisible(false)}
+						// TODO: 最小化开启悬浮窗口
 						onClick={() => {}}
 					/>
 				</div>

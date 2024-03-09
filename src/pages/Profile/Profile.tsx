@@ -9,6 +9,7 @@ import UserService from '@/api/user'
 import RelationService from '@/api/relation'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
+import { useLiveStore } from '@/stores/live'
 // import { getCookie } from '@/utils/cookie'
 // import { hasCamera, hasMike } from '@/utils/media'
 
@@ -26,6 +27,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	const { updateContacts } = useStateStore()
 	const { clearMessages } = useMessageStore()
+	const liveStore = useLiveStore()
 
 	const onPageInit = async () => {
 		await updateUserInfo(true)
@@ -292,24 +294,22 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						</div>
 					)}
 					<div
-						className="size-10  flex flex-col justify-center items-center"
-						// onClick={() => callUser(true)}
-					>
-						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-							{/* <Link iconF7="videocam_fill" iconSize={22} /> */}
-							<Icon f7="videocam_fill" size={22} />
-						</div>
-						<span className="text-xs">视频</span>
-					</div>
-					<div
 						className="size-10 flex flex-col justify-center items-center"
-						// onClick={() => callUser(false)}
+						onClick={() => liveStore.call({ id: user_id, isGroup: false, audio: true, video: false })}
 					>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-							{/* <Link iconF7="phone_fill" iconSize={22} /> */}
 							<Icon f7="phone_fill" size={22} />
 						</div>
 						<span className="text-xs">语音</span>
+					</div>
+					<div
+						className="size-10  flex flex-col justify-center items-center"
+						onClick={() => liveStore.call({ id: user_id, isGroup: false, audio: true, video: true })}
+					>
+						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
+							<Icon f7="videocam_fill" size={22} />
+						</div>
+						<span className="text-xs">视频</span>
 					</div>
 					<div className="size-10  flex flex-col justify-center items-center" onClick={() => {}}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
