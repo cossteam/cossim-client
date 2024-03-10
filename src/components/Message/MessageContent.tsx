@@ -1,5 +1,5 @@
 import { MESSAGE_CONTENT_ID } from '@/shared'
-import { useChatStore } from '@/stores/chat'
+// import { useChatStore } from '@/stores/chat'
 import clsx from 'clsx'
 import { useEffect, useRef, useState } from 'react'
 import MessageVirtualList from './components/MessageVirtualList'
@@ -7,7 +7,7 @@ import MessageRow from './components/MessageRow'
 
 const MessageContent = () => {
 	const contentRef = useRef<HTMLDivElement | null>(null)
-	const chatStore = useChatStore()
+	// const chatStore = useChatStore()
 
 	// 首次渲染
 	// const [render, setRender] = useState<boolean>(true)

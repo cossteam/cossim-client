@@ -1,5 +1,6 @@
 import { OwnEventEnum, useLiveStore } from '@/stores/live'
-import { Icon, Link } from 'framework7-react'
+import { Link } from 'framework7-react'
+import OperateButton from './OperateButton'
 
 const LiveRoomOperate: React.FC<any> = (props: any) => {
 	// 通话状态
@@ -29,24 +30,57 @@ const LiveRoomOperate: React.FC<any> = (props: any) => {
 				/>
 			</div>
 			<div className="flex-1 flex overflow-scroll">{props.children && props.children}</div>
-			<div className="min-h-64 flex justify-center items-center">
-				<div className="flex flex-col justify-center items-center">
-					<div
-						className="p-4 rounded-full text-white bg-[#F9BAA7]"
-						onClick={liveStore.ownEvent === OwnEventEnum.BUSY ? liveStore.hangup : liveStore.refuse}
-					>
-						<Icon className="rotate-90" f7="phone_fill" size={30} />
-					</div>
-					<span className="mt-2">{liveStore.ownEvent === OwnEventEnum.BUSY ? '挂断' : '拒绝'}</span>
+			<div className="min-h-64 flex flex-col">
+				<div className="text-center">{liveStore.ownEventDesc(liveStore.ownEvent)}</div>
+				<div className="flex-1 flex justify-evenly items-center">
+					<OperateButton
+						f7Icon={liveStore.audio ? 'mic_fill' : 'mic'}
+						backgroundColor="#B9B3DD"
+						text="麦克风"
+						onClick={() =>
+							liveStore.configMedia({
+								audio: !liveStore.audio
+							})
+						}
+					/>
+					<OperateButton
+						f7Icon={liveStore.video ? 'videocam_fill' : 'videocam'}
+						backgroundColor="#B9B3DD"
+						text="视频"
+						onClick={() =>
+							liveStore.configMedia({
+								video: !liveStore.video
+							})
+						}
+					/>
 				</div>
-				{liveStore.ownEvent === OwnEventEnum.WAITING && (
-					<div className="flex flex-col justify-center items-center">
-						<div className="p-4 rounded-full text-white bg-[#65C6B0]" onClick={() => liveStore.accept()}>
-							<Icon f7="phone_fill" size={30} />
-						</div>
-						<span className="mt-2">接听</span>
-					</div>
-				)}
+				<div className="flex-1 flex justify-evenly items-center">
+					{liveStore.ownEvent === OwnEventEnum.BUSY ? (
+						<OperateButton
+							f7Icon="phone_fill"
+							iconClassName="rotate-90"
+							text="挂断"
+							backgroundColor="#F9BAA7"
+							onClick={liveStore.hangup}
+						/>
+					) : (
+						<OperateButton
+							f7Icon="phone_fill"
+							iconClassName="rotate-90"
+							text="拒绝"
+							backgroundColor="#F9BAA7"
+							onClick={liveStore.refuse}
+						/>
+					)}
+					{liveStore.ownEvent === OwnEventEnum.INVITED && (
+						<OperateButton
+							f7Icon="phone_fill"
+							text="接听"
+							backgroundColor="#65C6B0"
+							onClick={liveStore.accept}
+						/>
+					)}
+				</div>
 			</div>
 		</div>
 	)
