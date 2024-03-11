@@ -9,6 +9,7 @@ import ToolTip from './MessageToolTips'
 import LongPressButton from '@/components/LongPressButton/LongPressButton'
 import { ReadEditor } from '@/Editor'
 import { useTooltipsStore } from '@/stores/tooltips'
+// import { useChatStore } from '@/stores/chat'
 
 interface MessageBoxProps {
 	msg: PrivateChats
@@ -24,6 +25,7 @@ const MessageItem: React.FC<MessageBoxProps> = ({ msg, index, onSelect, classNam
 	const is_self = isMe(msg?.sender_id)
 
 	const tooltipStore = useTooltipsStore()
+	// const chatStore = useChatStore()
 
 	const selectChange = useCallback((type: TOOLTIP_TYPE, msg_id: number) => onSelect(type, msg_id), [onSelect])
 

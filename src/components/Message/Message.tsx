@@ -6,7 +6,7 @@ import MessageContent from './MessageContent'
 import MessageFooter from './MessageFooter'
 import { useChatStore } from '@/stores/chat'
 import { useWindowSize } from '@reactuses/core'
-import {  useState } from 'react'
+import { useState } from 'react'
 import './styles/Message.scss'
 
 const Message: React.FC = () => {
@@ -31,6 +31,7 @@ const Message: React.FC = () => {
 			transition={{ duration: 0.2, ease: 'easeIn' }}
 			className={clsx('message-popup', { 'message-popup-opacity': opacity })}
 			onAnimationComplete={handleAnimationComplete}
+			// style={{ zIndex: chatStore.beforeJump ? 4999 : 5000 }}
 		>
 			<Page noToolbar className="coss_message transition-all relative">
 				<div className="h-screen overflow-hidden flex flex-col">

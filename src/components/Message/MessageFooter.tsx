@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
 import ToolEditor, { ReadEditor, ToolEditorMethods } from '@/Editor'
 import { $t, MessageMore, TOOLTIP_TYPE } from '@/shared'
 import { useTooltipsStore } from '@/stores/tooltips'
@@ -18,7 +20,6 @@ import Quill from 'quill'
 import { useClickOutside } from '@reactuses/core'
 
 const MessageFooter = () => {
-	// const chatStore = useChatStore()
 	const tooltipStore = useTooltipsStore()
 	const editorRef = useRef<ToolEditorMethods>(null)
 	const inputRef = useRef<HTMLDivElement | null>(null)

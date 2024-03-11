@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ListOnItemsRenderedProps, ListOnScrollProps, VariableSizeList } from 'react-window'
+import { ListOnItemsRenderedProps, VariableSizeList } from 'react-window'
 import { isMe } from '@/shared'
 import { useChatStore } from '@/stores/chat'
 
@@ -18,28 +18,25 @@ const MessageVirtualList: React.FC<MessageVariableSizeListProps> = ({ Row, heigh
 	// 虚拟列表实例
 	const listRef = useRef<VariableSizeList | null>(null)
 	// 根据索引记录列表的高度, 默认为50
-	const [sizes, setSizes] = useState<{ [key: number]: number }>({ 1: 50 })
+	const [sizes, setSizes] = useState<{ [key: number]: number }>({ 1: 80 })
 	// 首次渲染
 	const [render, setRender] = useState<boolean>(true)
 	// 会话仓库
 	const chatStore = useChatStore()
 	// 消息总数
 	const messageCount = useMemo(() => chatStore.messages.length, [chatStore.messages])
-	// 当前是否滚动到底部
-	// const [isAtBottom, setIsAtBottom] = useState<boolean>(false)
 	// 根据索引获取Item的尺寸
-	const getItemSize = useCallback((index: number) => sizes[index] || 50, [sizes])
+	const getItemSize = useCallback((index: number) => sizes[index] || 80, [sizes])
 
 	useEffect(() => {
 		if (!chatStore.beforeOpened) return
-		// if (render) {
+		// if (!render) return
 		requestAnimationFrame(() => {
 			setTimeout(() => {
 				listRef.current?.scrollToItem(messageCount, 'end')
 				chatStore.updateOpened(true)
 			}, 100)
 		})
-		// }
 		setRender(false)
 	}, [chatStore.beforeOpened])
 
@@ -80,14 +77,6 @@ const MessageVirtualList: React.FC<MessageVariableSizeListProps> = ({ Row, heigh
 		!chatStore.opened && setRender(true)
 	}, [chatStore.opened])
 
-	const handlerScroll = (options: ListOnScrollProps) => {
-		console.log('滚动', options)
-		if (options.scrollDirection === 'backward') {
-			if (chatStore.messages.length >= chatStore.addMessages.length) return
-			chatStore.addMessages(chatStore.allMessages)
-		}
-	}
-
 	return (
 		<VariableSizeList
 			ref={listRef}
@@ -96,7 +85,7 @@ const MessageVirtualList: React.FC<MessageVariableSizeListProps> = ({ Row, heigh
 			itemSize={getItemSize}
 			width="100%"
 			onItemsRendered={onItemsRendered}
-			onScroll={handlerScroll}
+			initialScrollOffset={messageCount}
 		>
 			{rowRender}
 		</VariableSizeList>

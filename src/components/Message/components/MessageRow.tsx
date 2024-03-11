@@ -24,23 +24,23 @@ const MessageRow: React.FC<RowProps & MessageRowProps> = ({ index, setItemSize, 
 
 	// 计算每条消息的高度
 	useEffect(() => {
-		setItemSize(index, itemRef.current!.offsetHeight)
-		// const doc = new DOMParser().parseFromString(msg?.content ?? '', 'text/html')
-		// const imgs = doc.querySelectorAll('img')
-		// const elementHeight = itemRef.current?.offsetHeight
-		// // 替换图片
-		// if (imgs.length) {
-		// 	const image = new Image()
-		// 	for (let i = 0; i < imgs.length; i++) {
-		// 		image.src = imgs[i].src
-		// 		image.onload = () => {
-		// 			const elementHeight = itemRef.current?.offsetHeight
-		// 			setItemSize(index, elementHeight!)
-		// 		}
-		// 	}
-		// } else {
-		// 	setItemSize(index, elementHeight!)
-		// }
+		// setItemSize(index, itemRef.current!.offsetHeight)
+		const doc = new DOMParser().parseFromString(msg?.content ?? '', 'text/html')
+		const imgs = doc.querySelectorAll('img')
+		const elementHeight = itemRef.current?.offsetHeight
+		// 替换图片
+		if (imgs.length) {
+			const image = new Image()
+			for (let i = 0; i < imgs.length; i++) {
+				image.src = imgs[i].src
+				image.onload = () => {
+					const elementHeight = itemRef.current?.offsetHeight
+					setItemSize(index, elementHeight!)
+				}
+			}
+		} else {
+			setItemSize(index, elementHeight!)
+		}
 	}, [])
 
 	const is_read = useMemo(() => msg?.is_read === MESSAGE_READ.READ, [msg])

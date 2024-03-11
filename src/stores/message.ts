@@ -7,7 +7,7 @@ import {
 	MessageBurnAfterRead,
 	USER_ID,
 	addMarkMessage,
-	getMessageFromServer,
+	// getMessageFromServer,
 	// initMessage,
 	updateDialogs
 } from '@/shared'
@@ -53,6 +53,9 @@ export interface MessageStore {
 	 */
 	trgger: boolean
 	opened: boolean
+	height: number
+	refresh: boolean
+	num: number
 	/**
 	 * 更新触发
 	 *
@@ -166,10 +169,27 @@ export interface MessageStore {
 	recallMessage: (msg: PrivateChats) => Promise<{ success: boolean; msg: string }>
 	/**
 	 * 更新显示
-	 * 
+	 *
 	 * @param {boolean} opened
 	 */
 	updateOpened: (opened: boolean) => void
+
+	/**
+	 * 更新页面高度
+	 *
+	 * @param {number} height
+	 */
+	updateHeight: (height: number) => void
+	/**
+	 * 更新刷新
+	 *
+	 * @param {boolean} refresh
+	 */
+	updateRefresh: (refresh: boolean) => void
+	/**
+	 * 从头部添加消息
+	 */
+	addMessages: () => void
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -188,6 +208,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	at_users: [],
 	reads: [],
 	opened: false,
+	height: 0,
+	refresh: false,
+	num: 0,
 	updateTrgger: (trgger: boolean) => set({ trgger }),
 
 	updateMessage: async (msg: PrivateChats) => {
@@ -412,45 +435,58 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	initMessage: async (is_group: boolean, dialog_id: number, receiver_id: string) => {
+		const { height } = get()
+		const num = Math.ceil(height / 80)
+
 		const tableName = UserStore.tables.messages
 		const messages = await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', dialog_id)
 
 		// 获取服务器上的消息
-		getMessageFromServer(receiver_id, is_group).then((res: any) => {
-			const data = res?.group_messages || res?.user_messages || []
-			const newData: any[] = data.map((v: any) => ({
-				...v,
-				msg_id: v?.id,
-				at_all_user: v?.at_all_user ?? 0,
-				at_users: v?.at_users ?? []
-			}))
+		// getMessageFromServer(receiver_id, is_group).then((res: any) => {
+		// 	const data = res?.group_messages || res?.user_messages || []
+		// 	const newData: any[] = data.map((v: any) => ({
+		// 		...v,
+		// 		msg_id: v?.id,
+		// 		at_all_user: v?.at_all_user ?? 0,
+		// 		at_users: v?.at_users ?? []
+		// 	}))
 
-			if (!messages?.length) {
-				if (!data.length) return
-				const messages: any[] = data
-					.map((v: any) => ({
-						...v,
-						msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
-						uid: uuidv4()
-					}))
-					?.reverse()
-				set({ messages })
-				UserStore.bulkAdd(UserStore.tables.messages, messages)
-				return
-			}
+		// 	if (!messages?.length) {
+		// 		if (!data.length) return
+		// 		const messages: any[] = data
+		// 			.map((v: any) => ({
+		// 				...v,
+		// 				msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
+		// 				uid: uuidv4()
+		// 			}))
+		// 			?.reverse()
+		// 		set({ messages })
+		// 		UserStore.bulkAdd(UserStore.tables.messages, messages)
+		// 		return
+		// 	}
 
-			// TODO: 对比两个数组的差异，更新本地数据库
-			differenceBy(newData || [], messages, 'msg_id')
-			// console.log('diff', diffData, newData, messages)
-			// console.log('messages', messages)
-		})
+		// 	// TODO: 对比两个数组的差异，更新本地数据库
+		// 	differenceBy(newData || [], messages, 'msg_id')
+		// 	// console.log('diff', diffData, newData, messages)
+		// 	// console.log('messages', messages)
+		// })
 
 		// 当前会话的信息，如果是私聊就是好友信息，如果是群聊就是群信息
 		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', receiver_id)
 		// 自己的信息
 		const myInfo = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
 
-		set({ messages, tableName, is_group, receiver_id, dialog_id, all_meesages: messages, userInfo, myInfo })
+		set({
+			messages: messages.slice(-num),
+			tableName,
+			num,
+			is_group,
+			receiver_id,
+			dialog_id,
+			all_meesages: messages,
+			userInfo,
+			myInfo
+		})
 
 		// 设置已读
 		// readMessage(messages)
@@ -528,4 +564,18 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	updateOpened: (opened) => set({ opened }),
+	updateHeight: (height) => set({ height }),
+	updateRefresh: (refresh) => set({ refresh }),
+	addMessages: async () => {
+		const { messages, all_meesages, num, refresh, updateRefresh } = get()
+
+		if (refresh) return
+		updateRefresh(true)
+
+		if (messages.length >= all_meesages.length) return
+		const newMessages = all_meesages.slice(-(num + messages.length))
+		setTimeout(()=>{
+			set({ messages: newMessages })
+		},1000)
+	}
 }))

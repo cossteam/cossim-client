@@ -72,24 +72,6 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 	const onPageTabShow = async () => {
 		try {
 			await updateContactInit()
-			// 获取群聊消息
-			// GroupService.groupListApi({})
-			// 	.then(({ data }) => {
-			// 		Object.entries(data).forEach(([key, value]) => {
-			// 			;(value as any[]).forEach(async (item) => {
-			// 				const friend = friends?.find((v) => v.user_id === item.user_id)
-			// 				friend
-			// 					? await UserStore.update(UserStore.tables.friends, 'user_id', item.user_id, {
-			// 							...friend,
-			// 							...item
-			// 						})
-			// 					: await UserStore.add(UserStore.tables.friends, { ...item, group: key })
-			// 			})
-			// 		})
-			// 	})
-			// 	.catch((error) => {
-			// 		console.log('获取群聊信息失败', error)
-			// 	})
 		} catch (error) {
 			console.error('获取好友列表出错', error)
 		} finally {
