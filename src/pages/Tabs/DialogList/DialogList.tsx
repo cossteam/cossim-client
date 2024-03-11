@@ -7,7 +7,8 @@ import {
 	List,
 	ListItem,
 	SwipeoutActions,
-	SwipeoutButton
+	SwipeoutButton,
+	PageContent
 } from 'framework7-react'
 import { Plus, Search, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -238,70 +239,77 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 					</ListItem> */}
 				</List>
 			</Popover>
+			<PageContent className="p-0 max-h-full h-full">
+				<List contactsList noChevron mediaList dividers className="h-full bg-bgPrimary pb-14 overflow-auto">
+					{[...chats, ...chats, ...chats].map((item, index) => {
+						// {[...chats].map((item, index) => {
+						return (
+							<ListItem
+								className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
+								key={item?.dialog_id + `${index}`}
+								// link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
+								title={item?.dialog_name}
+								badge={item?.dialog_unread_count}
+								badgeColor="red"
+								swipeout
+								after={format(
+									item?.last_message?.send_time
+										? item?.last_message?.send_time
+										: item?.dialog_create_at,
+									'zh_CN'
+								)}
+								link
+								onClick={async () => {
+									// await chatStore.initMessage({
+									// 	is_group: item?.group_id ? true : false,
+									// 	dialog_id: item?.dialog_id,
+									// 	receiver_id: item?.user_id ?? item?.group_id,
+									// 	name: item?.dialog_name,
+									// 	avatar: item?.dialog_avatar
+									// })
 
-			<List contactsList noChevron mediaList dividers className="h-full bg-bgPrimary">
-				{chats.map((item) => {
-					return (
-						<ListItem
-							className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
-							key={item?.dialog_id}
-							// link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
-							title={item?.dialog_name}
-							badge={item?.dialog_unread_count}
-							badgeColor="red"
-							swipeout
-							after={format(
-								item?.last_message?.send_time ? item?.last_message?.send_time : item?.dialog_create_at,
-								'zh_CN'
-							)}
-							link
-							onClick={async () => {
-								// await chatStore.initMessage({
-								// 	is_group: item?.group_id ? true : false,
-								// 	dialog_id: item?.dialog_id,
-								// 	receiver_id: item?.user_id ?? item?.group_id,
-								// 	name: item?.dialog_name,
-								// 	avatar: item?.dialog_avatar
-								// })
-
-								await msgStore.initMessage(
-									item?.group_id ? true : false,
-									item?.dialog_id,
-									item?.user_id ?? item?.group_id
-								)
-								f7router.navigate(
-									`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
-								)
-							}}
-						>
-							<img
-								slot="media"
-								src={`${item?.dialog_avatar}`}
-								loading="lazy"
-								className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"
-							/>
-							<div slot="text" className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap">
-								<ReadEditor
-									content={
-										(item?.group_id && item?.last_message?.sender_info?.name
-											? item?.last_message?.sender_info?.name + ':'
-											: '') + handlerContent(item?.last_message?.content ?? '')
-									}
-									className="dialog-read-editor"
+									await msgStore.initMessage(
+										item?.group_id ? true : false,
+										item?.dialog_id,
+										item?.user_id ?? item?.group_id
+									)
+									f7router.navigate(
+										`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
+									)
+								}}
+							>
+								<img
+									slot="media"
+									src={`${item?.dialog_avatar}`}
+									loading="lazy"
+									className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"
 								/>
-							</div>
-							<SwipeoutActions right>
-								<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
-									{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
-								</SwipeoutButton>
-								<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
-									{$t('删除')}
-								</SwipeoutButton>
-							</SwipeoutActions>
-						</ListItem>
-					)
-				})}
-			</List>
+								<div
+									slot="text"
+									className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap"
+								>
+									<ReadEditor
+										content={
+											(item?.group_id && item?.last_message?.sender_info?.name
+												? item?.last_message?.sender_info?.name + ':'
+												: '') + handlerContent(item?.last_message?.content ?? '')
+										}
+										className="dialog-read-editor"
+									/>
+								</div>
+								<SwipeoutActions right>
+									<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
+										{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
+									</SwipeoutButton>
+									<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
+										{$t('删除')}
+									</SwipeoutButton>
+								</SwipeoutActions>
+							</ListItem>
+						)
+					})}
+				</List>
+			</PageContent>
 		</Page>
 	)
 }
