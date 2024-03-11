@@ -1,33 +1,7 @@
-/**
- * TODO: 后续可能会使用到
- *
- * @export
- * @class Base
- * @template T
- */
 import Dexie, { Table } from 'dexie'
-// import { COMMON_DATA_BASE_NAME } from '@/shared'
-// import type { UserDataBase } from '@/types/db/common-db'
-import { ServiceImpl } from '@/shared/db'
+import { CommonTableOptions } from './type'
 
-interface baseArray {
-	[key: string]: any
-}
-
-interface CommonTableOptions {
-	cacheDialogs?: baseArray[]
-	cacheEmojis?: baseArray[]
-	cacheFileSort?: baseArray[]
-	cacheLoginEmail?: string
-	cacheUserBasic?: baseArray[]
-	cacheVersion?: string
-	callAt?: baseArray[]
-	clientId?: string
-	dialogUnread?: string
-	userInfo?: baseArray
-}
-
-class CommonDataBaseImpl extends Dexie {
+class CommonTable extends Dexie {
 	common!: Table<CommonTableOptions>
 
 	constructor(name: string, version: number = 1) {
@@ -46,6 +20,7 @@ class CommonDataBaseImpl extends Dexie {
 			 * | userInfo               用户基本信息
 			 */
 			common: `
+                ++id,
                 cacheDialogs, 
                 cacheEmojis, 
                 cacheFileSort, 
@@ -59,11 +34,6 @@ class CommonDataBaseImpl extends Dexie {
             `
 		})
 	}
-
 }
 
-const CommonDataBase = new ServiceImpl({
-	db: new CommonDataBaseImpl('COSS')
-})
-
-export default CommonDataBase
+export default CommonTable
