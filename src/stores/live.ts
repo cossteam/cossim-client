@@ -1,4 +1,3 @@
-import { data } from '@emoji-mart/data'
 import { SocketEvent } from '@/shared'
 import { create } from 'zustand'
 import { persist, createJSONStorage, devtools } from 'zustand/middleware'
