@@ -1,3 +1,4 @@
+import { data } from '@emoji-mart/data'
 import { SocketEvent } from '@/shared'
 import { create } from 'zustand'
 import { persist, createJSONStorage, devtools } from 'zustand/middleware'
@@ -190,11 +191,11 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 				f7.dialog.alert(msg)
 				return
 			}
-			// const localRoom = await CallService.getLocalRoom(id, '550') // 本地测试
-			// console.log('localRoom', localRoom)
-			const localRoom = {
-				data
-			}
+			const localRoom = await CallService.getLocalRoom(id, '550') // 本地测试
+			console.log('本地推流信息：', localRoom)
+			// const localRoom = {
+			// 	data
+			// }
 			set({
 				serverUrl: localRoom.data.url || data.url,
 				token: localRoom.data.token || data.token,
@@ -252,6 +253,8 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 		switch (event) {
 			case SocketEvent.UserCallReqEvent:
 			case SocketEvent.GroupCallReqEvent:
+				// set({ id: eventDate.data.recipient_id })
+				set({ id: eventDate.data.sender_id })
 				ownEvent = OwnEventEnum.INVITED
 				break
 			case SocketEvent.UserCallRejectEvent:

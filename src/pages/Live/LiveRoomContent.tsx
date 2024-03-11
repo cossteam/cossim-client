@@ -1,16 +1,18 @@
 import './LiveRoomContent.scss'
 // import { useLiveStore } from '@/stores/live'
 
-const LiveRoomContent: React.FC<any> = (props: any) => {
+interface LiveRoomContentProps {
+	selfId?: string
+	othersId?: string
+}
+
+const LiveRoomContent: React.FC<LiveRoomContentProps> = (props: LiveRoomContentProps) => {
 	// 通话状态
 	// const liveStore = useLiveStore()
 
 	return (
-		<div className="w-full h-full flex flex-col justify-center items-center" {...props}>
-			<div className="flex flex-col">
-				{/* <span>audio: {liveStore.audio ? '开' : '关'}</span>
-				<span>video: {liveStore.video ? '开' : '关'}</span> */}
-			</div>
+		<div id={props.othersId ?? ''} className="w-full h-full relative flex flex-col justify-center items-center">
+			<div id={props.selfId ?? ''} className="w-[40%] rounded-md absolute top-[10%] right-0"></div>
 		</div>
 	)
 }

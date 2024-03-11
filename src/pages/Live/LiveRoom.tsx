@@ -8,7 +8,8 @@ import LiveRoomClient from './live'
 const LiveRoom: React.FC = () => {
 	// 通话状态
 	const liveStore = useLiveStore()
-	const ROOTNODEID = 'live-room-content'
+	const SELF_NODE_ID = 'self_node'
+	const OTHERS_NODE_ID = 'others_node'
 	let liveRoomClient: LiveRoomClient
 
 	// 监听我的通话事件
@@ -35,20 +36,16 @@ const LiveRoom: React.FC = () => {
 			case OwnEventEnum.BUSY:
 				// 通话中
 				console.log(liveStore.serverUrl, liveStore.token)
-				// eslint-disable-next-line no-case-declarations
-				const url: any = 'ws://localhost:7880' ?? liveStore.serverUrl!
-				// eslint-disable-next-line no-case-declarations
-				const token: any =
-					'eyJhbGciOiJIUzI1NiJ9.eyJ2aWRlbyI6eyJyb29tSm9pbiI6dHJ1ZSwicm9vbSI6IjU1MCJ9LCJpc3MiOiJkZXZrZXkiLCJleHAiOjE3MTAxMjA1MjcsIm5iZiI6MCwic3ViIjoibW8ifQ.F7_33IT2WC-T-STkeCdkuD7isEaXnAkoW9ZP9cwZ7vk' ??
-					liveStore.token
-				liveRoomClient = new LiveRoomClient(ROOTNODEID, url, token)
+				if (liveStore.serverUrl === null || liveStore.token == null) return
+				liveRoomClient = new LiveRoomClient(SELF_NODE_ID, OTHERS_NODE_ID, liveStore.serverUrl, liveStore.token)
 				liveRoomClient
 					.connect()
 					.then(() => {
+						liveRoomClient.createAudioTrack()
 						liveRoomClient.createVideoTrack()
 					})
-					.catch((e) => {
-						console.log(e)
+					.catch((e: any) => {
+						console.log('WS连接失败，以挂断', e)
 						liveStore.hangup()
 					})
 				break
@@ -65,6 +62,26 @@ const LiveRoom: React.FC = () => {
 		}
 	}, [liveStore.ownEvent])
 
+	/*
+	 * 监听麦克风和摄像头状态
+	 */
+	useEffect(() => {
+		if (!liveStore.audio) {
+			liveRoomClient?.closeAorV('audio')
+			console.log('关闭麦克风')
+		} else if (liveStore.audio) {
+			liveRoomClient?.createAudioTrack()
+		}
+	}, [liveStore.audio])
+	useEffect(() => {
+		if (!liveStore.video) {
+			liveRoomClient?.closeAorV('video')
+			console.log('关闭摄像头')
+		} else if (liveStore.video) {
+			liveRoomClient?.createVideoTrack()
+		}
+	}, [liveStore.video])
+
 	// 监听页面开关
 	useEffect(() => {
 		if (!liveStore.opened) {
@@ -77,12 +94,12 @@ const LiveRoom: React.FC = () => {
 			<Page noNavbar noToolbar>
 				<PageContent className=" bg-[rgba(0,0,0,0.73)] text-white ">
 					<div className="absolute w-full h-full">
-						{!liveStore.isGroup && <LiveRoomContent id={ROOTNODEID} />}
+						{!liveStore.isGroup && <LiveRoomContent selfId={SELF_NODE_ID} othersId={OTHERS_NODE_ID} />}
 					</div>
 					<div className="absolute w-full h-full">
 						{liveStore.isGroup ? (
 							<LiveRoomOperate>
-								<LiveRoomContent id={ROOTNODEID} />
+								<LiveRoomContent selfId={SELF_NODE_ID} othersId={OTHERS_NODE_ID} />
 							</LiveRoomOperate>
 						) : (
 							<LiveRoomOperate />
