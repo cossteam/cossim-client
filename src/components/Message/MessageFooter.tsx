@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
 import ToolEditor, { ReadEditor, ToolEditorMethods } from '@/Editor'
 import { $t, MessageMore, TOOLTIP_TYPE } from '@/shared'
 import { useTooltipsStore } from '@/stores/tooltips'

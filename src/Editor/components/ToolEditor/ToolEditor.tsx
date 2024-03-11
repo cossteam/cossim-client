@@ -60,7 +60,7 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 			}
 		}
 		const quill = new Quill(EditorRef.current, {
-			readOnly: true,
+			readOnly: props.readonly ?? true,
 			placeholder: props?.placeholder,
 			modules: props.is_group ? modules : {}
 		})
@@ -79,11 +79,11 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 		}
 	}, [quill, props.initValue])
 
-	useEffect(() => {
-		if (!quill) return
-		quill.enable(props.readonly)
-		if (props.readonly) quill?.focus()
-	}, [props.readonly])
+	// useEffect(() => {
+	// 	if (!quill) return
+	// 	quill.enable(props.readonly)
+	// 	if (props.readonly) quill?.focus()
+	// }, [props.readonly])
 
 	useImperativeHandle(ref, () => ({
 		quill: quill!

@@ -9,7 +9,7 @@ class CommonStoreImpl extends Dexie {
 	constructor(name: string, version: number = 1) {
 		super(name)
 		this.version(version).stores({
-			users: '++id, &user_id, account, keyPair, device_id, device_info, other_info'
+			users: '++id, &user_id, account, keyPair, device_id, device_info, other_info',
 		})
 	}
 }
@@ -19,3 +19,4 @@ const CommonStore = new ServiceImpl({
 })
 
 export default CommonStore
+/*  */
