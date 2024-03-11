@@ -151,7 +151,9 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					className={clsx('flex-1 overflow-y-auto overflow-x-hidden', isShowGroupAnnouncement ? 'pt-16' : '')}
 					ref={contentRef}
 				>
-					<MessageItem dialog_id={dialog_id} el={contentRef} isScrollEnd={isScrollEnd} />
+					{!!msgStore.messages.length && (
+						<MessageItem dialog_id={dialog_id} el={contentRef} isScrollEnd={isScrollEnd} />
+					)}
 				</div>
 
 				<MessageBar

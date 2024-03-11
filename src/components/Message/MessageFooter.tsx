@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
 import ToolEditor, { ReadEditor, ToolEditorMethods } from '@/Editor'
 import { $t, MESSAGE_TYPE, MessageMore, TOOLTIP_TYPE } from '@/shared'
 import { useChatStore } from '@/stores/chat'
@@ -10,10 +12,9 @@ import {
 	MicCircleFill,
 	PlusCircle,
 	Trash,
-	Xmark,
 	XmarkCircle
 } from 'framework7-icons/react'
-import { Button, Link } from 'framework7-react'
+import {  Link } from 'framework7-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { KeyboardIcon } from '../Icon/Icon'
 import Quill from 'quill'

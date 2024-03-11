@@ -135,6 +135,9 @@ function App() {
 			SocketClient.addListener('onWsMessage', handlerInit)
 		}
 
+		// 计算页面高度
+		msgStore.updateHeight(document.documentElement.clientHeight)
+
 		return () => {
 			SocketClient.removeListener('onWsMessage', handlerInit)
 		}
