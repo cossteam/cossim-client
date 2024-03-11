@@ -55,6 +55,7 @@ export interface MessageStore {
 	opened: boolean
 	height: number
 	refresh: boolean
+	num: number
 	/**
 	 * 更新触发
 	 *
@@ -185,6 +186,10 @@ export interface MessageStore {
 	 * @param {boolean} refresh
 	 */
 	updateRefresh: (refresh: boolean) => void
+	/**
+	 * 从头部添加消息
+	 */
+	addMessages: () => void
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -205,6 +210,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	opened: false,
 	height: 0,
 	refresh: false,
+	num: 0,
 	updateTrgger: (trgger: boolean) => set({ trgger }),
 
 	updateMessage: async (msg: PrivateChats) => {
@@ -473,6 +479,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		set({
 			messages: messages.slice(-num),
 			tableName,
+			num,
 			is_group,
 			receiver_id,
 			dialog_id,
@@ -558,5 +565,17 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	},
 	updateOpened: (opened) => set({ opened }),
 	updateHeight: (height) => set({ height }),
-	updateRefresh: (refresh) => set({ refresh })
+	updateRefresh: (refresh) => set({ refresh }),
+	addMessages: async () => {
+		const { messages, all_meesages, num, refresh, updateRefresh } = get()
+
+		if (refresh) return
+		updateRefresh(true)
+
+		if (messages.length >= all_meesages.length) return
+		const newMessages = all_meesages.slice(-(num + messages.length))
+		setTimeout(()=>{
+			set({ messages: newMessages })
+		},1000)
+	}
 }))

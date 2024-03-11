@@ -22,7 +22,7 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 	// 根据索引记录列表的高度, 默认为50
 	const [sizes, setSizes] = useState<{ [key: number]: number }>({ 1: 80 })
 
-	const { messages } = useMessageStore()
+	const msgStore = useMessageStore()
 	const [isFristIn, setIsFristIn] = useState<boolean>(true)
 
 	// 根据索引获取Item的尺寸
@@ -38,12 +38,12 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 	// }
 
 	useEffect(() => {
-		if (!messages.length) return
+		if (!msgStore.messages.length) return
 		// 首次进入需要滚动到底部
-		if (isFristIn && listRef.current && messages.length > 10) {
+		if (isFristIn && listRef.current && msgStore.messages.length > 10) {
 			requestAnimationFrame(() => {
 				setTimeout(() => {
-					listRef.current?.scrollToItem(messages.length - 1, 'end')
+					listRef.current?.scrollToItem(msgStore.messages.length - 1, 'end')
 					// scroll(el.current!, smoothScroll, scrollSpeed)
 				}, 0)
 			})
@@ -53,7 +53,7 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 		if (!isFristIn) {
 			console.log(111)
 		}
-	}, [messages])
+	}, [msgStore.messages])
 
 	// 根据索引，设置Item高度
 	const setItemSize = useCallback((index = 1, size = 10) => {
@@ -77,18 +77,24 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 
 	const handlerScroll = useCallback((options: ListOnScrollProps) => {
 		if (options.scrollOffset === 0) {
-			console.log('处理刷新')
+			msgStore.addMessages()
 		}
 	}, [])
+
+	useEffect(() => {
+		console.log('is', msgStore.refresh)
+		if (!msgStore.refresh) return
+		listRef.current?.scrollToItem(msgStore.num, 'auto')
+	}, [msgStore.messages])
 
 	return (
 		<VariableSizeList
 			ref={listRef}
 			height={height}
-			itemCount={messages.length}
+			itemCount={msgStore.messages.length}
 			itemSize={getItemSize}
 			width="100%"
-			initialScrollOffset={messages.length}
+			initialScrollOffset={msgStore.messages.length}
 			onScroll={handlerScroll}
 		>
 			{rowRender}
