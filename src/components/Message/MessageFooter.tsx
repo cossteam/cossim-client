@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // @ts-nocheck
 import ToolEditor, { ReadEditor, ToolEditorMethods } from '@/Editor'
-import { $t, MESSAGE_TYPE, MessageMore, TOOLTIP_TYPE } from '@/shared'
-import { useChatStore } from '@/stores/chat'
+import { $t, MessageMore, TOOLTIP_TYPE } from '@/shared'
 import { useTooltipsStore } from '@/stores/tooltips'
 import clsx from 'clsx'
 import {
@@ -14,22 +13,21 @@ import {
 	Trash,
 	XmarkCircle
 } from 'framework7-icons/react'
-import {  Link } from 'framework7-react'
+import { Link } from 'framework7-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { KeyboardIcon } from '../Icon/Icon'
 import Quill from 'quill'
 import { useClickOutside } from '@reactuses/core'
 
 const MessageFooter = () => {
-	const chatStore = useChatStore()
 	const tooltipStore = useTooltipsStore()
 	const editorRef = useRef<ToolEditorMethods>(null)
 	const inputRef = useRef<HTMLDivElement | null>(null)
 
 	// 选择表情或者文字或者更多
-	const [messageMore, setMessageMore] = useState<MessageMore>(MessageMore.TEXT)
+	const [messageMore] = useState<MessageMore>(MessageMore.TEXT)
 	// 发送按钮或者语音按钮
-	const [visible, setVisible] = useState<boolean>(false)
+	// const [setVisible] = useState<boolean>(false)
 	// 编辑器只读
 	const [readonly, setReadonly] = useState<boolean>(false)
 
@@ -45,7 +43,7 @@ const MessageFooter = () => {
 				const quill = editorRef.current.quill
 				quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
 					if (type !== Quill.events.SELECTION_CHANGE) {
-						setVisible(quill.getLength() > 1)
+						// setVisible(quill.getLength() > 1)
 					}
 				})
 

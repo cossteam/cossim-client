@@ -26,7 +26,7 @@ import { v4 as uuidv4 } from 'uuid'
 import clsx from 'clsx'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
-import { useChatStore } from '@/stores/chat'
+// import { useChatStore } from '@/stores/chat'
 
 const getAfterMessage = async () => {
 	try {
@@ -88,7 +88,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	// 消息列表
 	const msgStore = useMessageStore()
 	// 消息更新
-	const chatStore = useChatStore()
+	// const chatStore = useChatStore()
 
 	// 获取对话列表
 	const getDialogList = async () => {
@@ -126,12 +126,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		} catch {
 			console.log('错误')
 		}
-	}
-
-	// 刷新
-	const onRefresh = async (done: any) => {
-		await getDialogList()
-		done()
 	}
 
 	// 置顶对话
@@ -201,10 +195,28 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		return content
 	}, [])
 
+	// 刷新
+	const onRefresh = async (done: any) => {
+		await getDialogList()
+		done()
+		// setPtrRefresh(true)
+	}
+
+	const [ptrRefresh, setPtrRefresh] = useState(true)
+	const onDialogListScroll = (e: any) => {
+		if (e.target?.scrollTop === 0) {
+			setPtrRefresh(true)
+			return
+		}
+		if (ptrRefresh) {
+			setPtrRefresh(false)
+		}
+	}
+
 	return (
 		<Page
-			ptr
-			className="coss_dialog bg-gray-200"
+			ptr={ptrRefresh}
+			className={clsx('coss_dialog bg-gray-200', !ptrRefresh && 'hide-page-content')}
 			onPageTabShow={getDialogList}
 			onPageBeforeIn={getDialogList}
 			onPtrRefresh={onRefresh}
@@ -240,75 +252,67 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 				</List>
 			</Popover>
 			<PageContent className="p-0 max-h-full h-full">
-				<List contactsList noChevron mediaList dividers className="h-full bg-bgPrimary pb-14 overflow-auto">
-					{/* {[...chats, ...chats, ...chats].map((item, index) => { */}
-					{[...chats].map((item, index) => {
-						return (
-							<ListItem
-								className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
-								key={item?.dialog_id + `${index}`}
-								// link={`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`}
-								title={item?.dialog_name}
-								badge={item?.dialog_unread_count}
-								badgeColor="red"
-								swipeout
-								after={format(
-									item?.last_message?.send_time
-										? item?.last_message?.send_time
-										: item?.dialog_create_at,
-									'zh_CN'
-								)}
-								link
-								onClick={async () => {
-									// await chatStore.initMessage({
-									// 	is_group: item?.group_id ? true : false,
-									// 	dialog_id: item?.dialog_id,
-									// 	receiver_id: item?.user_id ?? item?.group_id,
-									// 	name: item?.dialog_name,
-									// 	avatar: item?.dialog_avatar
-									// })
-
-									await msgStore.initMessage(
-										item?.group_id ? true : false,
-										item?.dialog_id,
-										item?.user_id ?? item?.group_id
-									)
-									f7router.navigate(
-										`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
-									)
-								}}
-							>
-								<img
-									slot="media"
-									src={`${item?.dialog_avatar}`}
-									loading="lazy"
-									className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"
-								/>
-								<div
-									slot="text"
-									className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap"
+				<div className="h-full bg-bgPrimary pb-12 overflow-y-auto" onScroll={onDialogListScroll}>
+					<List contactsList noChevron mediaList dividers className="">
+						{[...chats].map((item, index) => {
+							return (
+								<ListItem
+									className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
+									key={item?.dialog_id + `${index}`}
+									title={item?.dialog_name}
+									badge={item?.dialog_unread_count}
+									badgeColor="red"
+									swipeout
+									after={format(
+										item?.last_message?.send_time
+											? item?.last_message?.send_time
+											: item?.dialog_create_at,
+										'zh_CN'
+									)}
+									link
+									onClick={async () => {
+										await msgStore.initMessage(
+											item?.group_id ? true : false,
+											item?.dialog_id,
+											item?.user_id ?? item?.group_id
+										)
+										f7router.navigate(
+											`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
+										)
+									}}
 								>
-									<ReadEditor
-										content={
-											(item?.group_id && item?.last_message?.sender_info?.name
-												? item?.last_message?.sender_info?.name + ':'
-												: '') + handlerContent(item?.last_message?.content ?? '')
-										}
-										className="dialog-read-editor"
+									<img
+										slot="media"
+										src={`${item?.dialog_avatar}`}
+										loading="lazy"
+										className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"
 									/>
-								</div>
-								<SwipeoutActions right>
-									<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
-										{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
-									</SwipeoutButton>
-									<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
-										{$t('删除')}
-									</SwipeoutButton>
-								</SwipeoutActions>
-							</ListItem>
-						)
-					})}
-				</List>
+									<div
+										slot="text"
+										className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap"
+									>
+										<ReadEditor
+											content={
+												(item?.group_id && item?.last_message?.sender_info?.name
+													? item?.last_message?.sender_info?.name + ':'
+													: '') + handlerContent(item?.last_message?.content ?? '')
+											}
+											className="dialog-read-editor"
+										/>
+									</div>
+									<SwipeoutActions right>
+										<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
+											{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
+										</SwipeoutButton>
+										<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
+											{$t('删除')}
+										</SwipeoutButton>
+									</SwipeoutActions>
+								</ListItem>
+							)
+						})}
+					</List>
+				</div>
 			</PageContent>
 		</Page>
 	)

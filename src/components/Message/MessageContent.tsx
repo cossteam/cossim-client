@@ -1,10 +1,9 @@
 import { MESSAGE_CONTENT_ID } from '@/shared'
-import { useChatStore } from '@/stores/chat'
 import clsx from 'clsx'
 import { useEffect, useRef, useState } from 'react'
 import MessageVirtualList from './components/MessageVirtualList'
 import MessageRow from './components/MessageRow'
-// import { Element } from 'react-scroll'
+import { useChatStore } from '@/stores/chat'
 
 const MessageContent = () => {
 	const contentRef = useRef<HTMLDivElement | null>(null)
