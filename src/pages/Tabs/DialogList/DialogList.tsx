@@ -241,8 +241,8 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 			</Popover>
 			<PageContent className="p-0 max-h-full h-full">
 				<List contactsList noChevron mediaList dividers className="h-full bg-bgPrimary pb-14 overflow-auto">
-					{[...chats, ...chats, ...chats].map((item, index) => {
-						// {[...chats].map((item, index) => {
+					{/* {[...chats, ...chats, ...chats].map((item, index) => { */}
+					{[...chats].map((item, index) => {
 						return (
 							<ListItem
 								className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
