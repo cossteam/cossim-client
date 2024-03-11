@@ -1,19 +1,24 @@
-// import CommonDataBase from '@/cache'
-import { useAsyncEffect } from '@reactuses/core'
+import { ConfigProvider } from 'antd'
+import { RouterProvider } from 'react-router-dom'
+import router from './router'
+// import { usePermission } from './permission'
 
 function App() {
-	useAsyncEffect(
-		async () => {
-			// console.log('CommonDataBase.get()', await CommonDataBase.common.add({ key: 'test', value: 1 }))
-			// console.log('CommonDataBase.get()', await CommonDataBase.add({ cacheDialogs: [] }))
+	// usePermission()
 
-			// console.log('CommonDataBase.get()', await CommonDataBase.get())
-		},
-		() => {},
-		[]
+	return (
+		<ConfigProvider
+			// theme={{
+			// 	token: {
+			// 		colorPrimary: '#00b96b',
+			// 		borderRadius: 4
+			// 	}
+			// }}
+			theme={{ cssVar: true, hashed: false }}
+		>
+			<RouterProvider router={router} />
+		</ConfigProvider>
 	)
-
-	return 'qq'
 }
 
 export default App
