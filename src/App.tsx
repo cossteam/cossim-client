@@ -28,7 +28,6 @@ import DOMPurify from 'dompurify'
 import { useLiveStore } from './stores/live'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
-import MessagePopup from './components/ChatMessage/MessagePopup'
 // import { useChatStore } from './stores/chat'
 import Message from '@/components/Message/Message'
 import LiveRoom from './pages/Live/LiveRoom'
@@ -201,7 +200,6 @@ function App() {
 			{hasCookie(TOKEN) ? (
 				<>
 					<Layout />
-					<MessagePopup opened={msgStore.opened} />
 					<Message />
 					<LiveRoom />
 				</>

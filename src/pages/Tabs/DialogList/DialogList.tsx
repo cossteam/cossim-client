@@ -25,7 +25,7 @@ import { v4 as uuidv4 } from 'uuid'
 import clsx from 'clsx'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
-// import { useChatStore } from '@/stores/chat'
+import { useChatStore } from '@/stores/chat'
 
 const getAfterMessage = async () => {
 	try {
@@ -87,7 +87,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	// 消息列表
 	const msgStore = useMessageStore()
 	// 消息更新
-	// const chatStore = useChatStore()
+	const chatStore = useChatStore()
 
 	// 获取对话列表
 	const getDialogList = async () => {

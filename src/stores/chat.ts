@@ -49,8 +49,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 	updateOpened: (opened: boolean) => {
 		set({ opened })
 		if (!opened) {
-			const { updateBeforeOpened } = get()
+			const { updateBeforeOpened, updateBeforeJump } = get()
 			updateBeforeOpened(false)
+			updateBeforeJump(false)
 		}
 	},
 	updateMessages: (message: PrivateChats) => {
@@ -63,29 +64,35 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 		}
 	},
 	initMessage: async (options) => {
-		const messages = await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', options.dialog_id)
+		// const messages = await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', options.dialog_id)
 		const userInfo = await UserStore.findOneById(UserStore.tables.friends, 'user_id', options.receiver_id)
 		const receiver_info = Object.assign({}, options, userInfo)
 
 		// 从服务器上拉取消息
-		messageFromServer({ id: options.receiver_id, is_group: options.is_group }).then((res: any) => {
+		await messageFromServer({
+			id: options.receiver_id,
+			is_group: options.is_group,
+			page_size: 15,
+			page_num: 1
+		}).then((res: any) => {
 			const data = res?.group_messages || res?.user_messages || []
-			if (!messages.length) {
-				const newData = data.reverse().map((v: PrivateChats) => ({
-					...v,
-					uid: uuidv4()
-				}))
-				set({ messages: newData })
-				UserStore.bulkAdd(UserStore.tables.messages, newData)
-			} else {
-				// TODO: 对比两个数组的差异，更新本地数据库
-			}
+			// if (!messages.length) {
+			const newData = data.reverse().map((v: PrivateChats) => ({
+				...v,
+				uid: uuidv4()
+			}))
+			set({ messages: newData })
+			// UserStore.bulkAdd(UserStore.tables.messages, newData)
+			// } else {
+			// 	// TODO: 对比两个数组的差异，更新本地数据库
+			// }
 		})
 
-		set({ messages: messages.slice(-15), allMessages: messages, receiver_info, beforeOpened: true })
+		set({ receiver_info, beforeOpened: true })
 	},
 	addMessages: (messages: PrivateChats[]) => {
 		set((state) => ({ messages: [...state.messages, ...messages] }))
 	},
+	updateBeforeJump: (beforeJump: boolean) => set({ beforeJump }),
 	destroy: () => set({ ...defaultStore })
 }))

@@ -78,6 +78,13 @@ export interface ChatStore extends ChatStoreValue {
 	addMessages: (messages: PrivateChats[]) => void
 
 	/**
+	 * 更新离开前的消息
+	 * 
+	 * @returns 
+	 */
+	updateBeforeJump: (beforeJump: boolean) => void
+
+	/**
 	 * 离开后销毁
 	 */
 	destroy: () => void
