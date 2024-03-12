@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { App as AppComponent, View, f7 } from 'framework7-react'
+import { App as AppComponent, Icon, View, f7 } from 'framework7-react'
 import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
@@ -25,7 +25,7 @@ import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
 import DOMPurify from 'dompurify'
-import { useLiveStore } from './stores/live'
+import { OwnEventEnum, useLiveStore } from './stores/live'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 // import { useChatStore } from './stores/chat'
@@ -205,6 +205,14 @@ function App() {
 					<Layout />
 					<Message />
 					<LiveRoom />
+					{!liveStore.opened && liveStore.ownEvent !== OwnEventEnum.IDLE && (
+						<div
+							className="show-live z-[9999] bg-[rgba(0,0,0,0.8)] text-white py-4 pl-3 pr-2 rounded-l-lg fixed top-[20%] right-0"
+							onClick={() => liveStore.updateOpened(!liveStore.opened)}
+						>
+							<Icon f7="phone_fill" />
+						</div>
+					)}
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />
