@@ -13,9 +13,8 @@ import {
 import { Plus, Search, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useEffect, useState } from 'react'
-import { format } from 'timeago.js'
 import { isEqual } from 'lodash-es'
-import { $t, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND } from '@/shared'
+import { $t, formatDialogListTime, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND } from '@/shared'
 import UserStore from '@/db/user'
 import MsgService from '@/api/msg'
 import RelationService from '@/api/relation'
@@ -212,7 +211,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 			setPtrRefresh(false)
 		}
 	}
-
 	return (
 		<Page
 			ptr={ptrRefresh}
@@ -232,7 +230,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 					</Link>
 				</NavRight>
 			</Navbar>
-
+			{/*加号弹窗*/}
 			<Popover className="popover-menu w-[160px] bg-black z-[9999]" backdrop={false} arrow={false}>
 				<List className="text-white" dividersIos outlineIos strongIos>
 					<ListItem link="/add_group/" popoverClose className="coss_dialog_list">
@@ -263,12 +261,16 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 									badge={item?.dialog_unread_count}
 									badgeColor="red"
 									swipeout
-									after={format(
-										item?.last_message?.send_time
-											? item?.last_message?.send_time
-											: item?.dialog_create_at,
-										'zh_CN'
-									)}
+									after={formatDialogListTime(item?.last_message?.send_time
+										? item?.last_message?.send_time
+										: item?.dialog_create_at,)
+									}
+									// format(
+									// 	item?.last_message?.send_time
+									// 		? item?.last_message?.send_time
+									// 		: item?.dialog_create_at,
+									// 	'zh_CN'
+									// )}
 									link
 									onClick={async () => {
 										await msgStore.initMessage(

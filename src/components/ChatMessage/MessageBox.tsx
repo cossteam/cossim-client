@@ -1,10 +1,10 @@
 import type { PrivateChats } from '@/types/db/user-db'
 import clsx from 'clsx'
 import { Exclamationmark, Flag, Gobackward } from 'framework7-icons/react'
-import { createElement, RefObject, useCallback, useRef } from 'react'
+import { createElement, RefObject, useCallback, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { $t, formatTime, isMe, MESSAGE_SEND, MESSAGE_TYPE, TOOLTIP_TYPE } from '@/shared'
+import { $t, formatTime, isMe, formatTimeFull, MESSAGE_SEND, MESSAGE_TYPE, TOOLTIP_TYPE } from '@/shared'
 import ToolTip from './MessageToolTips'
 import LongPressButton from '@/components/LongPressButton/LongPressButton'
 import { ReadEditor } from '@/Editor'
@@ -24,6 +24,8 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 	const is_self = isMe(msg?.sender_id)
 
 	const tooltipStore = useTooltipsStore()
+
+	const [messageTime, setMessageTime] = useState<string>(formatTime(msg?.created_at ?? msg?.create_at))
 
 	const selectChange = useCallback((type: TOOLTIP_TYPE, msg_id: number) => onSelect(type, msg_id), [onSelect])
 
@@ -65,6 +67,19 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 				{msg?.content}
 			</div>
 		)
+	}
+
+	/**
+	 * 点击时间转换时间格式
+	 */
+	const handlerClickTime = () => {
+		const time: string = formatTime(msg?.created_at ?? msg?.create_at);
+		const timeFull: string = formatTimeFull(msg?.created_at ?? msg?.create_at)
+		if (messageTime.length < timeFull.length) {
+			setMessageTime(timeFull)
+		} else {
+			setMessageTime(time)
+		}
 	}
 
 	return (
@@ -116,7 +131,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 					<div
 						className={clsx('flex text-[0.85rem] items-center', is_self ? 'justify-end' : 'justify-start')}
 					>
-						<span className="text-[0.85rem] mr-1">{formatTime(msg?.created_at ?? msg?.create_at)}</span>
+						<span onClick={handlerClickTime} style={{color: "#94a3b8"}} className="text-[0.85rem] mr-1">{messageTime}</span>
 						{is_self && (
 							<>
 								{msg?.msg_send_state === MESSAGE_SEND.SENDING && (
