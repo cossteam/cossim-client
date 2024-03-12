@@ -1,4 +1,5 @@
 import { $t } from '@/shared'
+
 export async function hasMike() {
 	try {
 		return navigator?.mediaDevices?.getUserMedia({ video: false, audio: true })
