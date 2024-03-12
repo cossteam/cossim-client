@@ -150,6 +150,10 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		// setTimeout(() => editorRef.current?.quill?.focus(), 300)
 	}
 
+	const onSelectImages = (images: string[]) => {
+		console.log('files', images)
+	}
+
 	return (
 		<div className={clsx('message-toolbar bg-bgPrimary bottom-0 w-full h-auto z-[99] relative')} ref={toolbarRef}>
 			<div className="flex flex-col justify-center items-center">
@@ -278,6 +282,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 								id={receiver_id}
 								f7router={f7router!}
 								members={members}
+								onSelectImages={onSelectImages}
 							/>
 						)}
 					</div>
