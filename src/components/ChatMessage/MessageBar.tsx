@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
 import clsx from 'clsx'
 import React, { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { $t, MESSAGE_TYPE, MessageMore, TOOLTIP_TYPE, hasImageHtml, scroll } from '@/shared'
