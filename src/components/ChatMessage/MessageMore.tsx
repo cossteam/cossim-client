@@ -8,6 +8,7 @@ interface MessageMoreProps {
 	is_group: boolean
 	f7router: Router.Router
 	members: any[]
+	onSelectImages: (images: string[]) => void
 }
 
 const MessageMore: React.FC<MessageMoreProps> = (props) => {

@@ -26,8 +26,12 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 	useEffect(() => {
 		if (!msgStore.messages.length) return
 		if (isFirstIn && listRef.current && msgStore.messages.length > 10) {
-			listRef.current.scrollToItem(msgStore.messages.length - 1, 'end')
+			listRef.current.scrollToItem(msgStore.messages.length, 'end')
 			setIsFirstIn(false)
+		}
+
+		if (!isFirstIn && !msgStore.refresh) {
+			listRef.current?.scrollToItem(msgStore.messages.length, 'end')
 		}
 	}, [msgStore.messages, isFirstIn])
 
@@ -60,8 +64,27 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 	useEffect(() => {
 		if (!msgStore.refresh) return
 		listRef.current?.scrollToItem(prevScrollTop.current, 'start')
-		msgStore.updateRefresh(false)
+		// msgStore.updateRefresh(false)
 	}, [msgStore.messages, msgStore.refresh])
+
+	const pageHeight = useRef<number>(0)
+	const newPageHeight = useRef<number>(0)
+	useEffect(() => {
+		// 获取页面高度
+		pageHeight.current = document.documentElement.clientHeight
+		const handlerWindowSize = () => {
+			newPageHeight.current = document.documentElement.clientHeight
+			if (newPageHeight.current !== pageHeight.current) {
+				listRef.current?.scrollToItem(msgStore.messages.length, 'end')
+			}
+		}
+
+		window.addEventListener('resize', handlerWindowSize)
+
+		return () => {
+			window.removeEventListener('resize', handlerWindowSize)
+		}
+	}, [])
 
 	return (
 		<VariableSizeList
