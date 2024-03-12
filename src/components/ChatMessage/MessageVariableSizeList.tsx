@@ -1,8 +1,6 @@
 import { useMessageStore } from '@/stores/message'
-// import { debounce } from 'lodash-es'
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ListOnScrollProps, VariableSizeList } from 'react-window'
-// import { scroll } from '@/shared'
 
 export interface RowProps {
 	index: number
@@ -13,57 +11,31 @@ export interface RowProps {
 interface MessageVariableSizeListProps {
 	Row: ({ index, style, setItemSize }: RowProps) => JSX.Element
 	height: number
-	el: RefObject<HTMLDivElement | null>
-	isScrollEnd: (setp?: number) => boolean
 }
 
 const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, height }) => {
 	const listRef = useRef<VariableSizeList | null>(null)
-	// 根据索引记录列表的高度, 默认为50
 	const [sizes, setSizes] = useState<{ [key: number]: number }>({ 1: 80 })
+	const prevScrollTop = useRef(0)
 
 	const msgStore = useMessageStore()
-	const [isFristIn, setIsFristIn] = useState<boolean>(true)
+	const [isFirstIn, setIsFirstIn] = useState<boolean>(true)
 
-	// 根据索引获取Item的尺寸
 	const getItemSize = useCallback((index: number) => sizes[index] || 80, [sizes])
-
-	// const scrollEnd = (smoothScroll: boolean = false, scrollSpeed?: number) => {
-	// 	requestAnimationFrame(() => {
-	// 		setTimeout(() => {
-	// 			listRef.current?.scrollToItem(messages.length - 1, 'end')
-	// 			// scroll(el.current!, smoothScroll, scrollSpeed)
-	// 		}, 0)
-	// 	})
-	// }
 
 	useEffect(() => {
 		if (!msgStore.messages.length) return
-		// 首次进入需要滚动到底部
-		if (isFristIn && listRef.current && msgStore.messages.length > 10) {
-			requestAnimationFrame(() => {
-				setTimeout(() => {
-					listRef.current?.scrollToItem(msgStore.messages.length - 1, 'end')
-					// scroll(el.current!, smoothScroll, scrollSpeed)
-				}, 0)
-			})
-			setIsFristIn(false)
+		if (isFirstIn && listRef.current && msgStore.messages.length > 10) {
+			listRef.current.scrollToItem(msgStore.messages.length - 1, 'end')
+			setIsFirstIn(false)
 		}
+	}, [msgStore.messages, isFirstIn])
 
-		if (!isFristIn) {
-			console.log(111)
-		}
-	}, [msgStore.messages])
-
-	// 根据索引，设置Item高度
 	const setItemSize = useCallback((index = 1, size = 10) => {
-		setSizes((prevSize) => {
-			return {
-				...prevSize,
-				[index]: size
-			}
-		})
-		// 根据索引，重置缓存位置。
+		setSizes((prevSize) => ({
+			...prevSize,
+			[index]: size
+		}))
 		listRef.current?.resetAfterIndex(index, false)
 	}, [])
 
@@ -75,17 +47,21 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 		)
 	}, [])
 
-	const handlerScroll = useCallback((options: ListOnScrollProps) => {
-		if (options.scrollOffset === 0) {
-			msgStore.addMessages()
-		}
-	}, [])
+	const handlerScroll = useCallback(
+		(options: ListOnScrollProps) => {
+			if (options.scrollOffset === 0) {
+				prevScrollTop.current = msgStore.messages.length
+				msgStore.addMessages()
+			}
+		},
+		[msgStore.messages]
+	)
 
 	useEffect(() => {
-		console.log('is', msgStore.refresh)
 		if (!msgStore.refresh) return
-		listRef.current?.scrollToItem(msgStore.num, 'auto')
-	}, [msgStore.messages])
+		listRef.current?.scrollToItem(prevScrollTop.current, 'start')
+		msgStore.updateRefresh(false)
+	}, [msgStore.messages, msgStore.refresh])
 
 	return (
 		<VariableSizeList

@@ -5,7 +5,7 @@ import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'rea
 import { useTooltipsStore } from '@/stores/tooltips'
 import { useAsyncEffect, useClipboard } from '@reactuses/core'
 import { useToast } from '@/hooks/useToast'
-import MessageVariableSizeList from './MessageVariableSizeList'
+import MessageVariableSizeList, { RowProps } from './MessageVariableSizeList'
 import MessageRow from './MessageRow'
 import { debounce } from 'lodash-es'
 import { PrivateChats } from '@/types/db/user-db'
@@ -17,7 +17,32 @@ interface MessageItemProps {
 }
 let all_messages: PrivateChats[] = []
 
-const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el, isScrollEnd }) => {
+interface MemoRowProps {
+	index: number
+	style: React.CSSProperties
+	setItemSize: (index: number, size: number) => void
+	selectChange: (type: TOOLTIP_TYPE, msg_id: number) => void
+	onSelect: (index: number, selected: boolean) => void
+	el: RefObject<HTMLDivElement | null>
+}
+
+const MemoRow: React.FC<MemoRowProps> = ({ index, style, setItemSize, selectChange, onSelect, el }) => {
+	const rowProps = useMemo(
+		() => ({
+			index,
+			style,
+			setItemSize,
+			selectChange,
+			onSelect,
+			el
+		}),
+		[index, style, setItemSize, selectChange, onSelect, el]
+	)
+
+	return <MessageRow {...rowProps} />
+}
+
+const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el }) => {
 	const msgStore = useMessageStore()
 	const tooltipStore = useTooltipsStore()
 	const [, copy] = useClipboard()
@@ -181,21 +206,35 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el, isScrollEnd })
 		burnAfterReading(msgStore)
 	}, [])
 
+	const row = useCallback(
+		({ index, style, setItemSize }: RowProps) => (
+			<MemoRow
+				index={index}
+				style={style}
+				setItemSize={setItemSize}
+				selectChange={selectChange}
+				onSelect={selectEvent.selectChange}
+				el={el}
+			/>
+		),
+		[]
+	)
+
 	return (
 		<MessageVariableSizeList
-			Row={({ index, style, setItemSize }) => (
-				<MessageRow
-					index={index}
-					style={style}
-					setItemSize={setItemSize}
-					selectChange={selectChange}
-					onSelect={selectEvent.selectChange}
-					el={el}
-				/>
-			)}
+			Row={row
+				// <MessageRow
+				// 	index={index}
+				// 	style={style}
+				// 	setItemSize={setItemSize}
+				// 	selectChange={selectChange}
+				// 	onSelect={selectEvent.selectChange}
+				// 	el={el}
+				// />
+			}
 			height={height}
-			el={el}
-			isScrollEnd={isScrollEnd}
+			// el={el}
+			// isScrollEnd={isScrollEnd}
 		/>
 	)
 }

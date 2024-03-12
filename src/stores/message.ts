@@ -488,6 +488,10 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			myInfo
 		})
 
+		// setTimeout(() => {
+		// 	set({ messages })
+		// }, 1000)
+
 		// 设置已读
 		// readMessage(messages)
 	},
@@ -506,7 +510,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		}
 	},
 	clearMessages: async () => {
-		set({ messages: [], all_meesages: [], dialog_id: 0 })
+		set({ messages: [], all_meesages: [], dialog_id: 0, refresh: false })
 	},
 	updateMessageById: async (msg: PrivateChats) => {
 		const { messages } = get()
@@ -572,10 +576,10 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		if (refresh) return
 		updateRefresh(true)
 
-		if (messages.length >= all_meesages.length) return
+		if (messages.length >= all_meesages.length) return set({ refresh: false })
 		const newMessages = all_meesages.slice(-(num + messages.length))
-		setTimeout(()=>{
+		setTimeout(() => {
 			set({ messages: newMessages })
-		},1000)
+		}, 1000)
 	}
 }))
