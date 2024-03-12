@@ -9,13 +9,10 @@ import {
 } from 'livekit-client'
 
 export default class LiveRoomClient {
-	public NODEID_OTHERS_ID = 'live-content-others'
-	public NODEID_SELF_ID = 'live-content-self'
 	/**
-	 * 房间根节点
+	 * 房间节点
 	 */
-	private othersNode: HTMLElement | null
-	private selfNode: HTMLElement | null
+	private rootNode: HTMLElement | null
 
 	/**
 	 * 服务器地址
@@ -49,19 +46,19 @@ export default class LiveRoomClient {
 
 	/**
 	 * LiveKit 客户端
-	 * @param othersNode 根节点
+	 * @param rootNodeId 根节点ID
 	 * @param serverUrl 服务器地址
-	 * @param token 凭证
+	 * @param token token
 	 * @param options 通话配置
 	 */
-	constructor(selfNodeId: string, othersNodeId: string, serverUrl: string, token: string, options?: RoomOptions) {
-		this.selfNode = document.getElementById(selfNodeId)
-		this.othersNode = document.getElementById(othersNodeId)
+	constructor(rootNodeId: string, serverUrl: string, token: string, options?: RoomOptions) {
+		this.rootNode = document.getElementById(rootNodeId)
 		this.serverUrl = serverUrl
 		this.token = token
 		this.client = new Room({
 			adaptiveStream: true,
 			dynacast: true,
+			audioCaptureDefaults: {},
 			videoCaptureDefaults: {
 				// resolution: VideoPresets.h90.resolution
 				resolution: VideoPresets.h720.resolution
@@ -77,16 +74,11 @@ export default class LiveRoomClient {
 		this.client.on(
 			RoomEvent.TrackSubscribed,
 			(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant) => {
+				console.log('TrackPublication', publication)
+				console.log('参与人', participant)
 				if (track.kind === 'video') {
-					console.log('publication', publication)
-					console.log('participant', participant)
-					console.log('identity', participant.identity, publication.mimeType)
-					this.othersNode?.appendChild(track.attach())
+					this.rootNode?.appendChild(track.attach())
 				} else if (track.kind === 'audio') {
-					console.log('publication', publication.mimeType)
-					console.log('participant', participant)
-					console.log('identity', participant.identity, publication.mimeType)
-					this.othersNode?.appendChild(track.attach())
 					track.attach().play()
 				}
 			}
@@ -95,21 +87,12 @@ export default class LiveRoomClient {
 		this.client.on(
 			RoomEvent.TrackUnsubscribed,
 			(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant) => {
-				// if (track.kind === 'video') {
-				//     deleteChild(participant.identity)
-				// } else if (track.kind === 'audio') {
-				// 	track.attach().pause()
-				// }
+				console.log('监听用户离开', publication, participant)
 				if (track.kind === 'video') {
-					console.log('publication', publication)
-					console.log('participant', participant)
-					console.log('identity', participant.identity, publication.mimeType)
-					this.othersNode?.appendChild(track.attach())
+					const el = track.attach()
+					el.parentElement?.removeChild(el)
 				} else if (track.kind === 'audio') {
-					console.log('publication', publication.mimeType)
-					console.log('participant', participant)
-					console.log('identity', participant.identity, publication.mimeType)
-					track.attach().play()
+					track.attach().pause()
 				}
 			}
 		)
@@ -145,9 +128,9 @@ export default class LiveRoomClient {
 		}
 		this.localAudioTrack = await this.client.localParticipant.setMicrophoneEnabled(true)
 		//播放本地音频
-		const element = this.localAudioTrack.track.attach()
-		this.selfNode?.appendChild(element)
-		element?.play()
+		// const element = this.localAudioTrack.track.attach()
+		// this.selfNode?.appendChild(element)
+		// element?.play()
 	}
 
 	async createVideoTrack() {
@@ -157,8 +140,11 @@ export default class LiveRoomClient {
 		}
 		this.localVideoTrack = await this.client.localParticipant.setCameraEnabled(true)
 		//播放本地视频
-		const element = this.localVideoTrack.track.attach()
-		this.selfNode?.appendChild(element)
+		const element: HTMLDivElement = document.createElement('div')
+		element.id = 'self_video'
+		element.setAttribute('style', 'display: flex; justify-content: center; align-items: center;')
+		element.appendChild(this.localVideoTrack.track.attach())
+		this.rootNode?.appendChild(element)
 	}
 
 	/**
@@ -166,18 +152,23 @@ export default class LiveRoomClient {
 	 */
 	closeAorV(type: 'video' | 'audio') {
 		console.log(type)
-
-		if (type === 'video') {
-			if (this.localVideoTrack) {
-				this.client.localParticipant.setCameraEnabled(false)
-				this.localVideoTrack.track.detach()
-				this.localVideoTrack = null
-			}
-		} else if (type === 'audio') {
+		if (type === 'audio') {
+			// console.log('关闭音频', this.localAudioTrack)
 			if (this.localAudioTrack) {
 				this.client.localParticipant.setMicrophoneEnabled(false)
+				console.log(this.localAudioTrack)
 				this.localAudioTrack.track.detach()
 				this.localAudioTrack = null
+			}
+		} else if (type === 'video') {
+			// console.log('关闭视频', this.localVideoTrack)
+			if (this.localVideoTrack) {
+				this.client.localParticipant.setCameraEnabled(false)
+				console.log(this.localVideoTrack)
+				// const el = track.attach()
+				// el.parentElement?.removeChild(el)
+				this.localVideoTrack.track.detach()
+				this.localVideoTrack = null
 			}
 		}
 	}
@@ -190,8 +181,7 @@ export default class LiveRoomClient {
 		if (this.localVideoTrack) {
 			this.client.localParticipant.setCameraEnabled(false)
 			this.localVideoTrack = null
-			if (this.selfNode) this.selfNode.innerHTML = ''
-			if (this.othersNode) this.othersNode.innerHTML = ''
+			if (this.rootNode) this.rootNode.innerHTML = ''
 		}
 		return this.client.disconnect()
 	}

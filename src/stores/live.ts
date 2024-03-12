@@ -102,13 +102,15 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 			id: callProps.id,
 			isGroup: callProps.isGroup
 		}
-		callProps.members && (status['members'] = callProps.members)
+		if (callProps.isGroup && callProps.members) {
+			status['members'] = callProps.members
+		}
 		callProps.audio && (status['audio'] = callProps.audio)
 		callProps.video && (status['video'] = callProps.video)
 		// 创建通话参数
 		const createRoomParams: any = {}
 		!callProps.isGroup && (createRoomParams['user_id'] = callProps.id)
-		callProps.isGroup && (createRoomParams['group_id'] = callProps.id)
+		callProps.isGroup && (createRoomParams['group_id'] = Number(callProps.id))
 		callProps.isGroup && (createRoomParams['member'] = callProps.members?.map((item) => item.user_id) || [])
 		createRoomParams['option'] = {
 			// audio_enabled: true,
@@ -125,7 +127,7 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 				: await CallService.createLiveGroupApi(createRoomParams)
 			if (code !== 200) {
 				f7.dialog.alert(msg, () => {
-					hangup() // 测试
+					hangup()
 				})
 				return
 			}
@@ -190,14 +192,9 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 				f7.dialog.alert(msg)
 				return
 			}
-			const localRoom = await CallService.getLocalRoom(id, '550') // 本地测试
-			console.log('本地推流信息：', localRoom)
-			// const localRoom = {
-			// 	data
-			// }
 			set({
-				serverUrl: localRoom.data.url || data.url,
-				token: localRoom.data.token || data.token,
+				serverUrl: data.url,
+				token: data.token,
 				ownEvent: OwnEventEnum.BUSY
 			})
 		} catch (error: any) {

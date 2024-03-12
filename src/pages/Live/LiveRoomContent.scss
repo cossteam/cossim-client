@@ -1,4 +1,12 @@
 video {
-	width: 100% !important;
+	max-width: unset !important;
 	height: 100% !important;
+}
+#self_video {
+	width: 25%;
+	height: 20%;
+	overflow: hidden;
+	position: fixed;
+	top: 2%;
+	right: 4%;
 }
