@@ -3,6 +3,8 @@ import { createBrowserRouter, RouteObject, Navigate } from 'react-router-dom'
 
 import Loading from '@/components/Loading'
 import NotFound from '@/pages/NotFound'
+// import Dashboard from '@/pages/Dashboard/Dashboard'
+// import Login from '@/pages/Account/Login/Login'
 import App from '@/App'
 
 const Dashboard = lazy(() => import('@/pages/Dashboard/Dashboard'))

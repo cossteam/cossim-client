@@ -1,13 +1,15 @@
-import { ConfigProvider } from 'antd'
-// import { usePermission } from './permission'
-import { Outlet } from 'react-router-dom'
-
+import { Button, ConfigProvider } from 'antd'
+import { beforeRouter } from './permission'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 
 const App = () => {
-	// 权限控制
-	// usePermission()
+	const location = useLocation()
+	const navigate = useNavigate()
 
-	console.log('11')
+	useEffect(() => {
+		beforeRouter(location, navigate)
+	}, [])
 
 	return (
 		<ConfigProvider
@@ -19,6 +21,7 @@ const App = () => {
 			// }}
 			theme={{ cssVar: true, hashed: false }}
 		>
+			<Button type='primary'>22</Button>
 			<Outlet />
 		</ConfigProvider>
 	)
