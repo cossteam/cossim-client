@@ -17,19 +17,18 @@ import { $t } from './i18n'
 export const formatTime = (time: number | string): string => {
 	const targetTime = dayjs(time)
 	const currentTime = dayjs()
+	// 获取当天的0点
+	const startTime = currentTime.startOf('day')
+	// 获取昨天点0点
+	const beforeYestTime = currentTime.subtract(1, 'day').startOf('day')
 	const difference = currentTime.diff(targetTime, 'minute') // 相差几分钟
-	// return dayjs(time).format('YYYY-M-D HH:mm:ss')
 	if (difference < 1) {
 		return $t('刚刚')
-	} else if (difference < 60) {
-		// return `${difference}${$t('分钟前')}`
+	} else if (targetTime > startTime) {
 		return dayjs(time).format('HH:mm')
-	} else if (difference < 60 * 24) {
-		// return `${Math.floor(difference / 60)}${$t('小时前')}`
-		return dayjs(time).format('HH:mm')
-	} else if (difference < 60 * 24 * 2) {
+	} else if (targetTime < startTime) {
 		return $t('昨天') + ' ' + dayjs(time).format('HH:mm')
-	} else if (difference < 60 * 24 * 3) {
+	} else if (targetTime < beforeYestTime) {
 		return $t('前天') + ' ' + dayjs(time).format('HH:mm')
 	} else if (difference < 60 * 24 * 7) {
 		return dayjs(time).format('MM-DD HH:mm')
@@ -43,19 +42,18 @@ export const formatTime = (time: number | string): string => {
 export const formatDialogListTime = (time: string): string => {
 	const targetTime = dayjs(time)
 	const currentTime = dayjs()
+	// 获取当天的0点
+	const startTime = currentTime.startOf('day')
+	// 获取昨天点0点
+	const beforeYestTime = currentTime.subtract(1, 'day').startOf('day')
 	const difference = currentTime.diff(targetTime, 'minute') // 相差几分钟
-	// return dayjs(time).format('YYYY-M-D HH:mm:ss')
 	if (difference < 1) {
 		return $t('刚刚')
-	} else if (difference < 60) {
-		// return `${difference}${$t('分钟前')}`
+	} else if (targetTime > startTime) {
 		return dayjs(time).format('HH:mm')
-	} else if (difference < 60 * 24) {
-		// return `${Math.floor(difference / 60)}${$t('小时前')}`
-		return dayjs(time).format('HH:mm')
-	} else if (difference < 60 * 24 * 2) {
+	} else if (targetTime < startTime) {
 		return $t('昨天') + ' ' + dayjs(time).format('HH:mm')
-	} else if (difference < 60 * 24 * 3) {
+	} else if (targetTime < beforeYestTime) {
 		return $t('前天') + ' ' + dayjs(time).format('HH:mm')
 	} else if (difference < 60 * 24 * 7) {
 		return dayjs(time).format('MM-DD')
