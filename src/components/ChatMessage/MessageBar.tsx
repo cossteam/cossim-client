@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import React, { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { $t, MESSAGE_TYPE, MessageMore, TOOLTIP_TYPE, hasImageHtml, scroll } from '@/shared'
 import { useMessageStore } from '@/stores/message'
-import { Link } from 'framework7-react'
+import { Button, Link } from 'framework7-react'
 import {
 	ArrowRightCircleFill,
 	ArrowUpRight,
@@ -19,13 +19,14 @@ import { KeyboardIcon } from '@/components/Icon/Icon'
 import ToolEditor, { ReadEditor, type ToolEditorMethods } from '@/Editor'
 import Emojis from '@/components/Emojis/Emojis'
 import Quill from 'quill'
-import { useClickOutside, useResizeObserver } from '@reactuses/core'
+import { useAsyncEffect, useClickOutside, useLongPress, useResizeObserver } from '@reactuses/core'
 import { useTooltipsStore } from '@/stores/tooltips'
 import MessageMoreComponent from './MessageMore'
 import { Router } from 'framework7/types'
 import useSpeechRecognition from '@/hooks/useSpeechRecognition'
-import { motion, useTime, useTransform } from 'framer-motion'
+// import { motion, useTime, useTransform } from 'framer-motion'
 import StorageService from '@/api/storage'
+// import './css/MessageBar.scss'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
@@ -112,8 +113,27 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		editorRef.current?.quill?.blur()
 	}
 
+	const [test, setTest] = useState<boolean>(true)
+	const onLongPress = () => {
+		// console.log('onLongPress')
+		// TODO: 开始录音
+		// setTest(true)
+		startRecording()
+	}
+
+	const longPressEvent = useLongPress(onLongPress, { delay: 300 })
+
 	const audioRef = useRef<HTMLDivElement | null>(null)
-	const start = useRef<number>(0)
+
+	const handlerTouchEnd = async () => {
+		stopRecording()
+		// console.log('handlerTouchEnd', test)
+		// alert('handlerTouchEnd')
+		// setTest(false)
+		// stopRecording()
+		// if (!audioData?.file) return
+	}
+
 	useEffect(() => {
 		requestAnimationFrame(() => {
 			const timer = setTimeout(() => {
@@ -144,30 +164,14 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 		setWidth(document.body.clientWidth)
 
-		const handlerTouchStart = (e) => {
-			e.preventDefault()
-			startRecording()
+		const handlerContextmenu = (e: { preventDefault: () => any }) => e.preventDefault()
 
-			setTimeout(() => {
-				stopRecording()
-			}, 5000)
-		}
-
-		const handlerTouchEnd = async () => {
-			console.log('handlerTouchEnd')
-			stopRecording()
-			console.log('audioData?.data', audioData?.data)
-			const file = new File([audioData?.data], 'test.wav', { type: 'audio/wav' })
-			const { data } = await StorageService.uploadFile({ file, type: 0 })
-			console.log('data', data)
-		}
-
-		audioRef.current?.addEventListener('touchstart', handlerTouchStart, { passive: false })
+		audioRef.current?.addEventListener('contextmenu', handlerContextmenu)
 		audioRef.current?.addEventListener('touchend', handlerTouchEnd)
 
 		return () => {
 			editorRef.current?.quill?.off(Quill.events.EDITOR_CHANGE)
-			audioRef.current?.removeEventListener('touchstart', handlerTouchStart)
+			audioRef.current?.removeEventListener('contextmenu', handlerContextmenu)
 			audioRef.current?.removeEventListener('touchend', handlerTouchEnd)
 		}
 	}, [])
@@ -188,37 +192,19 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		console.log('files', images)
 	}
 
-	const time = useTime()
-	const rotate = useTransform(
-		time,
-		[0, 4000], // For every 4 seconds...
-		[0, 360], // ...rotate 360deg
-		{ clamp: false }
+	useAsyncEffect(
+		async () => {
+			if (!audioData?.file) return
+			// const { data } = await StorageService.uploadFile({ file: audioData!.file, type: 0 })
+			// if (!data) return
+			// console.log('data', data)
+		},
+		() => {},
+		[audioData?.file]
 	)
-
-	useEffect(() => {
-		console.log('生成 audioData', audioData)
-	}, [audioData])
-
-	const play = () => {
-		if (audioData) {
-			const audio = new Audio(audioData.url)
-			audio.play()
-		}
-	}
 
 	return (
 		<>
-			<audio src={audioData?.url} controls></audio>
-			<button onClick={startRecording} className="h-16 bg-slate-200">
-				play
-			</button>
-			{/* <button onClick={startRecording} className="h-16 bg-slate-200">
-				Start Recording
-			</button>
-			<button onClick={stopRecording} className="h-16 bg-slate-500">
-				Stop Recording
-			</button> */}
 			<div
 				className={clsx('message-toolbar bg-bgPrimary bottom-0 w-full h-auto z-[99] relative')}
 				ref={toolbarRef}
@@ -257,22 +243,8 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 									<KeyboardIcon className="text-4xl text-gray-500 mr-2 animate__animated animate__zoomIn" />
 								</Link>
 								<div
-									className="w-full h-9 mx-2 rounded animate__animated animate__zoomIn bg-bgTertiary flex justify-center items-center text-gray-500"
-									// onKeyDown={startRecording}
-									// onKeyUp={stopRecording}
-									// onClick={() => {
-									// 	startRecording()
-									// 	setTimeout(() => stopRecording(), 3000)
-									// }}
-									// onTouchStart={(e) => {
-									// 	e.stopPropagation()
-									// 	e.preventDefault()
-									// 	console.log('onTouchStart')
-									// }}
-									// onTouchEnd={() => {
-									// 	console.log('onTouchEnd')
-									// }}
-									// onTouchEnd={stopRecording}
+									className="w-full h-9 mx-2 rounded animate__animated animate__zoomIn bg-bgTertiary flex justify-center items-center text-gray-500 select-none"
+									{...longPressEvent}
 									ref={audioRef}
 								>
 									{isRecording ? $t('取消') : $t('按住说话')}
@@ -290,7 +262,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 							>
 								<div className={clsx('flex-1 rounded pl-2')}>
 									<div
-										className="py-2 bg-bgSecondary rounded w-full flex items-center"
+										className="py-2 bg-bgTertiary rounded w-full flex items-center"
 										onClick={handlerInputClick}
 									>
 										<ToolEditor
@@ -343,6 +315,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 											onClick={() => {
 												setMsgType(MESSAGE_TYPE.AUDIO)
 											}}
+											// {...longPressEvent}
+											// @ts-ignore
+											// ref={audioRef}
 										>
 											<MicCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
 										</Link>
@@ -382,24 +357,38 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 				</div>
 			</div>
 
+			{/* !isRecording ||  */}
 			<div
 				className={clsx(
-					'fixed bg-black bg-opacity-50 w-full h-full top-0 left-0 z-[9999] flex items-end flex-col justify-end',
+					'fixed bg-black bg-opacity-50 w-full h-screen top-0 left-0 z-[9999] flex items-end flex-col justify-end select-none',
 					!isRecording ? '-z-10 opacity-0 hidden' : 'z-[9999] opacity-100'
 				)}
+				onContextMenu={(e) => e.preventDefault()}
+				onTouchEnd={handlerTouchEnd}
 			>
 				<div className="flex flex-col justify-center items-center w-full relative z-1">
-					<div className="recwave w-full h-16"></div>
-					<div style={{ height: width / 2 + 'px' }} />
+					<div className="w-[200px] mx-auto path mb-20 rounded-lg recwave" />
+
+					<div className="flex w-full justify-between px-4">
+						<div className="flex-1">
+							<div className="w-16 h-16 bg-gray-200 rounded-full flex justify-center items-center">1</div>
+						</div>
+						<div className="flex-1 flex justify-end">
+							<div className="w-16 h-16 bg-gray-200 rounded-full flex justify-center items-center">2</div>
+						</div>
+					</div>
+					<div style={{ height: width / 2.5 + 'px' }} />
 					<div
-						className="absolute bg-gray-200 rounded-[100%] z-10"
+						className="absolute bg-gray-200 rounded-[100%] z-10 flex justify-center pt-10"
 						style={{
 							width: width * 1.5 + 'px',
 							height: width + 'px',
 							bottom: -width / 1.5 + 'px',
 							left: -width / 4 + 'px'
 						}}
-					></div>
+					>
+						111
+					</div>
 				</div>
 			</div>
 		</>

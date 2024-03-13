@@ -1,4 +1,4 @@
 export interface UploadFile {
-    file: File;
+    file: File
     type: number
 }
