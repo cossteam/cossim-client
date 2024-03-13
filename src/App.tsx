@@ -1,10 +1,10 @@
 import { ConfigProvider } from 'antd'
 import { RouterProvider } from 'react-router-dom'
 import router from './router'
-// import { usePermission } from './permission'
+import { usePermission } from './permission'
 
 function App() {
-	// usePermission()
+	usePermission()
 
 	return (
 		<ConfigProvider
