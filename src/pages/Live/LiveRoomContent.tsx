@@ -1,19 +1,31 @@
+import clsx from 'clsx'
 import './LiveRoomContent.scss'
+import { useMemo } from 'react'
 // import { useLiveStore } from '@/stores/live'
 
 interface LiveRoomContentProps {
-	selfId?: string
-	othersId?: string
+	rootNodeId: string
+	isGroup: boolean
 }
 
 const LiveRoomContent: React.FC<LiveRoomContentProps> = (props: LiveRoomContentProps) => {
 	// 通话状态
 	// const liveStore = useLiveStore()
 
+	const bodyWidth = useMemo(() => {
+		return document.body.clientWidth
+	}, [document.body.clientWidth])
+
+	console.log(bodyWidth)
+
 	return (
-		<div id={props.othersId ?? ''} className="w-full h-full relative flex flex-col justify-center items-center">
-			<div id={props.selfId ?? ''} className="w-[40%] rounded-md absolute top-[10%] right-0"></div>
-		</div>
+		<div
+			id={props.rootNodeId ?? ''}
+			className={clsx(
+				'w-full h-full relative',
+				props.isGroup ? 'grid grid-rows-2 grid-cols-2' : 'overflow-hidden flex justify-center items-center'
+			)}
+		></div>
 	)
 }
 

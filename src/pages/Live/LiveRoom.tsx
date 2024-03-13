@@ -1,6 +1,6 @@
 import { OwnEventEnum, useLiveStore } from '@/stores/live'
 import { Page, PageContent, Popup } from 'framework7-react'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import LiveRoomContent from './LiveRoomContent'
 import LiveRoomOperate from './LiveRoomOperate'
 import LiveRoomClient from './live'
@@ -8,9 +8,10 @@ import LiveRoomClient from './live'
 const LiveRoom: React.FC = () => {
 	// 通话状态
 	const liveStore = useLiveStore()
-	const SELF_NODE_ID = 'self_node'
-	const OTHERS_NODE_ID = 'others_node'
-	let liveRoomClient: LiveRoomClient
+	const ROOT_NODE_ID = 'LIVEROOM_ROOT_NODE_ID'
+	const [connect, setConnect] = useState(false)
+
+	const liveRoomClient = useRef<LiveRoomClient | null>(null)
 
 	// 监听我的通话事件
 	useEffect(() => {
@@ -24,6 +25,11 @@ const LiveRoom: React.FC = () => {
 				break
 			case OwnEventEnum.INVITED:
 				// 被邀请
+				// 获取通话配置
+				liveStore.configMedia({
+					audio: true,
+					video: false
+				})
 				liveStore.updateOpened(true)
 				break
 			case OwnEventEnum.REFUSE:
@@ -35,17 +41,19 @@ const LiveRoom: React.FC = () => {
 				break
 			case OwnEventEnum.BUSY:
 				// 通话中
-				console.log(liveStore.serverUrl, liveStore.token)
-				if (liveStore.serverUrl === null || liveStore.token == null) return
-				liveRoomClient = new LiveRoomClient(SELF_NODE_ID, OTHERS_NODE_ID, liveStore.serverUrl, liveStore.token)
-				liveRoomClient
+				if (liveStore.serverUrl === null || liveStore.token === null) return
+				liveRoomClient.current = new LiveRoomClient(ROOT_NODE_ID, liveStore.serverUrl, liveStore.token)
+				liveRoomClient.current
 					.connect()
 					.then(() => {
-						liveRoomClient.createAudioTrack()
-						liveRoomClient.createVideoTrack()
+						liveStore.audio && liveRoomClient.current?.createAudioTrack()
+						liveStore.video && liveRoomClient.current?.createVideoTrack()
+						console.log('client', liveRoomClient.current?.client)
+						setConnect(true)
 					})
 					.catch((e: any) => {
 						console.log('WS连接失败，以挂断', e)
+						setConnect(false)
 						liveStore.hangup()
 					})
 				break
@@ -58,7 +66,7 @@ const LiveRoom: React.FC = () => {
 				break
 		}
 		return () => {
-			liveRoomClient?.disconnect()
+			liveRoomClient.current?.disconnect()
 		}
 	}, [liveStore.ownEvent])
 
@@ -66,19 +74,23 @@ const LiveRoom: React.FC = () => {
 	 * 监听麦克风和摄像头状态
 	 */
 	useEffect(() => {
+		if (!connect) return
 		if (!liveStore.audio) {
-			liveRoomClient?.closeAorV('audio')
-			console.log('关闭麦克风')
+			console.log('关闭麦克风', liveRoomClient.current?.client)
+			liveRoomClient.current?.closeAorV('audio')
 		} else if (liveStore.audio) {
-			liveRoomClient?.createAudioTrack()
+			liveRoomClient.current?.createAudioTrack()
+			console.log('开启麦克风')
 		}
 	}, [liveStore.audio])
 	useEffect(() => {
+		if (!connect) return
 		if (!liveStore.video) {
-			liveRoomClient?.closeAorV('video')
-			console.log('关闭摄像头')
+			console.log('关闭摄像头', liveRoomClient.current?.client)
+			liveRoomClient.current?.closeAorV('video')
 		} else if (liveStore.video) {
-			liveRoomClient?.createVideoTrack()
+			liveRoomClient.current?.createVideoTrack()
+			console.log('开启摄像头')
 		}
 	}, [liveStore.video])
 
@@ -94,16 +106,16 @@ const LiveRoom: React.FC = () => {
 			<Page noNavbar noToolbar>
 				<PageContent className=" bg-[rgba(0,0,0,0.73)] text-white ">
 					<div className="absolute w-full h-full">
-						{!liveStore.isGroup && <LiveRoomContent selfId={SELF_NODE_ID} othersId={OTHERS_NODE_ID} />}
+						{!liveStore.isGroup && (
+							<LiveRoomContent isGroup={liveStore.isGroup} rootNodeId={ROOT_NODE_ID} />
+						)}
 					</div>
 					<div className="absolute w-full h-full">
-						{liveStore.isGroup ? (
-							<LiveRoomOperate>
-								<LiveRoomContent selfId={SELF_NODE_ID} othersId={OTHERS_NODE_ID} />
-							</LiveRoomOperate>
-						) : (
-							<LiveRoomOperate />
-						)}
+						<LiveRoomOperate>
+							{liveStore.isGroup && (
+								<LiveRoomContent isGroup={liveStore.isGroup} rootNodeId={ROOT_NODE_ID} />
+							)}
+						</LiveRoomOperate>
 					</div>
 				</PageContent>
 			</Page>

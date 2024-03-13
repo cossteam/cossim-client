@@ -125,6 +125,9 @@ dependencies:
   react-window:
     specifier: ^1.8.10
     version: 1.8.10(react-dom@18.2.0)(react@18.2.0)
+  recorder-core:
+    specifier: ^1.3.23122400
+    version: 1.3.23122400
   rxjs:
     specifier: ^7.8.1
     version: 7.8.1
@@ -4063,6 +4066,10 @@ packages:
     engines: {node: '>=8.10.0'}
     dependencies:
       picomatch: 2.3.1
+
+  /recorder-core@1.3.23122400:
+    resolution: {integrity: sha512-oDtV56qlaKFPBkEtYaMbYBC/aiYa76wSBAauJKlLk6fKX5b5I6Fo8EyjxkUkWrCHK9uv1Cf4HVls0EUwoBrKxQ==}
+    dev: false
 
   /regenerator-runtime@0.14.1:
     resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}

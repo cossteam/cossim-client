@@ -138,7 +138,7 @@ class CallServiceImpl {
 	}
 
 	getLocalRoom(userName: string, roomName: string) {
-		return axios.get('http://192.168.110.56:5000/getToken', {
+		return axios.get('http://192.168.100.21:5000/getToken', {
 			method: 'GET',
 			params: {
 				userName,

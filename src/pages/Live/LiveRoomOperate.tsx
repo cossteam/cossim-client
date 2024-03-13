@@ -19,8 +19,6 @@ const LiveRoomOperate: React.FC<any> = (props: any) => {
 	return (
 		<div className="h-full flex flex-col" {...props}>
 			<div className="h-16 px-4 flex justify-between items-center">
-				<span></span>
-				<span></span>
 				<Link
 					className="pt-1"
 					iconF7="arrow_uturn_down_circle_fill"
@@ -28,9 +26,12 @@ const LiveRoomOperate: React.FC<any> = (props: any) => {
 					// TODO: 最小化开启悬浮窗口
 					onClick={() => liveStore.updateOpened(false)}
 				/>
+				<span></span>
+				<span></span>
 			</div>
 			<div className="flex-1 flex overflow-scroll">{props.children && props.children}</div>
-			<div className="min-h-64 flex flex-col">
+			{/* <div className="min-h-64 pt-4 flex flex-col bg-[rgb(0,0,0,0.05)]"> */}
+			<div className="min-h-64 pt-4 flex flex-col">
 				<div className="text-center">{liveStore.ownEventDesc(liveStore.ownEvent)}</div>
 				<div className="flex-1 flex justify-evenly items-center">
 					<OperateButton
