@@ -29,7 +29,7 @@ import { OwnEventEnum, useLiveStore } from './stores/live'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 // import { useChatStore } from './stores/chat'
-import Message from '@/components/Message/Message'
+// import Message from '@/components/Message/Message'
 import LiveRoom from './pages/Live/LiveRoom'
 
 let store: MessageStore | null = null
@@ -203,7 +203,7 @@ function App() {
 			{hasCookie(TOKEN) ? (
 				<>
 					<Layout />
-					<Message />
+					{/* <Message /> */}
 					<LiveRoom />
 					{!liveStore.opened && liveStore.ownEvent !== OwnEventEnum.IDLE && (
 						<div

@@ -4,10 +4,17 @@ import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
 import 'recorder-core/src/extensions/waveview'
 
+interface AudioData {
+	url: string
+	blob: Blob
+	duration: number
+	data: FormData
+}
+
 interface SpeechRecognition {
 	startRecording: () => void
 	stopRecording: () => void
-	audioData: Blob | null
+	audioData: AudioData | null
 	wave: any
 	isRecording: boolean
 }
@@ -16,8 +23,9 @@ const useSpeechRecognition = (): SpeechRecognition => {
 	const rec = useRef<any | null>(null)
 	const wave = useRef<any>(null)
 	const [isRecording, setIsRecording] = useState<boolean>(false)
-	const [audioData, setAudioData] = useState<Blob | null>(null)
+	const [audioData, setAudioData] = useState<AudioData | null>(null)
 
+	/** 开始 */
 	const startRecording = () => {
 		rec.current = Recorder({
 			type: 'mp3',
@@ -39,12 +47,13 @@ const useSpeechRecognition = (): SpeechRecognition => {
 				if (Recorder.WaveView) wave.current = Recorder.WaveView({ elem: '.recwave' })
 			},
 			(msg: string, isUserNotAllow: boolean) => {
+				setIsRecording(false)
 				//用户拒绝未授权或不支持
 				console.log((isUserNotAllow ? 'UserNotAllow，' : '') + '无法录音:' + msg)
 			}
 		)
 		setIsRecording(true)
-		rec.current.start()
+		// rec.current.start()
 	}
 
 	/**结束录音**/
@@ -54,24 +63,26 @@ const useSpeechRecognition = (): SpeechRecognition => {
 			(blob: Blob, duration: number) => {
 				//简单利用URL生成本地文件地址，注意不用了时需要revokeObjectURL，否则霸占内存
 				const localUrl = (window.URL || webkitURL).createObjectURL(blob)
-
-				// 生成地址
-				const formData = new FormData()
-				formData.append('file', blob, 'recorder.mp3')
-
-				console.log('formData', formData)
-
 				console.log(blob, localUrl, '时长:' + duration + 'ms', wave.current)
+
+				const fileName = `${Math.random().toString(36).substring(6)}.mp3`
+				const file = new File([blob], fileName)
+				const data = new FormData()
+				data.append('file', file, fileName)
+
+				console.log('file', file, data)
+
 				//释放录音资源
 				rec.current.close()
 				rec.current = null
-				setAudioData(blob)
+				setAudioData({ url: localUrl, duration: duration, blob: blob, data })
 				setIsRecording(false)
 			},
 			(msg: string) => {
 				console.log('录音失败:' + msg)
 				rec.current.close()
 				rec.current = null
+				setIsRecording(false)
 			}
 		)
 	}
