@@ -26,7 +26,7 @@ import { Router } from 'framework7/types'
 import useSpeechRecognition from '@/hooks/useSpeechRecognition'
 // import { motion, useTime, useTransform } from 'framer-motion'
 import StorageService from '@/api/storage'
-// import './css/MessageBar.scss'
+import './css/MessageBar.scss'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
@@ -47,7 +47,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	const [width, setWidth] = useState<number>(0)
 
 	// 检查语言权限
-	const { startRecording, stopRecording, isRecording, audioData } = useSpeechRecognition()
+	const { startRecording, stopRecording, isRecording, audioData, loading } = useSpeechRecognition()
 
 	// 键盘高度
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(0)
@@ -114,24 +114,17 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	}
 
 	const [test, setTest] = useState<boolean>(true)
+	const [audioBtn, setAudioBtn] = useState<boolean>(false)
 	const onLongPress = () => {
-		// console.log('onLongPress')
-		// TODO: 开始录音
-		// setTest(true)
+		setAudioBtn(true)
 		startRecording()
 	}
-
 	const longPressEvent = useLongPress(onLongPress, { delay: 300 })
-
 	const audioRef = useRef<HTMLDivElement | null>(null)
 
 	const handlerTouchEnd = async () => {
 		stopRecording()
-		// console.log('handlerTouchEnd', test)
-		// alert('handlerTouchEnd')
-		// setTest(false)
-		// stopRecording()
-		// if (!audioData?.file) return
+		setAudioBtn(false)
 	}
 
 	useEffect(() => {
@@ -166,13 +159,19 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 		const handlerContextmenu = (e: { preventDefault: () => any }) => e.preventDefault()
 
+		const handlerTouchMove = (e: any) => {
+			console.log('move', e)
+		}
+
 		audioRef.current?.addEventListener('contextmenu', handlerContextmenu)
 		audioRef.current?.addEventListener('touchend', handlerTouchEnd)
+		audioRef.current?.addEventListener('touchmove', handlerTouchMove)
 
 		return () => {
 			editorRef.current?.quill?.off(Quill.events.EDITOR_CHANGE)
 			audioRef.current?.removeEventListener('contextmenu', handlerContextmenu)
 			audioRef.current?.removeEventListener('touchend', handlerTouchEnd)
+			audioRef.current?.removeEventListener('touchmove', handlerTouchMove)
 		}
 	}, [])
 
@@ -209,7 +208,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 				className={clsx('message-toolbar bg-bgPrimary bottom-0 w-full h-auto z-[99] relative')}
 				ref={toolbarRef}
 			>
-				<div className="flex flex-col justify-center items-center">
+				<div className="flex flex-col justify-center items-center w-full">
 					<div className="w-full rounded-2xl flex items-end relative h-full py-2">
 						<div className={clsx('w-full', isSelect ? 'flex' : 'hidden')}>
 							<div className="w-full flex bg-bgPrimary">
@@ -242,13 +241,11 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 								>
 									<KeyboardIcon className="text-4xl text-gray-500 mr-2 animate__animated animate__zoomIn" />
 								</Link>
-								<div
-									className="w-full h-9 mx-2 rounded animate__animated animate__zoomIn bg-bgTertiary flex justify-center items-center text-gray-500 select-none"
-									{...longPressEvent}
-									ref={audioRef}
-								>
-									{isRecording ? $t('取消') : $t('按住说话')}
-								</div>
+								<Button className="w-full flex h-9 mx-2 rounded animate__animated animate__zoomIn bg-bgTertiary justify-center items-center text-gray-500 select-none">
+									<div className="" {...longPressEvent} ref={audioRef}>
+										{$t('按住说话')}
+									</div>
+								</Button>
 								<Link onClick={() => moreTypeChange(MessageMore.TEXT)}>
 									<PlusCircle className="text-4xl text-gray-500 mr-2" />
 								</Link>
@@ -256,71 +253,85 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 							<div
 								className={clsx(
-									'w-full flex items-end',
+									'w-full flex items-end px-2',
 									msgType !== MESSAGE_TYPE.AUDIO ? 'flex' : 'hidden'
 								)}
 							>
-								<div className={clsx('flex-1 rounded pl-2')}>
-									<div
-										className="py-2 bg-bgTertiary rounded w-full flex items-center"
-										onClick={handlerInputClick}
-									>
-										<ToolEditor
-											ref={editorRef}
-											readonly={false}
-											placeholder={$t('请输入内容')}
-											id={receiver_id}
-											is_group={is_group}
-										/>
-									</div>
-									{[TOOLTIP_TYPE.EDIT, TOOLTIP_TYPE.REPLY].includes(tooltipStore.type) && (
-										<div className="mt-1 bg-bgTertiary relative flex justify-between">
-											<ReadEditor
-												content={tooltipStore.selectItem?.content ?? ''}
-												className="reply-read-editor"
-											/>
-											<Link className="pr-2" onClick={clear}>
-												<XmarkCircle className="text-textTertiary" />
-											</Link>
+								{isRecording || audioBtn ? (
+									<div className="flex-1" />
+								) : (
+									<>
+										<div className={clsx('flex-1 rounded')}>
+											<div
+												className="py-2 bg-bgTertiary rounded w-full flex items-center"
+												onClick={handlerInputClick}
+											>
+												<ToolEditor
+													ref={editorRef}
+													readonly={false}
+													placeholder={$t('请输入内容')}
+													id={receiver_id}
+													is_group={is_group}
+												/>
+											</div>
+											{[TOOLTIP_TYPE.EDIT, TOOLTIP_TYPE.REPLY].includes(tooltipStore.type) && (
+												<div className="mt-1 bg-bgTertiary relative flex justify-between">
+													<ReadEditor
+														content={tooltipStore.selectItem?.content ?? ''}
+														className="reply-read-editor"
+													/>
+													<Link className="pr-2" onClick={clear}>
+														<XmarkCircle className="text-textTertiary" />
+													</Link>
+												</div>
+											)}
 										</div>
-									)}
-								</div>
-								<div className="flex items-center px-2">
-									{moreType === MessageMore.EMOJI ? (
-										<Link onClick={() => moreTypeChange(MessageMore.TEXT)}>
-											<KeyboardIcon className="text-4xl text-gray-500 mr-2" />
-										</Link>
-									) : (
-										<Link onClick={() => moreTypeChange(MessageMore.EMOJI)}>
-											<FaceSmiling className="text-4xl text-gray-500 mr-2" />
-										</Link>
-									)}
+										<div className="flex h-[38px] items-center w-[40px] justify-center">
+											{moreType === MessageMore.EMOJI ? (
+												<Link onClick={() => moreTypeChange(MessageMore.TEXT)}>
+													<KeyboardIcon className="text-4xl text-gray-500" />
+												</Link>
+											) : (
+												<Link onClick={() => moreTypeChange(MessageMore.EMOJI)}>
+													<FaceSmiling className="text-4xl text-gray-500" />
+												</Link>
+											)}
+										</div>
 
-									{moreType === MessageMore.OTHER ? (
-										<Link onClick={() => moreTypeChange(MessageMore.TEXT)}>
-											<KeyboardIcon className="text-4xl text-gray-500 mr-2" />
-										</Link>
-									) : (
-										<Link onClick={() => moreTypeChange(MessageMore.OTHER)}>
-											<PlusCircle className="text-4xl text-gray-500 mr-2" />
-										</Link>
-									)}
+										<div className="flex h-[38px] items-center w-[40px] justify-center">
+											{moreType === MessageMore.OTHER ? (
+												<Link onClick={() => moreTypeChange(MessageMore.TEXT)}>
+													<KeyboardIcon className="text-4xl text-gray-500" />
+												</Link>
+											) : (
+												<Link onClick={() => moreTypeChange(MessageMore.OTHER)}>
+													<PlusCircle className="text-4xl text-gray-500" />
+												</Link>
+											)}
+										</div>
+									</>
+								)}
 
+								<div className="flex h-[38px] items-center w-[40px] justify-center relative">
 									{showBtn ? (
 										<Link onClick={sendMessage}>
 											<ArrowRightCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
 										</Link>
 									) : (
-										<Link
+										<div
 											onClick={() => {
 												setMsgType(MESSAGE_TYPE.AUDIO)
 											}}
 											// {...longPressEvent}
-											// @ts-ignore
 											// ref={audioRef}
 										>
-											<MicCircleFill className="text-4xl text-primary animate__animated animate__zoomIn" />
-										</Link>
+											<MicCircleFill
+												className={clsx(
+													'text-4xl text-primary animate__animated animate__zoomIn'
+												)}
+											/>
+											<span className={clsx(audioBtn && 'living')}></span>
+										</div>
 									)}
 								</div>
 							</div>
@@ -357,8 +368,20 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 				</div>
 			</div>
 
+			{isRecording ||
+				(!isRecording && (
+					<div
+						className="fixed w-full h-screen bg-black bg-opacity-20 bottom-0 -z-1 flex justify-center items-center"
+						onMouseMove={() => {
+							console.log('onMouseMove')
+						}}
+					>
+						<div className="w-3/5 h-16 rounded recwave text-white text-center"></div>
+					</div>
+				))}
+
 			{/* !isRecording ||  */}
-			<div
+			{/* <div
 				className={clsx(
 					'fixed bg-black bg-opacity-50 w-full h-screen top-0 left-0 z-[9999] flex items-end flex-col justify-end select-none',
 					!isRecording ? '-z-10 opacity-0 hidden' : 'z-[9999] opacity-100'
@@ -390,7 +413,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 						111
 					</div>
 				</div>
-			</div>
+			</div> */}
 		</>
 	)
 }
