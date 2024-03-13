@@ -25,6 +25,7 @@ import MessageMoreComponent from './MessageMore'
 import { Router } from 'framework7/types'
 import useSpeechRecognition from '@/hooks/useSpeechRecognition'
 import { motion, useTime, useTransform } from 'framer-motion'
+import StorageService from '@/api/storage'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
@@ -111,6 +112,8 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		editorRef.current?.quill?.blur()
 	}
 
+	const audioRef = useRef<HTMLDivElement | null>(null)
+	const start = useRef<number>(0)
 	useEffect(() => {
 		requestAnimationFrame(() => {
 			const timer = setTimeout(() => {
@@ -141,8 +144,31 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 		setWidth(document.body.clientWidth)
 
+		const handlerTouchStart = (e) => {
+			e.preventDefault()
+			startRecording()
+
+			setTimeout(() => {
+				stopRecording()
+			}, 5000)
+		}
+
+		const handlerTouchEnd = async () => {
+			console.log('handlerTouchEnd')
+			stopRecording()
+			console.log('audioData?.data', audioData?.data)
+			const file = new File([audioData?.data], 'test.wav', { type: 'audio/wav' })
+			const { data } = await StorageService.uploadFile({ file, type: 0 })
+			console.log('data', data)
+		}
+
+		audioRef.current?.addEventListener('touchstart', handlerTouchStart, { passive: false })
+		audioRef.current?.addEventListener('touchend', handlerTouchEnd)
+
 		return () => {
 			editorRef.current?.quill?.off(Quill.events.EDITOR_CHANGE)
+			audioRef.current?.removeEventListener('touchstart', handlerTouchStart)
+			audioRef.current?.removeEventListener('touchend', handlerTouchEnd)
 		}
 	}, [])
 
@@ -170,24 +196,29 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		{ clamp: false }
 	)
 
-	const playAudio = async () => {
+	useEffect(() => {
+		console.log('生成 audioData', audioData)
+	}, [audioData])
+
+	const play = () => {
 		if (audioData) {
-			const audio = new Audio(URL.createObjectURL(audioData))
+			const audio = new Audio(audioData.url)
 			audio.play()
 		}
 	}
 
 	return (
 		<>
-			<button onClick={playAudio} className="h-16 bg-slate-200">
+			<audio src={audioData?.url} controls></audio>
+			<button onClick={startRecording} className="h-16 bg-slate-200">
 				play
 			</button>
-			<button onClick={startRecording} className="h-16 bg-slate-200">
+			{/* <button onClick={startRecording} className="h-16 bg-slate-200">
 				Start Recording
 			</button>
 			<button onClick={stopRecording} className="h-16 bg-slate-500">
 				Stop Recording
-			</button>
+			</button> */}
 			<div
 				className={clsx('message-toolbar bg-bgPrimary bottom-0 w-full h-auto z-[99] relative')}
 				ref={toolbarRef}
@@ -229,11 +260,20 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 									className="w-full h-9 mx-2 rounded animate__animated animate__zoomIn bg-bgTertiary flex justify-center items-center text-gray-500"
 									// onKeyDown={startRecording}
 									// onKeyUp={stopRecording}
-									onClick={() => {
-										startRecording()
-										setTimeout(() => stopRecording(), 3000)
-									}}
+									// onClick={() => {
+									// 	startRecording()
+									// 	setTimeout(() => stopRecording(), 3000)
+									// }}
+									// onTouchStart={(e) => {
+									// 	e.stopPropagation()
+									// 	e.preventDefault()
+									// 	console.log('onTouchStart')
+									// }}
+									// onTouchEnd={() => {
+									// 	console.log('onTouchEnd')
+									// }}
 									// onTouchEnd={stopRecording}
+									ref={audioRef}
 								>
 									{isRecording ? $t('取消') : $t('按住说话')}
 								</div>
@@ -342,10 +382,15 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 				</div>
 			</div>
 
-			{/* <div className="fixed bg-black bg-opacity-50 w-full h-full top-0 left-0 z-[9999] flex items-end flex-col justify-end">
+			<div
+				className={clsx(
+					'fixed bg-black bg-opacity-50 w-full h-full top-0 left-0 z-[9999] flex items-end flex-col justify-end',
+					!isRecording ? '-z-10 opacity-0 hidden' : 'z-[9999] opacity-100'
+				)}
+			>
 				<div className="flex flex-col justify-center items-center w-full relative z-1">
-					<motion.div style={{ rotate }} className="w-12 h-12 bg-white" />
-					<div className="" style={{ height: width / 2 + 'px' }}></div>
+					<div className="recwave w-full h-16"></div>
+					<div style={{ height: width / 2 + 'px' }} />
 					<div
 						className="absolute bg-gray-200 rounded-[100%] z-10"
 						style={{
@@ -356,7 +401,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 						}}
 					></div>
 				</div>
-			</div> */}
+			</div>
 		</>
 	)
 }

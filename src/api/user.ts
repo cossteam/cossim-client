@@ -156,9 +156,9 @@ class UserServiceImpl {
 	 * @returns {Promise<DataResponse>}
 	 */
 	updateAvatarApi(data: { file: File }): Promise<DataResponse> {
-		const formData = new FormData();
-		formData.append('file', data.file);
-	
+		const formData = new FormData()
+		formData.append('file', data.file)
+
 		return request({
 			url: `${this.baseUrl}/avatar/modify`,
 			method: 'POST',
@@ -166,7 +166,7 @@ class UserServiceImpl {
 			headers: {
 				'Content-Type': 'multipart/form-data'
 			}
-		});
+		})
 	}
 
 	// /**

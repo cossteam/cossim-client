@@ -27,7 +27,8 @@ import localNotification, { LocalNotificationType } from '@/utils/notification'
 import DOMPurify from 'dompurify'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
-import Message from '@/components/Message/Message'
+// import { useChatStore } from './stores/chat'
+// import Message from '@/components/Message/Message'
 import LiveRoom from './pages/Live/LiveRoom'
 import { useLiveStore } from './stores/live'
 
@@ -200,7 +201,7 @@ function App() {
 			{hasCookie(TOKEN) ? (
 				<>
 					<Layout />
-					<Message />
+					{/* <Message /> */}
 					<LiveRoom />
 				</>
 			) : (
