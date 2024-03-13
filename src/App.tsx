@@ -30,7 +30,7 @@ import { PluginListenerHandle } from '@capacitor/core'
 // import { useChatStore } from './stores/chat'
 // import Message from '@/components/Message/Message'
 import LiveRoom from './pages/Live/LiveRoom'
-import { useLiveStore } from './stores/live'
+import { OwnEventEnum, useLiveStore } from './stores/live'
 
 let store: MessageStore | null = null
 
@@ -112,7 +112,13 @@ function App() {
 				case SocketEvent.GroupCallRejectEvent:
 				case SocketEvent.UserCallHangupEvent:
 				case SocketEvent.GroupCallHangupEvent:
-					liveStore.updateEvent(event, data)
+					if (liveStore.ownEvent === OwnEventEnum.IDLE) {
+						liveStore.updateEvent(event, data)
+						break
+					}
+					f7.dialog.confirm('你有新的通话请求是否结束当前通话并接听？', () => {
+						liveStore.updateEvent(event, data)
+					})
 					break
 				case SocketEvent.MessageLabelEvent:
 					handlerLabelSocket(data, store!)

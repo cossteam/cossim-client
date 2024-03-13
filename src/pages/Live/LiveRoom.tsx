@@ -48,13 +48,12 @@ const LiveRoom: React.FC = () => {
 					.then(() => {
 						liveStore.audio && liveRoomClient.current?.createAudioTrack()
 						liveStore.video && liveRoomClient.current?.createVideoTrack()
-						console.log('client', liveRoomClient.current?.client)
 						setConnect(true)
 					})
 					.catch((e: any) => {
 						console.log('WS连接失败，以挂断', e)
 						setConnect(false)
-						liveStore.hangup()
+						// liveStore.hangup()
 					})
 				break
 			case OwnEventEnum.HANGUP:

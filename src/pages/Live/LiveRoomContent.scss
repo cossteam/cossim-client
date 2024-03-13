@@ -1,8 +1,22 @@
 .room-content-group {
-	// grid grid-rows-2 grid-cols-3
-	// position: fixed;
-	// top: 0;
-	// left: 0;
+	.video_box {
+		video {
+			max-width: unset;
+			height: 100%;
+			// display: none;
+		}
+	}
+	.avctiv {
+		video {
+			max-width: unset;
+			height: 100%;
+			transform: translateX(-50%);
+			position: fixed;
+			top: 0;
+			left: 50%;
+			z-index: 1;
+		}
+	}
 }
 
 .room-content {
@@ -11,18 +25,25 @@
 	top: 0;
 	left: 0;
 	.video_box {
+		height: 100%;
 		video {
 			max-width: unset;
-			height: 100vh !important;
+			height: 100%;
 		}
 	}
 	.self_video {
+		width: 20%;
+		height: 15%;
+		position: fixed;
+		top: 4%;
+		right: 4%;
+		z-index: 9999;
+		overflow: hidden;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		video {
-			width: 25%;
-			height: 10%;
-			position: fixed;
-			top: 4%;
-			right: 5%;
+			height: 100%;
 		}
 	}
 }
