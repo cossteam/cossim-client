@@ -1,6 +1,8 @@
 PODS:
   - Capacitor (5.7.0):
     - CapacitorCordova
+  - CapacitorApp (5.0.7):
+    - Capacitor
   - CapacitorCamera (5.0.9):
     - Capacitor
   - CapacitorCordova (5.7.0)
@@ -13,6 +15,7 @@ PODS:
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios`)"
+  - "CapacitorApp (from `../../node_modules/.pnpm/@capacitor+app@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/app`)"
   - "CapacitorCamera (from `../../node_modules/.pnpm/@capacitor+camera@5.0.9_@capacitor+core@5.7.0/node_modules/@capacitor/camera`)"
   - "CapacitorCordova (from `../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios`)"
   - "CapacitorDevice (from `../../node_modules/.pnpm/@capacitor+device@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/device`)"
@@ -22,6 +25,8 @@ DEPENDENCIES:
 EXTERNAL SOURCES:
   Capacitor:
     :path: "../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios"
+  CapacitorApp:
+    :path: "../../node_modules/.pnpm/@capacitor+app@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/app"
   CapacitorCamera:
     :path: "../../node_modules/.pnpm/@capacitor+camera@5.0.9_@capacitor+core@5.7.0/node_modules/@capacitor/camera"
   CapacitorCordova:
@@ -35,12 +40,13 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Capacitor: fc155ee2ee45a2093d716f13cf5aa5a865e2d85a
+  CapacitorApp: 17fecd0e6cb23feafac7eb0939417389038b0979
   CapacitorCamera: 4892c5c392f60039d853dde78bc50ba19fbd113e
   CapacitorCordova: e825fce1a2e14e4b5730641c7e098dccf74397b7
   CapacitorDevice: fc91bdb484dc0e70755e9b621cd557afe642613a
   CapacitorKeyboard: aec619a578235c6ce279075009a2689c2cf5c42c
   CapacitorLocalNotifications: c58afadd159f6bc540ef9b3cbdbc82510a2bf112
 
-PODFILE CHECKSUM: cc3965787483057f6099cee6a37b509a03957f64
+PODFILE CHECKSUM: 1b4b82e595be7a50e9ee56c80861a5a14c156b91
 
 COCOAPODS: 1.14.3

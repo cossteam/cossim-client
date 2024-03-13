@@ -19,6 +19,9 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 	useEffect(() => {
 		if (props?.members?.length > 0) {
 			setMembers(props?.members)
+			setTimeout(() => {
+				console.log(members)
+			})
 		}
 	}, [props.members])
 
