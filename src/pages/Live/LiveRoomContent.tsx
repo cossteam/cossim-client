@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import './LiveRoomContent.scss'
 import { useMemo } from 'react'
 // import { useLiveStore } from '@/stores/live'
@@ -19,13 +18,13 @@ const LiveRoomContent: React.FC<LiveRoomContentProps> = (props: LiveRoomContentP
 	console.log(bodyWidth)
 
 	return (
-		<div
-			id={props.rootNodeId ?? ''}
-			className={clsx(
-				'w-full h-full relative',
-				props.isGroup ? 'grid grid-rows-2 grid-cols-2' : 'overflow-hidden flex justify-center items-center'
+		<>
+			{props.isGroup ? (
+				<div id={props.rootNodeId ?? ''} className="room-content-group"></div>
+			) : (
+				<div id={props.rootNodeId ?? ''} className="room-content"></div>
 			)}
-		></div>
+		</>
 	)
 }
 

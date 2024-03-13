@@ -1,12 +1,28 @@
-video {
-	max-width: unset !important;
-	height: 100% !important;
+.room-content-group {
+	// grid grid-rows-2 grid-cols-3
+	// position: fixed;
+	// top: 0;
+	// left: 0;
 }
-#self_video {
-	width: 25%;
-	height: 20%;
-	overflow: hidden;
+
+.room-content {
+	z-index: -1;
 	position: fixed;
-	top: 2%;
-	right: 4%;
+	top: 0;
+	left: 0;
+	.video_box {
+		video {
+			max-width: unset;
+			height: 100vh !important;
+		}
+	}
+	.self_video {
+		video {
+			width: 25%;
+			height: 10%;
+			position: fixed;
+			top: 4%;
+			right: 5%;
+		}
+	}
 }
