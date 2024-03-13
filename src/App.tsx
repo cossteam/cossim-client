@@ -1,10 +1,13 @@
 import { ConfigProvider } from 'antd'
-import { RouterProvider } from 'react-router-dom'
-import router from './router'
-import { usePermission } from './permission'
+// import { usePermission } from './permission'
+import { Outlet } from 'react-router-dom'
 
-function App() {
-	usePermission()
+
+const App = () => {
+	// 权限控制
+	// usePermission()
+
+	console.log('11')
 
 	return (
 		<ConfigProvider
@@ -16,7 +19,7 @@ function App() {
 			// }}
 			theme={{ cssVar: true, hashed: false }}
 		>
-			<RouterProvider router={router} />
+			<Outlet />
 		</ConfigProvider>
 	)
 }

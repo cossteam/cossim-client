@@ -1,17 +1,48 @@
-import React from 'react'
-import { createBrowserRouter } from 'react-router-dom'
+import { createElement, Suspense, lazy, LazyExoticComponent } from 'react'
+import { createBrowserRouter, RouteObject, Navigate } from 'react-router-dom'
 
-import Login from '@/pages/Account/Login/Login'
-import Dashboard from '@/pages/Dashboard/Dashboard'
+import Loading from '@/components/Loading'
+import NotFound from '@/pages/NotFound'
+import App from '@/App'
 
-const routes = [
+const Dashboard = lazy(() => import('@/pages/Dashboard/Dashboard'))
+const Login = lazy(() => import('@/pages/Account/Login/Login'))
+
+/**
+ * 懒加载 + loading
+ *
+ * @param component	懒加载组件
+ * @returns
+ */
+const lazyLoad = (component: LazyExoticComponent<() => JSX.Element> | LazyExoticComponent<() => string>) => {
+	return createElement(Suspense, {
+		fallback: createElement(Loading),
+		children: createElement(component)
+	})
+}
+
+const routes: RouteObject[] = [
 	{
 		path: '/',
-		element: React.createElement(Dashboard)
+		element: createElement(App),
+		children: [
+			{
+				path: '',
+				element: createElement(Navigate, { to: '/dashboard', replace: true })
+			},
+			{
+				path: 'dashboard',
+				element: lazyLoad(Dashboard)
+			}
+		]
 	},
 	{
 		path: '/login',
-		element: React.createElement(Login)
+		element: lazyLoad(Login)
+	},
+	{
+		path: '*',
+		element: createElement(NotFound)
 	}
 ]
 
