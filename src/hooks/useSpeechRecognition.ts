@@ -74,8 +74,12 @@ const useSpeechRecognition = (): SpeechRecognition => {
 					const fileName = `${Math.random().toString(36).substring(6)}.mp3`
 					const file = new File([blob], fileName, { type: 'audio/mp3' })
 					setAudioData({ url: localUrl, duration: duration, blob, file })
+<<<<<<< HEAD
 
 					console.log('录音成功：', audioData)
+=======
+					console.log(file)
+>>>>>>> 6454eefd68d83b06a3985225d02e7f76e2d6ce18
 				},
 				(msg: string) => {
 					console.log('录音失败:' + msg)
