@@ -9,6 +9,7 @@ import ToolTip from './MessageToolTips'
 import LongPressButton from '@/components/LongPressButton/LongPressButton'
 import { ReadEditor } from '@/Editor'
 import { useTooltipsStore } from '@/stores/tooltips'
+import MessageAudio from './Audio/MessageAudio'
 
 interface MessageBoxProps {
 	msg: PrivateChats
@@ -69,11 +70,16 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 		)
 	}
 
+	// 语音
+	// if (msg?.type === MESSAGE_TYPE.AUDIO) {
+	// 	return <div className="flex max-w-[85%]"></div>
+	// }
+
 	/**
 	 * 点击时间转换时间格式
 	 */
 	const handlerClickTime = () => {
-		const time: string = formatTime(msg?.created_at ?? msg?.create_at);
+		const time: string = formatTime(msg?.created_at ?? msg?.create_at)
 		const timeFull: string = formatTimeFull(msg?.created_at ?? msg?.create_at)
 		if (messageTime.length < timeFull.length) {
 			setMessageTime(timeFull)
@@ -118,12 +124,18 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 							data-label={msg?.is_label}
 							ref={tooltipRef}
 						>
-							<ReadEditor
-								content={msg?.content}
-								replyContent={reply?.content}
-								replyName={reply?.sender_info?.name ?? reply?.sender_info?.nickname ?? ''}
-								className={clsx(is_self ? '' : 'read-editor-no-slef')}
-							/>
+							{msg?.type === MESSAGE_TYPE.AUDIO ? (
+								<div className={clsx('px-2 py-0')}>
+									<MessageAudio msg={msg} />
+								</div>
+							) : (
+								<ReadEditor
+									content={msg?.content}
+									replyContent={reply?.content}
+									replyName={reply?.sender_info?.name ?? reply?.sender_info?.nickname ?? ''}
+									className={clsx(is_self ? '' : 'read-editor-no-slef')}
+								/>
+							)}
 						</div>
 					</LongPressButton>
 
@@ -131,7 +143,9 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 					<div
 						className={clsx('flex text-[0.85rem] items-center', is_self ? 'justify-end' : 'justify-start')}
 					>
-						<span onClick={handlerClickTime} style={{color: "#94a3b8"}} className="text-[0.85rem] mr-1">{messageTime}</span>
+						<span onClick={handlerClickTime} style={{ color: '#94a3b8' }} className="text-[0.85rem] mr-1">
+							{messageTime}
+						</span>
 						{is_self && (
 							<>
 								{msg?.msg_send_state === MESSAGE_SEND.SENDING && (

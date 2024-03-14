@@ -30,9 +30,9 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 			setIsFirstIn(false)
 		}
 
-		if (!isFirstIn && !msgStore.refresh) {
-			listRef.current?.scrollToItem(msgStore.messages.length, 'end')
-		}
+		// if (!isFirstIn && !msgStore.refresh) {
+		// 	listRef.current?.scrollToItem(msgStore.messages.length, 'end')
+		// }
 	}, [msgStore.messages, isFirstIn])
 
 	const setItemSize = useCallback((index = 1, size = 10) => {
@@ -63,7 +63,7 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 
 	useEffect(() => {
 		if (!msgStore.refresh) return
-		listRef.current?.scrollToItem(prevScrollTop.current, 'start')
+		// listRef.current?.scrollToItem(prevScrollTop.current, 'start')
 		// msgStore.updateRefresh(false)
 	}, [msgStore.messages, msgStore.refresh])
 

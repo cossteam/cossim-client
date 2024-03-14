@@ -2,9 +2,9 @@
 // @ts-nocheck
 import clsx from 'clsx'
 import React, { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { $t, MESSAGE_TYPE, MessageMore, TOOLTIP_TYPE, hasImageHtml, scroll } from '@/shared'
+import { $t, MESSAGE_SEND, MESSAGE_TYPE, MessageMore, TOOLTIP_TYPE, hasImageHtml, scroll } from '@/shared'
 import { useMessageStore } from '@/stores/message'
-import { Button, Link } from 'framework7-react'
+import { Link } from 'framework7-react'
 import {
 	ArrowRightCircleFill,
 	ArrowUpRight,
@@ -27,6 +27,7 @@ import useSpeechRecognition from '@/hooks/useSpeechRecognition'
 // import { motion, useTime, useTransform } from 'framer-motion'
 import StorageService from '@/api/storage'
 import './css/MessageBar.scss'
+import { EmitterSource } from 'quill/core/emitter'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
@@ -44,10 +45,10 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	const editorRef = useRef<ToolEditorMethods>(null)
 	const moreRef = useRef<HTMLDivElement | null>(null)
 	const tooltipStore = useTooltipsStore()
-	const [width, setWidth] = useState<number>(0)
+	// const [width, setWidth] = useState<number>(0)
 
 	// 检查语言权限
-	const { startRecording, stopRecording, isRecording, audioData, loading } = useSpeechRecognition()
+	const { startRecording, stopRecording, isRecording, audioData, error } = useSpeechRecognition()
 
 	// 键盘高度
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(0)
@@ -84,7 +85,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		const quill = editorRef.current!.quill
 		let type = msgType
 
-		const content = quill.getSemanticHTML()
+		let content = '14 "'
+
+		if (quill) content = quill.getSemanticHTML()
 		if (hasImageHtml(content)) type = MESSAGE_TYPE.IMAGE
 
 		// 发送或编辑消息
@@ -97,8 +100,10 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		tooltipStore.updateType(TOOLTIP_TYPE.NONE)
 
 		// 发送成功的操作
-		quill.deleteText(0, quill.getLength() - 1)
-		if (!moreType) quill.focus()
+		if (quill) quill.deleteText(0, quill.getLength() - 1)
+		if (quill && !moreType) quill.focus()
+
+		setMsgType(MESSAGE_TYPE.TEXT)
 	}
 
 	// 发送表情
@@ -113,8 +118,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		editorRef.current?.quill?.blur()
 	}
 
-	const [test, setTest] = useState<boolean>(true)
+	// const [test, setTest] = useState<boolean>(true)
 	const [audioBtn, setAudioBtn] = useState<boolean>(false)
+	const recordRef = useRef<HTMLDivElement | null>(null)
 	const onLongPress = () => {
 		setAudioBtn(true)
 		startRecording()
@@ -134,28 +140,28 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 				const quill = editorRef.current.quill
 
-				// let eventSources: EmitterSource = Quill.sources.API
+				let eventSources: EmitterSource = Quill.sources.API
 
-				quill.on(Quill.events.EDITOR_CHANGE, (type: string) => {
+				quill.on(Quill.events.EDITOR_CHANGE, (type, _newDelta, _oldDelta, source) => {
 					if (type !== Quill.events.SELECTION_CHANGE) {
 						setShowBtn(quill.getLength() > 1)
 					}
-					// eventSources = source
+					eventSources = source
 				})
 
-				// quill.root.addEventListener('focus', () => {
-				// if (eventSources === Quill.sources.API) return
-				// setKeyboardHeight(0)
-				// setMoreType(MessageMore.TEXT)
-				// quill.blur()
-				// setTimeout(() => quill.focus(), 300)
-				// })
+				quill.root.addEventListener('focus', () => {
+					if (eventSources === Quill.sources.API) return
+					setKeyboardHeight(0)
+					setMoreType(MessageMore.TEXT)
+					quill.blur()
+					setTimeout(() => quill.focus(), 300)
+				})
 
 				clearTimeout(timer)
 			}, 0)
 		})
 
-		setWidth(document.body.clientWidth)
+		// setWidth(document.body.clientWidth)
 
 		const handlerContextmenu = (e: { preventDefault: () => any }) => e.preventDefault()
 
@@ -198,13 +204,35 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	useAsyncEffect(
 		async () => {
 			if (!audioData?.file) return
-			// const { data } = await StorageService.uploadFile({ file: audioData!.file, type: 0 })
-			// if (!data) return
-			// console.log('data', data)
+			let msg: any
+			try {
+				const duration = Math.ceil(audioData.duration / 1000)
+
+				msg = msgStore.craeteMessage(MESSAGE_TYPE.AUDIO, `${duration} "`)
+
+				// 音频上传
+				const { data } = await StorageService.uploadFile({ file: audioData!.file, type: 0 })
+
+				if (data) {
+					msg.content = `[语音信息]`
+					msg.msg_send_state = MESSAGE_SEND.SEND_SUCCESS
+					msg.msg_url = data.url
+					msg.file_id = data.file_id
+					msg.duration = duration
+					msgStore.send(msg)
+				}
+			} catch (error) {
+				console.log(error)
+				msg.msg_send_state = MESSAGE_SEND.SEND_FAILED
+			}
 		},
 		() => {},
 		[audioData?.file]
 	)
+
+	useEffect(() => {
+		if (error) console.log('报错')
+	}, [error])
 
 	return (
 		<>
@@ -245,11 +273,15 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 								>
 									<KeyboardIcon className="text-4xl text-gray-500 mr-2 animate__animated animate__zoomIn" />
 								</Link>
-								<Button className="w-full flex h-9 mx-2 rounded animate__animated animate__zoomIn bg-bgTertiary justify-center items-center text-gray-500 select-none">
-									<div className="" {...longPressEvent} ref={audioRef}>
-										{$t('按住说话')}
-									</div>
-								</Button>
+								{/* <Button className="w-full flex h-9 mx-2 rounded animate__animated animate__zoomIn bg-bgTertiary justify-center items-center text-gray-500 select-none"> */}
+								<div
+									className="w-full flex h-9 mx-2 rounded animate__animated animate__zoomIn bg-bgTertiary justify-center items-center text-gray-500 select-none active:bg-primary active:bg-opacity-50 active:text-white"
+									{...longPressEvent}
+									ref={audioRef}
+								>
+									{$t('按住说话')}
+								</div>
+								{/* </Button> */}
 								<Link onClick={() => moreTypeChange(MessageMore.TEXT)}>
 									<PlusCircle className="text-4xl text-gray-500 mr-2" />
 								</Link>
@@ -327,7 +359,6 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 												setMsgType(MESSAGE_TYPE.AUDIO)
 											}}
 											// {...longPressEvent}
-											// ref={audioRef}
 										>
 											<MicCircleFill
 												className={clsx(
@@ -373,17 +404,14 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 				</div>
 			</div>
 
-			{isRecording ||
-				(!isRecording && (
-					<div
-						className="fixed w-full h-screen bg-black bg-opacity-20 bottom-0 -z-1 flex justify-center items-center"
-						onMouseMove={() => {
-							console.log('onMouseMove')
-						}}
-					>
-						<div className="w-3/5 h-16 rounded recwave text-white text-center"></div>
-					</div>
-				))}
+			{isRecording && (
+				<div
+					className="fixed w-full h-screen bg-black bg-opacity-20 bottom-0 -z-1 flex justify-center items-center"
+					ref={recordRef}
+				>
+					<div className="w-3/5 h-16 rounded recwave text-white text-center"></div>
+				</div>
+			)}
 
 			{/* !isRecording ||  */}
 			{/* <div

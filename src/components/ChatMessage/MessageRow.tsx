@@ -73,7 +73,7 @@ const MessageRow: React.FC<RowProps & MessageRowProps> = ({ index, setItemSize, 
 	}, [])
 
 	return (
-		<div ref={itemRef} className={clsx('h-auto', !msg?.is_tips && !is_read && 'bg-gray-200')} style={{ zIndex: 1 }}>
+		<div ref={itemRef} className={clsx('h-auto', !msg?.is_tips && !is_read && 'bg-gray')} style={{ zIndex: 1 }}>
 			<List noChevron mediaList className="my-0">
 				<ListItem
 					key={index}

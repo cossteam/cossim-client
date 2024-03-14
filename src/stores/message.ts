@@ -31,6 +31,13 @@ interface Options {
 	at_all_user?: number
 	at_users?: string[]
 	is_burn_after_reading?: number
+	audioData?: {
+		file_id: string
+		url: string
+	},
+	msg_url?: string
+	file_id?: string
+	duration?: number
 }
 
 export interface MessageStore {
@@ -190,6 +197,14 @@ export interface MessageStore {
 	 * 从头部添加消息
 	 */
 	addMessages: () => void
+	/**
+	 * 创建消息
+	 */
+	craeteMessage: (type: MESSAGE_TYPE, content: string, options?: Options) => PrivateChats
+	/**
+	 * 发送消息
+	 */
+	send: (msg: PrivateChats, options?: Options) => Promise<void>
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -211,9 +226,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	height: 0,
 	refresh: false,
 	num: 0,
-	updateTrgger: (trgger: boolean) => set({ trgger }),
+	updateTrgger: (trgger) => set({ trgger }),
 
-	updateMessage: async (msg: PrivateChats) => {
+	updateMessage: async (msg) => {
 		const { messages } = get()
 		set({ messages: [...messages, msg] })
 	},
@@ -227,18 +242,12 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			console.log('删除消息失败', error)
 		}
 	},
-	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
-		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, tableName, userInfo } = get()
-
-		let error_message = ''
-
-		// 判断是否是群聊
+	craeteMessage: (type, content, options) => {
+		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, userInfo } = get()
 		let { is_group } = get()
-
 		is_group = options?.is_group ?? is_group
 
-		const { is_forward = false } = options
-
+		const is_forward = options?.is_forward ?? false
 		const isUpdate = (is_forward && receiver_id === options?.receiver_id) || !options?.receiver_id
 
 		const msg: any = {
@@ -265,18 +274,30 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			at_users: at_users || [],
 			group_id: is_group ? Number(options?.receiver_id || receiver_id) : 0,
 			uid: uuidv4(),
-			is_tips: false
+			is_tips: false,
+			msg_url: options?.msg_url,
+			file_id: options?.file_id,
+			duration: options?.duration
 		}
-
-		// 如果是群聊
 		if (!msg.group_id) msg.group_id = 0
-
 		isUpdate && set({ messages: [...messages, msg] })
 
+		return msg
+	},
+	send: async (msg, options) => {
+		const { receiver_id, at_all_user, at_users } = get()
+		let { is_group } = get()
+
+		is_group = options?.is_group ?? is_group
+		const is_forward = options?.is_forward ?? false
+		const isUpdate = (is_forward && receiver_id === options?.receiver_id) || !options?.receiver_id
+
+		let error_message = ''
 		try {
+			// 上传文件操作
 			const params: any = {
-				type,
-				content,
+				type: msg.type,
+				content: msg.content,
 				dialog_id: msg.dialog_id,
 				replay_id: msg.reply_id,
 				is_burn_after_reading: msg.is_burn_after_reading
@@ -307,7 +328,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		} finally {
 			const msgs: any[] = []
 			msgs.push(msg)
-			await updateDatabaseMessage(tableName, msg.uid, msg)
+			await updateDatabaseMessage(UserStore.tables.messages, msg.uid, msg)
 
 			// 如果有错误信息
 			if (error_message) {
@@ -319,7 +340,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 					type: MESSAGE_TYPE.ERROR,
 					uid: uuidv4()
 				})
-				isUpdate && (await updateDatabaseMessage(tableName, msgs[1].uid, msgs[1]))
+				isUpdate && (await updateDatabaseMessage(UserStore.tables.messages, msgs[1].uid, msgs[1]))
 			} else {
 				// 更新会话
 				await updateDialogs(msg.dialog_id, msg)
@@ -332,6 +353,17 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 					at_users: []
 				}))
 		}
+	},
+	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
+		const { messages, receiver_id, craeteMessage, send } = get()
+		const is_forward = options?.is_forward ?? false
+		const isUpdate = (is_forward && receiver_id === options?.receiver_id) || !options?.receiver_id
+		const msg = craeteMessage(type, content, options)
+
+		// 如果是群聊
+		if (!msg.group_id) msg.group_id = 0
+		isUpdate && set({ messages: [...messages, msg] })
+		await send(msg, options)
 	},
 	editMessage: async (msg: PrivateChats, content: string) => {
 		const { is_group, messages, tableName } = get()
