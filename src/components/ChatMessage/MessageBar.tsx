@@ -194,8 +194,11 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	}
 
 	// 文件上传
-	const upload = (file: File): Promise<string> => {
-		return new Promise<string>((resolve, reject) => {
+	const upload = (file: File) => {
+		return new Promise<{
+			url: string
+			file_id: string
+		}>((resolve, reject) => {
 			StorageService.uploadFile({
 				file: file,
 				type: 2
@@ -205,7 +208,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 						reject(null)
 						return
 					}
-					resolve(data.url ?? '')
+					resolve(data)
 				})
 				.catch((err) => {
 					console.log(err)
@@ -252,13 +255,14 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 	// 文件选择
 	const onSelectFiles = async (files: File[]) => {
+		console.log(files)
 		for (const file of files) {
 			let fileMsg
 			const type = file.type
 			const typeText = fileTypeText(type)
 			if (file.size > 1024 * 1024 * 500) {
 				// 超过500M
-				fileMsg = await msgStore.craeteMessage(MESSAGE_TYPE.FILE, ``)
+				fileMsg = await msgStore.craeteMessage(MESSAGE_TYPE.FILE, `233000`)
 				fileMsg.content = `[${typeText}]`
 				fileMsg.msg_send_state = MESSAGE_SEND.SEND_FAILED
 				msgStore.updateDB(fileMsg, '文件过大[仅支持不超过500M的文件]', false)
@@ -266,10 +270,19 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 			}
 			try {
 				fileMsg = await msgStore.craeteMessage(fileMessageType(type), ``)
-				fileMsg.content = await fileBase64(file)
-				upload(file)
-				console.log(fileMsg)
+				fileMsg.msg_send_state = MESSAGE_SEND.SENDING
+				fileMsg.content = JSON.stringify({
+					url: await fileBase64(file)
+				})
+				const { url, file_id } = await upload(file)
+				fileMsg.content = JSON.stringify({
+					url
+				})
+				fileMsg.file_id = file_id
+				msgStore.send(fileMsg)
 			} catch (error: any) {
+				if (!fileMsg) return
+				fileMsg.msg_send_state = MESSAGE_SEND.SEND_FAILED
 				msgStore.updateDB(fileMsg, error.message ?? error, false)
 			}
 		}

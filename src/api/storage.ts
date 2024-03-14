@@ -9,7 +9,7 @@ class StorageServiceImpl {
 	 *
 	 * @param {UploadFile}  上传文件参数
 	 */
-	uploadFile(data: UploadFile) {
+	uploadFile(data: UploadFile): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/files`,
 			method: 'post',
