@@ -33,14 +33,14 @@ const useSpeechRecognition = (): SpeechRecognition => {
 		setLoading(true)
 
 		if (!rec.current) open()
-		
+
 		rec.current.open(
 			() => {
 				//打开麦克风授权获得相关资源
 				rec.current.start()
 
 				//创建可视化，指定一个要显示的div
-				if (Recorder.WaveView)
+				if (Recorder.WaveView && document.querySelector('.recwave'))
 					wave.current = Recorder.WaveView({
 						elem: '.recwave',
 						lineCount: 90,
@@ -74,6 +74,8 @@ const useSpeechRecognition = (): SpeechRecognition => {
 					const fileName = `${Math.random().toString(36).substring(6)}.mp3`
 					const file = new File([blob], fileName, { type: 'audio/mp3' })
 					setAudioData({ url: localUrl, duration: duration, blob, file })
+
+					console.log('录音成功：', audioData)
 				},
 				(msg: string) => {
 					console.log('录音失败:' + msg)
@@ -106,7 +108,11 @@ const useSpeechRecognition = (): SpeechRecognition => {
 	}
 
 	useEffect(() => {
-		open()
+		// open()
+
+		return () => {
+			rec.current && rec.current.close()
+		}
 	}, [])
 
 	return {

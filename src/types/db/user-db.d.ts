@@ -149,7 +149,7 @@ export interface PrivateChats {
 	/** 已读时间 */
 	read_at: number
 	/** 对方 id */
-	receiver_id: string
+	// receiver_id: string
 	/** 回复者 id  */
 	replay_id: number
 	/** 发送者 id */
