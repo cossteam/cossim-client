@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Recorder from 'recorder-core'
 import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
@@ -107,13 +107,13 @@ const useSpeechRecognition = (): SpeechRecognition => {
 		})
 	}
 
-	useEffect(() => {
-		// open()
+	// useEffect(() => {
+	// 	// open()
 
-		return () => {
-			rec.current && rec.current.close()
-		}
-	}, [])
+	// 	return () => {
+	// 		rec.current && rec.current.close()
+	// 	}
+	// }, [])
 
 	return {
 		startRecording,
