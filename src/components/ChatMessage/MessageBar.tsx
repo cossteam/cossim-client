@@ -193,12 +193,78 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		// setTimeout(() => editorRef.current?.quill?.focus(), 300)
 	}
 
-	// 上传文件
-	const onSelectFiles = (baseFiles: string[]) => {
-		console.log('files', baseFiles)
+	// 文件上传
+	const upload = (file: File): Promise<string> => {
+		return new Promise<string>((resolve, reject) => {
+			StorageService.uploadFile({
+				file: file,
+				type: 2
+			})
+				.then(({ code, data }: any) => {
+					if (code !== 200) {
+						reject(null)
+						return
+					}
+					resolve(data.url ?? '')
+				})
+				.catch((err) => {
+					console.log(err)
+					reject(err)
+				})
+		})
 	}
-	const onUploadSuccess = (fileUrls: string[]) => {
-		console.log('files', fileUrls)
+
+	// base64
+	const fileBase64 = (file: File): Promise<string> => {
+		return new Promise<string>((resolve, reject) => {
+			const reader = new FileReader()
+			reader.readAsDataURL(file)
+			reader.onload = (e: any) => {
+				resolve(e.target.result)
+			}
+			reader.onerror = (e) => {
+				reject(e)
+			}
+		})
+	}
+
+	const fileTypeText = (type: string) => {
+		switch (type) {
+			case 'image/*':
+				return '图片'
+			case 'video/*':
+				return '视频'
+			default:
+				return '文件'
+		}
+	}
+
+	const fileMessageType = () => {}
+
+	// 文件选择
+	const onSelectFiles = async (files: File[]) => {
+		for (const file of files) {
+			let fileMsg
+			const type = file.type
+			const typeText = fileTypeText(type)
+			if (file.size > 1024 * 1024 * 500) {
+				// 超过500M
+				fileMsg = await msgStore.craeteMessage(MESSAGE_TYPE.FILE, ``)
+				fileMsg.content = `[${typeText}]`
+				fileMsg.msg_send_state = MESSAGE_SEND.SEND_FAILED
+				msgStore.updateDB(fileMsg, '文件过大[仅支持不超过500M的文件]', false)
+				return
+			}
+			try {
+				fileMsg = await msgStore.craeteMessage(type === 'image/*' ? MESSAGE_TYPE.IMAGE : MESSAGE_TYPE.VIDEO, ``)
+				console.log(fileMsg)
+
+				// fileBase64(file)
+				// upload(file)
+			} catch (error: any) {
+				msgStore.updateDB(fileMsg, error.message ?? error, false)
+			}
+		}
 	}
 
 	useAsyncEffect(
@@ -208,22 +274,28 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 			try {
 				const duration = Math.ceil(audioData.duration / 1000)
 
-				msg = msgStore.craeteMessage(MESSAGE_TYPE.AUDIO, `${duration} "`)
+				msg = await msgStore.craeteMessage(MESSAGE_TYPE.AUDIO, `${duration} "`)
 
 				// 音频上传
-				const { data } = await StorageService.uploadFile({ file: audioData!.file, type: 0 })
+				const { code, data, msg: message } = await StorageService.uploadFile({ file: audioData!.file, type: 0 })
+
+				if (code !== 200) {
+					throw new Error(message)
+				}
 
 				if (data) {
-					msg.content = `[语音信息]`
+					msg.content = data.url
 					msg.msg_send_state = MESSAGE_SEND.SEND_SUCCESS
 					msg.msg_url = data.url
 					msg.file_id = data.file_id
 					msg.duration = duration
 					msgStore.send(msg)
 				}
-			} catch (error) {
-				console.log(error)
-				msg.msg_send_state = MESSAGE_SEND.SEND_FAILED
+			} catch (error: any) {
+				if (msg) {
+					msg.msg_send_state = MESSAGE_SEND.SEND_FAILED
+					msgStore.updateDB(msg, error, false)
+				}
 			}
 		},
 		() => {},
@@ -396,7 +468,6 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 									f7router={f7router!}
 									members={members}
 									onSelectFiles={onSelectFiles}
-									onUploadSuccess={onUploadSuccess}
 								/>
 							)}
 						</div>
