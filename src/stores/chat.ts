@@ -5,23 +5,6 @@ import { ChatStore, ChatStoreValue } from '@/types/store/chat'
 import { messageFromServer } from '@/shared'
 import { v4 as uuidv4 } from 'uuid'
 
-// const defaultMessage: PrivateChats = {
-// 	msg_id: 0,
-// 	sender_id: '',
-// 	sender_name: '',
-// 	sender_avatar: '',
-// 	content: '',
-// 	created_at: 0,
-// 	dialog_id: 0,
-// 	is_burn_after_reading: 0,
-// 	is_label: 0,
-// 	is_read: 0,
-// 	read_at: 0,
-// 	receiver_id: '',
-// 	replay_id: 0,
-// 	type: 0
-// }
-
 const defaultStore: ChatStoreValue = {
 	opened: false,
 	receiver_info: {

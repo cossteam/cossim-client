@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { App as AppComponent, Icon, View, f7 } from 'framework7-react'
+import { App as AppComponent, View, f7 } from 'framework7-react'
 import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
@@ -25,20 +25,18 @@ import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
 import DOMPurify from 'dompurify'
-import { OwnEventEnum, useLiveStore } from './stores/live'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 // import { useChatStore } from './stores/chat'
-import Message from '@/components/Message/Message'
+// import Message from '@/components/Message/Message'
 import LiveRoom from './pages/Live/LiveRoom'
+import { OwnEventEnum, useLiveStore } from './stores/live'
 
 let store: MessageStore | null = null
 
 function App() {
 	const msgStore = useMessageStore()
 	const stateStore = useStateStore()
-	// const chatStore = useChatStore()
-	// const user_id = getCookie(USER_ID) || ''
 
 	const toastRef = useRef(null)
 
@@ -114,7 +112,13 @@ function App() {
 				case SocketEvent.GroupCallRejectEvent:
 				case SocketEvent.UserCallHangupEvent:
 				case SocketEvent.GroupCallHangupEvent:
-					liveStore.updateEvent(event, data)
+					if (liveStore.ownEvent === OwnEventEnum.IDLE) {
+						liveStore.updateEvent(event, data)
+						break
+					}
+					f7.dialog.confirm('你有新的通话请求是否结束当前通话并接听？', () => {
+						liveStore.updateEvent(event, data)
+					})
 					break
 				case SocketEvent.MessageLabelEvent:
 					handlerLabelSocket(data, store!)
@@ -203,16 +207,8 @@ function App() {
 			{hasCookie(TOKEN) ? (
 				<>
 					<Layout />
-					<Message />
+					{/* <Message /> */}
 					<LiveRoom />
-					{!liveStore.opened && liveStore.ownEvent !== OwnEventEnum.IDLE && (
-						<div
-							className="show-live z-[9999] bg-[rgba(0,0,0,0.8)] text-white py-4 pl-3 pr-2 rounded-l-lg fixed top-[20%] right-0"
-							onClick={() => liveStore.updateOpened(!liveStore.opened)}
-						>
-							<Icon f7="phone_fill" />
-						</div>
-					)}
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />

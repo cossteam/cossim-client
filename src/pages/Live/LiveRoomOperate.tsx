@@ -18,20 +18,19 @@ const LiveRoomOperate: React.FC<any> = (props: any) => {
 
 	return (
 		<div className="h-full flex flex-col" {...props}>
-			<div className="h-16 px-4 flex justify-between items-center">
+			<div className="h-16 px-4 flex justify-between items-center z-[9999]">
 				<Link
 					className="pt-1"
 					iconF7="arrow_uturn_down_circle_fill"
 					iconSize={30}
 					// TODO: 最小化开启悬浮窗口
-					onClick={() => liveStore.updateOpened(false)}
+					onClick={() => liveStore.updateOpened(!liveStore.opened)}
 				/>
 				<span></span>
 				<span></span>
 			</div>
 			<div className="flex-1 flex overflow-scroll">{props.children && props.children}</div>
-			{/* <div className="min-h-64 pt-4 flex flex-col bg-[rgb(0,0,0,0.05)]"> */}
-			<div className="min-h-64 pt-4 flex flex-col">
+			<div className="min-h-64 pt-4 flex flex-col z-[9999]">
 				<div className="text-center">{liveStore.ownEventDesc(liveStore.ownEvent)}</div>
 				<div className="flex-1 flex justify-evenly items-center">
 					<OperateButton
@@ -56,7 +55,7 @@ const LiveRoomOperate: React.FC<any> = (props: any) => {
 					/>
 				</div>
 				<div className="flex-1 flex justify-evenly items-center">
-					{liveStore.ownEvent === OwnEventEnum.BUSY ? (
+					{[OwnEventEnum.BUSY, OwnEventEnum.WAITING].includes(liveStore.ownEvent) && (
 						<OperateButton
 							f7Icon="phone_fill"
 							iconClassName="rotate-90"
@@ -64,22 +63,23 @@ const LiveRoomOperate: React.FC<any> = (props: any) => {
 							backgroundColor="#F9BAA7"
 							onClick={liveStore.hangup}
 						/>
-					) : (
-						<OperateButton
-							f7Icon="phone_fill"
-							iconClassName="rotate-90"
-							text="拒绝"
-							backgroundColor="#F9BAA7"
-							onClick={liveStore.refuse}
-						/>
 					)}
 					{liveStore.ownEvent === OwnEventEnum.INVITED && (
-						<OperateButton
-							f7Icon="phone_fill"
-							text="接听"
-							backgroundColor="#65C6B0"
-							onClick={liveStore.accept}
-						/>
+						<>
+							<OperateButton
+								f7Icon="phone_fill"
+								iconClassName="rotate-90"
+								text="拒绝"
+								backgroundColor="#F9BAA7"
+								onClick={liveStore.refuse}
+							/>
+							<OperateButton
+								f7Icon="phone_fill"
+								text="接听"
+								backgroundColor="#65C6B0"
+								onClick={liveStore.accept}
+							/>
+						</>
 					)}
 				</div>
 			</div>

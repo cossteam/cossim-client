@@ -125,6 +125,8 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 								)
 							)}
 						</NavRight>
+
+						{/* 群公告 */}
 						{isShowGroupAnnouncement && (
 							<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster">
 								<Link

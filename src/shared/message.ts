@@ -110,7 +110,7 @@ export const addMarkMessage = async (tableName: string, msg: PrivateChats, is_la
  *  @param {PrivateChats} msg
  *  @returns
  */
-export const updateDialogs = async (dialog_id: string, msg: PrivateChats) => {
+export const updateDialogs = async (dialog_id: number, msg: PrivateChats) => {
 	try {
 		const result = await UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', dialog_id)
 		if (!result) return

@@ -75,9 +75,12 @@ export default class LiveRoomClient {
 			RoomEvent.TrackSubscribed,
 			(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant) => {
 				console.log('TrackPublication', publication)
-				console.log('参与人', participant)
+				console.log('参与人', participant.videoTracks)
 				if (track.kind === 'video') {
-					this.rootNode?.appendChild(track.attach())
+					const element: HTMLDivElement = document.createElement('div')
+					element.className = 'video_box'
+					element.appendChild(track.attach())
+					this.rootNode?.appendChild(element)
 				} else if (track.kind === 'audio') {
 					track.attach().play()
 				}
@@ -141,8 +144,7 @@ export default class LiveRoomClient {
 		this.localVideoTrack = await this.client.localParticipant.setCameraEnabled(true)
 		//播放本地视频
 		const element: HTMLDivElement = document.createElement('div')
-		element.id = 'self_video'
-		element.setAttribute('style', 'display: flex; justify-content: center; align-items: center;')
+		element.className = 'self_video video_box'
 		element.appendChild(this.localVideoTrack.track.attach())
 		this.rootNode?.appendChild(element)
 	}
@@ -165,8 +167,8 @@ export default class LiveRoomClient {
 			if (this.localVideoTrack) {
 				this.client.localParticipant.setCameraEnabled(false)
 				console.log(this.localVideoTrack)
-				// const el = track.attach()
-				// el.parentElement?.removeChild(el)
+				const el = this.localVideoTrack.track.attach()
+				el.parentElement?.removeChild(el)
 				this.localVideoTrack.track.detach()
 				this.localVideoTrack = null
 			}

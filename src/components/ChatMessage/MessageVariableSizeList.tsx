@@ -63,7 +63,7 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 
 	useEffect(() => {
 		if (!msgStore.refresh) return
-		listRef.current?.scrollToItem(prevScrollTop.current, 'start')
+		// listRef.current?.scrollToItem(prevScrollTop.current, 'start')
 		// msgStore.updateRefresh(false)
 	}, [msgStore.messages, msgStore.refresh])
 

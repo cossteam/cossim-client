@@ -1,6 +1,6 @@
 import { OwnEventEnum, useLiveStore } from '@/stores/live'
-import { Page, PageContent, Popup } from 'framework7-react'
-import { useEffect, useRef, useState } from 'react'
+import { Icon, Page, PageContent, Popup } from 'framework7-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import LiveRoomContent from './LiveRoomContent'
 import LiveRoomOperate from './LiveRoomOperate'
 import LiveRoomClient from './live'
@@ -48,13 +48,12 @@ const LiveRoom: React.FC = () => {
 					.then(() => {
 						liveStore.audio && liveRoomClient.current?.createAudioTrack()
 						liveStore.video && liveRoomClient.current?.createVideoTrack()
-						console.log('client', liveRoomClient.current?.client)
 						setConnect(true)
 					})
 					.catch((e: any) => {
 						console.log('WS连接失败，以挂断', e)
 						setConnect(false)
-						liveStore.hangup()
+						// liveStore.hangup()
 					})
 				break
 			case OwnEventEnum.HANGUP:
@@ -101,25 +100,28 @@ const LiveRoom: React.FC = () => {
 		}
 	}, [liveStore.opened])
 
+	const isGroup = useMemo(() => liveStore.isGroup, [liveStore.isGroup])
+
 	return (
-		<Popup opened={liveStore.opened} tabletFullscreen closeByBackdropClick={false}>
-			<Page noNavbar noToolbar>
-				<PageContent className=" bg-[rgba(0,0,0,0.73)] text-white ">
-					<div className="absolute w-full h-full">
-						{!liveStore.isGroup && (
-							<LiveRoomContent isGroup={liveStore.isGroup} rootNodeId={ROOT_NODE_ID} />
-						)}
-					</div>
-					<div className="absolute w-full h-full">
+		<>
+			<Popup opened={liveStore.opened} tabletFullscreen closeByBackdropClick={false}>
+				<Page noNavbar noToolbar>
+					<PageContent className=" bg-[rgba(0,0,0,0.73)] text-white ">
 						<LiveRoomOperate>
-							{liveStore.isGroup && (
-								<LiveRoomContent isGroup={liveStore.isGroup} rootNodeId={ROOT_NODE_ID} />
-							)}
+							<LiveRoomContent isGroup={isGroup} rootNodeId={ROOT_NODE_ID} />
 						</LiveRoomOperate>
-					</div>
-				</PageContent>
-			</Page>
-		</Popup>
+					</PageContent>
+				</Page>
+			</Popup>
+			{!liveStore.opened && liveStore.ownEvent !== OwnEventEnum.IDLE && (
+				<div
+					className="show-live z-[9999] bg-[rgba(0,0,0,0.8)] text-white py-4 pl-3 pr-2 rounded-l-lg fixed top-[20%] right-0"
+					onClick={() => liveStore.updateOpened(!liveStore.opened)}
+				>
+					<Icon f7="phone_fill" />
+				</div>
+			)}
+		</>
 	)
 }
 

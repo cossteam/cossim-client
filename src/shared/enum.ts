@@ -21,7 +21,9 @@ export enum MESSAGE_TYPE {
 	/** 待办 */
 	TODO = 7,
 	/** 错误信息 */
-	ERROR = 8
+	ERROR = 8,
+	/** 视频 */
+	VIDEO = 9
 }
 
 /** 消息阅读状态 */

@@ -152,7 +152,7 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 		const { id, isGroup } = get()
 		const refuseRoomParams: any = {}
 		!isGroup && (refuseRoomParams['user_id'] = id)
-		isGroup && (refuseRoomParams['group_id'] = id)
+		isGroup && (refuseRoomParams['group_id'] = Number(id))
 		try {
 			!isGroup
 				? await CallService.rejectLiveUserApi(refuseRoomParams)
@@ -179,19 +179,23 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 		}, 2000)
 	},
 	accept: async () => {
-		const { id, isGroup } = get()
+		const { id, isGroup, hangup } = get()
 		const joinRoomParams: any = {}
 		!isGroup && (joinRoomParams['user_id'] = id)
-		isGroup && (joinRoomParams['group_id'] = id)
+		isGroup && (joinRoomParams['group_id'] = Number(id))
 		try {
 			f7.dialog.preloader('连接中...')
 			const { code, data, msg } = !isGroup
 				? await CallService.joinLiveUserApi(joinRoomParams)
 				: await CallService.joinLiveGroupApi(joinRoomParams)
 			if (code !== 200) {
-				f7.dialog.alert(msg)
+				f7.dialog.alert(msg, () => {
+					hangup()
+				})
 				return
 			}
+			console.log('data', data)
+
 			set({
 				serverUrl: data.url,
 				token: data.token,
@@ -207,14 +211,16 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 		set({
 			ownEvent: OwnEventEnum.HANGUP
 		})
-		const { id, isGroup } = get()
+		const { id, isGroup, hanged } = get()
 		const createRoomParams: any = {}
 		!isGroup && (createRoomParams['user_id'] = id)
-		isGroup && (createRoomParams['group_id'] = id)
+		isGroup && (createRoomParams['group_id'] = Number(id))
 		try {
 			!isGroup
 				? await CallService.leaveLiveUserApi(createRoomParams)
 				: await CallService.leaveLiveGroupApi(createRoomParams)
+		} catch {
+			hanged()
 		} finally {
 			setTimeout(() => {
 				f7.dialog.close()
@@ -249,9 +255,14 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 		switch (event) {
 			case SocketEvent.UserCallReqEvent:
 			case SocketEvent.GroupCallReqEvent:
-				// set({ id: eventDate.data.recipient_id })
-				set({ id: eventDate.data.sender_id })
-				ownEvent = OwnEventEnum.INVITED
+				{
+					const isGroup = event === SocketEvent.GroupCallReqEvent
+					set({
+						id: isGroup ? eventDate.data.group_id : eventDate.data.sender_id,
+						isGroup
+					})
+					ownEvent = OwnEventEnum.INVITED
+				}
 				break
 			case SocketEvent.UserCallRejectEvent:
 			case SocketEvent.GroupCallRejectEvent:

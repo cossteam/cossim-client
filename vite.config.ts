@@ -2,10 +2,14 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import pluginBasicSsl from '@vitejs/plugin-basic-ssl'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [react()],
+	plugins: [
+		react(),
+		pluginBasicSsl()
+	],
 	resolve: {
 		alias: {
 			'@': fileURLToPath(new URL('./src', import.meta.url))
@@ -20,17 +24,17 @@ export default defineConfig({
 		}
 	}
 	// server: {
-	// 	proxy: {
-	// 		'/api/v1': {
-	// 			target: ENV.VITE_BASE_URL,
-	// 			changeOrigin: true,
-	// 			rewrite: (path) => path.replace(/^\/api\/v1/, '')
-	// 		},
-	// 		'/api/v1/msg/ws': {
-	// 			target: ENV.VITE_WS_URL,
-	// 			changeOrigin: true,
-	// 			rewrite: (path) => path.replace(/^\/api\/v1\/msg\/ws/, '')
-	// 		}
+	// proxy: {
+	// 	'/api/v1': {
+	// 		target: ENV.VITE_BASE_URL,
+	// 		changeOrigin: true,
+	// 		rewrite: (path) => path.replace(/^\/api\/v1/, '')
+	// 	},
+	// 	'/api/v1/msg/ws': {
+	// 		target: ENV.VITE_WS_URL,
+	// 		changeOrigin: true,
+	// 		rewrite: (path) => path.replace(/^\/api\/v1\/msg\/ws/, '')
 	// 	}
+	// }
 	// }
 })
