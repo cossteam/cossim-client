@@ -239,7 +239,16 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		}
 	}
 
-	const fileMessageType = () => {}
+	const fileMessageType = (type: string) => {
+		switch (type) {
+			case 'image/*':
+				return MESSAGE_TYPE.IMAGE
+			case 'video/*':
+				return MESSAGE_TYPE.VIDEO
+			default:
+				return MESSAGE_TYPE.FILE
+		}
+	}
 
 	// 文件选择
 	const onSelectFiles = async (files: File[]) => {
@@ -256,11 +265,10 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 				return
 			}
 			try {
-				fileMsg = await msgStore.craeteMessage(type === 'image/*' ? MESSAGE_TYPE.IMAGE : MESSAGE_TYPE.VIDEO, ``)
+				fileMsg = await msgStore.craeteMessage(fileMessageType(type), ``)
+				fileMsg.content = await fileBase64(file)
+				upload(file)
 				console.log(fileMsg)
-
-				// fileBase64(file)
-				// upload(file)
 			} catch (error: any) {
 				msgStore.updateDB(fileMsg, error.message ?? error, false)
 			}
@@ -284,7 +292,10 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 				}
 
 				if (data) {
-					msg.content = data.url
+					msg.content = JSON.stringify({
+						url: data.url,
+						duration
+					})
 					msg.msg_send_state = MESSAGE_SEND.SEND_SUCCESS
 					msg.msg_url = data.url
 					msg.file_id = data.file_id
