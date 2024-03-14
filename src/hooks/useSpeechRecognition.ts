@@ -33,7 +33,7 @@ const useSpeechRecognition = (): SpeechRecognition => {
 		setLoading(true)
 
 		if (!rec.current) open()
-		
+
 		rec.current.open(
 			() => {
 				//打开麦克风授权获得相关资源
@@ -74,6 +74,7 @@ const useSpeechRecognition = (): SpeechRecognition => {
 					const fileName = `${Math.random().toString(36).substring(6)}.mp3`
 					const file = new File([blob], fileName, { type: 'audio/mp3' })
 					setAudioData({ url: localUrl, duration: duration, blob, file })
+					console.log(file)
 				},
 				(msg: string) => {
 					console.log('录音失败:' + msg)
