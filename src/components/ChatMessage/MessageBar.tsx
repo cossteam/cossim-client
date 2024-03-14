@@ -187,8 +187,12 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		// setTimeout(() => editorRef.current?.quill?.focus(), 300)
 	}
 
-	const onSelectImages = (images: string[]) => {
-		console.log('files', images)
+	// 上传文件
+	const onSelectFiles = (baseFiles: string[]) => {
+		console.log('files', baseFiles)
+	}
+	const onUploadSuccess = (fileUrls: string[]) => {
+		console.log('files', fileUrls)
 	}
 
 	useAsyncEffect(
@@ -360,7 +364,8 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 									id={receiver_id}
 									f7router={f7router!}
 									members={members}
-									onSelectImages={onSelectImages}
+									onSelectFiles={onSelectFiles}
+									onUploadSuccess={onUploadSuccess}
 								/>
 							)}
 						</div>

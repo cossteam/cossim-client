@@ -54,16 +54,14 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 	// base64
 	const fileBase64 = (file: File): Promise<string> => {
 		return new Promise<string>((resolve, reject) => {
-			setTimeout(() => {
-				const reader = new FileReader()
-				reader.readAsDataURL(file)
-				reader.onload = (e: any) => {
-					resolve(e.target.result)
-				}
-				reader.onerror = (e) => {
-					reject(e)
-				}
-			}, 2000)
+			const reader = new FileReader()
+			reader.readAsDataURL(file)
+			reader.onload = (e: any) => {
+				resolve(e.target.result)
+			}
+			reader.onerror = (e) => {
+				reject(e)
+			}
 		})
 	}
 
