@@ -1,7 +1,7 @@
 import type { PrivateChats } from '@/types/db/user-db'
 import clsx from 'clsx'
 import { Exclamationmark, Flag, Gobackward } from 'framework7-icons/react'
-import { createElement, RefObject, useCallback, useMemo, useRef, useState } from 'react'
+import { createElement, RefObject, useCallback, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { $t, formatTime, isMe, formatTimeFull, MESSAGE_SEND, MESSAGE_TYPE, TOOLTIP_TYPE } from '@/shared'
@@ -10,6 +10,8 @@ import LongPressButton from '@/components/LongPressButton/LongPressButton'
 import { ReadEditor } from '@/Editor'
 import { useTooltipsStore } from '@/stores/tooltips'
 import MessageAudio from './Audio/MessageAudio'
+import MessageVideo from './Video/MessageVideo'
+import MessageImage from './Image/MessageImage'
 
 interface MessageBoxProps {
 	msg: PrivateChats
@@ -49,21 +51,27 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 		tooltipRef.current!.appendChild(div)
 	}, [])
 
-	const Row = useMemo(() => {
+	const Row = () => {
 		switch (msg?.type) {
 			case MESSAGE_TYPE.AUDIO:
 				return <MessageAudio msg={msg} />
+			case MESSAGE_TYPE.VIDEO:
+				return <MessageVideo msg={msg} />
+			case MESSAGE_TYPE.IMAGE:
+				return <MessageImage msg={msg} />
+			case MESSAGE_TYPE.FILE:
+				return <div className="py-2 px-2 bg-primary">[文件]</div>
 			default:
 				return (
 					<ReadEditor
 						content={msg?.content}
 						replyContent={reply?.content}
 						replyName={reply?.sender_info?.name ?? reply?.sender_info?.nickname ?? ''}
-						className={clsx(is_self ? '' : 'read-editor-no-slef')}
+						className={clsx('py-2 px-2', is_self ? 'bg-primary' : 'read-editor-no-slef bg-white')}
 					/>
 				)
 		}
-	}, [msg])
+	}
 
 	// 标注信息
 	if (msg?.type === MESSAGE_TYPE.LABEL) {
@@ -130,10 +138,10 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 					<LongPressButton callback={() => createTooltip()}>
 						<div
 							className={clsx(
-								'rounded-lg relative py-2 break-all mb-1 select-none',
+								'rounded-lg relative break-all mb-1 select-none overflow-hidden',
 								is_self
-									? 'bg-primary text-white  after:left-full after:border-l-primary rounded-tr-none '
-									: 'bg-bgPrimary after:right-full after:border-r-white rounded-tl-none '
+									? 'text-white  after:left-full after:border-l-primary rounded-tr-none '
+									: 'bg-bgPrimary after:right-full after:border-r-white rounded-tl-none'
 							)}
 							data-id={msg?.msg_id}
 							data-index={index}
@@ -150,7 +158,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 									className={clsx(is_self ? '' : 'read-editor-no-slef')}
 								/>
 							)} */}
-							{Row}
+							{Row()}
 						</div>
 					</LongPressButton>
 

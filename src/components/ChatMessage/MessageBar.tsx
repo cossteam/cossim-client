@@ -243,7 +243,12 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	}
 
 	const fileMessageType = (type: string) => {
-		switch (type) {
+		switch (
+			type
+				.split('/')
+				.map((part, index) => (index === 0 ? part : '*'))
+				.join('/')
+		) {
 			case 'image/*':
 				return MESSAGE_TYPE.IMAGE
 			case 'video/*':
@@ -262,13 +267,15 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 			const typeText = fileTypeText(type)
 			if (file.size > 1024 * 1024 * 500) {
 				// 超过500M
-				fileMsg = await msgStore.craeteMessage(MESSAGE_TYPE.FILE, `233000`)
+				fileMsg = await msgStore.craeteMessage(MESSAGE_TYPE.FILE, `-`)
 				fileMsg.content = `[${typeText}]`
 				fileMsg.msg_send_state = MESSAGE_SEND.SEND_FAILED
 				msgStore.updateDB(fileMsg, '文件过大[仅支持不超过500M的文件]', false)
 				return
 			}
 			try {
+				console.log(type, fileMessageType(type))
+
 				fileMsg = await msgStore.craeteMessage(fileMessageType(type), ``)
 				fileMsg.msg_send_state = MESSAGE_SEND.SENDING
 				fileMsg.content = JSON.stringify({
