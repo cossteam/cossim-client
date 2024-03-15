@@ -31,6 +31,7 @@ import { PluginListenerHandle } from '@capacitor/core'
 // import Message from '@/components/Message/Message'
 import LiveRoom from './pages/Live/LiveRoom'
 import { OwnEventEnum, useLiveStore } from './stores/live'
+import Preview from './components/Preview/Preview'
 
 let store: MessageStore | null = null
 
@@ -208,6 +209,7 @@ function App() {
 				<>
 					<Layout />
 					{/* <Message /> */}
+					<Preview />
 					<LiveRoom />
 				</>
 			) : (

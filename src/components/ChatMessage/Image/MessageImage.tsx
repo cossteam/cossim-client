@@ -1,3 +1,4 @@
+import { usePreviewStore } from '@/stores/preview'
 import { PrivateChats } from '@/types/db/user-db'
 import { useMemo } from 'react'
 
@@ -16,10 +17,14 @@ const MessageImage: React.FC<MessageAudioProps> = ({ msg }) => {
 
 	const url = useMemo(() => content?.url ?? '', [content?.url])
 
+	const previewStore = usePreviewStore()
+
 	return (
-		<div className="">
-			<img className="h-full" src={url} />
-		</div>
+		<>
+			<div className="" onClick={() => previewStore.preview({ url, type: 'image' })}>
+				<img className="h-full" src={url} />
+			</div>
+		</>
 	)
 }
 

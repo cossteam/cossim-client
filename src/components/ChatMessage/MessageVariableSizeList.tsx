@@ -87,17 +87,19 @@ const MessageVariableSizeList: React.FC<MessageVariableSizeListProps> = ({ Row, 
 	}, [])
 
 	return (
-		<VariableSizeList
-			ref={listRef}
-			height={height}
-			itemCount={msgStore.messages.length}
-			itemSize={getItemSize}
-			width="100%"
-			initialScrollOffset={msgStore.messages.length}
-			onScroll={handlerScroll}
-		>
-			{rowRender}
-		</VariableSizeList>
+		<>
+			<VariableSizeList
+				ref={listRef}
+				height={height}
+				itemCount={msgStore.messages.length}
+				itemSize={getItemSize}
+				width="100%"
+				initialScrollOffset={msgStore.messages.length}
+				onScroll={handlerScroll}
+			>
+				{rowRender}
+			</VariableSizeList>
+		</>
 	)
 }
 

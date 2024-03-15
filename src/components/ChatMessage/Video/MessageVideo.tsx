@@ -1,3 +1,4 @@
+import { usePreviewStore } from '@/stores/preview'
 import { PrivateChats } from '@/types/db/user-db'
 import { useMemo } from 'react'
 
@@ -16,10 +17,14 @@ const MessageVideo: React.FC<MessageAudioProps> = ({ msg }) => {
 
 	const url = useMemo(() => content?.url ?? '', [content?.url])
 
+	const previewStore = usePreviewStore()
+
 	return (
-		<div className="">
-			<video className="h-full" muted autoPlay loop src={url} />
-		</div>
+		<>
+			<div className="" onClick={() => previewStore.preview({ url, type: 'video' })}>
+				<video className="h-full" muted autoPlay loop src={url} />
+			</div>
+		</>
 	)
 }
 
