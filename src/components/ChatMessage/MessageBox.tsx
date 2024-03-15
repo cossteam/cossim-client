@@ -1,7 +1,7 @@
 import type { PrivateChats } from '@/types/db/user-db'
 import clsx from 'clsx'
 import { Exclamationmark, Flag, Gobackward } from 'framework7-icons/react'
-import { createElement, RefObject, useCallback, useRef, useState } from 'react'
+import { createElement, RefObject, useCallback, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { $t, formatTime, isMe, formatTimeFull, MESSAGE_SEND, MESSAGE_TYPE, TOOLTIP_TYPE } from '@/shared'
@@ -48,6 +48,22 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 		)
 		tooltipRef.current!.appendChild(div)
 	}, [])
+
+	const Row = useMemo(() => {
+		switch (msg?.type) {
+			case MESSAGE_TYPE.AUDIO:
+				return <MessageAudio msg={msg} />
+			default:
+				return (
+					<ReadEditor
+						content={msg?.content}
+						replyContent={reply?.content}
+						replyName={reply?.sender_info?.name ?? reply?.sender_info?.nickname ?? ''}
+						className={clsx(is_self ? '' : 'read-editor-no-slef')}
+					/>
+				)
+		}
+	}, [msg])
 
 	// 标注信息
 	if (msg?.type === MESSAGE_TYPE.LABEL) {
@@ -124,10 +140,8 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 							data-label={msg?.is_label}
 							ref={tooltipRef}
 						>
-							{msg?.type === MESSAGE_TYPE.AUDIO ? (
-								<div className={clsx('px-2 py-0')}>
-									<MessageAudio msg={msg} />
-								</div>
+							{/* {msg?.type === MESSAGE_TYPE.AUDIO ? (
+								<MessageAudio msg={msg} />
 							) : (
 								<ReadEditor
 									content={msg?.content}
@@ -135,7 +149,8 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 									replyName={reply?.sender_info?.name ?? reply?.sender_info?.nickname ?? ''}
 									className={clsx(is_self ? '' : 'read-editor-no-slef')}
 								/>
-							)}
+							)} */}
+							{Row}
 						</div>
 					</LongPressButton>
 
