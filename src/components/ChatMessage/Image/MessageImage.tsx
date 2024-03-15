@@ -16,8 +16,6 @@ const MessageImage: React.FC<MessageAudioProps> = ({ msg }) => {
 
 	const url = useMemo(() => content?.url ?? '', [content?.url])
 
-	console.log('msg', msg)
-
 	return (
 		<div className="">
 			<img className="h-full" src={url} />

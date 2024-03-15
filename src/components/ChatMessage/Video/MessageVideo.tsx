@@ -1,5 +1,5 @@
 import { PrivateChats } from '@/types/db/user-db'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 
 interface MessageAudioProps {
 	msg: PrivateChats
@@ -15,10 +15,6 @@ const MessageVideo: React.FC<MessageAudioProps> = ({ msg }) => {
 	}, [msg.content])
 
 	const url = useMemo(() => content?.url ?? '', [content?.url])
-
-	useEffect(() => {
-		console.log(content?.url)
-	}, [content])
 
 	return (
 		<div className="">

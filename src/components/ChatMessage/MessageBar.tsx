@@ -260,7 +260,6 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 	// 文件选择
 	const onSelectFiles = async (files: File[]) => {
-		console.log(files)
 		for (const file of files) {
 			let fileMsg
 			const type = file.type
@@ -274,8 +273,6 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 				return
 			}
 			try {
-				console.log(type, fileMessageType(type))
-
 				fileMsg = await msgStore.craeteMessage(fileMessageType(type), ``)
 				fileMsg.msg_send_state = MESSAGE_SEND.SENDING
 				fileMsg.content = JSON.stringify({

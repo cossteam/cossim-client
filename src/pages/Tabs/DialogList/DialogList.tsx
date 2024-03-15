@@ -14,7 +14,7 @@ import { Plus, Search, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } f
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useEffect, useState } from 'react'
 import { isEqual } from 'lodash-es'
-import { $t, formatDialogListTime, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND } from '@/shared'
+import { $t, formatDialogListTime, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MESSAGE_TYPE } from '@/shared'
 import UserStore from '@/db/user'
 import MsgService from '@/api/msg'
 import RelationService from '@/api/relation'
@@ -211,6 +211,28 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 			setPtrRefresh(false)
 		}
 	}
+
+	const Row = (item: any) => {
+		switch (item?.last_message?.msg_type) {
+			case MESSAGE_TYPE.IMAGE:
+				return '[图片]'
+			case MESSAGE_TYPE.VIDEO:
+				return '[视频]'
+			case MESSAGE_TYPE.FILE:
+				return '[文件]'
+			default:
+				return (
+					<ReadEditor
+						content={
+							(item?.group_id && item?.last_message?.sender_info?.name
+								? item?.last_message?.sender_info?.name + ':'
+								: '') + handlerContent(item?.last_message?.content ?? '')
+						}
+						className="dialog-read-editor"
+					/>
+				)
+		}
+	}
 	return (
 		<Page
 			ptr={ptrRefresh}
@@ -261,10 +283,11 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 									badge={item?.dialog_unread_count}
 									badgeColor="red"
 									swipeout
-									after={formatDialogListTime(item?.last_message?.send_time
-										? item?.last_message?.send_time
-										: item?.dialog_create_at,)
-									}
+									after={formatDialogListTime(
+										item?.last_message?.send_time
+											? item?.last_message?.send_time
+											: item?.dialog_create_at
+									)}
 									// format(
 									// 	item?.last_message?.send_time
 									// 		? item?.last_message?.send_time
@@ -293,14 +316,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 										slot="text"
 										className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap"
 									>
-										<ReadEditor
-											content={
-												(item?.group_id && item?.last_message?.sender_info?.name
-													? item?.last_message?.sender_info?.name + ':'
-													: '') + handlerContent(item?.last_message?.content ?? '')
-											}
-											className="dialog-read-editor"
-										/>
+										{Row(item)}
 									</div>
 									<SwipeoutActions right>
 										<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
