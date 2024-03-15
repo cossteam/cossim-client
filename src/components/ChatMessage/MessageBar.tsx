@@ -276,11 +276,15 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 				fileMsg = await msgStore.craeteMessage(fileMessageType(type), ``)
 				fileMsg.msg_send_state = MESSAGE_SEND.SENDING
 				fileMsg.content = JSON.stringify({
-					url: await fileBase64(file)
+					url: await fileBase64(file),
+					name: file.name,
+					size: file.size
 				})
 				const { url, file_id } = await upload(file)
 				fileMsg.content = JSON.stringify({
-					url
+					url,
+					name: file.name,
+					size: file.size
 				})
 				fileMsg.file_id = file_id
 				msgStore.send(fileMsg)

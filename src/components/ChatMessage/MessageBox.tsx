@@ -12,6 +12,7 @@ import { useTooltipsStore } from '@/stores/tooltips'
 import MessageAudio from './Audio/MessageAudio'
 import MessageVideo from './Video/MessageVideo'
 import MessageImage from './Image/MessageImage'
+import MessageFile from './File/MessageFile'
 
 interface MessageBoxProps {
 	msg: PrivateChats
@@ -60,7 +61,13 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 			case MESSAGE_TYPE.IMAGE:
 				return <MessageImage msg={msg} />
 			case MESSAGE_TYPE.FILE:
-				return <div className="py-2 px-2 bg-primary">[文件]</div>
+				// return <div className="py-2 px-2 bg-primary">[文件]</div>
+				return (
+					<MessageFile
+						className={clsx('py-2 px-2 bg-primary', is_self ? 'bg-primary' : 'bg-white text-black')}
+						msg={msg}
+					/>
+				)
 			default:
 				return (
 					<ReadEditor

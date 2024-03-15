@@ -2,7 +2,7 @@ import { useLiveStore } from '@/stores/live'
 import { useAsyncEffect, useFileDialog } from '@reactuses/core'
 import { Icon } from 'framework7-react'
 import { Router } from 'framework7/types'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface MessageMoreProps {
 	id: string
@@ -13,10 +13,13 @@ interface MessageMoreProps {
 }
 
 const MessageMore: React.FC<MessageMoreProps> = (props) => {
-	const [files, open, reset] = useFileDialog({
+	const [media, openAlbum, resetMedia] = useFileDialog({
 		multiple: true,
 		accept: 'image/*, video/*'
-		// capture: 'user' // user | environment
+	})
+	const [files, openFolder, resetFiles] = useFileDialog({
+		multiple: true,
+		accept: '*'
 	})
 	const liveStore = useLiveStore()
 	const [members, setMembers] = useState<any>()
@@ -29,9 +32,14 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 	}, [props.members])
 
 	// 文件选择
-	const openAlbum = () => {
-		reset()
-		open()
+	const selectFiles = (isFile: boolean = false) => {
+		if (isFile) {
+			resetFiles()
+			openFolder()
+			return
+		}
+		resetMedia()
+		openAlbum()
 	}
 	useAsyncEffect(
 		async () => {
@@ -41,13 +49,30 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		() => {},
 		[files]
 	)
+	useAsyncEffect(
+		async () => {
+			if (!media || !media?.length) return
+			props.onSelectFiles && props.onSelectFiles(media)
+		},
+		() => {},
+		[media]
+	)
+	const fileInputRef = useRef<any>()
+	const handleFileChange = (e: any) => {
+		props.onSelectFiles && props.onSelectFiles(e.target.files)
+	}
 
 	// 工具栏选项
 	const tools = [
+		// {
+		// 	f7Icon: 'camera',
+		// 	text: '相机',
+		// 	func: () => selectFiles()
+		// },
 		{
-			f7Icon: 'photo',
-			text: '相册',
-			func: () => openAlbum()
+			f7Icon: 'doc',
+			text: '文件',
+			func: () => selectFiles(true)
 		},
 		{
 			f7Icon: 'phone',
@@ -63,6 +88,24 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 
 	return (
 		<div className="toolbar-more w-full p-5 overflow-y-scroll grid grid-cols-5 gap-5">
+			<div
+				className="toolbar-more__item size-16 bg-gray-50 rounded-lg text-black-500 flex flex-col justify-center items-center"
+				onClick={() => {
+					fileInputRef.current.value = null
+					fileInputRef.current.click()
+				}}
+			>
+				<Icon f7="photo" className="text-3xl mb-1" />
+				<span className="text-xs">相册</span>
+				<input
+					ref={fileInputRef}
+					type="file"
+					accept="image/*, video/*"
+					multiple
+					style={{ display: 'none' }}
+					onChange={handleFileChange}
+				/>
+			</div>
 			{tools.map((tool, toolIdx) => {
 				return (
 					<div
