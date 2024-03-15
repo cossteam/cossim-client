@@ -107,6 +107,18 @@ const routes: Router.RouteParameters[] = [
 		asyncComponent: () => import('@/pages/CreateGroupNotice/CreateGroupNotice')
 	},
 	{
+		path: '/my_qrcode/',
+		asyncComponent: () => import('@/pages/MyQrcode/MyQrcode.tsx')
+	},
+	{
+		path: '/scanner/',
+		asyncComponent: () => import('@/pages/Scanner/Scanner')
+	},
+	{
+		path: '/test',
+		asyncComponent: () => import('@/pages/test/test')
+	},
+	{
 		path: '(.*)',
 		component: NotFound
 	}

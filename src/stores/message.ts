@@ -34,7 +34,7 @@ interface Options {
 	audioData?: {
 		file_id: string
 		url: string
-	},
+	}
 	msg_url?: string
 	file_id?: string
 	duration?: number
@@ -200,11 +200,15 @@ export interface MessageStore {
 	/**
 	 * 创建消息
 	 */
-	craeteMessage: (type: MESSAGE_TYPE, content: string, options?: Options) => PrivateChats
+	craeteMessage: (type: MESSAGE_TYPE, content: string, options?: Options) => Promise<PrivateChats>
 	/**
 	 * 发送消息
 	 */
 	send: (msg: PrivateChats, options?: Options) => Promise<void>
+	/**
+	 * 更新 DB
+	 */
+	updateDB: (msg: PrivateChats, error_message: string, isUpdate: boolean) => Promise<void>
 }
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -242,54 +246,60 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			console.log('删除消息失败', error)
 		}
 	},
-	craeteMessage: (type, content, options) => {
-		const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, userInfo } = get()
-		let { is_group } = get()
-		is_group = options?.is_group ?? is_group
+	craeteMessage: async (type, content, options) => {
+		let msg: any = {}
+		try {
+			const { messages, receiver_id, dialog_id, myInfo, at_all_user, at_users, userInfo } = get()
+			let { is_group } = get()
+			is_group = options?.is_group ?? is_group
 
-		const is_forward = options?.is_forward ?? false
-		const isUpdate = (is_forward && receiver_id === options?.receiver_id) || !options?.receiver_id
+			const is_forward = options?.is_forward ?? false
+			const isUpdate = (is_forward && receiver_id === options?.receiver_id) || !options?.receiver_id
 
-		const msg: any = {
-			dialog_id: options?.dialog_id ?? dialog_id,
-			content,
-			created_at: Date.now(),
-			is_burn_after_reading:
-				options?.is_burn_after_reading ?? userInfo?.preferences?.open_burn_after_reading ?? 0,
-			is_label: MESSAGE_MARK.NOT_MARK,
-			is_read: MESSAGE_READ.READ,
-			msg_id: 0,
-			msg_send_state: MESSAGE_SEND.SENDING,
-			receiver: options?.receiver_id ?? receiver_id,
-			read_at: Date.now(),
-			reply_id: options?.replay_id ?? 0,
-			sender_id: user_id,
-			type,
-			sender_info: {
-				avatar: myInfo?.user_info?.avatar,
-				nickname: myInfo?.user_info?.nickname,
-				user_id
-			},
-			at_all_user: at_all_user || 0,
-			at_users: at_users || [],
-			group_id: is_group ? Number(options?.receiver_id || receiver_id) : 0,
-			uid: uuidv4(),
-			is_tips: false,
-			msg_url: options?.msg_url,
-			file_id: options?.file_id,
-			duration: options?.duration
+			msg = {
+				dialog_id: options?.dialog_id ?? dialog_id,
+				content,
+				created_at: Date.now(),
+				is_burn_after_reading:
+					options?.is_burn_after_reading ?? userInfo?.preferences?.open_burn_after_reading ?? 0,
+				is_label: MESSAGE_MARK.NOT_MARK,
+				is_read: MESSAGE_READ.READ,
+				msg_id: 0,
+				msg_send_state: MESSAGE_SEND.SENDING,
+				receiver: options?.receiver_id ?? receiver_id,
+				read_at: Date.now(),
+				reply_id: options?.replay_id ?? 0,
+				sender_id: user_id,
+				type,
+				sender_info: {
+					avatar: myInfo?.user_info?.avatar,
+					nickname: myInfo?.user_info?.nickname,
+					user_id
+				},
+				at_all_user: at_all_user || 0,
+				at_users: at_users || [],
+				group_id: is_group ? Number(options?.receiver_id || receiver_id) : 0,
+				uid: uuidv4(),
+				is_tips: false,
+				msg_url: options?.msg_url ?? '',
+				file_id: options?.file_id ?? '',
+				duration: options?.duration ?? 0
+			}
+			if (!msg.group_id) msg.group_id = 0
+			isUpdate && set({ messages: [...messages, msg] })
+		} catch (error) {
+			console.log('err', error)
 		}
-		if (!msg.group_id) msg.group_id = 0
-		isUpdate && set({ messages: [...messages, msg] })
-
 		return msg
 	},
 	send: async (msg, options) => {
-		const { receiver_id, at_all_user, at_users } = get()
+		const { receiver_id, at_all_user, at_users, updateDB } = get()
 		let { is_group } = get()
 
 		is_group = options?.is_group ?? is_group
 		const is_forward = options?.is_forward ?? false
+
+		// 如果是转发且是自己就需要更新消息
 		const isUpdate = (is_forward && receiver_id === options?.receiver_id) || !options?.receiver_id
 
 		let error_message = ''
@@ -326,39 +336,68 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			console.error('发送消息失败', error)
 			msg.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		} finally {
-			const msgs: any[] = []
-			msgs.push(msg)
-			await updateDatabaseMessage(UserStore.tables.messages, msg.uid, msg)
+			updateDB(msg, error_message, isUpdate)
+			// const msgs: any[] = []
+			// msgs.push(msg)
+			// await updateDatabaseMessage(UserStore.tables.messages, msg.uid, msg)
 
-			// 如果有错误信息
-			if (error_message) {
-				msgs.push({
-					dialog_id: msg.dialog_id,
-					msg_id: null,
-					is_tips: true,
-					content: error_message,
-					type: MESSAGE_TYPE.ERROR,
-					uid: uuidv4()
-				})
-				isUpdate && (await updateDatabaseMessage(UserStore.tables.messages, msgs[1].uid, msgs[1]))
-			} else {
-				// 更新会话
-				await updateDialogs(msg.dialog_id, msg)
-			}
+			// // 如果有错误信息
+			// if (error_message) {
+			// 	msgs.push({
+			// 		dialog_id: msg.dialog_id,
+			// 		msg_id: null,
+			// 		is_tips: true,
+			// 		content: error_message,
+			// 		type: MESSAGE_TYPE.ERROR,
+			// 		uid: uuidv4()
+			// 	})
+			// 	isUpdate && (await updateDatabaseMessage(UserStore.tables.messages, msgs[1].uid, msgs[1]))
+			// } else {
+			// 	// 更新会话
+			// 	await updateDialogs(msg.dialog_id, msg)
+			// }
 
-			isUpdate &&
-				set((state) => ({
-					messages: [...state.messages.slice(0, -1), ...msgs],
-					at_all_user: 0,
-					at_users: []
-				}))
+			// isUpdate &&
+			// 	set((state) => ({
+			// 		messages: [...state.messages.slice(0, -1), ...msgs],
+			// 		at_all_user: 0,
+			// 		at_users: []
+			// 	}))
 		}
+	},
+	updateDB: async (msg, error_message, isUpdate) => {
+		const msgs: any[] = []
+		msgs.push(msg)
+		await updateDatabaseMessage(UserStore.tables.messages, msg.uid, msg)
+
+		// 如果有错误信息
+		if (error_message) {
+			msgs.push({
+				dialog_id: msg.dialog_id,
+				msg_id: null,
+				is_tips: true,
+				content: error_message,
+				type: MESSAGE_TYPE.ERROR,
+				uid: uuidv4()
+			})
+			isUpdate && (await updateDatabaseMessage(UserStore.tables.messages, msgs[1].uid, msgs[1]))
+		} else {
+			// 更新会话
+			await updateDialogs(msg.dialog_id, msg)
+		}
+
+		isUpdate &&
+			set((state) => ({
+				messages: [...state.messages.slice(0, -1), ...msgs],
+				at_all_user: 0,
+				at_users: []
+			}))
 	},
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
 		const { messages, receiver_id, craeteMessage, send } = get()
 		const is_forward = options?.is_forward ?? false
 		const isUpdate = (is_forward && receiver_id === options?.receiver_id) || !options?.receiver_id
-		const msg = craeteMessage(type, content, options)
+		const msg = await craeteMessage(type, content, options)
 
 		// 如果是群聊
 		if (!msg.group_id) msg.group_id = 0

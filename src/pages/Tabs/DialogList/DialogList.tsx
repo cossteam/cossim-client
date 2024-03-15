@@ -10,7 +10,7 @@ import {
 	SwipeoutButton,
 	PageContent
 } from 'framework7-react'
-import { Plus, Search, Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
+import { Plus, Search, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } from 'framework7-icons/react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useEffect, useState } from 'react'
 import { isEqual } from 'lodash-es'
@@ -243,10 +243,10 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 						<span className="coss_dialog_list__text">{$t('添加朋友')}</span>
 					</ListItem>
 
-					{/* <ListItem link="/camera/" popoverClose className="coss_dialog_list">
+					<ListItem link="/scanner/" noChevron popoverClose className="coss_dialog_list">
 						<ViewfinderCircleFill className="coss_dialog_list__icon" />
 						<span className="coss_dialog_list__text">{$t('扫一扫')}</span>
-					</ListItem> */}
+					</ListItem>
 				</List>
 			</Popover>
 			<PageContent className="p-0 max-h-full h-full">
@@ -278,7 +278,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 											item?.dialog_id,
 											item?.user_id ?? item?.group_id
 										)
-										f7router.navigate(
+										f7router?.navigate(
 											`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
 										)
 									}}

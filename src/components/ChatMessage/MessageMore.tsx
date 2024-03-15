@@ -1,4 +1,3 @@
-import StorageService from '@/api/storage'
 import { useLiveStore } from '@/stores/live'
 import { useAsyncEffect, useFileDialog } from '@reactuses/core'
 import { Icon } from 'framework7-react'
@@ -10,8 +9,7 @@ interface MessageMoreProps {
 	is_group: boolean
 	f7router: Router.Router
 	members: any[]
-	onSelectFiles?: (files: string[]) => void
-	onUploadSuccess?: (files: string[]) => void
+	onSelectFiles?: (files: FileList) => void
 }
 
 const MessageMore: React.FC<MessageMoreProps> = (props) => {
@@ -30,41 +28,6 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		}
 	}, [props.members])
 
-	// 文件上传
-	const upload = (file: File): Promise<string> => {
-		return new Promise<string>((resolve, reject) => {
-			StorageService.uploadFile({
-				file: file,
-				type: 2
-			})
-				.then(({ code, data }: any) => {
-					if (code !== 200) {
-						reject(null)
-						return
-					}
-					resolve(data.url ?? '')
-				})
-				.catch((err) => {
-					console.log(err)
-					reject(err)
-				})
-		})
-	}
-
-	// base64
-	const fileBase64 = (file: File): Promise<string> => {
-		return new Promise<string>((resolve, reject) => {
-			const reader = new FileReader()
-			reader.readAsDataURL(file)
-			reader.onload = (e: any) => {
-				resolve(e.target.result)
-			}
-			reader.onerror = (e) => {
-				reject(e)
-			}
-		})
-	}
-
 	// 文件选择
 	const openAlbum = () => {
 		reset()
@@ -73,26 +36,7 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 	useAsyncEffect(
 		async () => {
 			if (!files || !files?.length) return
-			const base64Promises: Promise<string>[] = []
-			const fileUrlPromises: Promise<string>[] = []
-			for (const file of files) {
-				base64Promises.push(fileBase64(file).catch())
-				fileUrlPromises.push(upload(file))
-			}
-			let uploaded = false
-			Promise.allSettled(base64Promises).then((res: any) => {
-				if (!uploaded) {
-					const values = res.map((item: { status: 'fulfilled' | 'rejected'; value: any }) => item.value)
-					props.onSelectFiles && props.onSelectFiles(values)
-				}
-			})
-			Promise.allSettled(fileUrlPromises).then((res: any) => {
-				if (!uploaded) {
-					uploaded = true
-					const values = res.map((item: { status: 'fulfilled' | 'rejected'; value: any }) => item.value)
-					props.onUploadSuccess && props.onUploadSuccess(values)
-				}
-			})
+			props.onSelectFiles && props.onSelectFiles(files)
 		},
 		() => {},
 		[files]
