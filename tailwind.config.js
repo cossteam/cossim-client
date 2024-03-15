@@ -2,30 +2,31 @@
 export default {
 	content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
 	theme: {
+		screens: {
+			// mobile
+			mobile: { min: '320px', max: '750px' },
+			// desktop
+			desktop: { min: '751px' }
+		},
 		extend: {
 			colors: {
 				/** @description 主题色 */
-				primary: 'rgb(var(--coss-primary))',
+				primary: 'rgb(--coss-color-primary)',
 
 				/** @description 背景色 */
-				bgPrimary: 'var(--coss-background-primary)',
-				bgSecondary: 'var(--coss-background-secondary)',
-				bgTertiary: 'var(--coss-background-tertiary)',
-
-				/** @description 边框 */
-				borderPrimary: 'var(--coss-border-primary)',
-				borderSecondary: 'var(--coss-border-secondary)',
-				borderTertiary: 'var(--coss-border-tertiary)',
+				bgPrimary: 'var(--coss-bg-primary)',
+				bgSecondary: 'var(--coss-bg-secondary)',
+				bgTertiary: 'var(--coss-bg-tertiary)',
 
 				/** @description 文本 */
 				textPrimary: 'var(--coss-text-primary)',
 				textSecondary: 'var(--coss-text-secondary)',
 				textTertiary: 'var(--coss-text-tertiary)',
-
-				/** @description 阴影 */
-				shadowPrimary: 'var(--coss-shadow-primary)'
 			}
 		}
 	},
-	plugins: []
+	plugins: [],
+	corePlugins: {
+		preflight: false
+	}
 }

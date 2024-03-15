@@ -1,12 +1,11 @@
-import { getAuth } from '@/utils/auth'
 import { NavigateFunction, Location } from 'react-router-dom'
-import { TOKEN } from '@/shared'
+import useUserStore from '@/stores/user'
 
 export const beforeRouter = (location: Location<any>, navigate: NavigateFunction) => {
-	const auth = getAuth(TOKEN)
+	const userStore = useUserStore.getState()
 
 	// 未登录
-	if (!auth) {
+	if (!userStore.token) {
 		return navigate('/login', { replace: true })
 	}
 

@@ -1,15 +1,44 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage, devtools } from 'zustand/middleware'
+import { ThemeStore } from './type'
+import { toLine } from '@/utils'
+import themeConfig from '@/config/theme'
 
-interface ThemeStore {
-	theme: 'light' | 'dark'
-	themeOptions: { [key: string]: string }
-}
-
-const useThemeStore = create<ThemeStore>()((set) => ({
+const themeStore = (set: any, get: any): ThemeStore => ({
 	theme: 'light',
+	/** 默认基本色 */
 	themeOptions: {
-		primary: '#42b883',
+		/** 主题色 */
+		colorPrimary: '#00b96b',
+		/** 圆角 */
+		borderRadius: 2,
+		/** 背景色 */
+		colorBgContainer: '#f6ffed'
+	},
+	init: () => {
+		const { themeOptions, theme } = get()
+
+		set({ themeOptions: Object.assign(themeOptions, theme === 'light' ? themeConfig.light : themeConfig.dark) })
+
+		// 生成 css 变量
+		const cssVariables = Object.entries(themeOptions).map(([key, value]) => {
+			return `--coss-${toLine(key)}: ${value}`
+		})
+
+		// 将 css 变量添加到 style 中的 root 中
+		const styleElement = document.createElement('style')
+		styleElement.textContent = `:root { ${cssVariables.join(';')} }`
+		document.head.appendChild(styleElement)
 	}
-}))
+})
+
+const useThemeStore = create(
+	devtools(
+		persist(themeStore, {
+			name: '__theme_storage__',
+			storage: createJSONStorage(() => localStorage)
+		})
+	)
+)
 
 export default useThemeStore

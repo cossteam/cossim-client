@@ -35,12 +35,12 @@ const routes: RouteObject[] = [
 			{
 				path: 'dashboard',
 				element: lazyLoad(Dashboard)
+			},
+			{
+				path: '/login',
+				element: lazyLoad(Login)
 			}
 		]
-	},
-	{
-		path: '/login',
-		element: lazyLoad(Login)
 	},
 	{
 		path: '*',

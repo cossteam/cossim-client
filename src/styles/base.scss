@@ -1,16 +1,5 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import './preflight.scss';
 @import './variables.scss';
-
-/**
- * 修复 antd 的按钮样式被 tailwind 重写的问题
- */
-// .ant-btn-primary {
-// 	background-color: $primary-color;
-// }
-
-// .ant-btn-default,
-// .ant-btn-dashed {
-// 	background-color: white;
-// }
