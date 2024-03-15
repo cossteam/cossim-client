@@ -64,11 +64,11 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 
 	// 工具栏选项
 	const tools = [
-		// {
-		// 	f7Icon: 'camera',
-		// 	text: '相机',
-		// 	func: () => selectFiles()
-		// },
+		{
+			f7Icon: 'camera',
+			text: '录像',
+			func: () => selectFiles()
+		},
 		{
 			f7Icon: 'doc',
 			text: '文件',
