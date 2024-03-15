@@ -21,7 +21,10 @@ const MessageImage: React.FC<MessageAudioProps> = ({ msg }) => {
 
 	return (
 		<>
-			<div className="" onClick={() => previewStore.preview({ url, type: 'image' })}>
+			<div
+				className="max-h-32 overflow-hidden flex justify-center items-center"
+				onClick={() => previewStore.preview({ url, type: 'image' })}
+			>
 				<img className="h-full" src={url} />
 			</div>
 		</>

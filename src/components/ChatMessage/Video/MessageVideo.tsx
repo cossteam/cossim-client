@@ -21,7 +21,10 @@ const MessageVideo: React.FC<MessageAudioProps> = ({ msg }) => {
 
 	return (
 		<>
-			<div className="" onClick={() => previewStore.preview({ url, type: 'video' })}>
+			<div
+				className="max-h-32 overflow-hidden flex justify-center items-center"
+				onClick={() => previewStore.preview({ url, type: 'video' })}
+			>
 				<video className="h-full" muted autoPlay loop src={url} />
 			</div>
 		</>
