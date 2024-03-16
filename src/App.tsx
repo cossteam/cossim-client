@@ -32,6 +32,7 @@ import { PluginListenerHandle } from '@capacitor/core'
 import LiveRoom from './pages/Live/LiveRoom'
 import { OwnEventEnum, useLiveStore } from './stores/live'
 import Preview from './components/Preview/Preview'
+import LiveRoomNew from '@/components/LiveRoom'
 
 let store: MessageStore | null = null
 
@@ -211,6 +212,7 @@ function App() {
 					{/* <Message /> */}
 					<Preview />
 					<LiveRoom />
+					<LiveRoomNew />
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />
