@@ -5,6 +5,7 @@ const OperateButton: React.FC<any> = (props: {
 	text?: string
 	size?: string
 	color?: string
+	iconColor?: string
 	iconRotate?: number
 	backgroundColor?: string
 	onClick?: () => void
@@ -24,7 +25,10 @@ const OperateButton: React.FC<any> = (props: {
 					size={props.size ?? 30}
 					style={{ transform: `rotate(${props.iconRotate ?? 0}deg)` }}
 				/> */}
-				<Link iconF7={props.f7Icon} style={{ transform: `rotate(${props.iconRotate ?? 0}deg)` }} />
+				<Link
+					iconF7={props.f7Icon}
+					style={{ color: props.iconColor ?? '#000', transform: `rotate(${props.iconRotate ?? 0}deg)` }}
+				/>
 			</div>
 			{props.text && <span className="mt-2">{props.text ?? ''}</span>}
 		</div>
