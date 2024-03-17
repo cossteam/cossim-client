@@ -1,7 +1,8 @@
 import { beforeRouter } from './permission'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
-import { AliveScope } from 'react-activation'
+import { App as AppComponent } from 'antd'
+import './App.scss'
 
 const App = () => {
 	const location = useLocation()
@@ -13,9 +14,9 @@ const App = () => {
 	}, [])
 
 	return (
-		<AliveScope>
+		<AppComponent className='app'>
 			<Outlet />
-		</AliveScope>
+		</AppComponent>
 	)
 }
 

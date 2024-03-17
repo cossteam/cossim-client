@@ -102,5 +102,17 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"/>
         </provider>
+    
+        <!-- 配置键盘不压缩页面 tesdt -->
+        <activity android:name="androidx.appcompat.widget.helper.KeyboardHelper"
+          android:windowSoftInputMode="adjustPan">
+          <activity android:name="androidx.appcompat.widget.helper.KeyboardHelper"
+          android:windowSoftInputMode="adjustNothing">
+</activity>
+</activity>
+
+
     </application>
+
+    
 </manifest>

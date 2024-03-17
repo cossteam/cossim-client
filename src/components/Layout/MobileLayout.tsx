@@ -1,17 +1,21 @@
-import { Swiper, SwiperSlide } from 'swiper/react'
-import 'swiper/css'
 import './styles/layout.scss'
 import Header from './Header/Header'
+import Footer from './Footer/Footer'
+import { Carousel } from 'antd'
+import Chats from '@/components/Chats/Chats'
 
 const MobileLayout = () => {
 	return (
 		<>
-			<Header />
-			<Swiper className="app-layout">
-				<SwiperSlide className="app-layout-slide">主页</SwiperSlide>
-				<SwiperSlide className="app-layout-slide">联系人</SwiperSlide>
-				<SwiperSlide className="app-layout-slide">我的</SwiperSlide>
-			</Swiper>
+			<Header title="COSS" />
+			<Carousel className="app-layout" infinite={false}>
+				<div className="app-layout-slide">
+					<Chats />
+				</div>
+				<div className="app-layout-slide">2</div>
+				<div className="app-layout-slide">3</div>
+			</Carousel>
+			<Footer />
 		</>
 	)
 }

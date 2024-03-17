@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { GlobalStore } from './type'
-import cacheStore from '@/cache'
+import cacheStore from '@/utils'
 
 const globalStore = (set: any) => ({
 	cachesMessages: [],
@@ -10,7 +10,6 @@ const globalStore = (set: any) => ({
 		const cachesMessages = await cacheStore.get('cachesMessages')
 		const cachesChats = await cacheStore.get('cachesChats')
 		const cachesContacts = await cacheStore.get('cachesContacts')
-		
 		set({ cachesMessages, cachesChats, cachesContacts })
 	}
 })

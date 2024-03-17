@@ -9,6 +9,8 @@ import App from '@/App'
 
 const Dashboard = lazy(() => import('@/pages/Dashboard/Dashboard'))
 const Login = lazy(() => import('@/pages/Account/Login/Login'))
+const Chats = lazy(() => import('@/pages/Chats/Chat'))
+const Message = lazy(()=>import('@/pages/Message/Message'))
 
 /**
  * 懒加载 + loading
@@ -34,7 +36,15 @@ const routes: RouteObject[] = [
 			},
 			{
 				path: 'dashboard',
-				element: lazyLoad(Dashboard)
+				element: lazyLoad(Dashboard),
+			},
+			{
+				path: 'chats',
+				element: lazyLoad(Chats)
+			},
+			{
+				path: 'message',
+				element: lazyLoad(Message)
 			},
 			{
 				path: '/login',

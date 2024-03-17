@@ -3,3 +3,15 @@
 @tailwind utilities;
 @import './preflight.scss';
 @import './variables.scss';
+
+html,
+body {
+    font-size: 16px;
+}
+
+/** 毛玻璃样式 **/
+.backdrop {
+    backdrop-filter: blur(25px) saturate(200%);
+    -webkit-backdrop-filter: blur(25px) saturate(200%);
+    background-color: rgba(255, 255, 255, 0.95);
+}

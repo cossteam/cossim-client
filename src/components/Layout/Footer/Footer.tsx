@@ -1,12 +1,13 @@
 import clsx from 'clsx'
 import { forwardRef } from 'react'
+import './Footer.scss'
 
 interface FooterProps {
 	className?: string
 }
 
 const Footer = forwardRef<HTMLDivElement, FooterProps>((props, ref) => {
-	return <div className={clsx('sticky top-0 z-50 bg-bgPrimary min-h-16', props.className)} ref={ref}></div>
+	return <div className={clsx('footer', props.className)} ref={ref}>fotter</div>
 })
 
 Footer.displayName = 'Footer'
