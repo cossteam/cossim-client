@@ -5,18 +5,12 @@ import { isEqual } from 'lodash-es'
 import { $t, MessageBurnAfterRead, MessageNoDisturb, RelationStatus } from '@/shared'
 import UserStore from '@/db/user'
 import UserService from '@/api/user'
-// import { useCallStore } from '@/stores/call'
 import RelationService from '@/api/relation'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
-import { useLiveStore } from '@/stores/live'
-// import { getCookie } from '@/utils/cookie'
-// import { hasCamera, hasMike } from '@/utils/media'
-
-// const userId = getCookie(USER_ID) || ''
+import { useLiveRoomStore } from '@/stores/liveRoom'
 
 const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
-	// const userId = getCookie(USER_ID) || ''
 	const user_id = f7route.params.user_id as string
 	const is_from_message_page = f7route.query.from_page === 'message'
 	const dialog_id = Number(f7route.query.dialog_id) ?? 0
@@ -27,7 +21,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	const { updateContacts } = useStateStore()
 	const { clearMessages } = useMessageStore()
-	const liveStore = useLiveStore()
+	const liveRoomStore = useLiveRoomStore()
 
 	const onPageInit = async () => {
 		await updateUserInfo(true)
@@ -295,7 +289,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					)}
 					<div
 						className="size-10 flex flex-col justify-center items-center"
-						onClick={() => liveStore.call({ id: user_id, isGroup: false, audio: true, video: false })}
+						onClick={() => liveRoomStore.call({ recipient: user_id, isGroup: false, video: false })}
 					>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 							<Icon f7="phone_fill" size={22} />
@@ -304,7 +298,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					</div>
 					<div
 						className="size-10  flex flex-col justify-center items-center"
-						onClick={() => liveStore.call({ id: user_id, isGroup: false, audio: true, video: true })}
+						onClick={() => liveRoomStore.call({ recipient: user_id, isGroup: false, video: true })}
 					>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 							<Icon f7="videocam_fill" size={22} />

@@ -27,12 +27,9 @@ import localNotification, { LocalNotificationType } from '@/utils/notification'
 import DOMPurify from 'dompurify'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
-// import { useChatStore } from './stores/chat'
-// import Message from '@/components/Message/Message'
-import LiveRoom from './pages/Live/LiveRoom'
-import { OwnEventEnum, useLiveStore } from './stores/live'
 import Preview from './components/Preview/Preview'
 import LiveRoomNew from '@/components/LiveRoom'
+import { LiveRoomStates, useLiveRoomStore } from './stores/liveRoom'
 
 let store: MessageStore | null = null
 
@@ -66,7 +63,7 @@ function App() {
 		}
 	})
 
-	const liveStore = useLiveStore() // 通话状态
+	const liveRoomStore = useLiveRoomStore()
 	useEffect(() => {
 		// 修复手机上的视口比例
 		if ((f7.device.ios || f7.device.android) && f7.device.standalone) {
@@ -108,19 +105,20 @@ function App() {
 				case SocketEvent.ApplyAcceptEvent:
 					handlerRequestResultSocket(data)
 					break
+				// 通话事件
 				case SocketEvent.UserCallReqEvent:
 				case SocketEvent.GroupCallReqEvent:
 				case SocketEvent.UserCallRejectEvent:
 				case SocketEvent.GroupCallRejectEvent:
 				case SocketEvent.UserCallHangupEvent:
 				case SocketEvent.GroupCallHangupEvent:
-					if (liveStore.ownEvent === OwnEventEnum.IDLE) {
-						liveStore.updateEvent(event, data)
+					if (liveRoomStore.state !== LiveRoomStates.IDLE) {
+						f7.dialog.confirm('你有新的通话请求是否结束当前通话并接听？', () => {
+							liveRoomStore.updateEvent(event, data)
+						})
 						break
 					}
-					f7.dialog.confirm('你有新的通话请求是否结束当前通话并接听？', () => {
-						liveStore.updateEvent(event, data)
-					})
+					liveRoomStore.updateEvent(event, data)
 					break
 				case SocketEvent.MessageLabelEvent:
 					handlerLabelSocket(data, store!)
@@ -211,7 +209,7 @@ function App() {
 					<Layout />
 					{/* <Message /> */}
 					<Preview />
-					<LiveRoom />
+					{/* <LiveRoom /> */}
 					<LiveRoomNew />
 				</>
 			) : (

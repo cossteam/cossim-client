@@ -1,4 +1,4 @@
-import { useLiveStore } from '@/stores/live'
+import { useLiveRoomStore } from '@/stores/liveRoom'
 import { useAsyncEffect, useFileDialog } from '@reactuses/core'
 import { Icon } from 'framework7-react'
 import { Router } from 'framework7/types'
@@ -21,7 +21,7 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		multiple: true,
 		accept: '*'
 	})
-	const liveStore = useLiveStore()
+	const liveRoomStore = useLiveRoomStore()
 	const [members, setMembers] = useState<any>()
 
 	// 监听群成员变化
@@ -77,12 +77,12 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		{
 			f7Icon: 'phone',
 			text: '语音',
-			func: () => liveStore.call({ id: props.id, isGroup: props.is_group, members, audio: true, video: false })
+			func: () => liveRoomStore.call({ recipient: props.id, isGroup: props.is_group, members, video: false })
 		},
 		{
 			f7Icon: 'videocam',
 			text: '视频',
-			func: () => liveStore.call({ id: props.id, isGroup: props.is_group, members, audio: true, video: true })
+			func: () => liveRoomStore.call({ recipient: props.id, isGroup: props.is_group, members, video: true })
 		}
 	]
 
