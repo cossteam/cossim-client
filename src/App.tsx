@@ -33,7 +33,7 @@ import { LiveRoomStates, useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
 import run from './run'
-import { isWebDevice } from './utils'
+import { isWeb } from './utils'
 
 let store: MessageStore | null = null
 
@@ -226,7 +226,7 @@ function App() {
 	useAsyncEffect(
 		async () => {
 			try {
-				if(await isWebDevice()) return
+				if (await isWeb()) return
 				// 设置状态栏样式
 				StatusBar.setBackgroundColor({ color: '#ffffff' }) // 设置状态栏背景颜色为白色
 				StatusBar.setOverlaysWebView({ overlay: false }) // 如果您使用的是原生状态栏，则需设置为 false
@@ -246,7 +246,6 @@ function App() {
 	useEffect(() => {
 		cacheStore.init()
 	}, [])
-
 
 	return (
 		<AppComponent {...f7params}>

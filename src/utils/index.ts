@@ -14,5 +14,15 @@ export const platform = async () => (await Device.getInfo()).platform
  */
 export const isWebDevice = async () => {
 	const platform = await Device.getInfo()
-	return platform.platform === 'web' || ['ios', 'android'].includes(platform.operatingSystem)
+	return platform.platform === 'web' && ['ios', 'android'].includes(platform.operatingSystem)
+}
+
+/**
+ * 判断是否是 web 平台
+ *
+ * @returns
+ */
+export const isWeb = async () => {
+	const platform = await Device.getInfo()
+	return platform.platform === 'web'
 }
