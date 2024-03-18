@@ -183,7 +183,10 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el }) => {
 
 	useEffect(() => {
 		if (!el.current) return
-		setHeight(el.current?.clientHeight ?? 700)
+		setTimeout(() => {
+			// console.log('el.current?.clientHeight', el.current?.clientHeight)
+			setHeight(el.current?.clientHeight ?? 700)
+		}, 0)
 	}, [el])
 
 	const clearReadMessage = () => {
@@ -222,7 +225,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ dialog_id, el }) => {
 
 	return (
 		<MessageVariableSizeList
-			Row={row
+			Row={
+				row
 				// <MessageRow
 				// 	index={index}
 				// 	style={style}

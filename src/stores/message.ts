@@ -386,18 +386,23 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 			await updateDialogs(msg.dialog_id, msg)
 		}
 
+		// console.log('isUpdate', isUpdate)
+
+		// setTimeout(() => {
 		isUpdate &&
 			set((state) => ({
 				messages: [...state.messages.slice(0, -1), ...msgs],
 				at_all_user: 0,
 				at_users: []
 			}))
+		// }, 0)
 	},
 	sendMessage: async (type: MESSAGE_TYPE, content: string, options = {}) => {
 		const { messages, receiver_id, craeteMessage, send } = get()
 		const is_forward = options?.is_forward ?? false
 		const isUpdate = (is_forward && receiver_id === options?.receiver_id) || !options?.receiver_id
 		const msg = await craeteMessage(type, content, options)
+		console.log(msg, isUpdate)
 
 		// 如果是群聊
 		if (!msg.group_id) msg.group_id = 0
