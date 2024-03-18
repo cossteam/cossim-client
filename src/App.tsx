@@ -30,6 +30,7 @@ import { PluginListenerHandle } from '@capacitor/core'
 import Preview from './components/Preview/Preview'
 import LiveRoomNew from '@/components/LiveRoom'
 import { LiveRoomStates, useLiveRoomStore } from './stores/liveRoom'
+import { StatusBar, Style } from '@capacitor/status-bar'
 
 let store: MessageStore | null = null
 
@@ -201,6 +202,18 @@ function App() {
 	useEffect(() => {
 		store = msgStore
 	}, [msgStore])
+
+	useAsyncEffect(
+		async () => {
+			// 设置状态栏样式
+			StatusBar.setBackgroundColor({ color: '#ffffff' }) // 设置状态栏背景颜色为白色
+			StatusBar.setOverlaysWebView({ overlay: false }) // 如果您使用的是原生状态栏，则需设置为 false
+			// 设置状态栏文字颜色
+			StatusBar.setStyle({ style: Style.Light }) // 设置状态栏文字为黑色
+		},
+		() => {},
+		[]
+	)
 
 	return (
 		<AppComponent {...f7params}>
