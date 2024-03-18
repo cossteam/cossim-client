@@ -11,7 +11,7 @@ const cacheStore = new Storage({
 	driverOrder: [CordovaSQLiteDriver._driver, Drivers.IndexedDB, Drivers.LocalStorage]
 })
 
-await cacheStore.defineDriver(CordovaSQLiteDriver)
-await cacheStore.create()
+cacheStore.defineDriver(CordovaSQLiteDriver)
+cacheStore.create()
 
 export default cacheStore

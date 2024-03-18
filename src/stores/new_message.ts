@@ -1,12 +1,15 @@
 import { create } from 'zustand'
 import { CacheStore, CacheStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
+// import useUserStore from './user'
+
+// const userStore = useUserStore.getState()
 
 const defaultOptions: CacheStoreOptions = {
 	firstOpened: true,
 	cacheDialogs: [],
 	cacheContacts: [],
-	cacheGroup: [],
+    cacheGroup: [],
 	cacheShareKeys: [],
 	unreadCount: 0,
 	applyCount: 0
