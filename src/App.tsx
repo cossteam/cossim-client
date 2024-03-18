@@ -32,7 +32,7 @@ import LiveRoomNew from '@/components/LiveRoom'
 import { LiveRoomStates, useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
-import run from './App'
+import run from './run'
 import { isWebDevice } from './utils'
 
 let store: MessageStore | null = null
