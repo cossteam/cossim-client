@@ -6,9 +6,6 @@ import { MessageStore } from '@/stores/message'
 // import CommonStore from '@/db/common'
 import { StateStore } from '@/stores/state'
 
-// const user_id = getCookie(USER_ID) ?? ''
-// const device_id = getCookie(DEVICE_ID) ?? ''
-
 /**
  * 处理私聊接收的 socket 的消息
  * @param {*} data  socket 消息
@@ -19,10 +16,6 @@ export const handlerMessageSocket = async (data: any, msgStore: MessageStore, st
 
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
 		if (data.driverId === getCookie(DEVICE_ID)) return
-
-		// 防止重复添加消息
-		// const index = msgStore.messages.findIndex((item: any) => item?.msg_id === message?.msg_id)
-		// if (index !== -1) return
 
 		const msg = {
 			dialog_id: message?.dialog_id,

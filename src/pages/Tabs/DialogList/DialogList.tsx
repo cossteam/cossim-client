@@ -71,7 +71,6 @@ const getAfterMessage = async () => {
 		// 		await UserStore.add(UserStore.tables.messages, item)
 		// 	}
 		// })
-
 		// await UserStore.bulkAdd(UserStore.tables.messages, messages.flat())
 	} catch (error) {
 		console.error(error)
