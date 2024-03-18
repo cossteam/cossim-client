@@ -29,7 +29,7 @@ import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 import Preview from './components/Preview/Preview'
 import LiveRoomNew from '@/components/LiveRoom'
-import { LiveRoomStates, useLiveRoomStore } from './stores/liveRoom'
+import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
 import run from './run'
@@ -116,12 +116,12 @@ function App() {
 				case SocketEvent.GroupCallRejectEvent:
 				case SocketEvent.UserCallHangupEvent:
 				case SocketEvent.GroupCallHangupEvent:
-					if (liveRoomStore.state !== LiveRoomStates.IDLE) {
-						f7.dialog.confirm('你有新的通话请求是否结束当前通话并接听？', () => {
-							liveRoomStore.updateEvent(event, data)
-						})
-						break
-					}
+					// if (liveRoomStore.state !== LiveRoomStates.IDLE) {
+					// 	f7.dialog.confirm('你有新的通话请求是否结束当前通话并接听？', () => {
+					// 		liveRoomStore.updateEvent(event, data)
+					// 	})
+					// 	break
+					// }
 					liveRoomStore.updateEvent(event, data)
 					break
 				case SocketEvent.MessageLabelEvent:

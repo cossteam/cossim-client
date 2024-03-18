@@ -1,4 +1,4 @@
-import { Link, List, ListGroup, ListItem, NavRight, Navbar, Page, Searchbar, Subnavbar } from 'framework7-react'
+import { Link, List, ListGroup, ListItem, NavRight, Navbar, Page } from 'framework7-react'
 import { Person2Alt, PersonBadgePlusFill, Search } from 'framework7-icons/react'
 
 import { $t, USER_ID, arrayToGroups, groupsToArray } from '@/shared'
