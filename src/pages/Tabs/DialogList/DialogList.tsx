@@ -12,7 +12,7 @@ import {
 	Subnavbar,
 	Searchbar
 } from 'framework7-react'
-import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } from 'framework7-icons/react'
+import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill, Search } from 'framework7-icons/react'
 // import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useState } from 'react'
 // import { isEqual } from 'lodash-es'
@@ -239,15 +239,14 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		>
 			<Navbar title="COSS" className="hidden-navbar-bg bg-bgPrimary">
 				<NavRight>
-					{/* <Link>
+					<Link>
 						<Search className="w-6 h-6" />
-					</Link> */}
+					</Link>
 					<Link popoverOpen=".popover-menu">
 						<Plus className="w-7 h-7" />
 					</Link>
 				</NavRight>
-
-				<Subnavbar inner={false}>
+				{/* <Subnavbar inner={false}>
 					<Searchbar
 						searchContainer=".contacts-list"
 						placeholder={$t('搜索会话')}
@@ -255,7 +254,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 						outline={false}
 						disableButtonText={$t('取消')}
 					/>
-				</Subnavbar>
+				</Subnavbar> */}
 			</Navbar>
 
 			{/*加号弹窗*/}
