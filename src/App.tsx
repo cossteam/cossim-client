@@ -40,7 +40,7 @@ function App() {
 
 	const toastRef = useRef(null)
 
-	let router: Router.Router | null = null
+	const router = useRef<Router.Router | null>(null)
 
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
@@ -59,7 +59,8 @@ function App() {
 		},
 		on: {
 			routeChanged: (_newRoute: Router.Route, _previousRoute: Router.Route, _router: Router.Router) => {
-				router = _router
+				router.current = _router
+				console.log(_router)
 			}
 		}
 	})
@@ -150,8 +151,12 @@ function App() {
 
 	let backListener: PluginListenerHandle
 	let appStateListener: PluginListenerHandle
+
 	useAsyncEffect(
 		async () => {
+			let backNumber = 0
+			let timer: NodeJS.Timeout | null = null
+
 			// @ts-ignore
 			toastRef.current = f7.toast.create({
 				text: $t('再按一次退出程序'),
@@ -159,23 +164,30 @@ function App() {
 				position: 'center'
 			})
 
-			let backNumber = 0
-			let timer: NodeJS.Timeout | null = null
+			const historyRoutes = ['/dialog/', '/contact/', '/my/']
+
 			const backButtonHandler = () => {
 				timer && clearTimeout(timer)
 				backNumber++
 				// @ts-ignore
-				!router && toastRef.current?.open()
+				// !router.current &&
 
 				timer = setTimeout(() => {
 					backNumber = 0
 				}, 1000)
 
-				if (backNumber > 1) CapApp.minimizeApp()
+				const flag = historyRoutes.includes(router.current?.currentRoute.url ?? '')
+				// @ts-ignore
+				if (flag) toastRef.current?.open()
+				if (backNumber > 1) {
+					if (flag) {
+						CapApp.minimizeApp()
+					}
+				}
 
-				if (router && router.history.length > 1) {
-					router.back()
-					router = null
+				if (router.current && router.current.history.length > 1) {
+					router.current.back()
+					router.current = null
 				}
 			}
 
@@ -205,11 +217,15 @@ function App() {
 
 	useAsyncEffect(
 		async () => {
-			// 设置状态栏样式
-			StatusBar.setBackgroundColor({ color: '#ffffff' }) // 设置状态栏背景颜色为白色
-			StatusBar.setOverlaysWebView({ overlay: false }) // 如果您使用的是原生状态栏，则需设置为 false
-			// 设置状态栏文字颜色
-			StatusBar.setStyle({ style: Style.Light }) // 设置状态栏文字为黑色
+			try {
+				// 设置状态栏样式
+				StatusBar.setBackgroundColor({ color: '#ffffff' }) // 设置状态栏背景颜色为白色
+				StatusBar.setOverlaysWebView({ overlay: false }) // 如果您使用的是原生状态栏，则需设置为 false
+				// 设置状态栏文字颜色
+				StatusBar.setStyle({ style: Style.Light }) // 设置状态栏文字为黑色
+			} catch (error) {
+				console.log(error)
+			}
 		},
 		() => {},
 		[]

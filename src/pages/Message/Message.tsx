@@ -68,8 +68,8 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	)
 
 	const remove = () => {
-		msgStore.clearMessages()
-		tooltipStore.clear()
+		// msgStore.clearMessages()
+		// tooltipStore.clear()
 		updateChat(true)
 	}
 
