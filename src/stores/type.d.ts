@@ -37,6 +37,12 @@ export interface CacheStoreOptions {
 	cacheContacts: any[]
 	/** 缓存共享密钥 */
 	cacheShareKeys: Array<{ user_id: string; shareKey: string }>
+	/** 缓存群信息列表 */
+	cacheGroup: any[]
+	/** 未读消息数 */
+	unreadCount: number
+	/** 好友或群聊申请数 */
+	applyCount: number
 }
 
 /**
@@ -55,4 +61,26 @@ export type CacheStore = CacheStoreOptions & {
 	 * @description 更新缓存会话列表
 	 */
 	updateCacheDialogs: (cacheDialogs: any[]) => void
+	/**
+	 * @description 更新未读消息数
+	 */
+	updateUnreadCount: (unreadCount: number) => void
+}
+
+/**
+ * @description 聊天状态
+ */
+export interface MessageStoreOptions {
+	/** 消息列表 */
+	messages: any[]
+	/** 会话 id */
+	dialogId: number
+	/** 接收者 id， 可以是群 id， 也可以是用户 id */
+	receiverId: string | number
+	/** 所有消息，从缓存中取出 */
+	allMessages: any[]
+	/** 是否在底部 */
+	isAtBottom: boolean
+	/** 接收者信息 */
+	receiverInfo: any
 }

@@ -161,16 +161,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		}
 	}
 
-	// useEffect(() => {
-	// 	if (!dialogs.length) return
-	// 	// const list = dialogs.map((item) => {
-	// 	// 	return {
-	// 	// 		...item
-	// 	// 	}
-	// 	// })
-	// 	// setChats(list.sort(customSort))
-	// }, [dialogs])
-
 	useEffect(() => {
 		if (stateStore.is_chat_update) {
 			getDialogList()

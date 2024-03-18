@@ -14,9 +14,13 @@ export async function getRemoteSession() {
 			...item,
 			shareKey: cacheStore.cacheShareKeys.find((v: any) => v?.id === item?.receiver)?.shareKey ?? null
 		}))
+		
+		// 未读消息数
+		const unreadCount = dialogs.reduce((prev: number, curr: any) => prev + curr?.dialog_unread_count, 0)
 
 		// 更新缓存
 		cacheStore.updateCacheDialogs(dialogs)
+		cacheStore.updateUnreadCount(unreadCount)
 	} catch (error) {
 		console.error('获取远程会话失败：', error)
 	}

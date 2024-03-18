@@ -2,6 +2,7 @@ import { Link, Toolbar, View, Views } from 'framework7-react'
 import { useRef, useState } from 'react'
 import $ from 'dom7'
 import { useStateStore } from '@/stores/state'
+import useCacheStore from '@/stores/cache'
 
 const Layout: React.FC = () => {
 	const [tabActive, setTabActive] = useState<string>('dialog')
@@ -22,6 +23,8 @@ const Layout: React.FC = () => {
 	// 全局状态（未读消息）
 	const stateStore = useStateStore()
 
+	const cacheStore = useCacheStore()
+
 	return (
 		<Views tabs className="safe-area app">
 			<View id="view-dialog" onTabShow={() => setTabActive('dialog')} tabActive tab url="/dialog/" main />
@@ -33,7 +36,7 @@ const Layout: React.FC = () => {
 					tabLink="#view-dialog"
 					iconF7="chat_bubble_2"
 					text="聊天"
-					badge={stateStore?.unread?.msg || 0}
+					badge={cacheStore.unreadCount}
 					badgeColor="red"
 					tabLinkActive
 					onClick={() => onTabLinkClick('dialog')}
