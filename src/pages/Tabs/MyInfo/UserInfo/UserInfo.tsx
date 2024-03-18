@@ -143,7 +143,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 
 			<List className="coss_list" strong>
 				<ListItem link title={$t('邮箱')} noChevron className="coss_item__bottom" after={userInfo?.email} />
-				<ListItem link title={$t('我的二维码')} noChevron className="coss_item__bottom" />
+				<ListItem link={'/my_qrcode/'} title={$t('我的二维码')} noChevron className="coss_item__bottom" />
 			</List>
 
 			<List className="coss_list" strong>
