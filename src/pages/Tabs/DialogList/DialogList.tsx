@@ -11,9 +11,6 @@ import {
 	PageContent,
 	Subnavbar,
 	Searchbar
-	PageContent,
-	Subnavbar,
-	Searchbar
 } from 'framework7-react'
 import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill } from 'framework7-icons/react'
 // import { useLiveQuery } from 'dexie-react-hooks'
