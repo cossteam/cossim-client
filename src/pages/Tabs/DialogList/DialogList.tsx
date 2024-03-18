@@ -8,9 +8,7 @@ import {
 	ListItem,
 	SwipeoutActions,
 	SwipeoutButton,
-	PageContent,
-	Subnavbar,
-	Searchbar
+	PageContent
 } from 'framework7-react'
 import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill, Search } from 'framework7-icons/react'
 // import { useLiveQuery } from 'dexie-react-hooks'
@@ -239,7 +237,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		>
 			<Navbar title="COSS" className="hidden-navbar-bg bg-bgPrimary">
 				<NavRight>
-					<Link>
+					<Link href={'/search/'}>
 						<Search className="w-6 h-6" />
 					</Link>
 					<Link popoverOpen=".popover-menu">
