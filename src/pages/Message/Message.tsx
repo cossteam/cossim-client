@@ -13,7 +13,7 @@ import GroupService from '@/api/group'
 import { getCookie } from '@/utils/cookie'
 import clsx from 'clsx'
 import { App } from '@capacitor/app'
-import { useAsyncEffect } from '@reactuses/core'
+import { useAsyncEffect, useWindowSize } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 
 const user_id = getCookie(USER_ID) ?? ''
@@ -24,6 +24,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const dialog_name = f7route.query.dialog_name
 	const is_group = f7route.query.is_group === 'true'
 	const contentRef = useRef<HTMLDivElement | null>(null)
+	const { height } = useWindowSize()
 
 	const msgStore = useMessageStore()
 	const { updateChat } = useStateStore()
@@ -91,7 +92,7 @@ const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			className="coss_message transition-all relative"
 			onPageBeforeIn={async () => is_group && getGroupAnnouncement()}
 		>
-			<div className="h-screen overflow-hidden flex flex-col">
+			<div className="h-screen overflow-hidden flex flex-col" style={{ height }}>
 				<div className="min-h-12 bg-bgPrimary">
 					<Navbar
 						title={dialog_name}
