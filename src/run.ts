@@ -14,7 +14,7 @@ export async function getRemoteSession() {
 			...item,
 			shareKey: cacheStore.cacheShareKeys.find((v: any) => v?.id === item?.receiver)?.shareKey ?? null
 		}))
-		
+
 		// 未读消息数
 		const unreadCount = dialogs.reduce((prev: number, curr: any) => prev + curr?.dialog_unread_count, 0)
 
@@ -44,6 +44,7 @@ export async function getBehindMessage() {
 	}
 }
 
+
 /**
  * 主入口
  */
@@ -58,6 +59,7 @@ function run() {
 			cacheStore.updateFirstOpened(false)
 		}
 	})
+
 }
 
 export default run
