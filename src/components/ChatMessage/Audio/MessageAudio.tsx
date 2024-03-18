@@ -33,7 +33,7 @@ const MessageAudio: React.FC<MessageAudioProps> = ({ msg }) => {
 
 	return (
 		<div
-			className={clsx('flex items-center py-0 px-2', is_self ? 'justify-end' : 'justify-start')}
+			className={clsx('flex items-center py-1 px-2', is_self ? 'justify-end' : 'justify-start')}
 			style={{ width }}
 			onClick={play}
 		>
