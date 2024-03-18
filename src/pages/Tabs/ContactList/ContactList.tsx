@@ -1,5 +1,5 @@
-import { List, ListGroup, ListItem, Navbar, Page, Searchbar, Subnavbar } from 'framework7-react'
-import { Person2Alt, PersonBadgePlusFill } from 'framework7-icons/react'
+import { Link, List, ListGroup, ListItem, NavRight, Navbar, Page, Searchbar, Subnavbar } from 'framework7-react'
+import { Person2Alt, PersonBadgePlusFill, Search } from 'framework7-icons/react'
 
 import { $t, USER_ID, arrayToGroups, groupsToArray } from '@/shared'
 import RelationService from '@/api/relation'
@@ -101,7 +101,12 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 			onPageInit={onPageTabShow}
 		>
 			<Navbar title={$t('联系人')} className="hidden-navbar-bg bg-bgPrimary">
-				<Subnavbar inner={false}>
+				<NavRight>
+					<Link href={'/search/'}>
+						<Search className="w-6 h-6" />
+					</Link>
+				</NavRight>
+				{/* <Subnavbar inner={false}>
 					<Searchbar
 						searchContainer=".contacts-list"
 						placeholder={$t('搜索联系人')}
@@ -109,10 +114,10 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 						outline={false}
 						disableButtonText={$t('取消')}
 					/>
-				</Subnavbar>
+				</Subnavbar> */}
 			</Navbar>
 
-			<List contactsList noChevron dividers className="h-full bg-bgPrimary">
+			<List contactsList noChevron dividers outline className="h-full bg-bgPrimary">
 				<ListItem link="/apply_list/" badge={applyTotal} badgeColor="red">
 					<PersonBadgePlusFill slot="media" className="text-primary text-2xl" />
 					<span slot="title" className="text-color-primary">
