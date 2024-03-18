@@ -1,5 +1,5 @@
-// /* eslint-disable @typescript-eslint/no-unused-vars */
-// // @ts-nocheck
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
 import clsx from 'clsx'
 import React, { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { $t, MESSAGE_SEND, MESSAGE_TYPE, MessageMore, TOOLTIP_TYPE, hasImageHtml, scroll } from '@/shared'
@@ -28,6 +28,7 @@ import useSpeechRecognition from '@/hooks/useSpeechRecognition'
 import StorageService from '@/api/storage'
 import './css/MessageBar.scss'
 import { EmitterSource } from 'quill/core/emitter'
+import { set } from 'lodash-es'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
@@ -45,22 +46,21 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	const editorRef = useRef<ToolEditorMethods>(null)
 	const moreRef = useRef<HTMLDivElement | null>(null)
 	const tooltipStore = useTooltipsStore()
-
-
+	// const [width, setWidth] = useState<number>(0)
 
 	// 检查语言权限
 	const { startRecording, stopRecording, isRecording, audioData, error } = useSpeechRecognition()
 
 	// 键盘高度
-	// const [keyboardHeight, setKeyboardHeight] = useState<number>(0) 
+	const [keyboardHeight, setKeyboardHeight] = useState<number>(0)
+
 	const [showMore, setShowMore] = useState<boolean>(false)
 
 	useResizeObserver(contentEl, () => scroll(contentEl.current!, false))
 	useClickOutside(toolbarRef, () => {
 		editorRef.current?.quill?.blur()
-		// setKeyboardHeight(0)
+		setKeyboardHeight(0)
 		setMoreType(MessageMore.TEXT)
-		setShowMore(false)
 	})
 
 	const [msgType, setMsgType] = useState(MESSAGE_TYPE.TEXT)
@@ -68,11 +68,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 	const moreTypeChange = useCallback((type: MessageMore) => {
 		if (type !== MessageMore.TEXT) {
-			// setKeyboardHeight(300)
-			setShowMore(true)
+			setKeyboardHeight(300)
 		} else {
-			setShowMore(false)
-			// setKeyboardHeight(0)
+			setKeyboardHeight(0)
 			requestAnimationFrame(() => {
 				setTimeout(() => editorRef.current?.quill?.focus(), 100)
 			})
@@ -121,6 +119,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		editorRef.current?.quill?.blur()
 	}
 
+	// const [test, setTest] = useState<boolean>(true)
 	const [audioBtn, setAudioBtn] = useState<boolean>(false)
 	const recordRef = useRef<HTMLDivElement | null>(null)
 	const onLongPress = () => {
@@ -134,6 +133,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		stopRecording()
 		setAudioBtn(false)
 	}
+
+	// 取消录音
+	const [isCancel, setIsCancel] = useState<boolean>(false)
 
 	useEffect(() => {
 		requestAnimationFrame(() => {
@@ -153,8 +155,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 				quill.root.addEventListener('focus', () => {
 					if (eventSources === Quill.sources.API) return
-					// setKeyboardHeight(0)
-					setShowMore(false)
+					setKeyboardHeight(0)
 					setMoreType(MessageMore.TEXT)
 					quill.blur()
 					setTimeout(() => quill.focus(), 300)
@@ -164,10 +165,18 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 			}, 0)
 		})
 
+		// setWidth(document.body.clientWidth)
+
 		const handlerContextmenu = (e: { preventDefault: () => any }) => e.preventDefault()
 
 		const handlerTouchMove = (e: any) => {
-			console.log('move', e)
+			const rect = toolbarRef.current?.getBoundingClientRect()
+			const y = e.touches[0].clientY
+			if (rect && y < rect.top) {
+				setIsCancel(true)
+			} else {
+				setIsCancel(false)
+			}
 		}
 
 		audioRef.current?.addEventListener('contextmenu', handlerContextmenu)
@@ -189,9 +198,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	}
 
 	const handlerInputClick = () => {
-		// setKeyboardHeight(0)
-		setShowMore(false)
+		setKeyboardHeight(0)
 		setMoreType(MessageMore.TEXT)
+		// setTimeout(() => editorRef.current?.quill?.focus(), 300)
 	}
 
 	// 文件上传
@@ -300,6 +309,10 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	useAsyncEffect(
 		async () => {
 			if (!audioData?.file) return
+			if (isCancel) {
+				setIsCancel(false)
+				return
+			}
 			let msg: any
 			try {
 				const duration = Math.ceil(audioData.duration / 1000)
@@ -378,6 +391,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 								>
 									<KeyboardIcon className="text-4xl text-gray-500 mr-2 animate__animated animate__zoomIn" />
 								</Link>
+								{/* <Button className="w-full flex h-9 mx-2 rounded animate__animated animate__zoomIn bg-bgTertiary justify-center items-center text-gray-500 select-none"> */}
 								<div
 									className="w-full flex h-9 mx-2 rounded animate__animated animate__zoomIn bg-bgTertiary justify-center items-center text-gray-500 select-none active:bg-primary active:bg-opacity-50 active:text-white"
 									{...longPressEvent}
@@ -385,6 +399,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 								>
 									{$t('按住说话')}
 								</div>
+								{/* </Button> */}
 								<Link onClick={() => moreTypeChange(MessageMore.TEXT)}>
 									<PlusCircle className="text-4xl text-gray-500 mr-2" />
 								</Link>
@@ -476,7 +491,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 						</div>
 					</div>
 					<div
-						className={clsx('w-full overflow-hidden h-[300px]',!showMore && 'hidden')}
+						className={clsx('w-full overflow-hidden h-[300px]', !showMore && 'hidden')}
 						// style={{
 						// 	height: keyboardHeight + 'px'
 						// }}
