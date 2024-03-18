@@ -74,12 +74,9 @@ const MyInfo = () => {
 
 	return (
 		<Page onPageInit={onPageInit} className="bg-bgTertiary coss_info">
-			<Navbar
-				className="bg-bgPrimary hidden-navbar-bg coss_navbar "
-				title={info?.nickname}
-				large
-				outline={false}
-			/>
+			<Navbar className="bg-bgPrimary hidden-navbar-bg coss_navbar" title={info?.nickname} large outline={false}>
+				<span></span>
+			</Navbar>
 			<List strong mediaList className="coss_list">
 				<ListItem
 					link={`/user_info/${info?.user_id}/`}

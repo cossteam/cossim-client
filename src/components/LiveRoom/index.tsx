@@ -7,6 +7,7 @@ import { ConnectionState, LocalTrack, RemoteTrack, Room, RoomEvent, VideoPresets
 import { useAsyncEffect } from '@reactuses/core'
 import VideoBox from './VideoBox'
 import { LiveRoomStates, useLiveRoomStore } from '@/stores/liveRoom'
+import { SocketEvent } from '@/shared'
 
 const LiveRoomNew: React.FC = () => {
 	// 状态
@@ -29,6 +30,27 @@ const LiveRoomNew: React.FC = () => {
 	const isBusy = useMemo(() => {
 		return liveRoomStore.state === LiveRoomStates.BUSY
 	}, [liveRoomStore.state])
+	// 事件处理
+	useEffect(() => {
+		if (!liveRoomStore?.eventDate?.event) return
+		// 来电
+		if ([SocketEvent.UserCallReqEvent, SocketEvent.GroupCallReqEvent].includes(liveRoomStore?.eventDate?.event)) {
+			liveRoomStore.handleCall()
+			return
+		}
+		// 拒绝/挂断
+		if (
+			[
+				SocketEvent.UserCallRejectEvent,
+				SocketEvent.GroupCallRejectEvent,
+				SocketEvent.UserCallHangupEvent,
+				SocketEvent.GroupCallHangupEvent
+			].includes(liveRoomStore?.eventDate?.event)
+		) {
+			liveRoomStore.hangup()
+			return
+		}
+	}, [liveRoomStore?.eventDate?.event])
 	// 创建房间
 	const client = useRef<Room>()
 	const [audioEnable, setAudioEnable] = useState(true)
@@ -253,7 +275,7 @@ const LiveRoomNew: React.FC = () => {
 											console.log(index)
 										}}
 									>
-										{index === 0 && <div className="absolute top-0 right-0">第一</div>}
+										{/* {index === 0 && <div className="absolute top-0 right-0">第一</div>} */}
 									</VideoBox>
 								)
 							})}
