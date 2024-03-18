@@ -29,6 +29,9 @@ dependencies:
   '@capacitor/local-notifications':
     specifier: ^5.0.7
     version: 5.0.7(@capacitor/core@5.7.0)
+  '@capacitor/status-bar':
+    specifier: ^5.0.7
+    version: 5.0.7(@capacitor/core@5.7.0)
   '@emoji-mart/data':
     specifier: ^1.1.2
     version: 1.1.2
@@ -214,6 +217,9 @@ devDependencies:
   autoprefixer:
     specifier: ^10.4.17
     version: 10.4.17(postcss@8.4.35)
+  eruda:
+    specifier: ^3.0.1
+    version: 3.0.1
   eslint:
     specifier: ^8.56.0
     version: 8.56.0
@@ -577,6 +583,14 @@ packages:
 
   /@capacitor/local-notifications@5.0.7(@capacitor/core@5.7.0):
     resolution: {integrity: sha512-Q16sAv9B55qrXRBgjsom3UAXQ9J5I9HxOToYtQ6jvM3237DphotvVSNriX2AGeXLi5nHkmNv2ZsFu17wTrRcpA==}
+    peerDependencies:
+      '@capacitor/core': ^5.0.0
+    dependencies:
+      '@capacitor/core': 5.7.0
+    dev: false
+
+  /@capacitor/status-bar@5.0.7(@capacitor/core@5.7.0):
+    resolution: {integrity: sha512-KblB3gV2LDMEjx3fQoNBAzxb+Tr+2mv68SfFLLDCMiMUD3Eile2TAWRWd1yxy496pDFTOs2BJtup8++iuuuJ/w==}
     peerDependencies:
       '@capacitor/core': ^5.0.0
     dependencies:
@@ -2362,6 +2376,10 @@ packages:
   /env-paths@2.2.1:
     resolution: {integrity: sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==}
     engines: {node: '>=6'}
+    dev: true
+
+  /eruda@3.0.1:
+    resolution: {integrity: sha512-6q1Xdwga4JTr1mKSW4mzuWSSbmXgqpm/8Wa1QGFGfCWRjC0bCQjbS4u06M1te1moucIS3hBLlbSTPWYH2W0qbQ==}
     dev: true
 
   /es-define-property@1.0.0:
