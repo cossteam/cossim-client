@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { MessageStore } from '@/stores/message'
 // import CommonStore from '@/db/common'
 import { StateStore } from '@/stores/state'
+import useCacheStore from '@/stores/cache'
+
 
 /**
  * 处理私聊接收的 socket 的消息
@@ -16,6 +18,10 @@ export const handlerMessageSocket = async (data: any, msgStore: MessageStore, st
 
 		//  如果是自己的消息且设备是同一台设备，就不需要继续操作
 		if (data.driverId === getCookie(DEVICE_ID)) return
+
+		// 首次进去 App 走拉去落后消息的通道
+		const cacheStore = useCacheStore.getState()
+		if(cacheStore.firstOpened) return
 
 		const msg = {
 			dialog_id: message?.dialog_id,

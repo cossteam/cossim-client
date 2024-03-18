@@ -31,6 +31,9 @@ import Preview from './components/Preview/Preview'
 import LiveRoomNew from '@/components/LiveRoom'
 import { LiveRoomStates, useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
+import useCacheStore from '@/stores/cache'
+import run from './App'
+import { isWebDevice } from './utils'
 
 let store: MessageStore | null = null
 
@@ -60,7 +63,6 @@ function App() {
 		on: {
 			routeChanged: (_newRoute: Router.Route, _previousRoute: Router.Route, _router: Router.Router) => {
 				router.current = _router
-				console.log(_router)
 			}
 		}
 	})
@@ -77,7 +79,7 @@ function App() {
 		const handlerInit = async (e: any) => {
 			const data = JSON.parse(e.data)
 			const event = data.event
-			console.log('接收到所有 sokect 通知：', data)
+			// console.log('接收到所有 sokect 通知：', data)
 			switch (event) {
 				case SocketEvent.OnlineEvent:
 					setCookie(DEVICE_ID, data.driverId)
@@ -137,6 +139,7 @@ function App() {
 
 		// 连接 socket
 		if (hasCookie(TOKEN)) {
+			run()
 			SocketClient.connect()
 			SocketClient.addListener('onWsMessage', handlerInit)
 		}
@@ -151,6 +154,8 @@ function App() {
 
 	let backListener: PluginListenerHandle
 	let appStateListener: PluginListenerHandle
+
+	// const [isActive, setIsActive] = useState(true)
 
 	useAsyncEffect(
 		async () => {
@@ -197,6 +202,9 @@ function App() {
 					if (hasCookie(TOKEN) && SocketClient.isDisconnect()) {
 						SocketClient.connect()
 					}
+					cacheStore.updateFirstOpened(true)
+				} else {
+					cacheStore.updateFirstOpened(false)
 				}
 			}
 
@@ -218,6 +226,7 @@ function App() {
 	useAsyncEffect(
 		async () => {
 			try {
+				if(await isWebDevice()) return
 				// 设置状态栏样式
 				StatusBar.setBackgroundColor({ color: '#ffffff' }) // 设置状态栏背景颜色为白色
 				StatusBar.setOverlaysWebView({ overlay: false }) // 如果您使用的是原生状态栏，则需设置为 false
@@ -230,6 +239,14 @@ function App() {
 		() => {},
 		[]
 	)
+
+	// 获取缓存
+	const cacheStore = useCacheStore()
+
+	useEffect(() => {
+		cacheStore.init()
+	}, [])
+
 
 	return (
 		<AppComponent {...f7params}>

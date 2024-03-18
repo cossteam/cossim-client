@@ -26,6 +26,7 @@ import clsx from 'clsx'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
 // import { useChatStore } from '@/stores/chat'
+import useCacheStore from '@/stores/cache'
 
 const getAfterMessage = async () => {
 	try {
@@ -79,7 +80,7 @@ const getAfterMessage = async () => {
 
 const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
-	const [chats, setChats] = useState<any[]>(dialogs)
+	// const [chats, setChats] = useState<any[]>(dialogs)
 
 	// 全局状态(消息未读)
 	const stateStore = useStateStore()
@@ -87,6 +88,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const msgStore = useMessageStore()
 	// 消息更新
 	// const chatStore = useChatStore()
+	const cacheStore = useCacheStore()
 
 	// 获取对话列表
 	const getDialogList = async () => {
@@ -159,15 +161,15 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		}
 	}
 
-	useEffect(() => {
-		if (!dialogs.length) return
-		const list = dialogs.map((item) => {
-			return {
-				...item
-			}
-		})
-		setChats(list.sort(customSort))
-	}, [dialogs])
+	// useEffect(() => {
+	// 	if (!dialogs.length) return
+	// 	// const list = dialogs.map((item) => {
+	// 	// 	return {
+	// 	// 		...item
+	// 	// 	}
+	// 	// })
+	// 	// setChats(list.sort(customSort))
+	// }, [dialogs])
 
 	useEffect(() => {
 		if (stateStore.is_chat_update) {
@@ -273,7 +275,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 			<PageContent className="p-0 max-h-full h-full">
 				<div className="h-full bg-bgPrimary pb-12 overflow-y-auto" onScroll={onDialogListScroll}>
 					<List contactsList noChevron mediaList dividers className="">
-						{[...chats].map((item, index) => {
+						{cacheStore.cacheDialogs.sort(customSort).map((item, index) => {
 							return (
 								<ListItem
 									className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
