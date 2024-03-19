@@ -28,6 +28,7 @@ import useSpeechRecognition from '@/hooks/useSpeechRecognition'
 import StorageService from '@/api/storage'
 import './css/MessageBar.scss'
 import { EmitterSource } from 'quill/core/emitter'
+import VideoCover from '@/utils/videoCover'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
@@ -242,7 +243,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		}
 	}
 
-	const fileMessageType = (type: string) => {
+	const fileMessageType = (type: string): MESSAGE_TYPE => {
 		switch (
 			type
 				.split('/')
@@ -256,6 +257,26 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 			default:
 				return MESSAGE_TYPE.FILE
 		}
+	}
+
+	const getVideoCover = async (file: File) => {
+		return new Promise<string>((resolve, reject) => {
+			try {
+				const videoCover = new VideoCover({
+					url: URL.createObjectURL(file),
+					duration: 10,
+					imgWidth: 800,
+					quality: 0.95,
+					imageType: 'image/jpeg',
+					isCheckImageColor: true
+				})
+				videoCover.getVideoCover((img) => {
+					resolve(img)
+				})
+			} catch (error) {
+				reject(error)
+			}
+		})
 	}
 
 	// 文件选择
@@ -273,16 +294,20 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 				return
 			}
 			try {
-				fileMsg = await msgStore.craeteMessage(fileMessageType(type), ``)
+				const msgType = fileMessageType(type)
+				fileMsg = await msgStore.craeteMessage(msgType, ``)
 				fileMsg.msg_send_state = MESSAGE_SEND.SENDING
+				const videoCover = msgType === MESSAGE_TYPE.VIDEO ? await getVideoCover(file) : ''
 				fileMsg.content = JSON.stringify({
 					url: await fileBase64(file),
+					cover: videoCover,
 					name: file.name,
 					size: file.size
 				})
 				const { url, file_id } = await upload(file)
 				fileMsg.content = JSON.stringify({
 					url,
+					cover: videoCover,
 					name: file.name,
 					size: file.size
 				})
@@ -291,7 +316,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 			} catch (error: any) {
 				if (!fileMsg) return
 				fileMsg.msg_send_state = MESSAGE_SEND.SEND_FAILED
-				msgStore.updateDB(fileMsg, error.message ?? error, false)
+				msgStore.updateDB(fileMsg, error?.message ?? error, false)
 			}
 		}
 	}
