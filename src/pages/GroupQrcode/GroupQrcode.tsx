@@ -34,7 +34,7 @@ const GroupQrcode: React.FC<RouterProps> = ({f7route}) => {
 					</div>
 				</div>
 				<div>
-					<QRCode style={{ margin: '0 auto' }} value={'group:' + groupId!} size={256} level={'H'} />
+					<QRCode style={{ margin: '0 auto' }} value={'group_id:' + groupId!} size={256} level={'H'} />
 				</div>
 				<div className="flex justify-center mt-10 text-neutral-400">
 					<span>通过扫描上面的二维码，即可添加群聊</span>

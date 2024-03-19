@@ -1,12 +1,15 @@
 import { Html5Qrcode } from 'html5-qrcode'
-import { Navbar, Page } from 'framework7-react'
+import { f7, Navbar, Page } from 'framework7-react'
 import { useEffect } from 'react'
 import { hasCamera } from '@/utils/media.ts'
+import UserService from '@/api/user'
+import { $t } from '@/shared'
 
 const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 	let QrCode: any = null
 
 	useEffect(() => {
+		handleScanner('group:454545');
 		getCameras()
 		return () => {
 			console.log(QrCode)
@@ -44,14 +47,41 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 					}
 				})
 				.catch((err) => {
-					// QrCode = new Html5Qrcode('reader')
-					// handle err
 					console.log('获取设备信息失败', err) // 获取设备信息失败
 				})
 		} catch (e) {
 			console.log(e)
 		}
 	}
+
+	const addPersional = async (userId: string) => {
+		try {
+			const { code } = await UserService.getUserInfoApi({ user_id: userId })
+			if (code == 200) {
+				console.log('获取用户状态', code);
+				f7router?.navigate(`/personal_detail/${userId}/`)
+			}
+		} catch (error) {
+			f7.dialog.alert($t('该二维码已过期'))
+		}
+	}
+
+	const handleScanner = (text: string) => {
+		const type: any = text.match(/.*(?=:)/)?.[0]
+		const content: any = text.match(/(?<=.*:).*/)?.[0]
+		console.log('获取',type, content); // Output: 一段文本，
+
+		switch(type) {
+			case 'group_id': 
+
+				break;
+			case 'user_id':
+				addPersional(content)
+				break;
+			default:
+		}
+	}
+
 	const start = () => {
 		QrCode?.start(
 			{ facingMode: 'environment' },
@@ -61,8 +91,9 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 			},
 			(decodedText: any) => {
 				console.log('扫描结果', decodedText)
+				handleScanner(decodedText)
 				// handleStop()
-				f7router?.navigate(`/personal_detail/${decodedText}/`)
+				
 			},
 			(errorMessage: any) => {
 				console.log('暂无额扫描结果', QrCode, errorMessage)
