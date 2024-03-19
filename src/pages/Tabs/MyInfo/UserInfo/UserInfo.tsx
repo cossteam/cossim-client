@@ -97,7 +97,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 		<Page className="bg-bgTertiary" noToolbar>
 			<Navbar className="bg-bgPrimary hidden-navbar-bg" backLink outline={false} title={$t('个人信息')} />
 			<List className="coss_list" strong>
-				<ListItem title="头像" onClick={handleAvatarClick} >
+				<ListItem className="coss_item__bottom" title="头像" onClick={handleAvatarClick} >
 					<div slot="after">
 						<input
 							type="file"
@@ -143,7 +143,8 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 
 			<List className="coss_list" strong>
 				<ListItem link title={$t('邮箱')} noChevron className="coss_item__bottom" after={userInfo?.email} />
-				<ListItem link={'/my_qrcode/'} title={$t('我的二维码')} noChevron className="coss_item__bottom" />
+				<ListItem link={'/my_qrcode/'} title={$t('我的二维码')} className="coss_item__bottom" />
+				<ListItem link={`/change_user_id/?coss_id=${userInfo?.coss_id}`} title={$t('ID')} className="coss_item__bottom" after={userInfo?.coss_id} />
 			</List>
 
 			<List className="coss_list" strong>

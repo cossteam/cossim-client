@@ -115,6 +115,18 @@ const routes: Router.RouteParameters[] = [
 		asyncComponent: () => import('@/pages/Scanner/Scanner')
 	},
 	{
+		path: '/change_user_id/',
+		asyncComponent: () => import('@/pages/ChangeUserID/ChangeUserID')
+	},
+	{
+		path: '/group_user_display_name/',
+		asyncComponent: () => import('@/pages/GroupUserDisplayName/GroupUserDisplayName')
+	},
+	{
+		path: '/user_remark/',
+		asyncComponent: () => import('@/pages/UserRemark/UserRemark')
+	},
+	{
 		path: '/test',
 		asyncComponent: () => import('@/pages/test/test')
 	},

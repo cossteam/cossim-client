@@ -23,10 +23,12 @@ export interface UserInfoParams {
 }
 
 export interface UpdateUserInfData {
-	avatar?: string
-	nickname?: string
-	signature?: string
-	tel?: string
+	avatar?: string;
+    coss_id?: string;
+    nickname?: string;
+    signature?: string;
+    tel?: string;
+    [property: string]: any;
 }
 
 export interface updatePassWorData {
