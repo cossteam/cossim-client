@@ -14,8 +14,8 @@ export enum MESSAGE_TYPE {
 	IMAGE = 3,
 	/** 标注消息 */
 	LABEL = 4,
-	/** 置顶消息 */
-	STICKER = 5,
+	/** 群公告 */
+	NOTICE = 5,
 	/** 文件 */
 	FILE = 6,
 	/** 待办 */
@@ -24,6 +24,26 @@ export enum MESSAGE_TYPE {
 	ERROR = 8,
 	/** 视频 */
 	VIDEO = 9
+}
+
+/** 消息类型 */
+export enum msgType {
+	/** 文本 */
+	TEXT = 1,
+	/** 音频 */
+	AUDIO = 2,
+	/** 图片 */
+	IMAGE = 3,
+	/** 标注 */
+	LABEL = 4,
+	/** 群公告 */
+	NOTICE = 5,
+	/** 文件 */
+	FILE = 6,
+	/** 错误信息, 例如提示：好友消息不存在 */
+	ERROR = 7,
+	/** 视频 */
+	VIDEO = 8,
 }
 
 /** 消息阅读状态 */

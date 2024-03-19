@@ -12,21 +12,28 @@ const defaultOptions: MessageStoreOptions = {
 	isAtBottom: true,
 	receiverInfo: {},
 	isNeedPull: true,
-	isGroup: false
+	isGroup: false,
+	container: null
 }
 
 const useMessageStore = create<MessageStore>((set) => ({
 	...defaultOptions,
 
 	init: async (options) => {
-		const allMessages = (await cacheStore.get(`message_${options.dialogId}`))?.messages ?? []
+		const allMessages = (await cacheStore.get(`dialog_${options.dialogId}`)) ?? []
 
 		const messages = allMessages.slice(-20)
 
+		// console.log("messages",messages);
+
 		set({ allMessages, messages, isNeedPull: !allMessages.length, ...options })
 
-		getRemoteMessage(options.isGroup, options.receiverId, 1, 1).then((data) => {
-			console.log('getRemoteMessage', data)
+		// 获取远程消息
+		getRemoteMessage(options.isGroup, options.receiverId, 1, 30).then((data) => {
+			const total = data.total
+			const msgs = data?.user_messages ?? data?.group_messages ?? []
+			console.log('getRemoteMessage', total, msgs)
+			cacheStore.set(`dialog_${options.dialogId}`, msgs)
 		})
 	},
 

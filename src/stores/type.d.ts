@@ -87,6 +87,8 @@ export interface MessageStoreOptions {
 	isNeedPull: boolean
 	/** 是否是群聊 */
 	isGroup: boolean
+	/** 消息容器 */
+	container: HTMLDivElement | null
 }
 
 interface initOptions {
