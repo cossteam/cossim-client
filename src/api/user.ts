@@ -105,13 +105,8 @@ class UserServiceImpl {
 
 	/**
 	 * 修改用户信息
-	 * @param {UpdateUserInfData} data
-	 * @param {*} data.avatar
-	 * @param {*} data.nickname
-	 * @param {*} data.signature
-	 * @param {*} data.status
-	 * @param {*} data.tel
-	 * @returns
+	 * @param {UpdateUserInfData} data 
+	 * @returns 
 	 */
 	updateUserInfoApi(data: UpdateUserInfData): Promise<DataResponse> {
 		return request({

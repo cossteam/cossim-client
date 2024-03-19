@@ -216,6 +216,19 @@ class RelationServiceImpl {
 			data
 		})
 	}
+
+	/**
+	 * 设置用户在群聊的昵称
+	 * @param data 
+	 * @returns 
+	 */
+	setGroupUserDisplayName(data: {group_id: number, remark: string}): Promise<DataResponse> {
+		return request({
+			url: `${this.relationGroup}/remark/set`,
+			method: 'POST',
+			data
+		})
+	}
 }
 
 const RelationService = new RelationServiceImpl()
