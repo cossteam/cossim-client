@@ -355,6 +355,9 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						onChange={blackList}
 					/>
 				</ListItem>
+				<ListItem link='/user_remark/' title={$t('备注')}>
+
+				</ListItem>
 			</List>
 
 			<List strong outline dividers className="bg-white m-0 mb-3">

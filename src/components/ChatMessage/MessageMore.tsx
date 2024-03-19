@@ -41,14 +41,7 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		resetMedia()
 		openAlbum()
 	}
-	useAsyncEffect(
-		async () => {
-			if (!files || !files?.length) return
-			props.onSelectFiles && props.onSelectFiles(files)
-		},
-		() => {},
-		[files]
-	)
+	// 相机
 	useAsyncEffect(
 		async () => {
 			if (!media || !media?.length) return
@@ -57,6 +50,16 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		() => {},
 		[media]
 	)
+	//  文件
+	useAsyncEffect(
+		async () => {
+			if (!files || !files?.length) return
+			props.onSelectFiles && props.onSelectFiles(files)
+		},
+		() => {},
+		[files]
+	)
+	// 相册
 	const fileInputRef = useRef<any>()
 	const handleFileChange = (e: any) => {
 		props.onSelectFiles && props.onSelectFiles(e.target.files)

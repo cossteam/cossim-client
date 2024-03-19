@@ -29,7 +29,7 @@ const MyQrCode = () => {
 					</div>
 				</div>
 				<div>
-					<QRCode style={{ margin: '0 auto' }} value={userId!} size={256} level={'H'} />
+					<QRCode style={{ margin: '0 auto' }} value={'user_id:' + userId!} size={256} level={'H'} />
 				</div>
 				<div className="flex justify-center mt-10 text-neutral-400">
 					<span>通过扫描上面的二维码，即可添加好友</span>
