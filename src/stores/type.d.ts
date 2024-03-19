@@ -83,4 +83,31 @@ export interface MessageStoreOptions {
 	isAtBottom: boolean
 	/** 接收者信息 */
 	receiverInfo: any
+	/** 是否需要从服务器上拉取消息 */
+	isNeedPull: boolean
+	/** 是否是群聊 */
+	isGroup: boolean
+}
+
+interface initOptions {
+	dialogId: number
+	receiverId: string | number
+	isGroup: boolean
+	receiverInfo?: any
+}
+
+/**
+ * @description 聊天仓库
+ */
+export type MessageStore = MessageStoreOptions & {
+	/**
+	 * 初始化消息
+	 * @param {string | number} dialogId 会话 id
+	 */
+	init: (options: initOptions) => Promise<void>
+	/**
+	 * 更新所有仓库信息, 可以只更新部分信息
+	 * @param { Partial<MessageStoreOptions>} options
+	 */
+	update: (options: Partial<MessageStoreOptions>) => void
 }

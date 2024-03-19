@@ -1,46 +1,38 @@
 import { create } from 'zustand'
-import { CacheStore, CacheStoreOptions } from './type'
+import { MessageStore, MessageStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
 // import useUserStore from './user'
+import { getRemoteMessage } from '@/shared'
 
-// const userStore = useUserStore.getState()
-
-const defaultOptions: CacheStoreOptions = {
-	firstOpened: true,
-	cacheDialogs: [],
-	cacheContacts: [],
-    cacheGroup: [],
-	cacheShareKeys: [],
-	unreadCount: 0,
-	applyCount: 0
+const defaultOptions: MessageStoreOptions = {
+	messages: [],
+	allMessages: [],
+	dialogId: 0,
+	receiverId: '',
+	isAtBottom: true,
+	receiverInfo: {},
+	isNeedPull: true,
+	isGroup: false
 }
 
-const useCacheStore = create<CacheStore>((set) => ({
+const useMessageStore = create<MessageStore>((set) => ({
 	...defaultOptions,
 
-	init: async () => {
-		const cacheDialogs = (await cacheStore.get('cacheDialogs')) ?? []
-		const cacheContacts = (await cacheStore.get('cacheContacts')) ?? []
-		const cacheShareKeys = (await cacheStore.get('cacheShareKey')) ?? []
-		const cacheGroup = (await cacheStore.get('cacheGroup')) ?? []
+	init: async (options) => {
+		const allMessages = (await cacheStore.get(`message_${options.dialogId}`))?.messages ?? []
 
-		const unreadCount = (await cacheStore.get('unreadCount')) ?? 0
-		const applyCount = (await cacheStore.get('applyCount')) ?? 0
+		const messages = allMessages.slice(-20)
 
-		set({ cacheDialogs, cacheContacts, cacheShareKeys, cacheGroup, unreadCount, applyCount })
+		set({ allMessages, messages, isNeedPull: !allMessages.length, ...options })
+
+		getRemoteMessage(options.isGroup, options.receiverId, 1, 1).then((data) => {
+			console.log('getRemoteMessage', data)
+		})
 	},
 
-	updateFirstOpened: (firstOpened) => set({ firstOpened }),
-
-	updateCacheDialogs: async (cacheDialogs) => {
-		await cacheStore.set('cacheDialogs', cacheDialogs)
-		set({ cacheDialogs })
-	},
-
-	updateUnreadCount: async (unreadCount) => {
-		await cacheStore.set('unreadCount', unreadCount)
-		set({ unreadCount })
+	update: (options) => {
+		set((state) => ({ ...state, ...options }))
 	}
 }))
 
-export default useCacheStore
+export default useMessageStore
