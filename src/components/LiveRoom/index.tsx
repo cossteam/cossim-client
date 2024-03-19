@@ -108,6 +108,7 @@ const LiveRoomNew: React.FC = () => {
 					.then(() => {
 						liveRoomStore.updateState(LiveRoomStates.BUSY)
 						resolve()
+						return
 					})
 					.catch((error) => {
 						count += 1
@@ -131,6 +132,7 @@ const LiveRoomNew: React.FC = () => {
 	}
 	useAsyncEffect(
 		async () => {
+			console.log(getliveRoomStatesText(liveRoomStore.state))
 			switch (liveRoomStore.state) {
 				case LiveRoomStates.IDLE:
 					break
