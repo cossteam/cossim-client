@@ -47,6 +47,8 @@ interface LiveRoomFunc {
 	updateOpened: (opened: boolean) => void
 	updateState: (state: LiveRoomStates) => void
 	updateEvent: (event: SocketEvent, eventDate: any) => void
+	/** 来电处理 */
+	handleCall: () => void
 	/** 呼叫 */
 	call: (callProps: CallProps) => void
 	/** 挂断通话 */
@@ -109,6 +111,12 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 		}
 		set({
 			eventDate
+		})
+	},
+	handleCall: () => {
+		set({
+			opened: true,
+			state: LiveRoomStates.WAITING
 		})
 	},
 	call: async (callProps: CallProps) => {

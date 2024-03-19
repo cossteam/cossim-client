@@ -11,6 +11,7 @@ import './Auth.scss'
 import { setCookie } from '@/utils/cookie'
 import CommonStore from '@/db/common'
 import { Device } from '@capacitor/device'
+import useUserStore from '@/stores/user'
 
 interface LoginScreenProps {
 	defaultData?: RegisterData
@@ -54,6 +55,8 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defau
 		setLoading(true)
 		return pass
 	}
+
+	const userStore = useUserStore()
 
 	// import { cloneDeep } from 'lodash-es'
 	// console.dir(cloneDeep(decryptedData));
@@ -106,6 +109,14 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defau
 			setCookie(USER_ID, data?.user_info?.user_id)
 			setCookie(ACCOUNT, data?.user_info?.email)
 			setCookie(TOKEN, data?.token)
+
+			userStore.update({
+				userId: data?.user_info?.user_id,
+				token: data?.token,
+				userInfo: data?.user_info,
+				deviceId: driver_id,
+			})
+
 			location.reload()
 		} catch (error) {
 			console.error('登录失败', error)

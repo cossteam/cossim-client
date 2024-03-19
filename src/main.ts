@@ -15,7 +15,6 @@ import 'dayjs/locale/zh-cn'
 import 'animate.css'
 // 注册 service worker
 // import './worker'
-
 dayjs.locale('zh-cn')
 
 // Init F7 React Plugin

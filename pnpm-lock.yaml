@@ -29,6 +29,9 @@ dependencies:
   '@capacitor/local-notifications':
     specifier: ^5.0.7
     version: 5.0.7(@capacitor/core@5.7.0)
+  '@capacitor/status-bar':
+    specifier: ^5.0.7
+    version: 5.0.7(@capacitor/core@5.7.0)
   '@emoji-mart/data':
     specifier: ^1.1.2
     version: 1.1.2
@@ -101,6 +104,9 @@ dependencies:
   livekit-client:
     specifier: ^1.15.11
     version: 1.15.11
+  localforage-cordovasqlitedriver:
+    specifier: ^1.8.0
+    version: 1.8.0
   lodash-es:
     specifier: ^4.17.21
     version: 4.17.21
@@ -214,6 +220,9 @@ devDependencies:
   autoprefixer:
     specifier: ^10.4.17
     version: 10.4.17(postcss@8.4.35)
+  eruda:
+    specifier: ^3.0.1
+    version: 3.0.1
   eslint:
     specifier: ^8.56.0
     version: 8.56.0
@@ -577,6 +586,14 @@ packages:
 
   /@capacitor/local-notifications@5.0.7(@capacitor/core@5.7.0):
     resolution: {integrity: sha512-Q16sAv9B55qrXRBgjsom3UAXQ9J5I9HxOToYtQ6jvM3237DphotvVSNriX2AGeXLi5nHkmNv2ZsFu17wTrRcpA==}
+    peerDependencies:
+      '@capacitor/core': ^5.0.0
+    dependencies:
+      '@capacitor/core': 5.7.0
+    dev: false
+
+  /@capacitor/status-bar@5.0.7(@capacitor/core@5.7.0):
+    resolution: {integrity: sha512-KblB3gV2LDMEjx3fQoNBAzxb+Tr+2mv68SfFLLDCMiMUD3Eile2TAWRWd1yxy496pDFTOs2BJtup8++iuuuJ/w==}
     peerDependencies:
       '@capacitor/core': ^5.0.0
     dependencies:
@@ -2364,6 +2381,10 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
+  /eruda@3.0.1:
+    resolution: {integrity: sha512-6q1Xdwga4JTr1mKSW4mzuWSSbmXgqpm/8Wa1QGFGfCWRjC0bCQjbS4u06M1te1moucIS3hBLlbSTPWYH2W0qbQ==}
+    dev: true
+
   /es-define-property@1.0.0:
     resolution: {integrity: sha512-jxayLKShrEqqzJ0eumQbVhTYQM27CfT1T35+gCgDFoL82JLsXqTJ76zv6A0YLOgEnLUMvLzsDsGIrl8NFpT2gQ==}
     engines: {node: '>= 0.4'}
@@ -3488,6 +3509,12 @@ packages:
       mlly: 1.5.0
       pkg-types: 1.0.3
     dev: true
+
+  /localforage-cordovasqlitedriver@1.8.0:
+    resolution: {integrity: sha512-AeYiVPURow8gPAGHNOiGMS9rlgv81wUuQLtnyCP6Eh1mq+IsqNl9fwAOP+RiTi6aO/Wfy3TTWiW2WtbTdJaUnQ==}
+    dependencies:
+      localforage: 1.10.0
+    dev: false
 
   /localforage@1.10.0:
     resolution: {integrity: sha512-14/H1aX7hzBBmmh7sGPd+AOMkkIrHM3Z1PAyGgZigA1H1p5O5ANnMyWzvpAETtG68/dC4pC0ncy3+PPGzXZHPg==}

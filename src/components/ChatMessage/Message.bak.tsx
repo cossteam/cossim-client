@@ -28,6 +28,7 @@ import useSpeechRecognition from '@/hooks/useSpeechRecognition'
 import StorageService from '@/api/storage'
 import './css/MessageBar.scss'
 import { EmitterSource } from 'quill/core/emitter'
+import { set } from 'lodash-es'
 
 interface MessageBarProps {
 	contentEl: RefObject<HTMLDivElement>
@@ -52,6 +53,8 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 
 	// 键盘高度
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(0)
+
+	const [showMore, setShowMore] = useState<boolean>(false)
 
 	useResizeObserver(contentEl, () => scroll(contentEl.current!, false))
 	useClickOutside(toolbarRef, () => {
@@ -85,9 +88,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		const quill = editorRef.current!.quill
 		let type = msgType
 
-		let content = '14 "'
-
-		if (quill) content = quill.getSemanticHTML()
+		const content = quill.getSemanticHTML()
 		if (hasImageHtml(content)) type = MESSAGE_TYPE.IMAGE
 
 		// 发送或编辑消息
@@ -133,6 +134,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		setAudioBtn(false)
 	}
 
+	// 取消录音
+	const [isCancel, setIsCancel] = useState<boolean>(false)
+
 	useEffect(() => {
 		requestAnimationFrame(() => {
 			const timer = setTimeout(() => {
@@ -166,7 +170,13 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 		const handlerContextmenu = (e: { preventDefault: () => any }) => e.preventDefault()
 
 		const handlerTouchMove = (e: any) => {
-			console.log('move', e)
+			const rect = toolbarRef.current?.getBoundingClientRect()
+			const y = e.touches[0].clientY
+			if (rect && y < rect.top) {
+				setIsCancel(true)
+			} else {
+				setIsCancel(false)
+			}
 		}
 
 		audioRef.current?.addEventListener('contextmenu', handlerContextmenu)
@@ -299,6 +309,10 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 	useAsyncEffect(
 		async () => {
 			if (!audioData?.file) return
+			if (isCancel) {
+				setIsCancel(false)
+				return
+			}
 			let msg: any
 			try {
 				const duration = Math.ceil(audioData.duration / 1000)
@@ -477,10 +491,10 @@ const MessageBar: React.FC<MessageBarProps> = ({ contentEl, receiver_id, is_grou
 						</div>
 					</div>
 					<div
-						className={clsx('w-full overflow-hidden')}
-						style={{
-							height: keyboardHeight + 'px'
-						}}
+						className={clsx('w-full overflow-hidden h-[300px]', !showMore && 'hidden')}
+						// style={{
+						// 	height: keyboardHeight + 'px'
+						// }}
 						ref={moreRef}
 					>
 						<Emojis

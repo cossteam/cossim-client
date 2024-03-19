@@ -57,24 +57,26 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 	}
 
 	const handleAvatarClick = () => {
-        // 点击头像时触发文件选择器
-        const fileInput = document.getElementById('avatar-input') as HTMLInputElement;
-		
-        if (fileInput) {
-            fileInput.click();
-        }
-		
-    };
+		// 点击头像时触发文件选择器
+		const fileInput = document.getElementById('avatar-input') as HTMLInputElement
 
-    const handleFileChange =  (event: React.ChangeEvent<HTMLInputElement>) => {
-		
-        // 处理文件选择器的文件变化事件
-        const selectedFile = event.target.files?.[0];
-        if (selectedFile) {
-            UserService.updateAvatarApi({file:selectedFile}).then(async (res) => {
-                if (res) {
-                    f7.dialog.alert($t('修改成功'))
-					const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', f7route.params.user_id as string)
+		if (fileInput) {
+			fileInput.click()
+		}
+	}
+
+	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		// 处理文件选择器的文件变化事件
+		const selectedFile = event.target.files?.[0]
+		if (selectedFile) {
+			UserService.updateAvatarApi({ file: selectedFile }).then(async (res) => {
+				if (res) {
+					f7.dialog.alert($t('修改成功'))
+					const user = await CommonStore.findOneById(
+						CommonStore.tables.users,
+						'user_id',
+						f7route.params.user_id as string
+					)
 					CommonStore.update(CommonStore.tables.users, 'user_id', f7route.params.user_id as string, {
 						...user,
 						user_info: {
@@ -86,12 +88,12 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 						...userInfo,
 						avatar: res.data
 					})
-                } else {
-                    f7.dialog.alert($t('修改失败'))
-                }
-            })
-        }
-    };
+				} else {
+					f7.dialog.alert($t('修改失败'))
+				}
+			})
+		}
+	}
 
 	return (
 		<Page className="bg-bgTertiary" noToolbar>
@@ -106,7 +108,16 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 							onChange={handleFileChange}
 							accept="image/*"
 						/>
-						<img className="w-12 h-12 rounded-full bg-black bg-opacity-10" src={userInfo?.avatar} alt="" />
+						{/* <div className="w-12 h-12 rounded-full bg-black bg-opacity-10 flex justify-center items-center">
+							<img
+								src={userInfo?.avatar}
+								alt=""
+								className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
+							/>
+						</div> */}
+						<div className="w-16 h-16 rounded-full overflow-hidden bg-black bg-opacity-10 flex justify-center items-center">
+							<img src={userInfo?.avatar} alt="" className="h-full object-cover bg-black bg-opacity-10" />
+						</div>
 					</div>
 				</ListItem>
 				{/* <ListItem
