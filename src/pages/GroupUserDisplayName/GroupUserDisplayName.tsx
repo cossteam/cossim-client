@@ -1,11 +1,29 @@
 // 在群组中用户展示的名称
-import { Link, List, ListInput, Navbar, NavRight, Page } from 'framework7-react'
+import { f7, Link, List, ListInput, Navbar, NavRight, Page } from 'framework7-react'
+import { useState } from 'react'
+import RelationService from '@/api/relation'
+import { $t } from '@/shared'
 
-const GroupUserDisplayName = () => {
+const GroupUserDisplayName: React.FC<RouterProps> = ({f7route, f7router}) => {
+	const groupId = f7route.query.group_id!
+	const remark = f7route.query.remark
+	const [remark_, setRemark] = useState<any>()
+	console.log(f7route.query);
+	
+	const handlerSubmit = () => {
+		RelationService.setGroupUserDisplayName({
+			group_id: parseInt(groupId),
+			remark: remark_
+		}).then(() => {
+			f7router.back();
+		}).catch(() => {
+			f7.dialog.alert($t('修改失败'))
+		})
+	}
 	return (
 		<Page noToolbar>
 			<Navbar backLink>
-				<NavRight><Link>提交</Link></NavRight>
+				<NavRight><Link onClick={handlerSubmit}>提交</Link></NavRight>
 			</Navbar>
 			<div className="flex h-full flex-col">
 				<div>
@@ -14,7 +32,8 @@ const GroupUserDisplayName = () => {
 							name="name"
 							type="text"
 							clearButton
-							defaultValue={'123456'}
+							onChange={(e) => setRemark(e.target.value)}
+							defaultValue={remark}
 							autofocus
 						/>
 					</List>

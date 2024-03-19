@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { f7, Page, Navbar, List, ListItem, Button, Block } from 'framework7-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useClipboard } from '@reactuses/core'
@@ -7,20 +7,21 @@ import { $t, exportKeyPair } from '@/shared'
 import CommonStore from '@/db/common'
 import UserService from '@/api/user'
 import { removeAllCookie } from '@/utils/cookie'
+import useUserStore from '@/stores/user'
 import '../MyInfo.scss'
 
 const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 	const [userInfo, setUserInfo] = useState<any>({})
-
+	const userStore = useUserStore()
+	
 	const user = useLiveQuery(async () => {
 		const reslut = await CommonStore.findOneById(
 			CommonStore.tables.users,
 			'user_id',
 			f7route.params.user_id as string
 		)
-		setUserInfo(reslut?.user_info)
-		console.log('reslut?.user_info', reslut)
-
+		console.log('reslut?.user_info', reslut, userStore.userInfo)
+		setUserInfo(userStore.userInfo)
 		return reslut
 	})
 
@@ -94,6 +95,10 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 			})
 		}
 	}
+
+	useEffect(()=>{
+		setUserInfo(userStore.userInfo)
+	},[userStore.userInfo])
 
 	return (
 		<Page className="bg-bgTertiary" noToolbar>

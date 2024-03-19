@@ -111,6 +111,10 @@ const routes: Router.RouteParameters[] = [
 		asyncComponent: () => import('@/pages/MyQrcode/MyQrcode.tsx')
 	},
 	{
+		path: '/group_qrcode/',
+		asyncComponent: () => import('@/pages/GroupQrcode/GroupQrcode')
+	},
+	{
 		path: '/scanner/',
 		asyncComponent: () => import('@/pages/Scanner/Scanner')
 	},
