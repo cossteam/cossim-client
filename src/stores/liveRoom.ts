@@ -152,7 +152,6 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 				f7.dialog.alert(msg, () => {
 					hangup()
 				})
-				f7.dialog.close()
 				return
 			}
 			set({

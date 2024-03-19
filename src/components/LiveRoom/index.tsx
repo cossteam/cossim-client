@@ -81,14 +81,18 @@ const LiveRoomNew: React.FC = () => {
 		setAudioTrachs(audioTracks)
 	}
 	const cleanLocalTracks = (audio: boolean, video: boolean) => {
-		audio &&
+		if (audio) {
+			client.current?.localParticipant.setMicrophoneEnabled(audioEnable)
 			audioTrachs.map((track) => {
 				track.stop()
 			})
-		video &&
+		}
+		if (video) {
+			client.current?.localParticipant.setCameraEnabled(videoEnable)
 			videoTrachs.map((track) => {
 				track.stop()
 			})
+		}
 	}
 	const connectRoom = () => {
 		let count = 0
@@ -106,6 +110,7 @@ const LiveRoomNew: React.FC = () => {
 				client.current
 					?.connect(liveRoomStore.url!, liveRoomStore.token!)
 					.then(() => {
+						count = 0
 						liveRoomStore.updateState(LiveRoomStates.BUSY)
 						resolve()
 						return
@@ -151,6 +156,7 @@ const LiveRoomNew: React.FC = () => {
 					await createLocalTracks(audioEnable, videoEnable)
 					break
 				case LiveRoomStates.JOINING:
+					console.log('连接中')
 					await connectRoom()
 					break
 				case LiveRoomStates.BUSY:
@@ -172,6 +178,8 @@ const LiveRoomNew: React.FC = () => {
 		async () => {
 			client.current?.on(RoomEvent.Connected, () => {
 				console.log('连接成功')
+				client.current?.localParticipant.setCameraEnabled(videoEnable)
+				client.current?.localParticipant.setMicrophoneEnabled(audioEnable)
 			})
 			client.current?.on(RoomEvent.Disconnected, () => {
 				console.log('连接断开')
@@ -273,8 +281,7 @@ const LiveRoomNew: React.FC = () => {
 										}}
 										track={videoTrack}
 										onClick={() => {
-											setAvctiv(index)
-											console.log(index)
+											setAvctiv(avctiv === index ? -1 : index)
 										}}
 									>
 										{/* {index === 0 && <div className="absolute top-0 right-0">第一</div>} */}
