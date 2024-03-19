@@ -15,7 +15,7 @@ import {
 } from 'framework7-icons/react'
 import { Link } from 'framework7-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { KeyboardIcon } from '../Icon/Icon'
+import { KeyboardIcon } from '../../Icon/Icon'
 import Quill from 'quill'
 import { useClickOutside } from '@reactuses/core'
 

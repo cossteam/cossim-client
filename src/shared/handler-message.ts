@@ -23,8 +23,6 @@ export async function getRemoteMessage(
 		if (code !== 200) return null
 
 		result = data
-
-		console.log('data', data)
 	} catch (error) {
 		console.error('获取远程消息失败：', error)
 	}

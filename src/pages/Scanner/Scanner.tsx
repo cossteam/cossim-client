@@ -5,11 +5,12 @@ import { hasCamera } from '@/utils/media.ts'
 import UserService from '@/api/user'
 import { $t } from '@/shared'
 
-const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
+const QrScanner: React.FC<RouterProps> = ({ f7router, f7route }) => {
 	let QrCode: any = null
 
 	useEffect(() => {
-		handleScanner('group:454545');
+		console.log(f7router, f7route);
+		
 		getCameras()
 		return () => {
 			console.log(QrCode)
@@ -58,7 +59,7 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 		try {
 			const { code } = await UserService.getUserInfoApi({ user_id: userId })
 			if (code == 200) {
-				console.log('获取用户状态', code);
+				console.log('获取用户状态', code);			
 				f7router?.navigate(`/personal_detail/${userId}/`)
 			}
 		} catch (error) {
@@ -92,8 +93,7 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 			(decodedText: any) => {
 				console.log('扫描结果', decodedText)
 				handleScanner(decodedText)
-				// handleStop()
-				
+				handleStop()
 			},
 			(errorMessage: any) => {
 				console.log('暂无额扫描结果', QrCode, errorMessage)
