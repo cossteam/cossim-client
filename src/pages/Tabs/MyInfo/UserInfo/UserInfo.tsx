@@ -152,8 +152,12 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 
 			<List className="coss_list" strong>
 				<ListItem link title={$t('邮箱')} noChevron className="coss_item__bottom" after={userInfo?.email} />
-				<ListItem title={$t('我的二维码')} className="coss_item__bottom">
-					<Qrcode slot="after" className="text-3xl" onClick={() => f7router.navigate('/my_qrcode/')} />
+				<ListItem
+					title={$t('我的二维码')}
+					className="coss_item__bottom"
+					onClick={() => f7router.navigate('/my_qrcode/')}
+				>
+					<Qrcode slot="after" className="text-3xl" />
 				</ListItem>
 				<ListItem
 					link={`/change_user_id/?coss_id=${userInfo?.coss_id}`}
