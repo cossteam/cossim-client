@@ -109,8 +109,10 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 			default:
 				return
 		}
+		console.log('通话事件', eventDate)
 		set({
-			eventDate
+			eventDate,
+			video: eventDate?.data?.option?.video_enabled
 		})
 	},
 	handleCall: () => {
@@ -142,6 +144,8 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 			// resolution: '1280x720',
 			video_enabled: callProps.video
 		}
+		console.log('呼叫参数', createRoomParams)
+
 		try {
 			f7.dialog.preloader('正在呼叫...')
 			// 创建通话

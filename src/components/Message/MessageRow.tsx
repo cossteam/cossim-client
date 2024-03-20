@@ -30,7 +30,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const messageStore = useMessageStore()
 
 	// @ts-ignore
-	useClickOutside(longPressRef, () => setTimeout(()=>longPressRef.current?._tippy?.hide(),100))
+	useClickOutside(longPressRef, () => setTimeout(() => longPressRef.current?._tippy?.hide(), 100))
 
 	const className = clsx(
 		'py-2 px-3 rounded-lg',

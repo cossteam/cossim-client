@@ -1,29 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { f7, Page, Navbar, List, ListItem, Button, Block } from 'framework7-react'
-import { useLiveQuery } from 'dexie-react-hooks'
 import { useClipboard } from '@reactuses/core'
 
 import { $t, exportKeyPair } from '@/shared'
-import CommonStore from '@/db/common'
 import UserService from '@/api/user'
 import { removeAllCookie } from '@/utils/cookie'
 import useUserStore from '@/stores/user'
 import '../MyInfo.scss'
+import { Qrcode } from 'framework7-icons/react'
 
-const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
+const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 	const [userInfo, setUserInfo] = useState<any>({})
 	const userStore = useUserStore()
-	
-	const user = useLiveQuery(async () => {
-		const reslut = await CommonStore.findOneById(
-			CommonStore.tables.users,
-			'user_id',
-			f7route.params.user_id as string
-		)
-		console.log('reslut?.user_info', reslut, userStore.userInfo)
-		setUserInfo(userStore.userInfo)
-		return reslut
-	})
 
 	const logout = () => {
 		f7.dialog.confirm($t('退出登录'), $t('确定要退出登录吗？'), async () => {
@@ -45,7 +33,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 	const [, copy] = useClipboard()
 	const exportPreKey = async () => {
 		try {
-			const keyPair = user?.keyPair
+			const keyPair: any = userStore.keyPair
 			if (keyPair) {
 				const text = exportKeyPair(keyPair)
 				copy(text)
@@ -73,21 +61,11 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 			UserService.updateAvatarApi({ file: selectedFile }).then(async (res) => {
 				if (res) {
 					f7.dialog.alert($t('修改成功'))
-					const user = await CommonStore.findOneById(
-						CommonStore.tables.users,
-						'user_id',
-						f7route.params.user_id as string
-					)
-					CommonStore.update(CommonStore.tables.users, 'user_id', f7route.params.user_id as string, {
-						...user,
-						user_info: {
-							...user?.user_info,
-							avatar: res.data.avatar
+					userStore.update({
+						userInfo: {
+							...userInfo,
+							...res.data
 						}
-					})
-					setUserInfo({
-						...userInfo,
-						avatar: res.data
 					})
 				} else {
 					f7.dialog.alert($t('修改失败'))
@@ -96,15 +74,27 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 		}
 	}
 
-	useEffect(()=>{
-		setUserInfo(userStore.userInfo)
-	},[userStore.userInfo])
+	const loadUserInfo = async () => {
+		try {
+			const { data } = await UserService.getUserInfoApi({ user_id: userStore.userId })
+			if (!data) {
+				setUserInfo(userStore.userInfo)
+				return
+			}
+			userStore.update({
+				userInfo: data
+			})
+			setUserInfo(data)
+		} catch (error) {
+			console.log('获取用户信息错误', error)
+		}
+	}
 
 	return (
-		<Page className="bg-bgTertiary" noToolbar>
+		<Page className="bg-bgTertiary" noToolbar onPageBeforeIn={loadUserInfo}>
 			<Navbar className="bg-bgPrimary hidden-navbar-bg" backLink outline={false} title={$t('个人信息')} />
 			<List className="coss_list" strong>
-				<ListItem className="coss_item__bottom" title="头像" onClick={handleAvatarClick} >
+				<ListItem className="coss_item__bottom" title="头像" onClick={handleAvatarClick}>
 					<div slot="after">
 						<input
 							type="file"
@@ -150,17 +140,27 @@ const Userinfo: React.FC<RouterProps> = ({ f7router, f7route }) => {
 					</div>
 				</ListItem>
 				<ListItem
-					link={`/update_user_info/tel/?default=${userInfo?.tel || ''}&title=${$t('修改手机号')}`}
+					// link={`/update_user_info/tel/?default=${userInfo?.tel || ''}&title=${$t('修改手机号')}`}
 					title={$t('手机号')}
 					className="coss_item__bottom"
 					after={userInfo?.tel}
+					onClick={() => {
+						f7.dialog.alert($t('暂不支持修改手机号'))
+					}}
 				/>
 			</List>
 
 			<List className="coss_list" strong>
 				<ListItem link title={$t('邮箱')} noChevron className="coss_item__bottom" after={userInfo?.email} />
-				<ListItem link={'/my_qrcode/'} title={$t('我的二维码')} className="coss_item__bottom" />
-				<ListItem link={`/change_user_id/?coss_id=${userInfo?.coss_id}`} title={$t('ID')} className="coss_item__bottom" after={userInfo?.coss_id} />
+				<ListItem title={$t('我的二维码')} className="coss_item__bottom">
+					<Qrcode slot="after" className="text-3xl" onClick={() => f7router.navigate('/my_qrcode/')} />
+				</ListItem>
+				<ListItem
+					link={`/change_user_id/?coss_id=${userInfo?.coss_id}`}
+					title={$t('ID')}
+					className="coss_item__bottom"
+					after={userInfo?.coss_id}
+				/>
 			</List>
 
 			<List className="coss_list" strong>
