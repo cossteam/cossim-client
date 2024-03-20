@@ -34,6 +34,7 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
 import run from './run'
 import { isWeb } from './utils'
+import { Toaster } from 'react-hot-toast'
 
 let store: MessageStore | null = null
 
@@ -227,6 +228,10 @@ function App() {
 		async () => {
 			try {
 				if (await isWeb()) return
+				if (liveRoomStore.opened) {
+					await StatusBar.hide()
+					return
+				}
 				// 设置状态栏样式
 				StatusBar.setBackgroundColor({ color: '#ffffff' }) // 设置状态栏背景颜色为白色
 				StatusBar.setOverlaysWebView({ overlay: false }) // 如果您使用的是原生状态栏，则需设置为 false
@@ -237,7 +242,7 @@ function App() {
 			}
 		},
 		() => {},
-		[]
+		[liveRoomStore.opened]
 	)
 
 	// 获取缓存
@@ -252,14 +257,13 @@ function App() {
 			{hasCookie(TOKEN) ? (
 				<>
 					<Layout />
-					{/* <Message /> */}
 					<Preview />
-					{/* <LiveRoom /> */}
 					<LiveRoomNew />
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />
 			)}
+			<Toaster />
 		</AppComponent>
 	)
 }

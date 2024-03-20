@@ -1,3 +1,5 @@
+import { tooltipType } from '@/shared'
+
 /**
  * @description 用户状态
  */
@@ -87,6 +89,14 @@ export interface MessageStoreOptions {
 	isNeedPull: boolean
 	/** 是否是群聊 */
 	isGroup: boolean
+	/** 消息容器 */
+	container: HTMLDivElement | null
+	/** 当前选中的提示类型 */
+	tipType: tooltipType
+	/** 当前选中的消息 */
+	selectedMessage: any
+	/** 当前选中的消息列表 */
+	selectedMessages: any[]
 }
 
 interface initOptions {

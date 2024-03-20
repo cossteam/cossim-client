@@ -59,7 +59,6 @@ function run() {
 			cacheStore.updateFirstOpened(false)
 		}
 	})
-
 }
 
 export default run

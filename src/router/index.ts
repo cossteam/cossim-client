@@ -55,7 +55,7 @@ const routes: Router.RouteParameters[] = [
 		options: {
 			// animate: false,
 			transition: 'f7-push'
-		}
+		},
 		// keepAlive: true
 	},
 	{

@@ -11,126 +11,19 @@ import {
 	PageContent
 } from 'framework7-react'
 import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill, Search } from 'framework7-icons/react'
-// import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useState } from 'react'
-// import { isEqual } from 'lodash-es'
 import { $t, formatDialogListTime, MESSAGE_TYPE } from '@/shared'
-// import UserStore from '@/db/user'
-// import MsgService from '@/api/msg'
 import RelationService from '@/api/relation'
 import './DialogList.scss'
-// import ToolEditor from '@/components/Editor/ToolEditor'
 import { ReadEditor } from '@/Editor'
-// import { v4 as uuidv4 } from 'uuid'
 import clsx from 'clsx'
-// import { useStateStore } from '@/stores/state'
-import { useMessageStore } from '@/stores/message'
-// import { useChatStore } from '@/stores/chat'
 import useCacheStore from '@/stores/cache'
 import { getRemoteSession } from '@/run'
-// import useMessageStore from '@/stores/new_message'
-
-// const getAfterMessage = async () => {
-// 	try {
-// 		const dialogs = await UserStore.findAll(UserStore.tables.dialogs)
-
-// 		// 参数
-// 		const params = dialogs.map((v) => ({ dialog_id: v.dialog_id, msg_id: v?.last_message?.msg_id }))
-
-// 		const { code, data } = await MsgService.getBehindMessageApi(params)
-// 		if (code !== 200) return
-
-// 		const messages = data?.map((item: any) => {
-// 			const dialog_id = Number(item.dialog_id)
-// 			return item?.msg_list?.map((v: any) => ({
-// 				...v,
-// 				dialog_id,
-// 				create_at: v?.send_time,
-// 				is_burn_after_reading: 0,
-// 				is_label: MESSAGE_MARK.NOT_MARK,
-// 				is_read: MESSAGE_READ.NOT_READ,
-// 				msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
-// 				receiver: v?.receiver_info?.user_id || v?.receiver_info?.group_id,
-// 				read_at: 0,
-// 				reply_id: v?.reply_id,
-// 				sender_id: v?.sender_info?.user_id,
-// 				type: v?.msg_type,
-// 				sender_info: v?.sender_info,
-// 				at_all_user: v?.at_all_user || [],
-// 				at_users: v?.at_users || [],
-// 				group_id: v?.group_id,
-// 				uid: uuidv4(),
-// 				is_tips: false
-// 			}))
-// 		})
-
-// 		if (!messages) return
-
-// 		// TODO: 更新本地数据
-// 		// messages.map(async (item: any) => {
-// 		// 	const msgs = await UserStore.findOneAllById(UserStore.tables.messages, 'dialog_id', item?.dialog_id)
-// 		// 	const index = msgs?.findIndex((v: any) => v?.msg_id === item?.msg_id) ?? -1
-// 		// 	if (index === -1) {
-// 		// 		await UserStore.add(UserStore.tables.messages, item)
-// 		// 	}
-// 		// })
-// 		// await UserStore.bulkAdd(UserStore.tables.messages, messages.flat())
-// 	} catch (error) {
-// 		console.error(error)
-// 	}
-// }
+import useMessageStore from '@/stores/new_message'
 
 const DialogList: React.FC<RouterProps> = ({ f7router }) => {
-	// const dialogs = useLiveQuery(() => UserStore.findAll(UserStore.tables.dialogs)) || []
-	// const [chats, setChats] = useState<any[]>(dialogs)
-
-	// const messageStore = useMessageStore()
-
-	// 全局状态(消息未读)
-	// const stateStore = useStateStore()
-	// 消息列表
-	const msgStore = useMessageStore()
-	// 消息更新
-	// const chatStore = useChatStore()
+	const messageStore = useMessageStore()
 	const cacheStore = useCacheStore()
-
-	// 获取对话列表
-	// const getDialogList = async () => {
-	// 	try {
-	// 		// 获取落后的消息
-	// 		// await getAfterMessage()
-
-	// 		const { code, data } = await MsgService.getDialogApi()
-	// 		if (code !== 200) return
-
-	// 		if (data.length !== dialogs.length) {
-	// 			await UserStore.clear(UserStore.tables.dialogs)
-	// 			await UserStore.bulkAdd(UserStore.tables.dialogs, data)
-	// 			return
-	// 		}
-
-	// 		// let unreadMsgCount = 0 // 统计未读消息数量
-	// 		// data.forEach(async (item: any) => {
-	// 		// 	unreadMsgCount += Number(item.dialog_unread_count) // 统计未读消息数量
-	// 		// 	const dialog = await UserStore.findOneById(UserStore.tables.dialogs, 'dialog_id', item.dialog_id)
-
-	// 		// 	if (!dialog) return await UserStore.add(UserStore.tables.dialogs, item)
-
-	// 		// 	if (!isEqual(dialog, item)) {
-	// 		// 		await UserStore.update(UserStore.tables.dialogs, 'dialog_id', item.dialog_id, {
-	// 		// 			...dialog,
-	// 		// 			...item
-	// 		// 		})
-	// 		// 	}
-	// 		// })
-	// 		// stateStore.updateUnread({
-	// 		// 	...stateStore.unread,
-	// 		// 	msg: unreadMsgCount
-	// 		// })
-	// 	} catch {
-	// 		console.log('错误')
-	// 	}
-	// }
 
 	// 置顶对话
 	const topDialog = async (item: any) => {
@@ -164,13 +57,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 			}
 		}
 	}
-
-	// useEffect(() => {
-	// 	if (stateStore.is_chat_update) {
-	// 		getRemoteSession()
-	// 		stateStore.updateChat(false)
-	// 	}
-	// }, [stateStore.is_chat_update])
 
 	const handlerContent = useCallback((content: string) => {
 		const doc = new DOMParser().parseFromString(content, 'text/html')
@@ -233,8 +119,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		<Page
 			ptr={ptrRefresh}
 			className={clsx('coss_dialog bg-gray-200', !ptrRefresh && 'hide-page-content')}
-			// onPageTabShow={getRemoteSession}
-			// onPageBeforeIn={getRemoteSession}
 			onPtrRefresh={onRefresh}
 			noSwipeback={false}
 		>
@@ -247,15 +131,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 						<Plus className="w-7 h-7" />
 					</Link>
 				</NavRight>
-				{/* <Subnavbar inner={false}>
-					<Searchbar
-						searchContainer=".contacts-list"
-						placeholder={$t('搜索会话')}
-						searchIn=".item-title"
-						outline={false}
-						disableButtonText={$t('取消')}
-					/>
-				</Subnavbar> */}
 			</Navbar>
 
 			{/*加号弹窗*/}
@@ -294,19 +169,14 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 											? item?.last_message?.send_time
 											: item?.dialog_create_at
 									)}
-									// format(
-									// 	item?.last_message?.send_time
-									// 		? item?.last_message?.send_time
-									// 		: item?.dialog_create_at,
-									// 	'zh_CN'
-									// )}
 									link
 									onClick={async () => {
-										await msgStore.initMessage(
-											item?.group_id ? true : false,
-											item?.dialog_id,
-											item?.user_id ?? item?.group_id
-										)
+										await messageStore.init({
+											dialogId: item?.dialog_id ?? 0,
+											receiverId: item?.user_id ?? item?.group_id ?? 0,
+											isGroup: item?.user_id ? false : true,
+											receiverInfo: item
+										})
 										f7router?.navigate(
 											`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
 										)

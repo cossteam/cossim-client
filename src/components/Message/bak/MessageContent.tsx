@@ -1,8 +1,8 @@
 import { MESSAGE_CONTENT_ID } from '@/shared'
 import clsx from 'clsx'
 import { useEffect, useRef, useState } from 'react'
-import MessageVirtualList from './components/MessageVirtualList'
-import MessageRow from './components/MessageRow'
+import MessageVirtualList from './MessageVirtualList'
+import MessageRow from './MessageRow'
 import { useChatStore } from '@/stores/chat'
 
 const MessageContent = () => {
