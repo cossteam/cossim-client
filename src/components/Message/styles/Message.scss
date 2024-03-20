@@ -1,20 +1,3 @@
-.message-popup {
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 5000;
-    background: #fff;
-    opacity: 0;
-    transform: translateX(-100%);
-}
-
-.message-popup-opacity {
-    opacity: 1;
-}
-
 .coss_message {
     background: var(--coss-background-tertiary);
     position: relative;
@@ -26,6 +9,9 @@
 
 
     .page-content {
+        // padding-top: calc(var(--f7-page-navbar-offset, 0px) + var(--f7-page-toolbar-top-offset, 0px) + var(--f7-page-subnavbar-offset, 0px) + var(--f7-page-searchbar-offset, 0px) + var(--f7-page-content-extra-padding-top, 0px));
+        // padding-top: 88px;
+        // test
         padding: 0;
 
         &::-webkit-scrollbar {
@@ -42,33 +28,35 @@
 
         .coss_toolbar {
             background-color: var(--coss-background-primary);
+            // background-color: rgba(var(--f7-navbar-bg-color-rgb, var(--f7-bars-bg-color-rgb)), var(--f7-bars-translucent-opacity));
+            // -webkit-backdrop-filter: saturate(180%) blur(var(--f7-bars-translucent-blur));
+            // backdrop-filter: saturate(180%) blur(var(--f7-bars-translucent-blur));
         }
     }
 
 
-    // .coss_message_editor {
-    //     @apply max-w-full;
+    .coss_message_editor {
+        @apply max-w-full;
 
-    //     p {
-    //         @apply text-ellipsis whitespace-nowrap overflow-hidden text-[0.75rem] w-[85%] text-textTertiary;
-    //     }
-    // }
+        p {
+            @apply text-ellipsis whitespace-nowrap overflow-hidden text-[0.75rem] w-[85%] text-textTertiary;
+        }
+    }
 
-    // .message-bg {
-    //     animation: bgAnimation 0.3s ease forwards;
-    // }
+    .message-bg {
+        animation: bgAnimation 0.3s ease forwards;
+    }
 
-    // @keyframes bgAnimation {
-    //     0% {
-    //         opacity: 1;
-    //         z-index: -1;
-    //     }
-
-    //     100% {
-    //         opacity: 0;
-    //         z-index: -1;
-    //     }
-    // }
+    @keyframes bgAnimation {
+        0% {
+            opacity: 1;
+            z-index: -1;
+        } 
+        100% {
+            opacity: 0;
+            z-index: -1;
+        }
+    }
 
 }
 
@@ -90,11 +78,14 @@
         background-color: transparent;
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
+        // background-color: var(--coss-background-primary);
         margin-top: 0;
         padding: 0;
+        // margin-top: -12px;
         font-size: 14px;
         border-bottom: none;
         padding-top: 6px;
+        // box-sizing: border-box;
         height: auto;
 
         .subnavbar-inner {
@@ -118,5 +109,13 @@
         &:after {
             background: none;
         }
+    }
+}
+
+.reply_editor {
+    @apply text-ellipsis overflow-hidden w-fit text-textTertiary line-clamp-1 max-w-[70%];
+
+    p {
+        @apply text-ellipsis overflow-hidden w-fit text-textTertiary line-clamp-1 max-w-[70%];
     }
 }

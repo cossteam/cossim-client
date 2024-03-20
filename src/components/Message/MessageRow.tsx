@@ -21,34 +21,39 @@ interface MessageRowProps {
 	item: any
 }
 
+const className = (is_self: boolean) => {
+	return clsx(
+		'py-2 px-3 rounded-lg',
+		is_self ? 'bg-primary text-white rounded-tr-none text-right' : 'bg-bgPrimary rounded-tl-none text-left'
+	)
+}
+
 const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const longPressRef = useRef<HTMLDivElement>(null)
 
 	const type = useMemo(() => item?.type, [item?.type])
-	const is_self = useMemo(() => isMe(item?.sender_info?.user_id), [item?.sender_info?.user_id])
+	const is_self = useMemo(
+		() => isMe(item?.sender_info?.user_id ?? item?.sender_id),
+		[item?.sender_info?.user_id, item?.sender_id]
+	)
 
 	const messageStore = useMessageStore()
 
 	// @ts-ignore
 	useClickOutside(longPressRef, () => setTimeout(() => longPressRef.current?._tippy?.hide(), 100))
 
-	const className = clsx(
-		'py-2 px-3 rounded-lg',
-		is_self ? 'bg-primary text-white rounded-tr-none text-right' : 'bg-bgPrimary rounded-tl-none text-left'
-	)
-
 	const render = () => {
 		switch (type) {
 			case msgType.IMAGE:
 				return <MessageImage />
 			case msgType.AUDIO:
-				return <MessageAudio className={className} item={item} />
+				return <MessageAudio className={className(is_self)} item={item} />
 			case msgType.VIDEO:
 				return <MessageVideo />
 			case msgType.FILE:
 				return <MessageFile />
 			default:
-				return <ReadEditor content={item?.content} className={className} />
+				return <ReadEditor content={item?.content} className={className(is_self)} />
 		}
 	}
 
@@ -80,6 +85,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								animation="shift-away-subtle"
 								touch={['hold', 300]}
 								ref={longPressRef}
+								trigger="manual"
 							>
 								<div className="relative">{render()}</div>
 							</Tippy>

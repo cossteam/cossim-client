@@ -7,7 +7,6 @@ import { ConnectionState, LocalTrack, RemoteTrack, Room, RoomEvent, VideoPresets
 import { useAsyncEffect } from '@reactuses/core'
 import VideoBox from './VideoBox'
 import { LiveRoomStates, useLiveRoomStore } from '@/stores/liveRoom'
-import { SocketEvent } from '@/shared'
 
 const LiveRoomNew: React.FC = () => {
 	// 状态
@@ -30,28 +29,6 @@ const LiveRoomNew: React.FC = () => {
 	const isBusy = useMemo(() => {
 		return liveRoomStore.state === LiveRoomStates.BUSY
 	}, [liveRoomStore.state])
-	// 事件处理
-	useEffect(() => {
-		if (!liveRoomStore?.eventDate?.event) return
-		console.log('收到事件', liveRoomStore?.eventDate?.event)
-		// 来电
-		if ([SocketEvent.UserCallReqEvent, SocketEvent.GroupCallReqEvent].includes(liveRoomStore?.eventDate?.event)) {
-			liveRoomStore.handleCall()
-			return
-		}
-		// 拒绝/挂断
-		if (
-			[
-				SocketEvent.UserCallRejectEvent,
-				SocketEvent.GroupCallRejectEvent,
-				SocketEvent.UserCallHangupEvent,
-				SocketEvent.GroupCallHangupEvent
-			].includes(liveRoomStore?.eventDate?.event)
-		) {
-			liveRoomStore.hangup()
-			return
-		}
-	}, [liveRoomStore?.eventDate?.event])
 	// 创建房间
 	const client = useRef<Room>()
 	const [audioEnable, setAudioEnable] = useState(true)
@@ -248,6 +225,10 @@ const LiveRoomNew: React.FC = () => {
 				return '挂断'
 			case LiveRoomStates.ERROR:
 				return '连接失败'
+			case LiveRoomStates.REFUSEBYOTHER:
+				return '已被拒绝'
+			case LiveRoomStates.HANGUPBYOTHER:
+				return '已被挂断'
 			default:
 				return ''
 		}

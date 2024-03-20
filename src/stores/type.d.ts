@@ -1,4 +1,4 @@
-import { tooltipType } from '@/shared'
+import { tooltipType, msgSendType, emojiOrMore } from '@/shared'
 
 /**
  * @description 用户状态
@@ -45,6 +45,8 @@ export interface CacheStoreOptions {
 	unreadCount: number
 	/** 好友或群聊申请数 */
 	applyCount: number
+	/** 缓存的键盘高度, 默认 300 */
+	keyboardHeight: number
 }
 
 /**
@@ -67,6 +69,11 @@ export type CacheStore = CacheStoreOptions & {
 	 * @description 更新未读消息数
 	 */
 	updateUnreadCount: (unreadCount: number) => void
+
+	/**
+	 * @description 更新键盘高度
+	 */
+	updateKeyboardHeight: (keyboardHeight: number) => void
 }
 
 /**
@@ -97,6 +104,18 @@ export interface MessageStoreOptions {
 	selectedMessage: any
 	/** 当前选中的消息列表 */
 	selectedMessages: any[]
+	/** 输入内容 */
+	content: string
+	/** 草稿 */
+	draft: string
+	/** 发送按钮类型 */
+	sendType: msgSendType
+	/** 表情或者更多按钮 */
+	toolbarType: emojiOrMore
+	/** 选择的表情 */
+	selectedEmojis: string
+	/** 是否需要清除输入框内容 */
+	isClearContent: boolean
 }
 
 interface initOptions {
@@ -120,4 +139,11 @@ export type MessageStore = MessageStoreOptions & {
 	 * @param { Partial<MessageStoreOptions>} options
 	 */
 	update: (options: Partial<MessageStoreOptions>) => void
+
+	/**
+	 * 更新消息
+	 * @param {any} message
+	 * @param {boolean} isPush 是否是推送消息
+	 */
+	updateMessage: (message: any, isPush?: boolean) => void
 }

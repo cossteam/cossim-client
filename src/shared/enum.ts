@@ -4,9 +4,9 @@ export enum RESPONSE_CODE {
 	Unauthorized = 401
 }
 
-/** 消息类型 
+/** 消息类型
  * TODO: 后续删除
-*/
+ */
 export enum MESSAGE_TYPE {
 	/** 文本 */
 	TEXT = 1,
@@ -40,16 +40,20 @@ export enum msgType {
 	IMAGE = 3,
 	/** 标注 */
 	LABEL = 4,
-	/** 群公告 */
+	/** 通知 */
 	NOTICE = 5,
 	/** 文件 */
 	FILE = 6,
-	/** 错误信息, 例如提示：好友消息不存在 */
-	ERROR = 7,
-	/** 视频 */
-	VIDEO = 8,
-	/** 通话消息  */
-	CALL = 10
+	/** 视频文件 */
+	VIDEO = 7,
+	/** 表情回复 */
+	EMOJI = 8,
+	/** 语音通话消息 */
+	VOICE = 9,
+	/** 视频通话消息  */
+	CALL = 10,
+	/** 撤回消息 */
+	RECALL = 11
 }
 
 /** 消息阅读状态 */
@@ -100,7 +104,7 @@ export enum TOOLTIP_TYPE {
 	MARK = 'mark',
 	/** 无操作 */
 	NONE = 'none',
-	/** 设置为群公告 */
+	/** 通知 */
 	NOTICE = 'notice',
 	/** 设置撤回 */
 	RECALL = 'recall'
@@ -321,4 +325,24 @@ export enum MessageMore {
 	OTHER = 2,
 	/** 语音 */
 	AUDIO = 3
+}
+
+/** 消息页表情和更多切换 */
+export enum msgSendType {
+	/** 文本 */
+	TEXT = 0,
+	/** 语音 */
+	AUDIO = 1
+}
+
+/** 表情或者更多 */
+export enum emojiOrMore {
+	/** 表情 */
+	EMOJI = 1,
+	/** 更多 */
+	MORE = 2,
+	/** 无 */
+	NONE = 0,
+	/** 键盘 */
+	KEYBOARD = 3
 }

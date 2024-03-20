@@ -1,5 +1,5 @@
 import useMessageStore from '@/stores/new_message'
-import MessageList from '@/components/Message/MessageList'
+import MessageList from './MessageList'
 import { useEffect, useRef } from 'react'
 
 const MessageContent = () => {
