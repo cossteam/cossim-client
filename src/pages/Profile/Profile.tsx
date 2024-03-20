@@ -1,5 +1,5 @@
 import { Icon, Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { isEqual } from 'lodash-es'
 
 import { $t, MessageBurnAfterRead, MessageNoDisturb, RelationStatus } from '@/shared'
@@ -23,8 +23,9 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const { clearMessages } = useMessageStore()
 	const liveRoomStore = useLiveRoomStore()
 
-	const onPageInit = async () => {
-		await updateUserInfo(true)
+
+	const loadPage = () => {
+		updateUserInfo(true)
 	}
 
 	const updateUserInfo = async (request: boolean = true) => {
@@ -265,7 +266,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	)
 
 	return (
-		<Page ref={pageRef} className="profile-page bg-bgTertiary" noToolbar onPageInit={onPageInit}>
+		<Page ref={pageRef} className="profile-page bg-bgTertiary" noToolbar onPageBeforeIn={loadPage} >
 			<Navbar title={$t('用户信息')} backLink className="bg-bgPrimary hidden-navbar-bg" />
 
 			<div className="mb-3 p-4 bg-white flex flex-col justify-center items-center">
