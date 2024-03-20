@@ -322,6 +322,8 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			</div>
 
 			<List strong outline dividers className="bg-white m-0 mb-3">
+				<ListItem link={`/user_remark/?remark=${userInfo.preferences?.remark}&user_id=${userInfo.user_id}`} title={$t('备注')} after={userInfo.preferences?.remark} >
+				</ListItem>
 				<ListItem title={$t('阅后即焚')}>
 					<Toggle slot="after" checked={is_burn_after_reading} onChange={burnAfterRead} />
 				</ListItem>
@@ -355,8 +357,6 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						checked={userInfo?.relation_status === RelationStatus.BLACK}
 						onChange={blackList}
 					/>
-				</ListItem>
-				<ListItem link={`/user_remark/?remark=${userInfo.preferences?.remark}&user_id=${userInfo.user_id}`} title={$t('备注')} after={userInfo.preferences?.remark} >
 				</ListItem>
 			</List>
 
