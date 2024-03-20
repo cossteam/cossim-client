@@ -118,6 +118,7 @@ class Socket {
 	}
 }
 
+
 const socketUrl = import.meta.env.VITE_WS_URL + `?token=${getCookie(TOKEN)}`
 const SocketClient = new Socket(socketUrl)
 

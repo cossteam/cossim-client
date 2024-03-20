@@ -12,9 +12,7 @@ const MessageHeader = () => {
 				backLink
 				outline={false}
 				className="coss_message_navbar"
-			>
-				
-			</Navbar>
+			></Navbar>
 		</div>
 	)
 }

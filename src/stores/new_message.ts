@@ -1,8 +1,7 @@
 import { create } from 'zustand'
 import { MessageStore, MessageStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
-// import useUserStore from './user'
-import { getRemoteMessage, tooltipType } from '@/shared'
+import { emojiOrMore, getRemoteMessage, msgSendType, tooltipType } from '@/shared'
 
 const defaultOptions: MessageStoreOptions = {
 	messages: [],
@@ -16,10 +15,16 @@ const defaultOptions: MessageStoreOptions = {
 	container: null,
 	tipType: tooltipType.NONE,
 	selectedMessage: {},
-	selectedMessages: []
+	selectedMessages: [],
+	content: '',
+	draft: '',
+	sendType: msgSendType.AUDIO,
+	toolbarType: emojiOrMore.NONE,
+	selectedEmojis: '',
+	isClearContent: false
 }
 
-const useMessageStore = create<MessageStore>((set) => ({
+const useMessageStore = create<MessageStore>((set, get) => ({
 	...defaultOptions,
 
 	init: async (options) => {
@@ -36,12 +41,28 @@ const useMessageStore = create<MessageStore>((set) => ({
 			const total = data?.total ?? 0
 			const msgs = data?.user_messages ?? data?.group_messages ?? []
 			console.log('getRemoteMessage', total, msgs)
-			cacheStore.set(`dialog_${options.dialogId}`, msgs)
+			cacheStore.set(`dialog_${options.dialogId}`, msgs.reverse())
 		})
 	},
 
 	update: (options) => {
 		set((state) => ({ ...state, ...options }))
+	},
+
+	updateMessage: (message, isPush = true) => {
+		let { messages } = get()
+
+		if (isPush) {
+			set({ messages: [...messages, message] })
+		} else {
+			// 修改消息
+			messages = messages.map((msg) => (msg.msg_id === message.msg_id ? { ...msg, ...message } : msg))
+			set({ messages })
+		}
+
+		console.log('message', message)
+
+		// TODO: 更新缓存数据库
 	}
 }))
 

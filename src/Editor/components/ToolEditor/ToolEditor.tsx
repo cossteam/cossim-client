@@ -2,8 +2,6 @@ import clsx from 'clsx'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import 'quill/dist/quill.core.css'
 import './ToolEditor.scss'
-// import { useFocus } from '@reactuses/core'
-// import Quill from '../../moudles'
 import GroupService from '@/api/group'
 import { useMessageStore } from '@/stores/message'
 import 'quill-mention-react'
@@ -18,6 +16,8 @@ interface ToolEditorProps {
 	placeholder?: string
 	id?: string
 	is_group?: boolean
+	onChange?: (content: string) => void
+	defaultValue?: string
 }
 
 // 暴露给父组件的方法类型
@@ -65,7 +65,22 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 			modules: props.is_group ? modules : {}
 		})
 
+		quill.on('text-change', () => {
+			if (props.onChange) {
+				const content = quill.getSemanticHTML()
+				props.onChange(content)
+			}
+		})
+
+		if(props.defaultValue) {
+			quill.root.innerHTML = props.defaultValue
+		}
+
 		setQuill(quill)
+
+		return () => {
+			quill.off('text-change')
+		}
 	}, [])
 
 	useEffect(() => {
@@ -78,12 +93,6 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 			}
 		}
 	}, [quill, props.initValue])
-
-	// useEffect(() => {
-	// 	if (!quill) return
-	// 	quill.enable(props.readonly)
-	// 	if (props.readonly) quill?.focus()
-	// }, [props.readonly])
 
 	useImperativeHandle(ref, () => ({
 		quill: quill!

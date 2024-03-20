@@ -1,5 +1,5 @@
 import { CapacitorConfig } from '@capacitor/cli'
-import { KeyboardResize, KeyboardStyle } from '@capacitor/keyboard'
+import { KeyboardResize } from '@capacitor/keyboard'
 
 const config: CapacitorConfig = {
 	appId: 'com.hitosea.coss',
@@ -15,8 +15,8 @@ const config: CapacitorConfig = {
 			sound: 'beep.wav'
 		},
 		Keyboard: {
-			resize: KeyboardResize.Body,
-			style: KeyboardStyle.Dark,
+			resize: KeyboardResize.Native,
+			// style: KeyboardStyle.Dark,
 			resizeOnFullScreen: true
 		}
 	}
