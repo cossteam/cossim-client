@@ -4,7 +4,9 @@ export enum RESPONSE_CODE {
 	Unauthorized = 401
 }
 
-/** 消息类型 */
+/** 消息类型 
+ * TODO: 后续删除
+*/
 export enum MESSAGE_TYPE {
 	/** 文本 */
 	TEXT = 1,
@@ -23,7 +25,9 @@ export enum MESSAGE_TYPE {
 	/** 错误信息 */
 	ERROR = 8,
 	/** 视频 */
-	VIDEO = 9
+	VIDEO = 9,
+	/** 通话消息  */
+	CALL = 10
 }
 
 /** 消息类型 */
@@ -44,6 +48,8 @@ export enum msgType {
 	ERROR = 7,
 	/** 视频 */
 	VIDEO = 8,
+	/** 通话消息  */
+	CALL = 10
 }
 
 /** 消息阅读状态 */
@@ -74,8 +80,34 @@ export enum MESSAGE_MARK {
 	MARK = 1
 }
 
-/** 提示类型 */
+/** 提示类型
+ * TODO: 后续删除
+ */
 export enum TOOLTIP_TYPE {
+	/** 复制 */
+	COPY = 'copy',
+	/** 转发 */
+	FORWARD = 'forward',
+	/** 编辑 */
+	EDIT = 'edit',
+	/** 删除 */
+	DELETE = 'delete',
+	/** 多选 */
+	SELECT = 'select',
+	/** 回复 */
+	REPLY = 'reply',
+	/** 标记 */
+	MARK = 'mark',
+	/** 无操作 */
+	NONE = 'none',
+	/** 设置为群公告 */
+	NOTICE = 'notice',
+	/** 设置撤回 */
+	RECALL = 'recall'
+}
+
+/** 提示类型 */
+export enum tooltipType {
 	/** 复制 */
 	COPY = 'copy',
 	/** 转发 */

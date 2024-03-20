@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { MessageStore, MessageStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
 // import useUserStore from './user'
-import { getRemoteMessage } from '@/shared'
+import { getRemoteMessage, tooltipType } from '@/shared'
 
 const defaultOptions: MessageStoreOptions = {
 	messages: [],
@@ -13,7 +13,10 @@ const defaultOptions: MessageStoreOptions = {
 	receiverInfo: {},
 	isNeedPull: true,
 	isGroup: false,
-	container: null
+	container: null,
+	tipType: tooltipType.NONE,
+	selectedMessage: {},
+	selectedMessages: []
 }
 
 const useMessageStore = create<MessageStore>((set) => ({
@@ -30,7 +33,7 @@ const useMessageStore = create<MessageStore>((set) => ({
 
 		// 获取远程消息
 		getRemoteMessage(options.isGroup, options.receiverId, 1, 30).then((data) => {
-			const total = data.total
+			const total = data?.total ?? 0
 			const msgs = data?.user_messages ?? data?.group_messages ?? []
 			console.log('getRemoteMessage', total, msgs)
 			cacheStore.set(`dialog_${options.dialogId}`, msgs)
