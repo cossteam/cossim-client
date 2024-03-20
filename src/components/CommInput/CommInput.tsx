@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const CommInput = ({ title, onChange }: { title: string, onChange: (value: any)=> null }) => {
+const CommInput = ({ title, onChange }: { title: string, onChange: Function }) => {
     const [value, setValue] = useState('');
     const handleClear = () => {
         setValue('');
