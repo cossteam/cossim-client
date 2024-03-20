@@ -3,15 +3,14 @@ import { useState } from 'react'
 
 import { $t } from '@/shared'
 import UserService from '@/api/user'
-import CommonStore from '@/db/common'
 import { validPassword } from '@/utils/validate'
 import { removeAllCookie } from '@/utils/cookie'
+import useUserStore from '@/stores/user'
 
 const UpdateUserInfo: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const { default: defaultValue, title } = f7route.query
 	const type = f7route.params.type
-
-	// const { updateUser, removeUser } = useUserStore()
+	const userStore = useUserStore()
 
 	const [text, setText] = useState<string>(defaultValue as string)
 
@@ -19,37 +18,21 @@ const UpdateUserInfo: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const [newPassword, setNewPassword] = useState<string>('')
 	const [confirmPassword, setConfirmPassword] = useState<string>('')
 
-	// const savePassWord = (praams) => {
-	// 	return new Promise(async (resolve, reject) => {
-	// 		try {
-	// 			const { code, data, msg } = await updatePassWordApi(praams)
-	// 			if (code === 200) {
-	// 				resolve(data)
-	// 			}
-	// 			reject(new Error(msg))
-	// 		} catch (error) {
-	// 			reject(error)
-	// 		}
-	// 	})
-	// }
-
 	const updateUserInfo = async () => {
 		try {
 			f7.dialog.preloader($t('修改中...'))
 
 			const params = { [type as string]: text }
-			const { data } = await UserService.updateUserInfoApi(params)
-
-			const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', data?.user_id)
-			if (user) {
-				await CommonStore.update(CommonStore.tables.users, 'user_id', data?.user_id, {
-					...user,
-					user_info: {
-						...user.user_info,
-						...params
-					}
-				})
+			const { code, data, msg } = await UserService.updateUserInfoApi(params)
+			if (code !== 200) {
+				return f7.dialog.alert($t(msg))
 			}
+			userStore.update({
+				userInfo: {
+					...userStore.userInfo,
+					...data
+				}
+			})
 			f7router.back()
 		} catch (error) {
 			console.error('更新用户信息失败', error)
@@ -88,19 +71,6 @@ const UpdateUserInfo: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		if (type === 'password') return await updatePassword()
 		if (text === defaultValue || !text) return f7.dialog.alert($t('请输入修改内容'))
 		await updateUserInfo()
-
-		// f7.dialog.preloader('修改中...')
-		// const api = KEY === 'password' ? savePassWord : saveUserInfo
-		// await api(params)
-		// if (KEY === 'password') {
-		// 	f7.dialog.alert('请重新登录!', '密码修改成功', () => {
-		// 		removeUser()
-		// 		window.location.href = '/'
-		// 	})
-		// } else {
-		// 	f7router.back()
-		// }
-		// console.log('text', text,defaultValue)
 	}
 
 	return (

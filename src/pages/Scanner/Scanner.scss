@@ -1,0 +1,10 @@
+#reader {
+	video {
+		max-width: none !important;
+		width: unset !important;
+		height: 100%;
+	}
+	#qr-shaded-region {
+		border-width: 300px 50px !important;
+	}
+}

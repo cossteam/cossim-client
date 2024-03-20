@@ -23,7 +23,7 @@ const VideoBox: React.FC<any> = (props: any) => {
 
 	return (
 		<div ref={videoBoxRef} {...props}>
-			<div className="w-full h-full relative">{props.children && props.children}</div>
+			{props.children && <div className="w-full h-full absolute">{props.children}</div>}
 		</div>
 	)
 }

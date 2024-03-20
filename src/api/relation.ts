@@ -229,6 +229,19 @@ class RelationServiceImpl {
 			data
 		})
 	}
+
+	/**
+	 * 设置好友备注
+	 * @param data 
+	 * @returns 
+	 */
+	setUserRemark(data: {remark: string, user_id: string}): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/remark/set`,
+			method: 'POST',
+			data
+		})
+	}
 }
 
 const RelationService = new RelationServiceImpl()

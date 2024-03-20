@@ -18,7 +18,11 @@ export enum LiveRoomStates {
 	/** 挂断 */
 	HANGUP,
 	/** 连接失败 */
-	ERROR
+	ERROR,
+	/** 被拒绝 */
+	REFUSEBYOTHER,
+	/** 被挂断 */
+	HANGUPBYOTHER
 }
 
 export interface CallProps {
@@ -47,8 +51,6 @@ interface LiveRoomFunc {
 	updateOpened: (opened: boolean) => void
 	updateState: (state: LiveRoomStates) => void
 	updateEvent: (event: SocketEvent, eventDate: any) => void
-	/** 来电处理 */
-	handleCall: () => void
 	/** 呼叫 */
 	call: (callProps: CallProps) => void
 	/** 挂断通话 */
@@ -94,29 +96,43 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 					const isGroup = event === SocketEvent.GroupCallReqEvent
 					set({
 						isGroup,
-						recipient: isGroup ? Number(eventDate.data.group_id) : eventDate.data.sender_id
+						recipient: isGroup ? Number(eventDate.data.group_id) : eventDate.data.sender_id,
+						state: LiveRoomStates.WAITING,
+						opened: true
 					})
 				}
 				break
 			// 被拒绝
 			case SocketEvent.UserCallRejectEvent:
 			case SocketEvent.GroupCallRejectEvent:
+				set({
+					state: LiveRoomStates.REFUSEBYOTHER
+				})
+				setTimeout(() => {
+					set({
+						...initialState()
+					})
+				}, 2000)
 				break
 			// 被挂断
 			case SocketEvent.UserCallHangupEvent:
 			case SocketEvent.GroupCallHangupEvent:
+				set({
+					state: LiveRoomStates.HANGUPBYOTHER
+				})
+				setTimeout(() => {
+					set({
+						...initialState()
+					})
+				}, 2000)
 				break
 			default:
 				return
 		}
+		console.log('通话事件', eventDate)
 		set({
-			eventDate
-		})
-	},
-	handleCall: () => {
-		set({
-			opened: true,
-			state: LiveRoomStates.WAITING
+			eventDate,
+			video: eventDate?.data?.option?.video_enabled
 		})
 	},
 	call: async (callProps: CallProps) => {
@@ -142,6 +158,8 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 			// resolution: '1280x720',
 			video_enabled: callProps.video
 		}
+		console.log('呼叫参数', createRoomParams)
+
 		try {
 			f7.dialog.preloader('正在呼叫...')
 			// 创建通话

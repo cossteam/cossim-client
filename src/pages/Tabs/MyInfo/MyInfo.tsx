@@ -8,55 +8,33 @@ import {
 	GearAlt,
 	Qrcode
 } from 'framework7-icons/react'
-import { useEffect, useMemo, useState } from 'react'
-import { useLiveQuery } from 'dexie-react-hooks'
+import { useMemo, useState } from 'react'
 
 import UserService from '@/api/user'
-import { getCookie } from '@/utils/cookie'
-import { $t, USER_ID } from '@/shared'
-import CommonStore from '@/db/common'
+import { $t } from '@/shared'
 import './MyInfo.scss'
+import useUserStore from '@/stores/user'
 
-const user_id = getCookie(USER_ID) || ''
-
-const MyInfo = () => {
+const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 	const [info, setInfo] = useState<any>({})
+	const userStore = useUserStore()
+	const userId = useMemo(() => userStore.userId, [])
 
-	const userInfo = useLiveQuery(async () => {
-		return await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-	})
-
-	const updateInfo = async () => {
-		const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-		setInfo(user?.user_info)
-		return user
-	}
-
-	const onPageInit = async () => {
+	const loadUserInfo = async () => {
 		try {
-			const user = await updateInfo()
-			const { data } = await UserService.getUserInfoApi({ user_id })
-
-			if (!user || !data) return
-
-			await CommonStore.update(CommonStore.tables.users, 'user_id', user_id, {
-				...user,
-				user_info: {
-					...user?.user_info,
-					data
-				}
+			const { data } = await UserService.getUserInfoApi({ user_id: userId })
+			if (!data) {
+				setInfo(userStore.userInfo)
+				return
+			}
+			userStore.update({
+				userInfo: data
 			})
-
-			await updateInfo()
+			setInfo(data)
 		} catch (error) {
 			console.log('获取用户信息错误', error)
 		}
 	}
-
-	useEffect(() => {
-		if (!userInfo) return
-		setInfo(userInfo?.user_info)
-	}, [userInfo])
 
 	const settings = useMemo(
 		() => [
@@ -73,16 +51,16 @@ const MyInfo = () => {
 	)
 
 	return (
-		<Page onPageInit={onPageInit} className="bg-bgTertiary coss_info">
+		<Page onPageAfterIn={loadUserInfo} className="bg-bgTertiary coss_info">
 			<Navbar className="bg-bgPrimary hidden-navbar-bg coss_navbar" title={info?.nickname} large outline={false}>
 				<span></span>
 			</Navbar>
 			<List strong mediaList className="coss_list">
 				<ListItem
-					link={`/user_info/${info?.user_id}/`}
 					title={info?.email}
 					text={info?.signature}
 					className="coss_item__button"
+					onClick={() => f7router.navigate(`/user_info/${info?.user_id}/`)}
 				>
 					<div className="w-12 h-12" slot="media">
 						<img
@@ -91,7 +69,14 @@ const MyInfo = () => {
 							className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
 						/>
 					</div>
-					<Qrcode slot="after" className="text-3xl" />
+					<Qrcode
+						slot="after"
+						className="text-3xl"
+						onClick={(e) => {
+							e.stopPropagation()
+							f7router.navigate('/my_qrcode/')
+						}}
+					/>
 				</ListItem>
 			</List>
 

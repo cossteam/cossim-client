@@ -19,9 +19,13 @@ const ChangeUserID: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const handlerSubmit = () => {
 		UserService.updateUserInfoApi({
 			coss_id: id
-		}).then(() => {
-			userStore.update({ userInfo: {  ...userStore.userInfo, coss_id: id } })
-			f7router.back();
+		}).then((res) => {
+			if (res.code == 200) {
+				userStore.update({ userInfo: {  ...userStore.userInfo, coss_id: id } })
+				f7router.back();
+			} else {
+				f7.dialog.alert($t('修改失败'))
+			}
 		}).catch(() => {
 			f7.dialog.alert($t('修改失败'))
 		})
@@ -49,7 +53,7 @@ const ChangeUserID: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			{isChangeID &&
 				<div className="flex h-full flex-col">
 					<div>
-						<List className='mx-[16px]' strongIos outlineIos dividersIos form formStoreData>
+						<List strongIos outlineIos dividersIos form formStoreData>
 							<ListInput
 								name="name"
 								type="text"
