@@ -355,8 +355,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						onChange={blackList}
 					/>
 				</ListItem>
-				<ListItem link='/user_remark/' title={$t('备注')}>
-
+				<ListItem link={`/user_remark/?remark=${userInfo.preferences?.remark}&user_id=${userInfo.user_id}`} title={$t('备注')} after={userInfo.preferences?.remark} >
 				</ListItem>
 			</List>
 

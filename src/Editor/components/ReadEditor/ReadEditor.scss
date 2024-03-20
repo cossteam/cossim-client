@@ -1,5 +1,5 @@
 .read-editor {
-    @apply text-[1rem] overflow-hidden px-2;
+    @apply text-[1rem] overflow-hidden px-2 break-all;
 
     .read-editor-reply {
         @apply border-l-[2px] border-l-bgPrimary px-[0.5rem] mb-[0.5rem]  block max-w-[200px] overflow-hidden;

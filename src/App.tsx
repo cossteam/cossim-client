@@ -34,6 +34,7 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
 import run from './run'
 import { isWeb } from './utils'
+import { Toaster } from 'react-hot-toast'
 
 let store: MessageStore | null = null
 
@@ -256,14 +257,13 @@ function App() {
 			{hasCookie(TOKEN) ? (
 				<>
 					<Layout />
-					{/* <Message /> */}
 					<Preview />
-					{/* <LiveRoom /> */}
 					<LiveRoomNew />
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />
 			)}
+			<Toaster />
 		</AppComponent>
 	)
 }

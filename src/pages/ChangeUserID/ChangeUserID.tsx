@@ -19,9 +19,13 @@ const ChangeUserID: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const handlerSubmit = () => {
 		UserService.updateUserInfoApi({
 			coss_id: id
-		}).then(() => {
-			userStore.update({ userInfo: {  ...userStore.userInfo, coss_id: id } })
-			f7router.back();
+		}).then((res) => {
+			if (res.code == 200) {
+				userStore.update({ userInfo: {  ...userStore.userInfo, coss_id: id } })
+				f7router.back();
+			} else {
+				f7.dialog.alert($t('修改失败'))
+			}
 		}).catch(() => {
 			f7.dialog.alert($t('修改失败'))
 		})

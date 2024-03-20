@@ -1,4 +1,4 @@
-import { isMe, msgType } from '@/shared'
+import { isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import { useMemo, useRef } from 'react'
 
@@ -72,7 +72,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								<span className="mb-1 text-[0.75rem] text-gray-500">{item?.sender_info?.name}</span>
 							)}
 							<Tippy
-								content={<MessageTooltip parentEl={longPressRef} item={item} />}
+								content={<MessageTooltip item={item} />}
 								arrow={true}
 								interactive={true}
 								appendTo={document.body}
@@ -88,9 +88,13 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 						</div>
 					</div>
 				</div>
-				{/* <div className={clsx('flex justify-start order-first pt-5 pl-3', is_self ? 'flex-1' : '')}>
-				<input type="checkbox" />
-			</div> */}
+
+				{/* 多选时触发 */}
+				{messageStore.tipType === tooltipType.SELECT && (
+					<div className={clsx('flex justify-start order-first pt-5 pl-3', is_self ? 'flex-1' : '')}>
+						<input type="checkbox" />
+					</div>
+				)}
 			</div>
 		</>
 	)
