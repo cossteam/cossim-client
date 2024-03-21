@@ -14,7 +14,6 @@ import UserService from '@/api/user'
 import { $t } from '@/shared'
 import './MyInfo.scss'
 import useUserStore from '@/stores/user'
-import CommInput from '@/components/CommInput/CommInput'
 
 const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 	const [info, setInfo] = useState<any>({})
@@ -90,7 +89,6 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 					))}
 				</List>
 			))}
-			{/* <CommInput title='标题' onChange={(value: any) => console.log(value)}/> */}
 		</Page>
 	)
 }

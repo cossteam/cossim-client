@@ -1,5 +1,5 @@
 // 在群组中用户展示的名称
-import { f7, Link, List, ListInput, Navbar, NavRight, Page } from 'framework7-react'
+import { f7, Link, Navbar, NavRight, Page } from 'framework7-react'
 import { useState } from 'react'
 import RelationService from '@/api/relation'
 import { $t } from '@/shared'

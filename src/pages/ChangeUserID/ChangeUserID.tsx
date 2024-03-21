@@ -1,11 +1,11 @@
-import { f7, Button, Link, List, ListInput, Navbar, NavRight, Page } from 'framework7-react'
+import { f7, Button, Link, Navbar, NavRight, Page } from 'framework7-react'
 import {  useState } from 'react'
 import { $t } from '@/shared'
 import UserService from '@/api/user'
 import useUserStore from '@/stores/user'
 import CommInput from '@/components/CommInput/CommInput'
 
-const ChangeUserID: React.FC<RouterProps> = ({ f7route, f7router }) => {
+const ChangeUserID: React.FC<RouterProps> = ({ f7router }) => {
 
 	const [isChangeID, setIsChangeID] = useState(false)
 	const [id, setId] = useState('')

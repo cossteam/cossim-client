@@ -1,5 +1,5 @@
 import { Icon, Link, List, ListButton, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { isEqual } from 'lodash-es'
 
 import { $t, MessageBurnAfterRead, MessageNoDisturb, RelationStatus } from '@/shared'

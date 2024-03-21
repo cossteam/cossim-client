@@ -1,4 +1,4 @@
-import { Link, List, ListInput, NavRight, Navbar, Page, f7 } from 'framework7-react'
+import { Link, NavRight, Navbar, Page, f7 } from 'framework7-react'
 import { useState } from 'react'
 
 import { $t } from '@/shared'
