@@ -38,8 +38,9 @@ const LiveRoomNew: React.FC = () => {
 	// 本地
 	const [audioEnable, setAudioEnable] = useState(true)
 	const [videoEnable, setVideoEnable] = useState(true)
-	const [audioTrachs, setAudioTrachs] = useState<LocalTrack[]>([])
-	const [videoTrachs, setVideoTrachs] = useState<LocalTrack[]>([])
+	// const [audioTrachs, setAudioTrachs] = useState<LocalTrack[]>([])
+	// const [videoTrachs, setVideoTrachs] = useState<LocalTrack[]>([])
+	const [videoTrachs] = useState<LocalTrack[]>([])
 	// 远程
 	const [remoteAudioTracks, setRemoteAudioTracks] = useState<RemoteTrack[]>([])
 	const [remoteVideoTracks, setRemoteVideoTracks] = useState<RemoteTrack[]>([])

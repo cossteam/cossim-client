@@ -288,7 +288,7 @@ const LiveRoomNew: React.FC = () => {
 											zIndex: avctiv === index ? 999 : 0
 										}}
 										track={videoTrack}
-										videoStyle={{
+										videostyle={{
 											maxWidth: 'none',
 											height: '100%',
 											transform: 'scaleX(-1)',
@@ -329,7 +329,7 @@ const LiveRoomNew: React.FC = () => {
 												zIndex: avctiv === index ? 999 : 0
 											}}
 											track={videoTrack}
-											videoStyle={{
+											videostyle={{
 												maxWidth: 'none',
 												width: '100%',
 												transform: 'scaleX(-1)',
