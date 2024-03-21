@@ -1,7 +1,7 @@
 .input {
     // @apply: rounded-md h-10 w-full bg-gray-100 px-3
     width: 100%;
-    padding: 0 0.8rem;
+    padding: 0 0.3rem !important;
     border-radius: 8px;
     height: 3rem;
     font-size: 15px;
@@ -13,5 +13,5 @@
     float: right;
     clear: both;
     bottom: 32px;
-    right: 5px;
+    right: 2px;
 }

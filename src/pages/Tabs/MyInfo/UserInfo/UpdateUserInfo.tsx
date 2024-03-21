@@ -6,6 +6,7 @@ import UserService from '@/api/user'
 import { validPassword } from '@/utils/validate'
 import { removeAllCookie } from '@/utils/cookie'
 import useUserStore from '@/stores/user'
+import CommInput from '@/components/CommInput/CommInput'
 
 const UpdateUserInfo: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const { default: defaultValue, title } = f7route.query
@@ -74,7 +75,7 @@ const UpdateUserInfo: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}
 
 	return (
-		<Page noToolbar className="bg-bgTertiary">
+		<Page noToolbar>
 			<Navbar className="hidden-navbar-bg" backLink title={title}>
 				<NavRight>
 					<Link onClick={() => save()}>{$t('完成')}</Link>
@@ -82,43 +83,16 @@ const UpdateUserInfo: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			</Navbar>
 
 			{type !== 'password' ? (
-				<List strongIos outlineIos dividersIos form formStoreData>
-					<ListInput
-						name="name"
-						type="text"
-						onChange={(e) => setText(e.target.value)}
-						clearButton
-						defaultValue={defaultValue}
-						autofocus
-					/>
-				</List>
+				<div>
+					<CommInput defaultValue={defaultValue} onChange={(value: any) => setText(value)} />
+				</div>
+				
 			) : (
-				<List strongIos outlineIos dividersIos form formStoreData>
-					<ListInput
-						label={$t('旧密码')}
-						name="old_password"
-						type="password"
-						onChange={(e) => setOldPassword(e.target.value)}
-						clearButton
-						placeholder={$t('请输入旧密码')}
-					/>
-					<ListInput
-						label={$t('新密码')}
-						name="new_password"
-						type="password"
-						onChange={(e) => setNewPassword(e.target.value)}
-						clearButton
-						placeholder={$t('请输入新密码')}
-					/>
-					<ListInput
-						label={$t('确认密码')}
-						name="confirm_password"
-						type="password"
-						onChange={(e) => setConfirmPassword(e.target.value)}
-						clearButton
-						placeholder={$t('请再次输入新密码')}
-					/>
-				</List>
+				<div>
+					<CommInput title={$t('旧密码')} placeholder={$t('请输入旧密码')} type='password'  onChange={(value: any) => setOldPassword(value)} />
+					<CommInput title={$t('新密码')} placeholder={$t('请输入新密码')} type='password' onChange={(value: any) => setNewPassword(value)} />
+					<CommInput title={$t('确认密码')} placeholder={$t('请再次输入新密码')} type='password' onChange={(value: any) => setConfirmPassword(value)} />
+				</div>
 			)}
 		</Page>
 	)

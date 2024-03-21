@@ -3,6 +3,7 @@ import { f7, Link, List, ListInput, Navbar, NavRight, Page } from 'framework7-re
 import { useState } from 'react'
 import RelationService from '@/api/relation'
 import { $t } from '@/shared'
+import CommInput from '@/components/CommInput/CommInput'
 
 const GroupUserDisplayName: React.FC<RouterProps> = ({f7route, f7router}) => {
 	const groupId = f7route.query.group_id!
@@ -27,16 +28,11 @@ const GroupUserDisplayName: React.FC<RouterProps> = ({f7route, f7router}) => {
 			</Navbar>
 			<div className="flex h-full flex-col">
 				<div>
-					<List strongIos outlineIos dividersIos form formStoreData>
-						<ListInput
-							name="name"
-							type="text"
-							clearButton
-							onChange={(e) => setRemark(e.target.value)}
-							defaultValue={remark}
-							autofocus
-						/>
-					</List>
+				<h1 className='text-center text-xl font-bold mt-10 mb-1'>我在群组的昵称</h1>
+				<div className="flex justify-center mb-10 text-neutral-800">
+					<span>昵称修改后,只会在本群内展示,群成员都可见.</span>
+				</div>
+				<CommInput  defaultValue={remark} onChange={(value: any) => setRemark(value)} />
 				</div>
 			</div>
 		</Page>
