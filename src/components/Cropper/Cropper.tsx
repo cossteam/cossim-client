@@ -46,8 +46,8 @@ const CropperDemo = ({ image = 'https://img.huffingtonpost.com/asset/5ab4d4ac200
 				/>
 			</div>
 
-			<div style={{ position: 'relative', top: '45em', color: '#ffffff' }}>
-				<div className='flex px-10 justify-between items-center mb-20'>
+			<div style={{ position: 'fixed', width: '100%', bottom: '3em', color: '#ffffff' }}>
+				<div className='flex px-10 justify-between items-center'>
 					<span onClick={() => {
 						setRotation(rotation + 90)
 						console.log(rotation);
@@ -57,6 +57,7 @@ const CropperDemo = ({ image = 'https://img.huffingtonpost.com/asset/5ab4d4ac200
 					</span>
 					<span onClick={() => setRotation(0)} style={{ fontSize: '16px', fontWeight: 'bold', color: rotation == 0 ? '#666' : '#ffffff' }}>还原</span>
 				</div>
+				<div className='w-full h-[1px] my-10 bg-slate-900 '></div>
 				<div className='flex px-10 justify-between items-center'>
 					<span onClick={onCancel} style={{ fontSize: '16px', fontWeight: 'bold' }}>取消</span>
 					<span onClick={showCroppedImage} style={{ fontSize: '16px', fontWeight: 'bold' }}>完成</span>

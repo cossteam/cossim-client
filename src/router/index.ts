@@ -131,10 +131,6 @@ const routes: Router.RouteParameters[] = [
 		asyncComponent: () => import('@/pages/UserRemark/UserRemark')
 	},
 	{
-		path: '/avatar_crop/',
-		asyncComponent: () => import('@/pages/AvatarCrop/AvatarCrop')
-	},
-	{
 		path: '/test',
 		asyncComponent: () => import('@/pages/test/test')
 	},
