@@ -3,6 +3,7 @@ import { $t, emojiOrMore, msgSendType } from '@/shared'
 import { useEffect, useRef } from 'react'
 import useMessageStore from '@/stores/new_message'
 import Quill from 'quill'
+import MessageBlockquote from './MessageBlockquote'
 
 const MessageInput = () => {
 	const toolEditorRef = useRef<ToolEditorMethods | null>(null)
@@ -28,10 +29,10 @@ const MessageInput = () => {
 			// 如果是插入表情触发的聚焦，不做处理
 			if (isEmojiFocus.current) return
 			messageStore.update({ toolbarType: emojiOrMore.NONE })
-		} 
+		}
 
 		const handlerBlur = () => {
-			messageStore.update({ toolbarType: emojiOrMore.NONE })
+			// messageStore.update({ toolbarType: emojiOrMore.NONE })
 		}
 
 		quill.root.addEventListener('focus', handlerFocus)
@@ -75,14 +76,20 @@ const MessageInput = () => {
 	}, [messageStore.toolbarType])
 
 	return (
-		<div className="flex-1 py-2 bg-bgTertiary min-h-10 rounded max-h-[150px] overflow-y-auto" ref={inputRef}>
-			<ToolEditor
-				readonly={false}
-				placeholder={$t('请输入消息')}
-				ref={toolEditorRef}
-				defaultValue={messageStore.draft}
-				onChange={handlerChange}
-			/>
+		<div className="flex-1 max-w-[calc(100%-108px)]">
+			<div
+				className="flex py-2 flex-col justify-center bg-bgTertiary min-h-10 rounded max-h-[150px] overflow-y-auto overflow-x-hidden"
+				ref={inputRef}
+			>
+				<MessageBlockquote />
+				<ToolEditor
+					readonly={false}
+					placeholder={$t('请输入消息')}
+					ref={toolEditorRef}
+					defaultValue={messageStore.draft}
+					onChange={handlerChange}
+				/>
+			</div>
 		</div>
 	)
 }

@@ -4,10 +4,10 @@ import { useWindowSize } from '@reactuses/core'
 import MessageHeader from './MessageHeader'
 import MessageContent from './MessageContent'
 import MessageToolbar from './MessageToolbar'
-// import { keyboardChange } from '@/shared'
-// import { useEffect } from 'react'
 import useKeyboard from '@/hooks/useKeyboard'
 import './styles/MessageTip.scss'
+// import MessagePlaceholder from './MessageToolbar/MessagePlaceholder' 
+import Contact from '@/components/Contact/Contact'
 
 const Message: React.FC<RouterProps> = () => {
 	const { height } = useWindowSize()
@@ -19,7 +19,16 @@ const Message: React.FC<RouterProps> = () => {
 				<MessageHeader />
 				<MessageContent />
 				<MessageToolbar />
+				{/* <MessagePlaceholder /> */}
 			</div>
+
+			{/* 转发弹出 */}
+			<Contact
+				completed={() => null}
+				// opened={showSelectMember}
+				// setOpened={updateShowSelectMember}
+				// group
+			/>
 		</Page>
 	)
 }

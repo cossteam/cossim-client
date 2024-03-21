@@ -19,6 +19,7 @@ import 'tippy.js/animations/shift-away-subtle.css'
 import MessageNotice from './MessageRow/MessageNotice'
 import MessageError from './MessageRow/MessageError'
 
+
 interface MessageRowProps {
 	item: { [key: string]: any }
 }
@@ -43,6 +44,11 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 
 	// @ts-ignore
 	useClickOutside(longPressRef, () => setTimeout(() => longPressRef.current?._tippy?.hide(), 100))
+
+	// const onChange = (tipType: tooltipType) => {
+	// 	messageStore.update({ tipType, selectedMessage: item })
+	// 	tooltipStatMachine(tipType,item)
+	// }
 
 	const render = () => {
 		switch (type) {
@@ -72,7 +78,10 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 						<img
 							src={item?.sender_info?.avatar}
 							alt="avatar"
-							className={clsx('w-10 h-10 rounded-full', is_self ? 'order-last ml-2' : 'order-first mr-2')}
+							className={clsx(
+								'w-10 h-10 rounded-full object-cover',
+								is_self ? 'order-last ml-2' : 'order-first mr-2'
+							)}
 						/>
 						<div
 							className={clsx(

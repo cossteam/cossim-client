@@ -19,6 +19,7 @@
 		"@capacitor/android": "^5.7.0",
 		"@capacitor/app": "^5.0.7",
 		"@capacitor/camera": "^5.0.9",
+		"@capacitor/clipboard": "^5.0.7",
 		"@capacitor/core": "^5.7.0",
 		"@capacitor/device": "^5.0.7",
 		"@capacitor/ios": "^5.7.0",

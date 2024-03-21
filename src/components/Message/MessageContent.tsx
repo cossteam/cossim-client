@@ -11,7 +11,6 @@ const MessageContent = () => {
 		messageStore.update({ container: container.current })
 	}, [container.current])
 
-
 	return (
 		<div className="flex-1 overflow-y-auto py-4" ref={container}>
 			<MessageList />

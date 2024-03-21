@@ -1,4 +1,4 @@
-import MessageCompoent from '../../components/Message'
+import MessageCompoent from '@/components/Message'
 
 const Message: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	return <MessageCompoent f7route={f7route} f7router={f7router} />

@@ -22,10 +22,7 @@ const MessagePlaceholder = () => {
 	}, [messageStore.toolbarType])
 
 	return (
-		<>
-			<div className="min-h-14" />
-			<div className="w-full" style={{ height: messageStore.placeholderHeight }} />
-		</>
+		<div style={{ height: messageStore.placeholderHeight + 56 }} />
 	)
 }
 

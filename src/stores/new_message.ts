@@ -25,7 +25,8 @@ const defaultOptions: MessageStoreOptions = {
 	isClearContent: false,
 	tableName: '',
 	total: 0,
-	placeholderHeight: 0
+	placeholderHeight: 0,
+	manualTipType: tooltipType.NONE
 }
 
 const useMessageStore = create<MessageStore>((set, get) => ({
@@ -43,7 +44,7 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 			useCacheStore.getState().updateCacheSearchMessage([...cache.cacheSearchMessage, tableName])
 		}
 
-		const messages = allMessages.slice(-20)
+		const messages = allMessages.slice(-15)
 
 		set({ allMessages, messages, isNeedPull: !allMessages.length, tableName, ...options })
 
@@ -58,8 +59,9 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 				.filter((msg) => !allMessages.some((m) => m?.msg_id === msg?.msg_id))
 
 			if (diffData.length > 0) {
-				set({ allMessages: diffData.concat(allMessages), messages: diffData.concat(messages) })
-				cacheStore.set(tableName, diffData)
+				// const messages = diffData.concat(allMessages)
+				// set({ allMessages: messages, messages: messages.slice(-15) })
+				// cacheStore.set(tableName, diffData)
 			}
 
 			set({ total })
@@ -80,7 +82,12 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 
 		set({ messages })
 		cacheStore.set(tableName, messages)
-	}
+	},
+
+	// updateManualTipType: (type) => {
+	// 	const ManualCloseList = [tooltipType.EDIT, tooltipType.FORWARD, tooltipType.REPLY, tooltipType.SELECT]
+	// 	if (ManualCloseList.includes(type)) set({ manualTipType: type })
+	// }
 }))
 
 export default useMessageStore

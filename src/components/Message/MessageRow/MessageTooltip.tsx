@@ -1,4 +1,4 @@
-import { $t, TOOLTIP_TYPE, msgType } from '@/shared'
+import { $t, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import {
 	ArrowUpRight,
@@ -13,6 +13,7 @@ import {
 import { Link } from 'framework7-react'
 import useMessageStore from '@/stores/new_message'
 import { useMemo } from 'react'
+import tooltipStatMachine from '../script/tootip'
 
 interface MessageTooltipProps {
 	item: any
@@ -20,42 +21,42 @@ interface MessageTooltipProps {
 
 const tips = [
 	{
-		name: TOOLTIP_TYPE.COPY,
+		name: tooltipType.COPY,
 		title: $t('复制'),
 		icon: <SquareOnSquare className="text-lg" />
 	},
 	{
-		name: TOOLTIP_TYPE.FORWARD,
+		name: tooltipType.FORWARD,
 		title: $t('转发'),
 		icon: <ArrowUpRight className="text-lg" />
 	},
 	{
-		name: TOOLTIP_TYPE.EDIT,
+		name: tooltipType.EDIT,
 		title: $t('编辑'),
 		icon: <SquarePencil className="text-lg" />
 	},
 	{
-		name: TOOLTIP_TYPE.DELETE,
+		name: tooltipType.DELETE,
 		title: $t('删除'),
 		icon: <Trash className="text-lg" />
 	},
 	{
-		name: TOOLTIP_TYPE.SELECT,
+		name: tooltipType.SELECT,
 		title: $t('多选'),
 		icon: <TextAlignleft className="text-lg" />
 	},
 	{
-		name: TOOLTIP_TYPE.REPLY,
+		name: tooltipType.REPLY,
 		title: $t('回复'),
 		icon: <BubbleLeftBubbleRight className="text-lg" />
 	},
 	{
-		name: TOOLTIP_TYPE.MARK,
+		name: tooltipType.MARK,
 		title: $t('标注'),
 		icon: <Flag className="text-lg" />
 	},
 	{
-		name: TOOLTIP_TYPE.RECALL,
+		name: tooltipType.RECALL,
 		title: $t('撤回'),
 		icon: <ArrowUturnLeft className="text-lg" />
 	}
@@ -67,20 +68,29 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item }) => {
 	const tooltips = useMemo(() => {
 		// 当前消息是通话
 		if (item?.type === msgType.CALL) {
-			return tips.filter((tip) => tip.name === TOOLTIP_TYPE.DELETE)
+			return tips.filter((tip) => tip.name === tooltipType.DELETE)
 		}
 
-	
 		// 如果当前消息已经超过撤回时间
 		// if (isOverRecallTime(item?.created_at)) {
-		// 	return tips.filter((tip) => tip.name !== TOOLTIP_TYPE.RECALL)
+		// 	return tips.filter((tip) => tip.name !== tooltipType.RECALL)
 		// }
 
 		return tips
 	}, [item])
 
 	const handlerClick = (data: any) => {
-		messageStore.update({ tipType: data.name, selectedMessage: item })
+		const ManualCloseList = [tooltipType.EDIT, tooltipType.FORWARD, tooltipType.REPLY, tooltipType.SELECT]
+
+		if (ManualCloseList.includes(data.name)) {
+			messageStore.update({ manualTipType: data.name })
+		} else {
+			messageStore.update({ tipType: data.name })
+		}
+
+		messageStore.update({ selectedMessage: item })
+
+		tooltipStatMachine(data.name, item)
 	}
 
 	return (

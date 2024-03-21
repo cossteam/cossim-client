@@ -10,18 +10,12 @@ const MessageToolbarContent = () => {
 	const messageStore = useMessageStore()
 	const cacheStore = useCacheStore()
 
-	// const isNone = useMemo(
-	// 	() => [emojiOrMore.NONE, emojiOrMore.KEYBOARD].includes(messageStore.toolbarType),
-	// 	[messageStore.toolbarType]
-	// )
+	const isNone = useMemo(() => messageStore.toolbarType === emojiOrMore.NONE, [messageStore.toolbarType])
 	const isEmoji = useMemo(() => messageStore.toolbarType === emojiOrMore.EMOJI, [messageStore.toolbarType])
 	const isMore = useMemo(() => messageStore.toolbarType === emojiOrMore.MORE, [messageStore.toolbarType])
 
 	return (
-		<div
-			className={clsx('w-full h-[300px] flex overflow-hidden')}
-			style={{ height: cacheStore.keyboardHeight }}
-		>
+		<div className={clsx('w-full h-[300px] flex overflow-hidden', isNone && 'hidden')} style={{ height: cacheStore.keyboardHeight }}>
 			<MessageEmojis
 				onSelectEmojis={(emoji) => messageStore.update({ selectedEmojis: emoji.native })}
 				className={clsx('w-full', !isEmoji && 'hidden')}

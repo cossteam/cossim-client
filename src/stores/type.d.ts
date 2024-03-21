@@ -130,6 +130,8 @@ export interface MessageStoreOptions {
 	total: number
 	/** 占位高度 */
 	placeholderHeight: number
+	/** 当前需要手动关闭的提示 */
+	manualTipType: tooltipType
 }
 
 interface initOptions {

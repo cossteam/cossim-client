@@ -21,16 +21,11 @@ const useKeyboard = () => {
 		const innerHeight = window.innerHeight
 		const keyboardHeight = pageHeight.current - innerHeight
 		if (keyboardHeight > 0) {
-			console.log('键盘弹起', keyboardHeight)
+			// console.log('键盘弹起', keyboardHeight)
 			cacheStore.updateKeyboardHeight(keyboardHeight)
-			// TODO: 可以做滚动处理
-			// window.removeEventListener('resize', handlerWindowResize)
-		} 
-		// else {
-		// 	cacheStore.updateKeyboardHeight(300)
-		// }
-
-		console.log('键盘弹起', pageHeight.current, innerHeight)
+			window.removeEventListener('resize', handlerWindowResize)
+		}
+		// console.log('键盘弹起', pageHeight.current, innerHeight)
 	}
 
 	useAsyncEffect(
@@ -41,8 +36,11 @@ const useKeyboard = () => {
 
 			isWeb.current = platform.platform !== 'web'
 
+			// console.log('当前欢快', isWeb.current, platform.platform, Keyboard)
+
 			if (isWeb.current) {
 				Keyboard?.addListener('keyboardWillShow', (info) => {
+					console.log('键盘躺起', info)
 					cacheStore.updateKeyboardHeight(info.keyboardHeight)
 				})
 
@@ -52,7 +50,6 @@ const useKeyboard = () => {
 
 				// Keyboard?.addListener('keyboardWillHide', () => {
 				// 	cacheStore.updateKeyboardHeight(300)
-
 				// })
 
 				// Keyboard?.addListener('keyboardDidHide', () => {
@@ -63,7 +60,7 @@ const useKeyboard = () => {
 			}
 		},
 		() => {
-			isWeb.current && Keyboard?.removeAllListeners()
+			// isWeb.current && Keyboard?.removeAllListeners()
 			window.removeEventListener('resize', handlerWindowResize)
 		},
 		[]
