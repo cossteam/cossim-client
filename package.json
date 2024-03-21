@@ -61,6 +61,7 @@
 		"quill-mention-react": "^0.0.7",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
+		"react-easy-crop": "^5.0.5",
 		"react-hot-toast": "^2.4.1",
 		"react-router-dom": "^6.22.3",
 		"react-scroll": "^1.9.0",

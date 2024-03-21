@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { f7, Page, Navbar, List, ListItem, Button, Block } from 'framework7-react'
+import { f7, Page, Navbar, List, ListItem, Button, Block, Popup } from 'framework7-react'
 import { useClipboard } from '@reactuses/core'
 
 import { $t, exportKeyPair } from '@/shared'
@@ -8,10 +8,13 @@ import { removeAllCookie } from '@/utils/cookie'
 import useUserStore from '@/stores/user'
 import '../MyInfo.scss'
 import { Qrcode } from 'framework7-icons/react'
+import Cropper from '@/components/Cropper/Cropper'
 
 const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 	const [userInfo, setUserInfo] = useState<any>({})
 	const userStore = useUserStore()
+	const [isOpened, setOpened] = useState(false)
+	const [files, setFiles] = useState<any>()
 
 	const logout = () => {
 		f7.dialog.confirm($t('退出登录'), $t('确定要退出登录吗？'), async () => {
@@ -52,15 +55,19 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 		if (fileInput) {
 			fileInput.click()
 		}
+		
 	}
 
-	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		// 处理文件选择器的文件变化事件
-		const selectedFile = event.target.files?.[0]
-		if (selectedFile) {
-			UserService.updateAvatarApi({ file: selectedFile }).then(async (res) => {
-				if (res) {
+
+	const handlerComplete = (croppedImage: any) => {
+		const file = new File([croppedImage], 'avatar.png',{type: 'image/jpeg'});
+		console.log('url转file', file);
+		
+		UserService.updateAvatarApi({ file }).then(async (res) => {
+				if (res.code == 200) {
+
 					f7.dialog.alert($t('修改成功'))
+					setOpened(false)
 					userStore.update({
 						userInfo: {
 							...userInfo,
@@ -71,6 +78,17 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 					f7.dialog.alert($t('修改失败'))
 				}
 			})
+	}
+
+	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		// 处理文件选择器的文件变化事件
+		const selectedFile = event.target.files?.[0]
+		if (selectedFile) {
+			console.log('图片文件',selectedFile);
+			const blob = new Blob([selectedFile]);
+			const blobUrl = URL.createObjectURL(blob)
+			setFiles(blobUrl)
+			setOpened(true)
 		}
 	}
 
@@ -183,6 +201,10 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 					{$t('退出登录')}
 				</Button>
 			</Block>
+
+			<Popup className=' bg-black' opened={isOpened}>
+				<Cropper image={files} onCancel={() => setOpened(false)} onComplete={handlerComplete} /> 
+			</Popup>
 		</Page>
 	)
 }

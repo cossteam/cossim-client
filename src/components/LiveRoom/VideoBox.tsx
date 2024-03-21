@@ -5,7 +5,7 @@ interface VideoBoxProps {
 	className: string
 	style: CSSProperties | undefined
 	track: any
-	videoStyle?: CSSProperties | undefined
+	videostyle?: (CSSProperties & { autoplay?: boolean; loop?: boolean; muted?: boolean }) | undefined
 	children?: any
 	onClick: () => void
 }
@@ -16,19 +16,15 @@ const VideoBox: React.FC<VideoBoxProps> = (props) => {
 
 	useEffect(() => {
 		if (!props.track || !videoBoxRef.current) return
-		const el = props.track.attach()
-		el.style.maxWidth = 'none'
-		el.style.height = '100%'
-		el.style.transform = 'scaleX(-1)'
-		if (props.videoStyle) {
-			console.log('videoStyle', props.videoStyle)
-			// for (const styleItem of props.videoStyle) {
-			// 	console.log(styleItem)
-			// }
+		const el: HTMLVideoElement = props.track.attach()
+		if (props.videostyle) {
+			for (const key in props.videostyle) {
+				if (Object.prototype.hasOwnProperty.call(props.videostyle, key)) {
+					// @ts-ignore
+					el.style[key] = props.videostyle[key]
+				}
+			}
 		}
-		el.autoplay = true
-		el.loop = true
-		el.muted = true
 		videoEL.current = el
 		videoBoxRef.current.appendChild(videoEL.current!)
 		return () => {
