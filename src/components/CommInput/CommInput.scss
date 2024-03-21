@@ -1,0 +1,17 @@
+.input {
+    // @apply: rounded-md h-10 w-full bg-gray-100 px-3
+    width: 100%;
+    padding: 0 0.8rem;
+    border-radius: 8px;
+    height: 3rem;
+    font-size: 15px;
+    background: rgb(245, 245, 245) !important;
+}
+
+.clear-button {
+    position: relative;
+    float: right;
+    clear: both;
+    bottom: 32px;
+    right: 5px;
+}
