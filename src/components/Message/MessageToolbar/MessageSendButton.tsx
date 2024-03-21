@@ -8,10 +8,10 @@ const MessageSendButton = () => {
 	const messageStore = useMessageStore()
 
 	const handlerSendMessage = () => {
-		// if(messageStore)
+		// console.log('发大水')
 		sendMessage(messageStore.content, msgType.TEXT)
-		// 发送成功后，需要清空输入框内容，交给输入组件处理
-		messageStore.update({ isClearContent: true})
+		// 无论成功与否，清空输入框内容，交给输入组件处理
+		messageStore.update({ isClearContent: true })
 	}
 
 	return (

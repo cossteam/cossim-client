@@ -32,6 +32,8 @@ export enum MESSAGE_TYPE {
 
 /** 消息类型 */
 export enum msgType {
+	/** 错误消息 */
+	ERROR = 0,
 	/** 文本 */
 	TEXT = 1,
 	/** 音频 */

@@ -3,7 +3,6 @@ import { $t, emojiOrMore, msgSendType } from '@/shared'
 import { useEffect, useRef } from 'react'
 import useMessageStore from '@/stores/new_message'
 import Quill from 'quill'
-import { useClickOutside } from '@reactuses/core'
 
 const MessageInput = () => {
 	const toolEditorRef = useRef<ToolEditorMethods | null>(null)
@@ -19,26 +18,28 @@ const MessageInput = () => {
 		messageStore.update({ content, sendType })
 	}
 
-	// 点击外部去除聚焦， 预防傻逼的手机端有时不自动离开焦点，容易再次出发聚焦
-	useClickOutside(inputRef, () => {
-		toolEditorRef.current?.quill.blur()
-	})
-
 	useEffect(() => {
 		if (!toolEditorRef.current || !toolEditorRef.current.quill) return
 
 		const quill = toolEditorRef.current.quill
 
 		const handlerFocus = () => {
+			messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
 			// 如果是插入表情触发的聚焦，不做处理
 			if (isEmojiFocus.current) return
+			messageStore.update({ toolbarType: emojiOrMore.NONE })
+		} 
+
+		const handlerBlur = () => {
 			messageStore.update({ toolbarType: emojiOrMore.NONE })
 		}
 
 		quill.root.addEventListener('focus', handlerFocus)
+		quill.root.addEventListener('blur', handlerBlur)
 
 		return () => {
 			quill.root.removeEventListener('focus', handlerFocus)
+			quill.root.removeEventListener('blur', handlerBlur)
 		}
 	}, [toolEditorRef.current])
 
@@ -52,6 +53,7 @@ const MessageInput = () => {
 		quill?.insertText(quill.getSelection()?.index || 0, messageStore.selectedEmojis, Quill.sources.API)
 		quill?.blur()
 		isEmojiFocus.current = false
+		messageStore.update({ selectedEmojis: '' })
 	}, [messageStore.selectedEmojis])
 
 	// 清空文本

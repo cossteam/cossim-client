@@ -1,0 +1,7 @@
+.message-tip {
+    @apply w-full flex justify-center;
+
+    .message-tip__text {
+        @apply bg-[#dedadaef] text-gray-500 px-2 py-[2px] rounded text-[0.7rem];
+    }
+}

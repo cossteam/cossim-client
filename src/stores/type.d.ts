@@ -47,6 +47,8 @@ export interface CacheStoreOptions {
 	applyCount: number
 	/** 缓存的键盘高度, 默认 300 */
 	keyboardHeight: number
+	/** 搜索消息表名，主要用与搜索时获取对应表名的数据 */
+	cacheSearchMessage: string[]
 }
 
 /**
@@ -74,7 +76,13 @@ export type CacheStore = CacheStoreOptions & {
 	 * @description 更新键盘高度
 	 */
 	updateKeyboardHeight: (keyboardHeight: number) => void
+
+	/**
+	 * @description 更新搜索表
+	 */
+	updateCacheSearchMessage: (cacheSearchMessage: string[]) => void
 }
+
 
 /**
  * @description 聊天状态
@@ -116,6 +124,12 @@ export interface MessageStoreOptions {
 	selectedEmojis: string
 	/** 是否需要清除输入框内容 */
 	isClearContent: boolean
+	/** 存储的表名 */
+	tableName: string
+	/** 消息总数 */
+	total: number
+	/** 占位高度 */
+	placeholderHeight: number
 }
 
 interface initOptions {
@@ -139,7 +153,6 @@ export type MessageStore = MessageStoreOptions & {
 	 * @param { Partial<MessageStoreOptions>} options
 	 */
 	update: (options: Partial<MessageStoreOptions>) => void
-
 	/**
 	 * 更新消息
 	 * @param {any} message

@@ -7,6 +7,7 @@ import MessageToolbar from './MessageToolbar'
 // import { keyboardChange } from '@/shared'
 // import { useEffect } from 'react'
 import useKeyboard from '@/hooks/useKeyboard'
+import './styles/MessageTip.scss'
 
 const Message: React.FC<RouterProps> = () => {
 	const { height } = useWindowSize()

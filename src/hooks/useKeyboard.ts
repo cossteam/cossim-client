@@ -24,8 +24,11 @@ const useKeyboard = () => {
 			console.log('键盘弹起', keyboardHeight)
 			cacheStore.updateKeyboardHeight(keyboardHeight)
 			// TODO: 可以做滚动处理
-			window.removeEventListener('resize', handlerWindowResize)
-		}
+			// window.removeEventListener('resize', handlerWindowResize)
+		} 
+		// else {
+		// 	cacheStore.updateKeyboardHeight(300)
+		// }
 
 		console.log('键盘弹起', pageHeight.current, innerHeight)
 	}
@@ -40,20 +43,21 @@ const useKeyboard = () => {
 
 			if (isWeb.current) {
 				Keyboard?.addListener('keyboardWillShow', (info) => {
-					console.log('keyboard will show with height:', info.keyboardHeight)
+					cacheStore.updateKeyboardHeight(info.keyboardHeight)
 				})
 
-				Keyboard?.addListener('keyboardDidShow', (info) => {
-					console.log('keyboard did show with height:', info.keyboardHeight)
-				})
+				// Keyboard?.addListener('keyboardDidShow', (info) => {
+				// 	console.log('keyboard did show with height:', info.keyboardHeight)
+				// })
 
-				Keyboard?.addListener('keyboardWillHide', () => {
-					console.log('keyboard will hide')
-				})
+				// Keyboard?.addListener('keyboardWillHide', () => {
+				// 	cacheStore.updateKeyboardHeight(300)
 
-				Keyboard?.addListener('keyboardDidHide', () => {
-					console.log('keyboard did hide')
-				})
+				// })
+
+				// Keyboard?.addListener('keyboardDidHide', () => {
+				// 	console.log('keyboard did hide')
+				// })
 			} else {
 				window.addEventListener('resize', handlerWindowResize)
 			}

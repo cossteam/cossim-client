@@ -16,15 +16,17 @@ import { useClickOutside } from '@reactuses/core'
 import 'tippy.js/dist/tippy.css'
 import 'tippy.js/themes/light.css'
 import 'tippy.js/animations/shift-away-subtle.css'
+import MessageNotice from './MessageRow/MessageNotice'
+import MessageError from './MessageRow/MessageError'
 
 interface MessageRowProps {
-	item: any
+	item: { [key: string]: any }
 }
 
 const className = (is_self: boolean) => {
 	return clsx(
-		'py-2 px-3 rounded-lg',
-		is_self ? 'bg-primary text-white rounded-tr-none text-right' : 'bg-bgPrimary rounded-tl-none text-left'
+		'py-2 px-3 rounded-lg break-all',
+		is_self ? 'bg-primary text-white rounded-tr-none' : 'bg-bgPrimary rounded-tl-none'
 	)
 }
 
@@ -56,6 +58,11 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 				return <ReadEditor content={item?.content} className={className(is_self)} />
 		}
 	}
+
+	// 通知
+	if (type === msgType.NOTICE) return <MessageNotice item={item} />
+	// 错误消息
+	if (type === msgType.ERROR) return <MessageError item={item} />
 
 	return (
 		<>

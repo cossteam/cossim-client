@@ -10,7 +10,9 @@ const MessageList = () => {
 		messageStore.container?.scrollTo({
 			top: messageStore.container?.scrollHeight
 		})
-	}, [messageStore.container])
+	}, [messageStore.container, messageStore.messages])
+
+	
 
 	return messageStore.messages.map((item, index) => <MessageRow key={index} item={item} />)
 }
