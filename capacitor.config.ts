@@ -15,7 +15,7 @@ const config: CapacitorConfig = {
 			sound: 'beep.wav'
 		},
 		Keyboard: {
-			resize: KeyboardResize.Native,
+			resize: KeyboardResize.None,
 			// style: KeyboardStyle.Dark,
 			resizeOnFullScreen: true
 		}

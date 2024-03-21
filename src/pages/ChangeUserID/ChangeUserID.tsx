@@ -1,15 +1,11 @@
-import { f7, Button, Link, List, ListInput, Navbar, NavRight, Page } from 'framework7-react'
+import { f7, Button, Link, Navbar, NavRight, Page } from 'framework7-react'
 import {  useState } from 'react'
 import { $t } from '@/shared'
 import UserService from '@/api/user'
 import useUserStore from '@/stores/user'
+import CommInput from '@/components/CommInput/CommInput'
 
-const ChangeUserID: React.FC<RouterProps> = ({ f7route, f7router }) => {
-	console.log(f7route.query);
-
-	// useEffect(() => {
-	// 	setId(f7route.query.coss_id!)
-	// }, [])
+const ChangeUserID: React.FC<RouterProps> = ({ f7router }) => {
 
 	const [isChangeID, setIsChangeID] = useState(false)
 	const [id, setId] = useState('')
@@ -52,17 +48,9 @@ const ChangeUserID: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			}
 			{isChangeID &&
 				<div className="flex h-full flex-col">
+					<h1 className='text-center text-xl font-bold mt-10 mb-5'>修改用户ID</h1>
 					<div>
-						<List strongIos outlineIos dividersIos form formStoreData>
-							<ListInput
-								name="name"
-								type="text"
-								onChange={(e) => setId(e.target.value)}
-								clearButton
-								defaultValue={userStore.userInfo?.coss_id}
-								autofocus
-							/>
-						</List>
+						<CommInput defaultValue={userStore.userInfo?.coss_id} onChange={(value: any) => setId(value)} />
 					</div>
 				</div>
 			}

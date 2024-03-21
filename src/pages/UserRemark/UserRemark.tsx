@@ -1,8 +1,9 @@
 // 用户的备注
-import { f7, Link, List, ListInput, Navbar, NavRight, Page } from 'framework7-react'
+import { f7, Link, Navbar, NavRight, Page } from 'framework7-react'
 import { useState } from 'react'
 import RelationService from '@/api/relation'
 import { $t } from '@/shared'
+import CommInput from '@/components/CommInput/CommInput'
 
 const UserRemark: React.FC<RouterProps> = ({f7route, f7router}) => {
 	const oldRemark = f7route.query.remark
@@ -28,16 +29,8 @@ const UserRemark: React.FC<RouterProps> = ({f7route, f7router}) => {
 			</Navbar>
 			<div className="flex h-full flex-col">
 				<div>
-					<List strongIos outlineIos dividersIos form formStoreData>
-						<ListInput
-							name="name"
-							type="text"
-							clearButton
-							onChange={(e) => setRemark(e.target.value)}
-							defaultValue={oldRemark}
-							autofocus
-						/>
-					</List>
+				<h1 className='text-center text-xl font-bold mt-10 mb-5'>设定备注</h1>
+					<CommInput title='备注' defaultValue={oldRemark} onChange={(value: any) => setRemark(value)} />
 				</div>
 			</div>
 		</Page>

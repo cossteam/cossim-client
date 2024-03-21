@@ -51,6 +51,8 @@ interface LiveRoomFunc {
 	updateOpened: (opened: boolean) => void
 	updateState: (state: LiveRoomStates) => void
 	updateEvent: (event: SocketEvent, eventDate: any) => void
+	/** 检查 */
+	check: (id?: string | null) => void
 	/** 呼叫 */
 	call: (callProps: CallProps) => void
 	/** 挂断通话 */
@@ -88,6 +90,11 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 		})
 	},
 	updateEvent: (event: SocketEvent, eventDate: any) => {
+		console.log('通话事件', event, eventDate)
+		set({
+			eventDate,
+			video: eventDate?.data?.option?.video_enabled // 是否视频通话
+		})
 		switch (event) {
 			// 来电
 			case SocketEvent.UserCallReqEvent:
@@ -129,11 +136,9 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 			default:
 				return
 		}
-		console.log('通话事件', eventDate)
-		set({
-			eventDate,
-			video: eventDate?.data?.option?.video_enabled
-		})
+	},
+	check: async (id?: string | null) => {
+		console.log(id)
 	},
 	call: async (callProps: CallProps) => {
 		const { join, hangup } = get()
