@@ -117,13 +117,7 @@ function App() {
 				case SocketEvent.GroupCallRejectEvent:
 				case SocketEvent.UserCallHangupEvent:
 				case SocketEvent.GroupCallHangupEvent:
-					// if (liveRoomStore.state !== LiveRoomStates.IDLE) {
-					// 	f7.dialog.confirm('你有新的通话请求是否结束当前通话并接听？', () => {
-					// 		liveRoomStore.updateEvent(event, data)
-					// 	})
-					// 	break
-					// }
-					liveRoomStore.updateEvent(event, data)
+					liveRoomStore.handlerEvent(event, data)
 					break
 				case SocketEvent.MessageLabelEvent:
 					handlerLabelSocket(data, store!)

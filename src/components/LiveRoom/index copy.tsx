@@ -1,19 +1,17 @@
-import { Icon, Link, Popup, f7 } from 'framework7-react'
+import { Icon, Link, Popup } from 'framework7-react'
 import OperateButton from './OperateButton'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './index.scss'
 import clsx from 'clsx'
-import { LocalTrack, RemoteTrack, Room, RoomEvent, VideoPresets } from 'livekit-client'
+import { ConnectionState, LocalTrack, RemoteTrack, Room, RoomEvent, VideoPresets } from 'livekit-client'
 import { useAsyncEffect } from '@reactuses/core'
 import VideoBox from './VideoBox'
 import { LiveRoomStates, useLiveRoomStore } from '@/stores/liveRoom'
-import Timer from './Timer'
 
 const LiveRoomNew: React.FC = () => {
-	// 房间状态
+	// 状态
 	const liveRoomStore = useLiveRoomStore()
 	const isBackend = useMemo(() => {
-		// return liveRoomStore.opened && [LiveRoomStates].includes(liveRoomStore.state)
 		return !liveRoomStore.opened && liveRoomStore.state !== LiveRoomStates.IDLE
 	}, [liveRoomStore.opened, liveRoomStore.state])
 	const isGroup = useMemo(() => {
@@ -22,7 +20,6 @@ const LiveRoomNew: React.FC = () => {
 	const isVideo = useMemo(() => {
 		return liveRoomStore.video
 	}, [liveRoomStore.video])
-	// 通话状态
 	const isWaiting = useMemo(() => {
 		return liveRoomStore.state === LiveRoomStates.WAITING
 	}, [liveRoomStore.state])
@@ -32,22 +29,48 @@ const LiveRoomNew: React.FC = () => {
 	const isBusy = useMemo(() => {
 		return liveRoomStore.state === LiveRoomStates.BUSY
 	}, [liveRoomStore.state])
-
 	// 创建房间
 	const client = useRef<Room>()
-	// 本地
 	const [audioEnable, setAudioEnable] = useState(true)
-	const [videoEnable, setVideoEnable] = useState(true)
 	const [audioTrachs, setAudioTrachs] = useState<LocalTrack[]>([])
+	const [videoEnable, setVideoEnable] = useState(true)
 	const [videoTrachs, setVideoTrachs] = useState<LocalTrack[]>([])
-	// 远程
 	const [remoteAudioTracks, setRemoteAudioTracks] = useState<RemoteTrack[]>([])
 	const [remoteVideoTracks, setRemoteVideoTracks] = useState<RemoteTrack[]>([])
-
-	// 初始化房间
-	const initRoom = () => {
-		console.log('初始化房间', client.current)
-		// 创建房间
+	const createLocalTracks = async (option: { audio?: boolean; video?: boolean }) => {
+		const localTrack = (await client.current?.localParticipant.createTracks(option)) ?? []
+		const audioTracks = []
+		const videoTracks = []
+		for (const track of localTrack) {
+			switch (track.kind) {
+				case 'audio':
+					audioTracks.push(track)
+					break
+				case 'video':
+					videoTracks.push(track)
+					break
+			}
+		}
+		setVideoTrachs(videoTracks)
+		setAudioTrachs(audioTracks)
+	}
+	const cleanLocalTracks = (option: { audio?: boolean; video?: boolean }) => {
+		if (!client.current) return
+		if (option.audio) {
+			client.current.localParticipant.setMicrophoneEnabled(option.audio)
+			audioTrachs.map((track) => {
+				track.stop()
+			})
+		}
+		if (option.video) {
+			client.current.localParticipant.setCameraEnabled(option.video)
+			videoTrachs.map((track) => {
+				track.stop()
+			})
+		}
+	}
+	const initRoom = async () => {
+		console.log('初始化房间')
 		client.current = new Room({
 			adaptiveStream: true,
 			dynacast: true,
@@ -56,48 +79,59 @@ const LiveRoomNew: React.FC = () => {
 				resolution: VideoPresets.h720.resolution
 			}
 		})
-		// 监听连接事件
-		client.current.on(RoomEvent.Connected, () => {
-			console.log('连接成功', client.current)
-		})
-		// 监听订阅事件
-		client.current.on(RoomEvent.TrackSubscribed, (remoteTrack, remotePublication, remoteParticipant) => {
-			console.log('订阅成功 START')
-			console.log(
-				`订阅到【${remoteParticipant.name}】的远程【${remoteTrack.kind === 'audio' ? '音频' : '视频'}】频道`
-			)
-			console.log({ remoteTrack, remotePublication, remoteParticipant })
-			console.log('订阅成功 END')
-			if (remoteTrack.kind === 'video') {
-				setRemoteVideoTracks([remoteTrack])
-			} else if (remoteTrack.kind === 'audio') {
-				setRemoteAudioTracks([...remoteAudioTracks, remoteTrack])
-				remoteTrack.attach().play()
-			}
-		})
-		// 监听断开事件
-		client.current.on(RoomEvent.Disconnected, () => {
-			console.log('断开连接', client.current)
-			// liveRoomStore.hangup()
+		console.log(liveRoomStore.url!, liveRoomStore.token!)
+		client.current?.prepareConnection(liveRoomStore.url!)
+		await createLocalTracks({
+			audio: audioEnable,
+			video: videoEnable
 		})
 	}
-	const joinRoom = async () => {
-		// 连接房间
-		if (liveRoomStore.url === null || liveRoomStore.token === null) {
-			f7.dialog.alert('房间链接错误', '请检查房间链接和凭证是否正确')
-			return
+	// const checkRoom = () => {}
+	const connectRoom = () => {
+		let count = 0
+		const connect = () => {
+			return new Promise<void>((resolve, reject) => {
+				console.log('count', count)
+				if (count >= 3) {
+					liveRoomStore.updateState(LiveRoomStates.ERROR)
+					reject()
+					return
+				}
+				console.log(getliveRoomStatesText(liveRoomStore.state))
+				console.log(client.current)
+				// liveRoomStore.updateState(LiveRoomStates.JOINING)
+				client.current
+					?.connect(liveRoomStore.url!, liveRoomStore.token!)
+					.then(() => {
+						count = 0
+						liveRoomStore.updateState(LiveRoomStates.BUSY)
+						resolve()
+						return
+					})
+					.catch((error) => {
+						count += 1
+						console.log(error)
+						connect()
+					})
+			})
 		}
-		return await client.current?.connect(liveRoomStore.url, liveRoomStore.token).then(() => {
-			console.log('加入房间成功')
-			liveRoomStore.updateState(LiveRoomStates.BUSY)
-		})
+		return connect()
 	}
-
+	const disconnectRoom = async () => {
+		audioTrachs.map((track) => {
+			track.stop()
+		})
+		videoTrachs.map((track) => {
+			track.stop()
+		})
+		client.current?.state === ConnectionState.Connected && (await client.current?.disconnect())
+		client.current = undefined
+		console.log('销毁房间')
+	}
 	// 通话状态监听
 	useAsyncEffect(
 		async () => {
-			console.log('当前状态', liveRoomStore.getliveRoomStatesText(liveRoomStore.state))
-			console.log('当前房间', client.current)
+			console.log('当前状态', getliveRoomStatesText(liveRoomStore.state))
 			switch (liveRoomStore.state) {
 				case LiveRoomStates.IDLE:
 					break
@@ -105,32 +139,75 @@ const LiveRoomNew: React.FC = () => {
 					await initRoom()
 					break
 				case LiveRoomStates.JOINING:
-					await joinRoom()
+					await connectRoom()
 					break
 				case LiveRoomStates.BUSY:
+					console.log(client.current)
 					if (!client.current) {
 						await initRoom()
-						await joinRoom()
+						await connectRoom()
 					}
 					break
 				case LiveRoomStates.REFUSE:
 				case LiveRoomStates.HANGUP:
 					console.log('拒绝/挂断')
-					// await disconnectRoom()
-					break
-				case LiveRoomStates.REFUSEBYOTHER:
-				case LiveRoomStates.HANGUPBYOTHER:
-					console.log('被拒绝/被挂断')
+					await disconnectRoom()
 					break
 				case LiveRoomStates.ERROR:
 					console.log('错误')
-					// liveRoomStore.hangup()
+					liveRoomStore.hangup()
 					break
 			}
 		},
 		async () => {},
 		[liveRoomStore.state]
 	)
+	// 房间事件监听
+	useAsyncEffect(
+		async () => {
+			client.current?.on(RoomEvent.Connected, () => {
+				console.log('连接成功')
+				client.current?.localParticipant.setCameraEnabled(videoEnable)
+				client.current?.localParticipant.setMicrophoneEnabled(audioEnable)
+			})
+			client.current?.on(RoomEvent.Disconnected, async () => {
+				console.log('连接断开')
+				if (liveRoomStore.state === LiveRoomStates.BUSY) {
+					await connectRoom()
+				}
+			})
+			client.current?.on(RoomEvent.TrackSubscribed, (remoteTrack, remotePublication, remoteParticipant) => {
+				console.log('订阅成功')
+				console.log('订阅成功', remoteTrack)
+				console.log('订阅成功', remotePublication)
+				console.log('订阅成功', remoteParticipant)
+				if (remoteTrack.kind === 'video') {
+					setRemoteVideoTracks([...remoteVideoTracks, remoteTrack])
+				} else if (remoteTrack.kind === 'audio') {
+					setRemoteAudioTracks([...remoteAudioTracks, remoteTrack])
+					remoteTrack.attach().play()
+				}
+			})
+		},
+		async () => {},
+		[client.current]
+	)
+	// 麦克风
+	useEffect(() => {
+		if (audioEnable) {
+			createLocalTracks({ audio: audioEnable })
+		} else {
+			cleanLocalTracks({ audio: audioEnable })
+		}
+	}, [audioEnable])
+	// 摄像头
+	useEffect(() => {
+		if (audioEnable) {
+			cleanLocalTracks({ video: videoEnable })
+		} else {
+			createLocalTracks({ video: videoEnable })
+		}
+	}, [videoEnable])
 
 	// 界面布局
 	const [avctiv, setAvctiv] = useState(-1)
@@ -141,6 +218,31 @@ const LiveRoomNew: React.FC = () => {
 	const [videosTop, setVideosTop] = useState(0)
 	const onVideosScroll = (e: any) => {
 		setVideosTop(e.target.scrollTop)
+	}
+
+	const getliveRoomStatesText = (liveRoomStates: LiveRoomStates) => {
+		switch (liveRoomStates) {
+			case LiveRoomStates.IDLE:
+				return '空闲'
+			case LiveRoomStates.WAITING:
+				return '等待中'
+			case LiveRoomStates.REFUSE:
+				return '拒绝'
+			case LiveRoomStates.JOINING:
+				return '加入中'
+			case LiveRoomStates.BUSY:
+				return '通话中'
+			case LiveRoomStates.HANGUP:
+				return '挂断'
+			case LiveRoomStates.ERROR:
+				return '连接失败'
+			case LiveRoomStates.REFUSEBYOTHER:
+				return '已被拒绝'
+			case LiveRoomStates.HANGUPBYOTHER:
+				return '已被挂断'
+			default:
+				return ''
+		}
 	}
 
 	return (
@@ -166,18 +268,7 @@ const LiveRoomNew: React.FC = () => {
 							/>
 						</div>
 						<div>
-							{(isWaiting || isJoining) && (
-								<Timer
-									timeout={60}
-									onTimeout={() => {
-										liveRoomStore.updateState(LiveRoomStates.TIMEOUT)
-										setTimeout(() => {
-											liveRoomStore.resetState()
-										}, 2000)
-									}}
-								/>
-							)}
-							{isBusy && <Timer />}
+							<span>00:00</span>
 						</div>
 						<div className="flex-1 m-4 flex justify-end"></div>
 					</div>
@@ -197,7 +288,7 @@ const LiveRoomNew: React.FC = () => {
 											zIndex: avctiv === index ? 999 : 0
 										}}
 										track={videoTrack}
-										videostyle={{
+										videoStyle={{
 											maxWidth: 'none',
 											height: '100%',
 											transform: 'scaleX(-1)',
@@ -238,7 +329,7 @@ const LiveRoomNew: React.FC = () => {
 												zIndex: avctiv === index ? 999 : 0
 											}}
 											track={videoTrack}
-											videostyle={{
+											videoStyle={{
 												maxWidth: 'none',
 												width: '100%',
 												transform: 'scaleX(-1)',
@@ -255,7 +346,7 @@ const LiveRoomNew: React.FC = () => {
 					)}
 					<div className={clsx('w-full', !isGroup ? 'absolute bottom-0' : '')}>
 						<div className="m-4 flex flex-col justify-evenly  items-center">
-							<span>{liveRoomStore.getliveRoomStatesText(liveRoomStore.state)}</span>
+							<span>{getliveRoomStatesText(liveRoomStore.state)}</span>
 						</div>
 						<div className="m-4 flex justify-evenly items-center">
 							<OperateButton

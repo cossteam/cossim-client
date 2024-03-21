@@ -22,7 +22,9 @@ export enum LiveRoomStates {
 	/** 被拒绝 */
 	REFUSEBYOTHER,
 	/** 被挂断 */
-	HANGUPBYOTHER
+	HANGUPBYOTHER,
+	/** 超时 */
+	TIMEOUT
 }
 
 export interface CallProps {
@@ -50,7 +52,10 @@ interface LiveRoomParams {
 interface LiveRoomFunc {
 	updateOpened: (opened: boolean) => void
 	updateState: (state: LiveRoomStates) => void
-	updateEvent: (event: SocketEvent, eventDate: any) => void
+	/** 重置状态 */
+	resetState: () => void
+	getliveRoomStatesText: (state: LiveRoomStates) => string
+	handlerEvent: (event: SocketEvent, eventDate: any) => void
 	/** 检查 */
 	check: (id?: string | null) => void
 	/** 呼叫 */
@@ -89,8 +94,40 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 			state
 		})
 	},
-	updateEvent: (event: SocketEvent, eventDate: any) => {
+	resetState: () => {
+		set({
+			...initialState()
+		})
+	},
+	getliveRoomStatesText: (state: LiveRoomStates) => {
+		switch (state) {
+			case LiveRoomStates.IDLE:
+				return '空闲'
+			case LiveRoomStates.WAITING:
+				return '等待中'
+			case LiveRoomStates.REFUSE:
+				return '拒绝'
+			case LiveRoomStates.JOINING:
+				return '加入中'
+			case LiveRoomStates.BUSY:
+				return '通话中'
+			case LiveRoomStates.HANGUP:
+				return '挂断'
+			case LiveRoomStates.ERROR:
+				return '连接失败'
+			case LiveRoomStates.REFUSEBYOTHER:
+				return '已被拒绝'
+			case LiveRoomStates.HANGUPBYOTHER:
+				return '已被挂断'
+			case LiveRoomStates.TIMEOUT:
+				return '已超时'
+			default:
+				return ''
+		}
+	},
+	handlerEvent: (event: SocketEvent, eventDate: any) => {
 		console.log('通话事件', event, eventDate)
+		const { resetState } = get()
 		set({
 			eventDate,
 			video: eventDate?.data?.option?.video_enabled // 是否视频通话
@@ -116,9 +153,7 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 					state: LiveRoomStates.REFUSEBYOTHER
 				})
 				setTimeout(() => {
-					set({
-						...initialState()
-					})
+					resetState()
 				}, 2000)
 				break
 			// 被挂断
@@ -128,9 +163,7 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 					state: LiveRoomStates.HANGUPBYOTHER
 				})
 				setTimeout(() => {
-					set({
-						...initialState()
-					})
+					resetState()
 				}, 2000)
 				break
 			default:
