@@ -1,6 +1,6 @@
 import { Link, NavRight, Navbar, Page, Subnavbar } from 'framework7-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import './message.scss'
+import './Message.scss'
 import { useMessageStore } from '@/stores/message'
 import { $t, TOOLTIP_TYPE, USER_ID, getLatestGroupAnnouncement } from '@/shared'
 import { useStateStore } from '@/stores/state'
