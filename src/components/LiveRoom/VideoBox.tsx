@@ -1,6 +1,16 @@
-import { useEffect, useRef } from 'react'
+import { CSSProperties, useEffect, useRef } from 'react'
 
-const VideoBox: React.FC<any> = (props: any) => {
+interface VideoBoxProps {
+	key: any
+	className: string
+	style: CSSProperties | undefined
+	track: any
+	videoStyle?: CSSProperties | undefined
+	children?: any
+	onClick: () => void
+}
+
+const VideoBox: React.FC<VideoBoxProps> = (props) => {
 	const videoBoxRef = useRef<HTMLDivElement>(null)
 	const videoEL = useRef<HTMLVideoElement>()
 
@@ -10,6 +20,12 @@ const VideoBox: React.FC<any> = (props: any) => {
 		el.style.maxWidth = 'none'
 		el.style.height = '100%'
 		el.style.transform = 'scaleX(-1)'
+		if (props.videoStyle) {
+			console.log('videoStyle', props.videoStyle)
+			// for (const styleItem of props.videoStyle) {
+			// 	console.log(styleItem)
+			// }
+		}
 		el.autoplay = true
 		el.loop = true
 		el.muted = true

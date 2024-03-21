@@ -69,6 +69,7 @@ const LiveRoomNew: React.FC = () => {
 			})
 		}
 	}
+	// const checkRoom = () => {}
 	const connectRoom = () => {
 		let count = 0
 		const connect = () => {
@@ -135,10 +136,14 @@ const LiveRoomNew: React.FC = () => {
 					})
 					break
 				case LiveRoomStates.JOINING:
-					console.log('连接中')
 					await connectRoom()
 					break
 				case LiveRoomStates.BUSY:
+					console.log(client.current)
+
+					// if (client.current?.state === ) {
+					//     await connectRoom()
+					// }
 					break
 				case LiveRoomStates.REFUSE:
 				case LiveRoomStates.HANGUP:
@@ -162,8 +167,11 @@ const LiveRoomNew: React.FC = () => {
 				client.current?.localParticipant.setCameraEnabled(videoEnable)
 				client.current?.localParticipant.setMicrophoneEnabled(audioEnable)
 			})
-			client.current?.on(RoomEvent.Disconnected, () => {
+			client.current?.on(RoomEvent.Disconnected, async () => {
 				console.log('连接断开')
+				if (liveRoomStore.state === LiveRoomStates.BUSY) {
+					await connectRoom()
+				}
 			})
 			client.current?.on(RoomEvent.TrackSubscribed, (remoteTrack, remotePublication, remoteParticipant) => {
 				console.log('订阅成功')
@@ -277,6 +285,11 @@ const LiveRoomNew: React.FC = () => {
 											zIndex: avctiv === index ? 999 : 0
 										}}
 										track={videoTrack}
+										videoStyle={{
+											maxWidth: 'none',
+											height: '100%',
+											transform: 'scaleX(-1)'
+										}}
 										onClick={() => {
 											setAvctiv(avctiv === index ? -1 : index)
 										}}
@@ -310,6 +323,11 @@ const LiveRoomNew: React.FC = () => {
 											zIndex: avctiv === index ? 999 : 0
 										}}
 										track={videoTrack}
+										videoStyle={{
+											maxWidth: 'none',
+											height: '100%',
+											transform: 'scaleX(-1)'
+										}}
 										onClick={() => setAvctiv(avctiv === index ? -1 : index)}
 									/>
 								)
@@ -355,7 +373,7 @@ const LiveRoomNew: React.FC = () => {
 									onClick={liveRoomStore.refuse}
 								/>
 							)}
-							{isGroup && isBusy && (
+							{/* {isGroup && isBusy && (
 								<OperateButton
 									f7Icon="phone_fill"
 									text="挂断"
@@ -364,7 +382,7 @@ const LiveRoomNew: React.FC = () => {
 									backgroundColor="#ff4949"
 									onClick={() => liveRoomStore.hangup()}
 								/>
-							)}
+							)} */}
 							{isWaiting && (
 								<OperateButton
 									f7Icon="phone_fill"
@@ -381,7 +399,7 @@ const LiveRoomNew: React.FC = () => {
 			{isBackend && (
 				<div
 					className="show-live z-[9999] bg-[rgba(0,0,0,0.8)] text-white py-3 px-2 rounded-l-lg fixed top-[20%] right-0"
-					onClick={() => {}}
+					onClick={() => liveRoomStore.updateOpened(!liveRoomStore.opened)}
 				>
 					<Icon f7="phone_fill" size={20} />
 				</div>
