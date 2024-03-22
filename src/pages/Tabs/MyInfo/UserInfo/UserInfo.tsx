@@ -58,11 +58,9 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 		
 	}
 
-
-	const handlerComplete = (croppedImage: any) => {
-		const file = new File([croppedImage], 'avatar.png',{type: 'image/png'});
-		console.log('url转file', file);
-		
+	const handlerComplete = (blob: any) => {
+		const file = new File([blob], 'avatar.png',{type: 'image/png'})
+		console.log('blob转file', file);
 		UserService.updateAvatarApi({ file }).then(async (res) => {
 				if (res.code == 200) {
 
