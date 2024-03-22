@@ -39,14 +39,13 @@ const LiveRoomNew: React.FC = () => {
 	const [audioEnable, setAudioEnable] = useState(true)
 	const [videoEnable, setVideoEnable] = useState(true)
 	// const [audioTrachs, setAudioTrachs] = useState<LocalTrack[]>([])
-	// const [videoTrachs, setVideoTrachs] = useState<LocalTrack[]>([])
-	const [videoTrachs] = useState<LocalTrack[]>([])
+	const [videoTrachs, setVideoTrachs] = useState<LocalTrack[]>([])
 	// 远程
 	const [remoteAudioTracks, setRemoteAudioTracks] = useState<RemoteTrack[]>([])
 	const [remoteVideoTracks, setRemoteVideoTracks] = useState<RemoteTrack[]>([])
 
 	// 初始化房间
-	const initRoom = () => {
+	const initRoom = async () => {
 		console.log('初始化房间', client.current)
 		// 创建房间
 		client.current = new Room({
@@ -57,6 +56,25 @@ const LiveRoomNew: React.FC = () => {
 				resolution: VideoPresets.h720.resolution
 			}
 		})
+		// 获取本地音视频流
+		const localTracks = await client.current.localParticipant.createTracks({
+			audio: true,
+			video: isVideo
+		})
+		const audioTracks = []
+		const videoTracks = []
+		for (const track of localTracks) {
+			switch (track.kind) {
+				case 'audio':
+					audioTracks.push(track)
+					break
+				case 'video':
+					videoTracks.push(track)
+					break
+			}
+		}
+		setVideoTrachs(videoTracks)
+		// setAudioTrachs(audioTracks)
 		// 监听连接事件
 		client.current.on(RoomEvent.Connected, () => {
 			console.log('连接成功', client.current)
@@ -70,7 +88,7 @@ const LiveRoomNew: React.FC = () => {
 			console.log({ remoteTrack, remotePublication, remoteParticipant })
 			console.log('订阅成功 END')
 			if (remoteTrack.kind === 'video') {
-				setRemoteVideoTracks([remoteTrack])
+				setRemoteVideoTracks([...remoteVideoTracks, remoteTrack])
 			} else if (remoteTrack.kind === 'audio') {
 				setRemoteAudioTracks([...remoteAudioTracks, remoteTrack])
 				remoteTrack.attach().play()
