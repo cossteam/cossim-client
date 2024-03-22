@@ -58,11 +58,9 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 		
 	}
 
-
-	const handlerComplete = (croppedImage: any) => {
-		const file = new File([croppedImage], 'avatar.png',{type: 'image/jpeg'});
-		console.log('url转file', file);
-		
+	const handlerComplete = (blob: any) => {
+		const file = new File([blob], 'avatar.png',{type: 'image/png'})
+		console.log('blob转file', file);
 		UserService.updateAvatarApi({ file }).then(async (res) => {
 				if (res.code == 200) {
 
@@ -110,7 +108,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 
 	return (
 		<Page className="bg-bgTertiary" noToolbar onPageBeforeIn={loadUserInfo}>
-			<Navbar className="bg-bgPrimary hidden-navbar-bg" backLink outline={false} title={$t('个人信息')} />
+			<Navbar className="bg-bgTertiary hidden-navbar-bg" backLink outline={false} title={$t('个人信息')} />
 			<List className="coss_list" strong>
 				<ListItem className="coss_item__bottom" title="头像" onClick={handleAvatarClick}>
 					<div slot="after">
@@ -173,6 +171,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 				<ListItem
 					title={$t('我的二维码')}
 					className="coss_item__bottom"
+					link
 					onClick={() => f7router.navigate('/my_qrcode/')}
 				>
 					<Qrcode slot="after" className="text-3xl" />

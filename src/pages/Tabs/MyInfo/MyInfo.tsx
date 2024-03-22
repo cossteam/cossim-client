@@ -58,6 +58,7 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 			</Navbar>
 			<List strong mediaList className="coss_list">
 				<ListItem
+					link
 					title={info?.email}
 					text={info?.signature}
 					className="coss_item__button"

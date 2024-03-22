@@ -1,3 +1,4 @@
+
 export const createImage = (url: string) =>
   new Promise((resolve, reject) => {
     const image = new Image()
@@ -89,11 +90,9 @@ export default async function getCroppedImg(
     pixelCrop.height
   )
 
-  // As Base64 string
-  // return croppedCanvas.toDataURL('image/jpeg');
-
   // As a blob
   return new Promise((resolve) => {
-    croppedCanvas.toBlob((file) => resolve(URL.createObjectURL(file!)), 'image/jpeg')
+    // 返回一个blob接收后根据自己需求转换需要的格式
+    croppedCanvas.toBlob((file) => resolve(file), 'image/jpeg')
   })
 }
