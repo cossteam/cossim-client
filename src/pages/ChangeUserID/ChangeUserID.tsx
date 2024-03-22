@@ -1,5 +1,5 @@
 import { f7, Button, Link, Navbar, NavRight, Page } from 'framework7-react'
-import {  useState } from 'react'
+import { useState } from 'react'
 import { $t } from '@/shared'
 import UserService from '@/api/user'
 import useUserStore from '@/stores/user'
@@ -9,22 +9,29 @@ const ChangeUserID: React.FC<RouterProps> = ({ f7router }) => {
 
 	const [isChangeID, setIsChangeID] = useState(false)
 	const [id, setId] = useState('')
+	const [verify, setVerify] = useState(true);
 
 	const userStore = useUserStore()
 
 	const handlerSubmit = () => {
-		UserService.updateUserInfoApi({
-			coss_id: id
-		}).then((res) => {
-			if (res.code == 200) {
-				userStore.update({ userInfo: {  ...userStore.userInfo, coss_id: id } })
-				f7router.back();
-			} else {
-				f7.dialog.alert($t(res.msg))
-			}
-		}).catch(() => {
-			f7.dialog.alert($t('修改失败'))
-		})
+		const regex = /^[a-zA-Z0-9_]{10,20}$/
+		if (regex.test(id)) {
+			setVerify(true)
+			UserService.updateUserInfoApi({
+				coss_id: id
+			}).then((res) => {
+
+				if (res.code == 200) {
+					userStore.update({ userInfo: { ...userStore.userInfo, coss_id: id } })
+					f7router.back();
+				} else {
+					f7.dialog.alert($t(res.msg))
+				}
+			}).catch(() => {
+				f7.dialog.alert($t('修改失败'))
+			})
+		} else setVerify(false)
+
 	}
 	return (
 		<Page noToolbar>
@@ -52,6 +59,7 @@ const ChangeUserID: React.FC<RouterProps> = ({ f7router }) => {
 					<div>
 						<CommInput defaultValue={userStore.userInfo?.coss_id} onChange={(value: any) => setId(value)} />
 					</div>
+					<span style={{ color: verify ? '#bbb' : 'red' }} className='px-5 mt-5'>只能包含大小写字母、数字和下划线，并且长度在10到20个字符之间</span>
 				</div>
 			}
 		</Page>
