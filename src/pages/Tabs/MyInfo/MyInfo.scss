@@ -3,7 +3,10 @@
 
     .coss_item__bottom {
         @apply ml-5;
-        border-bottom: #eee solid 1px;
+        &:not(:last-child) {
+            border-bottom: #eee solid 1px;
+        }
+        
         .item-content {
             padding-left: 0 !important;
         }
