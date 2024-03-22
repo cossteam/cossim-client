@@ -34,6 +34,7 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 			setInfo(data)
 		} catch (error) {
 			console.log('获取用户信息错误', error)
+			setInfo(userStore.userInfo)
 		}
 	}
 
