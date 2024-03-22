@@ -20,7 +20,7 @@ const ChangeUserID: React.FC<RouterProps> = ({ f7router }) => {
 				userStore.update({ userInfo: {  ...userStore.userInfo, coss_id: id } })
 				f7router.back();
 			} else {
-				f7.dialog.alert($t('修改失败'))
+				f7.dialog.alert($t(res.msg))
 			}
 		}).catch(() => {
 			f7.dialog.alert($t('修改失败'))

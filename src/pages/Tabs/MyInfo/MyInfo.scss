@@ -2,9 +2,11 @@
 	@apply m-0 bg-bgPrimary mb-4;
 
     .coss_item__bottom {
-        @apply mb-3;
-        @apply ml-2;
+        @apply ml-5;
         border-bottom: #eee solid 1px;
+        .item-content {
+            padding-left: 0 !important;
+        }
     }
 
 	.coss_item__icon {
