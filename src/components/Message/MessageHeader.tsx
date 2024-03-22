@@ -1,5 +1,6 @@
-import { Navbar } from 'framework7-react'
+import { Link, Navbar, NavRight } from 'framework7-react'
 import useMessageStore from '@/stores/new_message'
+import { $t, tooltipType } from '@/shared'
 
 const MessageHeader = () => {
 	const messageStore = useMessageStore()
@@ -12,7 +13,15 @@ const MessageHeader = () => {
 				backLink
 				outline={false}
 				className="coss_message_navbar"
-			></Navbar>
+			>
+				{messageStore.manualTipType === tooltipType.SELECT && (
+					<NavRight>
+						<Link onClick={() => messageStore.update({ manualTipType: tooltipType.NONE })}>
+							{$t('取消')}
+						</Link>
+					</NavRight>
+				)}
+			</Navbar>
 		</div>
 	)
 }

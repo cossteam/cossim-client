@@ -32,7 +32,7 @@ import LiveRoomNew from '@/components/LiveRoom'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
-import run from './run'
+import run, { handleSocket } from './run'
 import { isWeb } from './utils'
 import { Toaster } from 'react-hot-toast'
 
@@ -136,7 +136,11 @@ function App() {
 		if (hasCookie(TOKEN)) {
 			run()
 			SocketClient.connect()
+
+			// TODO: 迁移下面监听到新的处理文件里面
 			SocketClient.addListener('onWsMessage', handlerInit)
+
+			SocketClient.addListener('onWsMessage', handleSocket)
 		}
 
 		// 计算页面高度
@@ -144,6 +148,8 @@ function App() {
 
 		return () => {
 			SocketClient.removeListener('onWsMessage', handlerInit)
+			SocketClient.removeListener('onWsMessage', handleSocket)
+
 		}
 	}, [])
 

@@ -6,12 +6,29 @@ import MessageContent from './MessageContent'
 import MessageToolbar from './MessageToolbar'
 import useKeyboard from '@/hooks/useKeyboard'
 import './styles/MessageTip.scss'
-// import MessagePlaceholder from './MessageToolbar/MessagePlaceholder' 
-import Contact from '@/components/Contact/Contact'
+import MessageForward from './MessageContent/MessageForward'
+import useMessageStore from '@/stores/new_message'
+import { useMemo } from 'react'
+import { tooltipType } from '@/shared'
 
 const Message: React.FC<RouterProps> = () => {
 	const { height } = useWindowSize()
+	const messageStore = useMessageStore()
+
+	// 处理键盘的
+	// TODO： 需优化
 	useKeyboard()
+
+	// 转发组件
+	const messageForward = useMemo(() => {
+		return (
+			<MessageForward
+				opened={messageStore.manualTipType === tooltipType.FORWARD}
+				openedClose={() => messageStore.update({ manualTipType: tooltipType.NONE })}
+				selectComplate={(selectList) => messageStore.update({ selectedMessages: selectList })}
+			/>
+		)
+	}, [messageStore.manualTipType])
 
 	return (
 		<Page noToolbar className="coss_message transition-all relative">
@@ -19,16 +36,10 @@ const Message: React.FC<RouterProps> = () => {
 				<MessageHeader />
 				<MessageContent />
 				<MessageToolbar />
-				{/* <MessagePlaceholder /> */}
 			</div>
 
 			{/* 转发弹出 */}
-			<Contact
-				completed={() => null}
-				// opened={showSelectMember}
-				// setOpened={updateShowSelectMember}
-				// group
-			/>
+			{messageForward}
 		</Page>
 	)
 }

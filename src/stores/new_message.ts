@@ -1,8 +1,7 @@
 import { create } from 'zustand'
 import { MessageStore, MessageStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
-import useCacheStore from './cache'
-import { CACHE_MESSAGE, emojiOrMore, getRemoteMessage, msgSendType, tooltipType } from '@/shared'
+import { CACHE_MESSAGE, emojiOrMore, msgSendType, tooltipType } from '@/shared'
 
 const defaultOptions: MessageStoreOptions = {
 	messages: [],
@@ -26,7 +25,10 @@ const defaultOptions: MessageStoreOptions = {
 	tableName: '',
 	total: 0,
 	placeholderHeight: 0,
-	manualTipType: tooltipType.NONE
+	manualTipType: tooltipType.NONE,
+	atAllUser: 0,
+	atUsers: [],
+	selectedForwardUsers: []
 }
 
 const useMessageStore = create<MessageStore>((set, get) => ({
@@ -37,57 +39,59 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 
 		const allMessages = (await cacheStore.get(tableName)) ?? []
 
-		const cache = useCacheStore.getState()
-
+		// const cache = useCacheStore.getState()
 		// 添加到搜索消息表名中
-		if (!cache.cacheSearchMessage.includes(tableName)) {
-			useCacheStore.getState().updateCacheSearchMessage([...cache.cacheSearchMessage, tableName])
-		}
+		// if (!cache.cacheSearchMessage.includes(tableName)) {
+		// 	useCacheStore.getState().updateCacheSearchMessage([...cache.cacheSearchMessage, tableName])
+		// }
 
 		const messages = allMessages.slice(-15)
 
 		set({ allMessages, messages, isNeedPull: !allMessages.length, tableName, ...options })
 
 		// 获取远程消息
-		getRemoteMessage(options.isGroup, options.receiverId, 1, 30).then((data) => {
-			const total = data?.total ?? 0
-			const msgs = data?.user_messages ?? data?.group_messages ?? []
+		// getRemoteMessage(options.isGroup, options.receiverId, 1, 100).then((data) => {
+		// 	const total = data?.total ?? 0
+		// 	const msgs = data?.user_messages ?? data?.group_messages ?? []
 
-			const diffData = msgs
-				.reverse()
-				// @ts-ignore
-				.filter((msg) => !allMessages.some((m) => m?.msg_id === msg?.msg_id))
+		// 	const diffData = msgs
+		// 		.reverse()
+		// 		// @ts-ignore
+		// 		.filter((msg) => !allMessages.some((m) => m?.msg_id === msg?.msg_id))
 
-			if (diffData.length > 0) {
-				// const messages = diffData.concat(allMessages)
-				// set({ allMessages: messages, messages: messages.slice(-15) })
-				// cacheStore.set(tableName, diffData)
-			}
+		// 	if (diffData.length > 0) {
+		// 		// const messages = diffData.concat(allMessages)
+		// 		// set({ allMessages: messages, messages: messages.slice(-15) })
+		// 		cacheStore.set(tableName, diffData)
+		// 	}
 
-			set({ total })
-		})
+		// 	set({ total })
+		// })
 	},
 
 	update: (options) => {
 		set((state) => ({ ...state, ...options }))
 	},
 
-	updateMessage: (message, isPush = true) => {
-		// eslint-disable-next-line prefer-const
-		let { messages, tableName } = get()
+	updateMessage: async (message, isPush = true) => {
+		const { tableName, allMessages, messages } = get()
+		const newAllMessages = isPush
+			? [...allMessages, message]
+			: allMessages.map((msg: any) => (msg.msg_id === message.msg_id ? { ...msg, ...message } : msg))
 
-		messages = isPush
-			? [...messages, message]
-			: messages.map((msg) => (msg.msg_id === message.msg_id ? { ...msg, ...message } : msg))
-
-		set({ messages })
-		cacheStore.set(tableName, messages)
+		set({ allMessages: newAllMessages, messages: newAllMessages.slice(-(messages.length + 1)) })
+		cacheStore.set(tableName, newAllMessages)
 	},
 
-	// updateManualTipType: (type) => {
-	// 	const ManualCloseList = [tooltipType.EDIT, tooltipType.FORWARD, tooltipType.REPLY, tooltipType.SELECT]
-	// 	if (ManualCloseList.includes(type)) set({ manualTipType: type })
-	// }
+	deleteMessage: async (message) => {
+		const { tableName, allMessages, messages } = get()
+		const newAllMessages = allMessages.filter((msg) => msg.msg_id !== message.msg_id)
+
+		console.log('deleteMessage', message, newAllMessages)
+
+		set({ allMessages: newAllMessages, messages: newAllMessages.slice(-(messages.length + 1)) })
+		await cacheStore.set(tableName, newAllMessages)
+	}
 }))
 
 export default useMessageStore

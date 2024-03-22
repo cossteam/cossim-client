@@ -1,4 +1,4 @@
-import { $t, msgType, tooltipType } from '@/shared'
+import { $t, MESSAGE_MARK, MESSAGE_SEND, isOverRecallTime, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import {
 	ArrowUpRight,
@@ -14,67 +14,80 @@ import { Link } from 'framework7-react'
 import useMessageStore from '@/stores/new_message'
 import { useMemo } from 'react'
 import tooltipStatMachine from '../script/tootip'
+import useUserStore from '@/stores/user'
 
 interface MessageTooltipProps {
 	item: any
 }
 
-const tips = [
-	{
-		name: tooltipType.COPY,
-		title: $t('复制'),
-		icon: <SquareOnSquare className="text-lg" />
-	},
-	{
-		name: tooltipType.FORWARD,
-		title: $t('转发'),
-		icon: <ArrowUpRight className="text-lg" />
-	},
-	{
-		name: tooltipType.EDIT,
-		title: $t('编辑'),
-		icon: <SquarePencil className="text-lg" />
-	},
-	{
-		name: tooltipType.DELETE,
-		title: $t('删除'),
-		icon: <Trash className="text-lg" />
-	},
-	{
-		name: tooltipType.SELECT,
-		title: $t('多选'),
-		icon: <TextAlignleft className="text-lg" />
-	},
-	{
-		name: tooltipType.REPLY,
-		title: $t('回复'),
-		icon: <BubbleLeftBubbleRight className="text-lg" />
-	},
-	{
-		name: tooltipType.MARK,
-		title: $t('标注'),
-		icon: <Flag className="text-lg" />
-	},
-	{
-		name: tooltipType.RECALL,
-		title: $t('撤回'),
-		icon: <ArrowUturnLeft className="text-lg" />
-	}
-]
-
 const MessageTooltip: React.FC<MessageTooltipProps> = ({ item }) => {
 	const messageStore = useMessageStore()
+	const userStore = useUserStore()
+
+	const tips = [
+		{
+			name: tooltipType.COPY,
+			title: $t('复制'),
+			icon: <SquareOnSquare className="text-lg" />
+		},
+		{
+			name: tooltipType.FORWARD,
+			title: $t('转发'),
+			icon: <ArrowUpRight className="text-lg" />
+		},
+		{
+			name: tooltipType.EDIT,
+			title: $t('编辑'),
+			icon: <SquarePencil className="text-lg" />
+		},
+		{
+			name: tooltipType.DELETE,
+			title: $t('删除'),
+			icon: <Trash className="text-lg" />
+		},
+		{
+			name: tooltipType.SELECT,
+			title: $t('多选'),
+			icon: <TextAlignleft className="text-lg" />
+		},
+		{
+			name: tooltipType.REPLY,
+			title: $t('回复'),
+			icon: <BubbleLeftBubbleRight className="text-lg" />
+		},
+		{
+			name: tooltipType.MARK,
+			title: item?.is_label === MESSAGE_MARK.NOT_MARK ? $t('标注') : $t('取消标注'),
+			icon: <Flag className="text-lg" />
+		},
+		{
+			name: tooltipType.RECALL,
+			title: $t('撤回'),
+			icon: <ArrowUturnLeft className="text-lg" />
+		}
+	]
 
 	const tooltips = useMemo(() => {
+		// 是否错误消息
+		const isError = item?.msg_send_state && item?.msg_send_state !== MESSAGE_SEND.SEND_SUCCESS
+		// 是否是通话消息
+		const isCall = item?.type === msgType.CALL
+
 		// 当前消息是通话
-		if (item?.type === msgType.CALL) {
+		if (isCall || isError) {
 			return tips.filter((tip) => tip.name === tooltipType.DELETE)
 		}
 
+		// 是否是自己的消息
+		const isMe = (item?.sender_info?.user_id ?? item?.sender_id) === userStore.userId
+		if (!isMe) {
+			return tips.filter((tip) => ![tooltipType.EDIT, tooltipType.RECALL].includes(tip.name))
+		}
+
 		// 如果当前消息已经超过撤回时间
-		// if (isOverRecallTime(item?.created_at)) {
-		// 	return tips.filter((tip) => tip.name !== tooltipType.RECALL)
-		// }
+		if (isOverRecallTime(item?.created_at ?? item?.send_at ?? item?.send_time)) {
+			return tips.filter((tip) => tip.name !== tooltipType.RECALL)
+		}
 
 		return tips
 	}, [item])
@@ -94,14 +107,14 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item }) => {
 	}
 
 	return (
-		<div className="h-auto py-5 px-2 w-[250px] rounded relative z=100">
+		<div className="h-auto py-3 px-2 w-auto rounded relative z-[100] flex items-center justify-center">
 			<div className="flex flex-wrap">
 				{tooltips.map((item, index) => (
 					<Link
 						onClick={() => handlerClick(item)}
 						aria-expanded="true"
 						key={item.name}
-						className={clsx('w-1/5 py-3 text-[1rem]', index > 4 ? 'pb-0' : 'pt-0')}
+						className={clsx('flex min-w-[20%] py-3 px-1 text-[1rem]', index > 4 ? 'pb-0' : 'pt-0')}
 					>
 						<div className="flex flex-col items-center justify-center">
 							<div className="mb-[6px]">{item?.icon}</div>

@@ -26,9 +26,9 @@ export const CACHE_SHARE_KEYS = 'CacheShareKeys'
 /** 缓存搜索消息表 */                      
 export const CACHE_SEARCH_MESSAGE = 'CacheSearchMessage'
 /** 缓存未读消息数 */
-export const CACHE_UNREAD_COUNT = 'unreadCount'
+export const CACHE_UNREAD_COUNT = 'CacheUnreadCount'
 /** 缓存申请列表数 */
-export const CACHE_APPLY_COUNT = 'applyCount'
+export const CACHE_APPLY_COUNT = 'CacheApplyCount'
 /** 缓存键盘高度 */
 export const CACHE_KEYBOARD_HEIGHT = 'keyboardHeight'
 /** 缓存消息 */

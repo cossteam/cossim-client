@@ -12,10 +12,11 @@ interface MessageTimeProps {
  * 点击时间转换时间格式
  */
 const MessageTime: React.FC<MessageTimeProps> = ({ item, is_self }) => {
-	const [messageTime, setMessageTime] = useState<string>(formatTime(item?.created_at ?? item?.create_at))
+	const create_at = item?.created_at ?? item?.send_at ?? item?.send_time
+	const [messageTime, setMessageTime] = useState<string>(formatTime(create_at))
 	const handlerClickTime = () => {
-		const time: string = formatTime(item?.created_at ?? item?.create_at)
-		const timeFull: string = formatTimeFull(item?.created_at ?? item?.create_at)
+		const time: string = formatTime(create_at)
+		const timeFull: string = formatTimeFull(create_at)
 		if (messageTime.length < timeFull.length) {
 			setMessageTime(timeFull)
 		} else {
@@ -24,7 +25,12 @@ const MessageTime: React.FC<MessageTimeProps> = ({ item, is_self }) => {
 	}
 
 	return (
-		<div className={clsx('flex text-[0.75rem] items-center mt-1 select-none', is_self ? 'justify-end' : 'justify-start')}>
+		<div
+			className={clsx(
+				'flex text-[0.75rem] items-center mt-1 select-none',
+				is_self ? 'justify-end' : 'justify-start'
+			)}
+		>
 			<span onClick={handlerClickTime} style={{ color: '#94a3b8' }} className="text-[0.75rem] mr-1">
 				{messageTime}
 			</span>

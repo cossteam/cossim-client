@@ -80,9 +80,25 @@ export type CacheStore = CacheStoreOptions & {
 	/**
 	 * @description 更新搜索表
 	 */
-	updateCacheSearchMessage: (cacheSearchMessage: string[]) => void
-}
+	updateCacheSearchMessage: (tableName: string) => void
 
+	/**
+	 * @description 更新消息列表
+	 */
+	updateCacheMessage: (cacheDialogs: any[]) => void
+
+	/**
+	 * @description 更新落后消息
+	 */
+	updateBehindMessage: (behindMessage: any[]) => void
+
+	/**
+	 * @description 添加缓存消息
+	 *
+	 * @param {any} message 消息
+	 */
+	addCacheMessage: (message: any) => Promise<void>
+}
 
 /**
  * @description 聊天状态
@@ -132,6 +148,12 @@ export interface MessageStoreOptions {
 	placeholderHeight: number
 	/** 当前需要手动关闭的提示 */
 	manualTipType: tooltipType
+	/** 是否 at 全体成员 */
+	atAllUser: 0 | 1
+	/** at 成员 id 列表 */
+	atUsers: string[]
+	/** 选中要转发的人员 */
+	selectedForwardUsers: any[]
 }
 
 interface initOptions {
@@ -160,5 +182,11 @@ export type MessageStore = MessageStoreOptions & {
 	 * @param {any} message
 	 * @param {boolean} isPush 是否是推送消息
 	 */
-	updateMessage: (message: any, isPush?: boolean) => void
+	updateMessage: (message: any, isPush?: boolean) => Promise<void>
+	/**
+	 * 删除消息
+	 *
+	 * @param {any} message
+	 */
+	deleteMessage: (message: any) => void
 }

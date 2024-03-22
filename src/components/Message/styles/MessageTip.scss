@@ -1,7 +1,7 @@
 .message-tip {
-    @apply w-full flex justify-center;
+    @apply w-full flex justify-center mb-2;
 
     .message-tip__text {
-        @apply bg-[#dedadaef] text-gray-500 px-2 py-[2px] rounded text-[0.7rem];
+        @apply bg-[#dedadaef] text-gray-500 px-2 py-[2px] rounded text-[0.7rem] flex max-w-[70%] whitespace-nowrap text-ellipsis overflow-hidden;
     }
 }

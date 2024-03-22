@@ -26,3 +26,16 @@ export const isWeb = async () => {
 	const platform = await Device.getInfo()
 	return platform.platform === 'web'
 }
+
+/**
+ * 将字符串转为 JSON 对象
+ *
+ * @param {string} content 字符串
+ */
+export const toJson = (content: string) => {
+	try {
+		return JSON.parse(content)
+	} catch (error) {
+		return {}
+	}
+}

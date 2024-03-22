@@ -27,7 +27,7 @@ export enum MESSAGE_TYPE {
 	/** 视频 */
 	VIDEO = 9,
 	/** 通话消息  */
-	CALL = 10
+	CALL = 10,
 }
 
 /** 消息类型 */
@@ -55,7 +55,9 @@ export enum msgType {
 	/** 视频通话消息  */
 	CALL = 10,
 	/** 撤回消息 */
-	RECALL = 11
+	RECALL = 11,
+	/** 取消标注 */
+	CANCEL_LABEL = 12
 }
 
 /** 消息阅读状态 */

@@ -14,15 +14,16 @@ export function generateMessage(message?: any) {
 	// TODO：查找好友，更具消息中的接收者 id 去查找对应的好友信息
 
 	const msg: any = {
-		msg_id: 0,
+		msg_id: Date.now(),
 		sender_id: userStore.userId,
 		receiver_id: messageStore.receiverId,
 		content: '',
-		type: msgType.TEXT,
-		replay_id: 0,
+		msg_type: msgType.TEXT,
+		reply_id: 0,
 		is_read: MESSAGE_READ.READ,
 		read_at: Date.now(),
 		created_at: Date.now(),
+		send_at: Date.now(),
 		dialog_id: messageStore.dialogId,
 		is_label: MESSAGE_MARK.NOT_MARK,
 		is_burn_after_reading: MessageBurnAfterRead.NO,

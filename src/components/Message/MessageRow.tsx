@@ -18,7 +18,9 @@ import 'tippy.js/themes/light.css'
 import 'tippy.js/animations/shift-away-subtle.css'
 import MessageNotice from './MessageRow/MessageNotice'
 import MessageError from './MessageRow/MessageError'
-
+import MessageLabel from './MessageRow/MessageLabel'
+import useUserStore from '@/stores/user'
+import MessageRecall from './MessageRow/MessageRecall'
 
 interface MessageRowProps {
 	item: { [key: string]: any }
@@ -34,21 +36,17 @@ const className = (is_self: boolean) => {
 const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const longPressRef = useRef<HTMLDivElement>(null)
 
-	const type = useMemo(() => item?.type, [item?.type])
+	const type = useMemo(() => item?.msg_type, [item?.msg_type])
 	const is_self = useMemo(
 		() => isMe(item?.sender_info?.user_id ?? item?.sender_id),
 		[item?.sender_info?.user_id, item?.sender_id]
 	)
 
 	const messageStore = useMessageStore()
+	const userStore = useUserStore()
 
 	// @ts-ignore
 	useClickOutside(longPressRef, () => setTimeout(() => longPressRef.current?._tippy?.hide(), 100))
-
-	// const onChange = (tipType: tooltipType) => {
-	// 	messageStore.update({ tipType, selectedMessage: item })
-	// 	tooltipStatMachine(tipType,item)
-	// }
 
 	const render = () => {
 		switch (type) {
@@ -69,6 +67,10 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	if (type === msgType.NOTICE) return <MessageNotice item={item} />
 	// 错误消息
 	if (type === msgType.ERROR) return <MessageError item={item} />
+	// 标注消息
+	if ([msgType.LABEL, msgType.CANCEL_LABEL].includes(type)) return <MessageLabel item={item} />
+	// 撤回消息
+	if (type === msgType.RECALL) return <MessageRecall item={item} />
 
 	return (
 		<>
@@ -76,7 +78,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 				<div className={clsx('max-w-[80%] flex-1 py-2 flex', is_self ? 'justify-end' : 'justify-start')}>
 					<div className={clsx('flex items-start', is_self ? 'justify-end pr-2' : 'justify-start pl-2')}>
 						<img
-							src={item?.sender_info?.avatar}
+							src={is_self ? userStore?.userInfo?.avatar : item?.sender_info?.avatar}
 							alt="avatar"
 							className={clsx(
 								'w-10 h-10 rounded-full object-cover',
@@ -94,7 +96,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 							)}
 							<Tippy
 								content={<MessageTooltip item={item} />}
-								arrow={true}
+								arrow={false}
 								interactive={true}
 								appendTo={document.body}
 								theme="light"
@@ -112,7 +114,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 				</div>
 
 				{/* 多选时触发 */}
-				{messageStore.tipType === tooltipType.SELECT && (
+				{messageStore.manualTipType === tooltipType.SELECT && (
 					<div className={clsx('flex justify-start order-first pt-5 pl-3', is_self ? 'flex-1' : '')}>
 						<input type="checkbox" />
 					</div>

@@ -21,9 +21,7 @@ const MessageBlockquote = () => {
 								? $t('编辑')
 								: messageStore.selectedMessage?.sender_info?.name ?? $t('回复')}
 						</p>
-						<p className="w-full overflow-hidden text-ellipsis whitespace-nowrap">
-							{content}
-						</p>
+						<p className="w-full overflow-hidden text-ellipsis whitespace-nowrap">{content}</p>
 						{/* <ReadEditor
 							content={messageStore.selectedMessage?.content}
 							className="px-0 whitespace-nowrap text-ellipsis overflow-hidden w-full line-clamp-1"
@@ -31,7 +29,7 @@ const MessageBlockquote = () => {
 					</div>
 					<Link
 						className="pr-2 text-lg"
-						onClick={() => messageStore.update({ manualTipType: tooltipType.NONE })}
+						onClick={() => messageStore.update({ manualTipType: tooltipType.NONE, content: '' })}
 					>
 						<XmarkCircle className="text-textTertiary" />
 					</Link>

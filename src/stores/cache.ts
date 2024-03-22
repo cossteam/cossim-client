@@ -7,6 +7,7 @@ import {
 	CACHE_DIALOGS,
 	CACHE_GROUP,
 	CACHE_KEYBOARD_HEIGHT,
+	CACHE_MESSAGE,
 	CACHE_SEARCH_MESSAGE,
 	CACHE_SHARE_KEYS,
 	CACHE_UNREAD_COUNT
@@ -24,7 +25,7 @@ const defaultOptions: CacheStoreOptions = {
 	keyboardHeight: 300
 }
 
-const useCacheStore = create<CacheStore>((set) => ({
+const useCacheStore = create<CacheStore>((set, get) => ({
 	...defaultOptions,
 
 	init: async () => {
@@ -67,9 +68,41 @@ const useCacheStore = create<CacheStore>((set) => ({
 		set({ keyboardHeight })
 	},
 
-	updateCacheSearchMessage: async (cacheSearchMessage) => {
-		await cacheStore.set(CACHE_SEARCH_MESSAGE, cacheSearchMessage)
+	updateCacheSearchMessage: async (tableName) => {
+		const { cacheSearchMessage } = get()
+		if (cacheSearchMessage.includes(tableName)) return
 		set({ cacheSearchMessage })
+		await cacheStore.set(CACHE_SEARCH_MESSAGE, cacheSearchMessage)
+	},
+
+	updateCacheMessage: async (cacheDialogs) => {
+		const { updateCacheSearchMessage } = get()
+
+		cacheDialogs.map(async (item) => {
+			const tableName = CACHE_MESSAGE + `_${item.dialog_id}`
+			const messages = (await cacheStore.get(tableName)) ?? []
+
+			// 如果没有消息就添加一个
+			if (!messages.length) {
+				cacheStore.set(tableName, [item?.last_message])
+			}
+
+			updateCacheSearchMessage(tableName)
+		})
+	},
+
+	updateBehindMessage: async (behindMessages) => {
+		behindMessages.map(async (item) => {
+			const tableName = CACHE_MESSAGE + `_${item.dialog_id}`
+			const messages = (await cacheStore.get(tableName)) ?? []
+			cacheStore.set(tableName, [...messages, ...item.msg_list])
+		})
+	},
+
+	addCacheMessage: async (message) => {
+		const tableName = CACHE_MESSAGE + `_${message.dialog_id}`
+		const messages = (await cacheStore.get(tableName)) ?? []
+		await cacheStore.set(tableName, [...messages, message])
 	}
 }))
 
