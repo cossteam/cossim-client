@@ -1,22 +1,24 @@
+import { LocalTrack, RemoteTrack } from 'livekit-client'
 import { CSSProperties, useEffect, useRef } from 'react'
+import { VideoStyle } from './types'
 
 interface VideoBoxProps {
 	key: any
 	className: string
 	style: CSSProperties | undefined
-	track: any
-	videostyle?: (CSSProperties & { autoplay?: boolean; loop?: boolean; muted?: boolean }) | undefined
+	track: LocalTrack | RemoteTrack
+	videostyle?: VideoStyle
 	children?: any
 	onClick: () => void
 }
 
 const VideoBox: React.FC<VideoBoxProps> = (props) => {
 	const videoBoxRef = useRef<HTMLDivElement>(null)
-	const videoEL = useRef<HTMLVideoElement>()
+	const videoEL = useRef<HTMLMediaElement>()
 
 	useEffect(() => {
 		if (!props.track || !videoBoxRef.current) return
-		const el: HTMLVideoElement = props.track.attach()
+		const el: HTMLMediaElement = props.track.attach()
 		if (props.videostyle) {
 			for (const key in props.videostyle) {
 				if (Object.prototype.hasOwnProperty.call(props.videostyle, key)) {
@@ -35,7 +37,7 @@ const VideoBox: React.FC<VideoBoxProps> = (props) => {
 
 	return (
 		<div ref={videoBoxRef} {...props}>
-			{props.children && <div className="w-full h-full absolute">{props.children}</div>}
+			{props.children && props.children}
 		</div>
 	)
 }

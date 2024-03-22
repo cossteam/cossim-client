@@ -2,7 +2,7 @@ import { List, ListButton, ListItem, Navbar, Page, f7 } from 'framework7-react'
 import { useRef, useState } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
 
-import { $t } from '@/shared'
+import { $t, toastMessage } from '@/shared'
 import UserService from '@/api/user'
 import './PersonalDetail.scss'
 import Remark from '@/components/Remark/Remark'
@@ -46,11 +46,11 @@ const PersonalDetail: React.FC<RouterProps> = ({ f7route }) => {
 			})
 
 			if (code !== 200) {
-				f7.dialog.alert($t('添加失败'))
+				toastMessage($t('添加失败'))
 				return
 			}
 
-			f7.dialog.alert($t('添加成功,等待对方同意'))
+			toastMessage($t('添加成功,等待对方同意'))
 		} catch (error) {
 			console.error(error)
 		} finally {

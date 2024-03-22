@@ -252,6 +252,7 @@ const ApplyList = () => {
 								{!isOperate(item) ? (
 									<Button className="text-sm text-gray-500" onClick={() => {}}>
 										{getStatusText(item.status)}
+										{`(${item.status})`}
 									</Button>
 								) : (
 									<>

@@ -1,19 +1,48 @@
 import { Icon, Link, Popup, f7 } from 'framework7-react'
 import OperateButton from './OperateButton'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './index.scss'
 import clsx from 'clsx'
-import { LocalTrack, RemoteTrack, Room, RoomEvent, VideoPresets } from 'livekit-client'
+import {
+	AudioCaptureOptions,
+	LocalTrack,
+	RemoteTrack,
+	Room,
+	RoomEvent,
+	TrackPublishOptions,
+	VideoCaptureOptions,
+	VideoPresets
+} from 'livekit-client'
 import { useAsyncEffect } from '@reactuses/core'
 import VideoBox from './VideoBox'
 import { LiveRoomStates, useLiveRoomStore } from '@/stores/liveRoom'
 import Timer from './Timer'
+import useUserStore from '@/stores/user'
+import { VideoStyle } from './types'
+
+interface TrackList {
+	track: LocalTrack | RemoteTrack
+	width?: number
+	height?: number
+	isLocal: boolean
+	type: 'video' | 'audio'
+	id: string
+	name: string
+}
 
 const LiveRoomNew: React.FC = () => {
+	// 获取用户信息
+	const userStore = useUserStore()
+	const userName = useMemo(() => {
+		return userStore.userInfo.nickname ?? '-'
+	}, [])
+	const userId = useMemo(() => {
+		return userStore?.userInfo?.user_id
+	}, [])
+
 	// 房间状态
 	const liveRoomStore = useLiveRoomStore()
 	const isBackend = useMemo(() => {
-		// return liveRoomStore.opened && [LiveRoomStates].includes(liveRoomStore.state)
 		return !liveRoomStore.opened && liveRoomStore.state !== LiveRoomStates.IDLE
 	}, [liveRoomStore.opened, liveRoomStore.state])
 	const isGroup = useMemo(() => {
@@ -35,14 +64,11 @@ const LiveRoomNew: React.FC = () => {
 
 	// 创建房间
 	const client = useRef<Room>()
-	// 本地
 	const [audioEnable, setAudioEnable] = useState(true)
 	const [videoEnable, setVideoEnable] = useState(true)
-	// const [audioTrachs, setAudioTrachs] = useState<LocalTrack[]>([])
-	const [videoTrachs, setVideoTrachs] = useState<LocalTrack[]>([])
-	// 远程
-	const [remoteAudioTracks, setRemoteAudioTracks] = useState<RemoteTrack[]>([])
-	const [remoteVideoTracks, setRemoteVideoTracks] = useState<RemoteTrack[]>([])
+	// 频道
+	const [, setAudioTracks] = useState<TrackList[]>([])
+	const [videoTracks, setVideoTracks] = useState<TrackList[]>([])
 
 	// 初始化房间
 	const initRoom = async () => {
@@ -61,20 +87,37 @@ const LiveRoomNew: React.FC = () => {
 			audio: true,
 			video: isVideo
 		})
-		const audioTracks = []
-		const videoTracks = []
+		const audioTracks: TrackList[] = []
+		const videoTracks: TrackList[] = []
 		for (const track of localTracks) {
 			switch (track.kind) {
 				case 'audio':
-					audioTracks.push(track)
+					audioTracks.push({
+						track,
+						isLocal: true,
+						type: track.kind,
+						id: userId,
+						name: userName
+					})
 					break
 				case 'video':
-					videoTracks.push(track)
+					{
+						const { width, height } = track.dimensions!
+						videoTracks.push({
+							track,
+							width,
+							height,
+							isLocal: true,
+							type: track.kind,
+							id: userId,
+							name: userName
+						})
+					}
 					break
 			}
 		}
-		setVideoTrachs(videoTracks)
-		// setAudioTrachs(audioTracks)
+		setVideoTracks(videoTracks)
+		setAudioTracks(audioTracks)
 		// 监听连接事件
 		client.current.on(RoomEvent.Connected, () => {
 			console.log('连接成功', client.current)
@@ -87,12 +130,34 @@ const LiveRoomNew: React.FC = () => {
 			)
 			console.log({ remoteTrack, remotePublication, remoteParticipant })
 			console.log('订阅成功 END')
+			const track: TrackList = {
+				track: remoteTrack,
+				isLocal: false,
+				type: remoteTrack.kind as any,
+				id: remoteParticipant.identity,
+				name: remoteParticipant.name ?? '-'
+			}
 			if (remoteTrack.kind === 'video') {
-				setRemoteVideoTracks([...remoteVideoTracks, remoteTrack])
+				// @ts-ignore
+				console.log('是否存在 lastDimensions', remoteTrack.lastDimensions!)
+				// @ts-ignore
+				const { width, height } = remoteTrack.lastDimensions
+				setVideoTracks([
+					...videoTracks,
+					{
+						...track,
+						width,
+						height
+					}
+				])
 			} else if (remoteTrack.kind === 'audio') {
-				setRemoteAudioTracks([...remoteAudioTracks, remoteTrack])
+				setAudioTracks([...audioTracks, track])
 				remoteTrack.attach().play()
 			}
+			console.log({
+				audioTracks,
+				videoTracks
+			})
 		})
 		// 监听断开事件
 		client.current.on(RoomEvent.Disconnected, () => {
@@ -100,6 +165,30 @@ const LiveRoomNew: React.FC = () => {
 			// liveRoomStore.hangup()
 		})
 	}
+	// 配置音频
+	const configAudio = (audioEnable: boolean, options?: AudioCaptureOptions, publishOptions?: TrackPublishOptions) => {
+		client.current?.localParticipant.setMicrophoneEnabled(
+			audioEnable,
+			options ?? {
+				echoCancellation: true,
+				noiseSuppression: true,
+				autoGainControl: true
+			},
+			publishOptions ?? {}
+		)
+	}
+	// 配置视频
+	const configVideo = (videoEnable: boolean, options?: VideoCaptureOptions, publishOptions?: TrackPublishOptions) => {
+		client.current?.localParticipant.setCameraEnabled(
+			videoEnable,
+			options ?? {
+				resolution: VideoPresets.h720.resolution,
+				facingMode: 'user' // "user" | "environment" | "left" | "right" | undefined
+			},
+			publishOptions ?? {}
+		)
+	}
+	// 加入房间
 	const joinRoom = async () => {
 		// 连接房间
 		if (liveRoomStore.url === null || liveRoomStore.token === null) {
@@ -107,8 +196,10 @@ const LiveRoomNew: React.FC = () => {
 			return
 		}
 		return await client.current?.connect(liveRoomStore.url, liveRoomStore.token).then(() => {
-			console.log('加入房间成功')
+			console.log('加入房间成功', { audioEnable, videoEnable })
 			liveRoomStore.updateState(LiveRoomStates.BUSY)
+			configAudio(audioEnable)
+			configVideo(videoEnable)
 		})
 	}
 
@@ -119,6 +210,8 @@ const LiveRoomNew: React.FC = () => {
 			console.log('当前房间', client.current)
 			switch (liveRoomStore.state) {
 				case LiveRoomStates.IDLE:
+					liveRoomStore.resetState()
+					console.log('清除状态')
 					break
 				case LiveRoomStates.WAITING:
 					await initRoom()
@@ -150,6 +243,17 @@ const LiveRoomNew: React.FC = () => {
 		async () => {},
 		[liveRoomStore.state]
 	)
+
+	// 音视频开关
+	useEffect(() => {
+		configAudio(audioEnable)
+		configVideo(videoEnable)
+		// if (!videoEnable) {
+		//     for (const videoTrach of videoTrachs) {
+		//         videoTrach.id
+		// 	}
+		// }
+	}, [audioEnable, videoEnable])
 
 	// 界面布局
 	const [avctiv, setAvctiv] = useState(-1)
@@ -185,24 +289,43 @@ const LiveRoomNew: React.FC = () => {
 							/>
 						</div>
 						<div>
-							{(isWaiting || isJoining) && (
-								<Timer
-									timeout={60}
-									onTimeout={() => {
-										liveRoomStore.updateState(LiveRoomStates.TIMEOUT)
-										setTimeout(() => {
-											liveRoomStore.resetState()
-										}, 2000)
-									}}
-								/>
-							)}
-							{isBusy && <Timer />}
+							<div>
+								{(isWaiting || isJoining) && (
+									<Timer
+										timeout={60}
+										onTimeout={() => {
+											liveRoomStore.updateState(LiveRoomStates.TIMEOUT)
+											setTimeout(() => {
+												liveRoomStore.resetState()
+											}, 2000)
+										}}
+									/>
+								)}
+								{isBusy && <Timer />}
+							</div>
 						</div>
 						<div className="flex-1 m-4 flex justify-end"></div>
 					</div>
 					{!isGroup ? (
 						<div id="videos" className="w-full h-full">
-							{[...videoTrachs, ...remoteVideoTracks].map((videoTrack, index) => {
+							{videoTracks.map((videoTrack, index) => {
+								const videoStyle: VideoStyle = {
+									maxWidth: 'none',
+									height: '100%',
+									transform: 'scaleX(-1)',
+									autoplay: true,
+									loop: true,
+									muted: true
+								}
+								// if (videoTrack.width && videoTrack.height) {
+								// 	if (videoTrack.width < videoTrack.height) {
+								// 		videoStyle['width'] = '100%'
+								// 	} else {
+								// 		videoStyle['height'] = '100%'
+								// 	}
+								// } else {
+								// 	videoStyle['width'] = '100%'
+								// }
 								return (
 									<VideoBox
 										key={index}
@@ -215,21 +338,12 @@ const LiveRoomNew: React.FC = () => {
 											right: avctiv === index ? `5%` : 'auto',
 											zIndex: avctiv === index ? 999 : 0
 										}}
-										track={videoTrack}
-										videostyle={{
-											maxWidth: 'none',
-											height: '100%',
-											transform: 'scaleX(-1)',
-											autoplay: true,
-											loop: true,
-											muted: true
-										}}
+										track={videoTrack.track}
+										videostyle={videoStyle}
 										onClick={() => {
 											setAvctiv(avctiv === index ? -1 : index)
 										}}
-									>
-										{/* {index === 0 && <div className="absolute top-0 right-0">第一</div>} */}
-									</VideoBox>
+									/>
 								)
 							})}
 						</div>
@@ -243,7 +357,23 @@ const LiveRoomNew: React.FC = () => {
 							onScroll={onVideosScroll}
 						>
 							<div id="videos" className="w-full flex flex-wrap" style={{}}>
-								{[...videoTrachs, ...remoteVideoTracks].map((videoTrack, index) => {
+								{videoTracks.map((videoTrack: TrackList, index) => {
+									const videoStyle: VideoStyle = {
+										maxWidth: 'none',
+										transform: 'scaleX(-1)',
+										autoplay: true,
+										loop: true,
+										muted: true
+									}
+									if (videoTrack.width && videoTrack.height) {
+										if (videoTrack.width < videoTrack.height) {
+											videoStyle['width'] = '100%'
+										} else {
+											videoStyle['height'] = '100%'
+										}
+									} else {
+										videoStyle['width'] = '100%'
+									}
 									return (
 										<VideoBox
 											key={index}
@@ -256,17 +386,14 @@ const LiveRoomNew: React.FC = () => {
 												left: avctiv === index ? 0 : 'auto',
 												zIndex: avctiv === index ? 999 : 0
 											}}
-											track={videoTrack}
-											videostyle={{
-												maxWidth: 'none',
-												width: '100%',
-												transform: 'scaleX(-1)',
-												autoplay: true,
-												loop: true,
-												muted: true
-											}}
+											track={videoTrack.track}
+											videostyle={videoStyle}
 											onClick={() => setAvctiv(avctiv === index ? -1 : index)}
-										/>
+										>
+											<div className="w-full px-4 py-2 z-[999] text-center bg-[#00000078] absolute bottom-0 right-0">
+												{videoTrack.name}
+											</div>
+										</VideoBox>
 									)
 								})}
 							</div>

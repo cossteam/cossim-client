@@ -14,6 +14,7 @@ import UserService from '@/api/user'
 import { $t } from '@/shared'
 import './MyInfo.scss'
 import useUserStore from '@/stores/user'
+import Avatar from '@/components/Avatar/Avatar'
 
 const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 	const [info, setInfo] = useState<any>({})
@@ -63,11 +64,7 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 					onClick={() => f7router.navigate(`/user_info/${info?.user_id}/`)}
 				>
 					<div className="w-12 h-12" slot="media">
-						<img
-							src={info?.avatar}
-							alt=""
-							className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
-						/>
+						<Avatar className="w-12 h-12" src={info?.avatar} />
 					</div>
 					<Qrcode
 						slot="after"

@@ -34,12 +34,13 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 	const selectChange = useCallback((type: TOOLTIP_TYPE, msg_id: number) => onSelect(type, msg_id), [onSelect])
 
 	// 创建工具提示
-	const createTooltip = useCallback(() => {
+	const createTooltip = () => {
 		// 如果当前状态为多选状态，就不给创建工具提示
 		if (tooltipStore.type === TOOLTIP_TYPE.SELECT) return
 		// 如果没有发生完毕
 		if (msg?.msg_send_state === MESSAGE_SEND.SENDING) return
 		const div = document.createElement('div')
+		div.style.position = 'fixed'
 		const root = createRoot(div)
 		root.render(
 			createElement(ToolTip, {
@@ -50,7 +51,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 			})
 		)
 		tooltipRef.current!.appendChild(div)
-	}, [])
+	}
 
 	const Row = () => {
 		switch (msg?.type) {
@@ -142,7 +143,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({ msg, index, onSelect, className
 				>
 					<div className="mb-1 text-[0.85rem]"></div>
 
-					<LongPressButton callback={() => createTooltip()}>
+					<LongPressButton callback={createTooltip}>
 						<div
 							className={clsx(
 								'rounded-lg relative break-all mb-1 select-none overflow-hidden',
