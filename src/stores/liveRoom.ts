@@ -127,7 +127,23 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 	},
 	handlerEvent: (event: SocketEvent, eventDate: any) => {
 		console.log('通话事件', event, eventDate)
-		const { resetState } = get()
+		const { state, resetState, hangup } = get()
+		if (
+			state !== LiveRoomStates.IDLE &&
+			[SocketEvent.UserCallReqEvent, SocketEvent.GroupCallReqEvent].includes(event)
+		) {
+			f7.dialog.confirm(
+				'你有新的来电，是否结束当前通话并接通?',
+				async () => {
+					// 确定
+					await hangup()
+				},
+				() => {
+					// 取消
+					return
+				}
+			)
+		}
 		set({
 			eventDate,
 			video: eventDate?.data?.option?.video_enabled // 是否视频通话
@@ -190,7 +206,7 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 		callProps.isGroup && (createRoomParams['group_id'] = Number(callProps.recipient))
 		callProps.isGroup && (createRoomParams['member'] = callProps.members?.map((item) => item.user_id) || [])
 		createRoomParams['option'] = {
-			// audio_enabled: true,
+			audio_enabled: true,
 			// codec: 'vp8',
 			// frame_rate: 0,
 			// resolution: '1280x720',

@@ -30,7 +30,9 @@ const MessageItem: React.FC<MessageBoxProps> = ({ msg, index, onSelect, classNam
 	const selectChange = useCallback((type: TOOLTIP_TYPE, msg_id: number) => onSelect(type, msg_id), [onSelect])
 
 	// 创建工具提示
-	const createTooltip = useCallback(() => {
+	const createTooltip = () => {
+		console.log('1111')
+
 		// 如果当前状态为多选状态，就不给创建工具提示
 		if (tooltipStore.type === TOOLTIP_TYPE.SELECT) return
 		// 如果没有发生完毕
@@ -46,7 +48,7 @@ const MessageItem: React.FC<MessageBoxProps> = ({ msg, index, onSelect, classNam
 			})
 		)
 		tooltipRef.current!.appendChild(div)
-	}, [])
+	}
 
 	// 标注信息
 	if (msg?.type === MESSAGE_TYPE.LABEL) {
