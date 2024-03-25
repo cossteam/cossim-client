@@ -14,7 +14,6 @@ const MessageSendButton = () => {
 		} else {
 			sendMessage(messageStore.content, msgType.TEXT)
 		}
-
 		// 无论成功与否，清空输入框内容，交给输入组件处理
 		messageStore.update({ isClearContent: true, manualTipType: tooltipType.NONE, tipType: tooltipType.NONE })
 	}

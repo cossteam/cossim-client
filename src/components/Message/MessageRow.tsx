@@ -1,9 +1,7 @@
-import { isMe, msgType, tooltipType } from '@/shared'
+import { isMe, msgType } from '@/shared'
 import clsx from 'clsx'
-import { useMemo, useRef } from 'react'
-
+import { useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/new_message'
-
 import { ReadEditor } from '@/Editor'
 import MessageImage from './MessageRow/MessageImage'
 import MessageAudio from './MessageRow/MessageAudio'
@@ -21,6 +19,7 @@ import MessageError from './MessageRow/MessageError'
 import MessageLabel from './MessageRow/MessageLabel'
 import useUserStore from '@/stores/user'
 import MessageRecall from './MessageRow/MessageRecall'
+import useLongPress from '@/hooks/useLongPress'
 
 interface MessageRowProps {
 	item: { [key: string]: any }
@@ -45,8 +44,21 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const messageStore = useMessageStore()
 	const userStore = useUserStore()
 
-	// @ts-ignore
-	useClickOutside(longPressRef, () => setTimeout(() => longPressRef.current?._tippy?.hide(), 100))
+	const [showTippy, setShowTippy] = useState<boolean>(false)
+
+	useLongPress(longPressRef, {
+		callback: () => {
+			setShowTippy(true)
+
+			// 全选内容文字内容
+			const selection = window?.getSelection()
+			selection?.selectAllChildren(longPressRef.current!)
+		},
+		delay: 300
+	})
+
+	// 点击其他地方移除提示框
+	useClickOutside(longPressRef, () => setTimeout(() => setShowTippy(false), 100))
 
 	const render = () => {
 		switch (type) {
@@ -63,6 +75,8 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		}
 	}
 
+	// 无内容
+	if (type === msgType.NONE) return null
 	// 通知
 	if (type === msgType.NOTICE) return <MessageNotice item={item} />
 	// 错误消息
@@ -101,9 +115,10 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								appendTo={document.body}
 								theme="light"
 								animation="shift-away-subtle"
-								touch={['hold', 300]}
+								// touch={['hold', 300]}
+								// trigger="manual"
 								ref={longPressRef}
-								trigger="manual"
+								visible={showTippy}
 							>
 								<div className="relative">{render()}</div>
 							</Tippy>
@@ -112,13 +127,6 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 						</div>
 					</div>
 				</div>
-
-				{/* 多选时触发 */}
-				{messageStore.manualTipType === tooltipType.SELECT && (
-					<div className={clsx('flex justify-start order-first pt-5 pl-3', is_self ? 'flex-1' : '')}>
-						<input type="checkbox" />
-					</div>
-				)}
 			</div>
 		</>
 	)

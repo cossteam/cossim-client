@@ -27,13 +27,15 @@ export enum MESSAGE_TYPE {
 	/** 视频 */
 	VIDEO = 9,
 	/** 通话消息  */
-	CALL = 10,
+	CALL = 10
 }
 
 /** 消息类型 */
 export enum msgType {
 	/** 错误消息 */
-	ERROR = 0,
+	ERROR = -1,
+	/** 无内容 */
+	NONE = 0,
 	/** 文本 */
 	TEXT = 1,
 	/** 音频 */

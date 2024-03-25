@@ -77,6 +77,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 
 	updateCacheMessage: async (cacheDialogs) => {
 		const { updateCacheSearchMessage } = get()
+		if (!cacheDialogs.length) return
 
 		cacheDialogs?.map(async (item) => {
 			const tableName = CACHE_MESSAGE + `_${item.dialog_id}`

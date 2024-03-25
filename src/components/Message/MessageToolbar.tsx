@@ -4,11 +4,13 @@ import MessageSendButton from './MessageToolbar/MessageSendButton'
 import MessageSendAudio from './MessageToolbar/MessageSendAudio'
 import MessageToolbarContent from './MessageToolbar/MessageToolbarContent'
 import './styles/MessageToolbar.scss'
-import { emojiOrMore, msgSendType } from '@/shared'
+import { emojiOrMore, msgSendType, tooltipType } from '@/shared'
 import { KeyboardIcon } from '@/components/Icon/Icon'
 import { FaceSmiling, PlusCircle } from 'framework7-icons/react'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useClickOutside } from '@reactuses/core'
+import clsx from 'clsx'
+import MessageSelect from './MessageToolbar/MessageSelect'
 // import useCacheStore from '@/stores/cache'
 
 const MessageToolbar = () => {
@@ -27,6 +29,8 @@ const MessageToolbar = () => {
 	// 	return 0
 	// }, [messageStore.placeholderHeight])
 
+	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
+
 	return (
 		<>
 			<div
@@ -34,7 +38,7 @@ const MessageToolbar = () => {
 				ref={toolbarRef}
 				// style={{ transform: `translateY(${height}px)` }}
 			>
-				<div className="w-full flex items-end gap-1 px-[6px] py-2">
+				<div className={clsx('w-full flex items-end gap-1 px-[6px] py-2', isSelect && 'hidden')}>
 					{/* 文本输入框 */}
 					<MessageInput />
 
@@ -63,6 +67,9 @@ const MessageToolbar = () => {
 						{messageStore.sendType === msgSendType.AUDIO ? <MessageSendAudio /> : <MessageSendButton />}
 					</div>
 				</div>
+
+				{/* 多选时显示 */}
+				{isSelect && <MessageSelect />}
 
 				{/* 表情或者更多内容切换 */}
 				<MessageToolbarContent />

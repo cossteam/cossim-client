@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import useMessageStore from '@/stores/new_message'
 import Quill from 'quill'
 import MessageBlockquote from './MessageBlockquote'
+import { isWeb } from '@/utils'
 
 const MessageInput = () => {
 	const toolEditorRef = useRef<ToolEditorMethods | null>(null)
@@ -24,11 +25,15 @@ const MessageInput = () => {
 
 		const quill = toolEditorRef.current.quill
 
-		const handlerFocus = () => {
-			messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
+		const handlerFocus = async () => {
 			// 如果是插入表情触发的聚焦，不做处理
 			if (isEmojiFocus.current) return
-			messageStore.update({ toolbarType: emojiOrMore.NONE })
+			// TODO: 后续根据需求修改，如果是web就不需要弹起
+			const web = await isWeb()
+			if (!web) {
+				messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
+			}
+			// messageStore.update({ toolbarType: emojiOrMore.NONE })
 		}
 
 		const handlerBlur = () => {

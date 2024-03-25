@@ -68,6 +68,8 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 
 		// 	set({ total })
 		// })
+
+		console.log('init message store', options)
 	},
 
 	update: (options) => {

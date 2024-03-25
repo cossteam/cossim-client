@@ -16,7 +16,15 @@ const MessageHeader = () => {
 			>
 				{messageStore.manualTipType === tooltipType.SELECT && (
 					<NavRight>
-						<Link onClick={() => messageStore.update({ manualTipType: tooltipType.NONE })}>
+						<Link
+							onClick={() =>
+								messageStore.update({
+									manualTipType: tooltipType.NONE,
+									selectedMessages: [],
+									selectedMessage: null
+								})
+							}
+						>
 							{$t('取消')}
 						</Link>
 					</NavRight>
