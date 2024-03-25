@@ -23,7 +23,7 @@ export const formatTime = (time: number | string): string => {
 	const beforeYestTime = currentTime.subtract(1, 'day').startOf('day')
 	const difference = currentTime.diff(targetTime, 'minute') // 相差几分钟
 	if (difference < 1) {
-		return $t('刚刚')
+		return dayjs(time).format('HH:mm')
 	} else if (targetTime > startTime) {
 		return dayjs(time).format('HH:mm')
 	} else if (targetTime < startTime) {
@@ -48,7 +48,7 @@ export const formatDialogListTime = (time: string): string => {
 	const beforeYestTime = currentTime.subtract(1, 'day').startOf('day')
 	const difference = currentTime.diff(targetTime, 'minute') // 相差几分钟
 	if (difference < 1) {
-		return $t('刚刚')
+		return dayjs(time).format('HH:mm')
 	} else if (targetTime > startTime) {
 		return dayjs(time).format('HH:mm')
 	} else if (targetTime < startTime) {
