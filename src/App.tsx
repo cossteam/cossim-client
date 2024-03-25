@@ -9,7 +9,7 @@ import {
 	TOKEN,
 	SocketClient,
 	handlerRequestSocket,
-	handlerMessageSocket,
+	// handlerMessageSocket,
 	SocketEvent,
 	handlerLabelSocket,
 	handlerRequestResultSocket,
@@ -20,7 +20,7 @@ import {
 } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 import { useMessageStore, MessageStore } from './stores/message'
-import { useStateStore } from '@/stores/state'
+// import { useStateStore } from '@/stores/state'
 import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
@@ -32,7 +32,7 @@ import LiveRoomNew from '@/components/LiveRoom'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
-import run, { handleSocket } from './run'
+import run, { handlerSocketMessage } from './run'
 import { isWeb } from './utils'
 import { Toaster } from 'react-hot-toast'
 
@@ -40,7 +40,7 @@ let store: MessageStore | null = null
 
 function App() {
 	const msgStore = useMessageStore()
-	const stateStore = useStateStore()
+	// const stateStore = useStateStore()
 
 	const toastRef = useRef(null)
 
@@ -102,7 +102,8 @@ function App() {
 					} catch {
 						console.log('发送本地通知失败')
 					}
-					handlerMessageSocket(data, store!, stateStore)
+					// handlerMessageSocket(data, store!, stateStore)
+					handlerSocketMessage(data)
 					break
 				case SocketEvent.ApplyListEvent:
 					handlerRequestSocket(data)
@@ -140,7 +141,7 @@ function App() {
 			// TODO: 迁移下面监听到新的处理文件里面
 			SocketClient.addListener('onWsMessage', handlerInit)
 
-			SocketClient.addListener('onWsMessage', handleSocket)
+			// SocketClient.addListener('onWsMessage', handleSocket)
 		}
 
 		// 计算页面高度
@@ -148,8 +149,7 @@ function App() {
 
 		return () => {
 			SocketClient.removeListener('onWsMessage', handlerInit)
-			SocketClient.removeListener('onWsMessage', handleSocket)
-
+			// SocketClient.removeListener('onWsMessage', handleSocket)
 		}
 	}, [])
 
