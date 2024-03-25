@@ -8,16 +8,18 @@ import useKeyboard from '@/hooks/useKeyboard'
 import './styles/MessageTip.scss'
 import MessageForward from './MessageContent/MessageForward'
 import useMessageStore from '@/stores/new_message'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { tooltipType } from '@/shared'
+import { forwardMessage } from './script/message'
 
 const Message: React.FC<RouterProps> = () => {
 	const { height } = useWindowSize()
 	const messageStore = useMessageStore()
 
-	// 处理键盘的
-	// TODO： 需优化
+	// TODO：需优化处理键盘
 	useKeyboard()
+
+	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
 
 	// 转发组件
 	const messageForward = useMemo(() => {
@@ -25,10 +27,21 @@ const Message: React.FC<RouterProps> = () => {
 			<MessageForward
 				opened={messageStore.manualTipType === tooltipType.FORWARD}
 				openedClose={() => messageStore.update({ manualTipType: tooltipType.NONE })}
-				selectComplate={(selectList) => messageStore.update({ selectedMessages: selectList })}
+				selectComplate={(selectList) =>
+					messageStore.update({
+						selectedForwardUsers: selectList,
+						selectedMessages: [isSelect ? messageStore.selectedMessages : messageStore.selectedMessage]
+					})
+				}
 			/>
 		)
 	}, [messageStore.manualTipType])
+
+	// 转发消息
+	useEffect(() => {
+		if (!messageStore.selectedForwardUsers.length) return
+		forwardMessage()
+	}, [messageStore.selectedForwardUsers])
 
 	return (
 		<Page noToolbar className="coss_message transition-all relative">
