@@ -9,10 +9,8 @@ const MessageSendButton = () => {
 
 	const handlerSendMessage = () => {
 		if (messageStore.manualTipType === tooltipType.EDIT) {
-			console.log('editMessage', messageStore.manualTipType)
-
 			// 编辑消息
-			editMessage(messageStore.selectedMessage, messageStore.content)
+			editMessage(messageStore.content)
 		} else {
 			sendMessage(messageStore.content, msgType.TEXT)
 		}

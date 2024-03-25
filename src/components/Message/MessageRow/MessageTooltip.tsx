@@ -107,14 +107,14 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item }) => {
 	}
 
 	return (
-		<div className="h-auto py-3 px-2 w-auto rounded relative z-[100] flex items-center justify-center">
-			<div className="flex flex-wrap">
+		<div className="h-auto py-3 w-auto rounded relative z-[100] flex items-center justify-center">
+			<div className="flex flex-wrap max-w-[250px]">
 				{tooltips.map((item, index) => (
 					<Link
 						onClick={() => handlerClick(item)}
 						aria-expanded="true"
 						key={item.name}
-						className={clsx('flex min-w-[20%] py-3 px-1 text-[1rem]', index > 4 ? 'pb-0' : 'pt-0')}
+						className={clsx('flex min-w-[50px] py-3 px-1 text-[1rem]', index > 4 ? 'pb-0' : 'pt-0')}
 					>
 						<div className="flex flex-col items-center justify-center">
 							<div className="mb-[6px]">{item?.icon}</div>

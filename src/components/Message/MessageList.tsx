@@ -1,6 +1,6 @@
 import useMessageStore from '@/stores/new_message'
 import MessageRow from './MessageRow'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { emojiOrMore } from '@/shared'
 
 const MessageList = () => {
@@ -20,7 +20,9 @@ const MessageList = () => {
 		})
 	}, [messageStore.toolbarType])
 
-	return messageStore.messages.map((item, index) => <MessageRow key={index} item={item} />)
+	const row = useCallback((item: any, index: number) => <MessageRow key={index} item={item} />, [])
+
+	return messageStore.messages.map((item, index) => row(item, index))
 }
 
 export default MessageList

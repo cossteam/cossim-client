@@ -5,7 +5,7 @@
  */
 
 import MsgService from '@/api/msg'
-import { MESSAGE_SEND, msgType, toastMessage } from '@/shared'
+import { MESSAGE_SEND, msgType, toastMessage, tooltipType } from '@/shared'
 import useCacheStore from '@/stores/cache'
 import useMessageStore from '@/stores/new_message'
 // import useUserStore from '@/stores/user'
@@ -19,13 +19,16 @@ import { generateMessage } from '@/utils/data'
  */
 export const sendMessage = async (content: string, type: msgType) => {
 	const messageStore = useMessageStore.getState()
-	// const cacheStore = useCacheStore.getState()
+
+	// 是否是回复消息
+	const isReply = messageStore.manualTipType === tooltipType.REPLY
 
 	// 生成消息对象
 	const message = generateMessage({
 		content,
 		msg_send_state: MESSAGE_SEND.SENDING,
-		msg_type: type
+		msg_type: type,
+		reply_id: isReply ? messageStore.selectedMessage?.msg_id : 0
 	})
 
 	// 是否当前会话
@@ -39,7 +42,7 @@ export const sendMessage = async (content: string, type: msgType) => {
 		type: message.msg_type,
 		content: message.content,
 		dialog_id: message.dialog_id,
-		replay_id: message.reply_id,
+		reply_id: message.reply_id,
 		is_burn_after_reading: message.is_burn_after_reading
 	}
 
@@ -77,14 +80,12 @@ export const sendMessage = async (content: string, type: msgType) => {
 
 /**
  * 修改消息
- *
- * @param {number}  msg_id	消息 id
  * @param {string}	content 消息内容
  *
  */
-export const editMessage = async (msg_id: number, content: string) => {
+export const editMessage = async (content: string) => {
 	const messageStore = useMessageStore.getState()
-	const message = messageStore.messages.find((item) => item?.msg_id === msg_id)
+	const message = messageStore.selectedMessage
 	if (!message) return
 	try {
 		const params = {
@@ -97,6 +98,8 @@ export const editMessage = async (msg_id: number, content: string) => {
 			: await MsgService.editUserMessageApi(params)
 
 		if (code !== 200) throw new Error(msg)
+
+		messageStore.updateMessage({ ...message, content }, false)
 	} catch (error: any) {
 		toastMessage(error?.message ?? '编辑失败')
 	}

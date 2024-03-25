@@ -58,7 +58,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		set({ cacheDialogs })
 	},
 
-	updateUnreadCount: async (unreadCount) => {
+	updateCacheUnreadCount: async (unreadCount) => {
 		await cacheStore.set(CACHE_UNREAD_COUNT, unreadCount)
 		set({ unreadCount })
 	},
@@ -78,7 +78,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 	updateCacheMessage: async (cacheDialogs) => {
 		const { updateCacheSearchMessage } = get()
 
-		cacheDialogs.map(async (item) => {
+		cacheDialogs?.map(async (item) => {
 			const tableName = CACHE_MESSAGE + `_${item.dialog_id}`
 			const messages = (await cacheStore.get(tableName)) ?? []
 
@@ -92,7 +92,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 	},
 
 	updateBehindMessage: async (behindMessages) => {
-		behindMessages.map(async (item) => {
+		behindMessages?.map(async (item) => {
 			const tableName = CACHE_MESSAGE + `_${item.dialog_id}`
 			const messages = (await cacheStore.get(tableName)) ?? []
 			cacheStore.set(tableName, [...messages, ...item.msg_list])

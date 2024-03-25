@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { MessageStore, MessageStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
-import { CACHE_MESSAGE, emojiOrMore, msgSendType, tooltipType } from '@/shared'
+import { CACHE_MESSAGE, emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
+import useCacheStore from './cache'
 
 const defaultOptions: MessageStoreOptions = {
 	messages: [],
@@ -39,11 +40,11 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 
 		const allMessages = (await cacheStore.get(tableName)) ?? []
 
-		// const cache = useCacheStore.getState()
 		// 添加到搜索消息表名中
-		// if (!cache.cacheSearchMessage.includes(tableName)) {
-		// 	useCacheStore.getState().updateCacheSearchMessage([...cache.cacheSearchMessage, tableName])
-		// }
+		const cache = useCacheStore.getState()
+		if (!cache.cacheSearchMessage.includes(tableName)) {
+			useCacheStore.getState().updateCacheSearchMessage(tableName)
+		}
 
 		const messages = allMessages.slice(-15)
 
@@ -80,17 +81,14 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 			: allMessages.map((msg: any) => (msg.msg_id === message.msg_id ? { ...msg, ...message } : msg))
 
 		set({ allMessages: newAllMessages, messages: newAllMessages.slice(-(messages.length + 1)) })
-		cacheStore.set(tableName, newAllMessages)
+		await updateCacheMessage(tableName, newAllMessages)
 	},
 
 	deleteMessage: async (message) => {
 		const { tableName, allMessages, messages } = get()
 		const newAllMessages = allMessages.filter((msg) => msg.msg_id !== message.msg_id)
-
-		console.log('deleteMessage', message, newAllMessages)
-
 		set({ allMessages: newAllMessages, messages: newAllMessages.slice(-(messages.length + 1)) })
-		await cacheStore.set(tableName, newAllMessages)
+		await updateCacheMessage(tableName, newAllMessages)
 	}
 }))
 

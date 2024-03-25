@@ -8,6 +8,8 @@ import { PrivateChats } from '@/types/db/user-db'
 import { $t, MESSAGE_TYPE } from '.'
 import MsgService from '@/api/msg'
 import CommonStore from '@/db/common'
+import useCacheStore from '@/stores/cache'
+import cacheStore from '@/utils/cache'
 
 interface CommonOptions {
 	tableName: string
@@ -242,7 +244,7 @@ export const hasImageHtml = (html: string) => {
  */
 export const scroll = (element: HTMLElement, smoothScroll: boolean = false, scrollSpeed: number = 500) => {
 	// element?.scrollTo({ top: element.scrollHeight, behavior: isSmooth ? 'smooth' : 'instant' })
-	if(!element) return
+	if (!element) return
 	if (smoothScroll) {
 		const distance = element.scrollHeight - element.clientHeight
 		const duration = scrollSpeed
@@ -287,8 +289,14 @@ export const getLatestGroupAnnouncement = (data: any) => {
 }
 
 /**
+ * ++++++++++++++++++++++++++++++++++
+ * 分割
+ * ===================================
+ */
+
+/**
  * 排序会话列表
- * 
+ *
  */
 export const customSort = (a: any, b: any) => {
 	if (a.top_at !== 0 && b.top_at === 0) {
@@ -308,4 +316,29 @@ export const customSort = (a: any, b: any) => {
 			)
 		}
 	}
+}
+
+/**
+ * 更新会话窗内容
+ * @param {any} message
+ */
+export const updateDialog = async (message: any) => {
+	const cacheStore = useCacheStore.getState()
+	const cacheDialogs = cacheStore.cacheDialogs.map((dialog) => {
+		if (dialog.dialog_id === message.dialog_id) {
+			return { ...dialog, last_message: { ...dialog.last_message, ...message } }
+		}
+		return dialog
+	})
+	cacheStore.updateCacheDialogs(cacheDialogs)
+}
+
+/**
+ * 更新缓存消息和会话
+ * @param {string} tableName	表名
+ * @param {any[]} messages		消息列表
+ */
+export const updateCacheMessage = async (tableName: string, messages: any[]) => {
+	await cacheStore.set(tableName, messages)
+	await updateDialog(messages.at(-1))
 }

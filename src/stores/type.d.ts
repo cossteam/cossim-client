@@ -68,15 +68,14 @@ export type CacheStore = CacheStoreOptions & {
 	 */
 	updateCacheDialogs: (cacheDialogs: any[]) => void
 	/**
-	 * @description 更新未读消息数
-	 */
-	updateUnreadCount: (unreadCount: number) => void
-
-	/**
 	 * @description 更新键盘高度
 	 */
 	updateKeyboardHeight: (keyboardHeight: number) => void
-
+	/**
+	 * @description 更新未读消息数
+	 * @param {number} UnreadCount 未读消息数
+	 */
+	updateCacheUnreadCount: (UnreadCount: number) => void
 	/**
 	 * @description 更新搜索表
 	 */

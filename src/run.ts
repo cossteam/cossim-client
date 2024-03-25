@@ -6,7 +6,7 @@
 import useCacheStore from '@/stores/cache'
 import MsgService from '@/api/msg'
 import useUserStore from './stores/user'
-import { CACHE_MESSAGE, MESSAGE_MARK, MESSAGE_SEND, SocketEvent, msgType } from './shared'
+import { CACHE_MESSAGE, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, SocketEvent, msgType } from './shared'
 import useMessageStore from './stores/new_message'
 import { generateMessage } from './utils/data'
 import cacheStore from './utils/cache'
@@ -30,7 +30,7 @@ export async function getRemoteSession() {
 
 		// 更新缓存
 		cacheStore.updateCacheDialogs(dialogs)
-		cacheStore.updateUnreadCount(unreadCount)
+		cacheStore.updateCacheUnreadCount(unreadCount)
 		// 如果是第一次打开就更新缓存消息，如果没有改对话消息缓存，就自动添加一个
 		cacheStore.updateCacheMessage(dialogs)
 	} catch (error) {
@@ -119,14 +119,15 @@ export async function handlerSocketMessage(data: any) {
 	// 获取消息类型
 	const type = message?.msg_type
 
-	// 是否需要继续操作
+	// 是否需要继续操作，如果是标注、撤回时需要继续操作,如果都不是且是自己当前设备发的就不处理
 	const isContinue = !isLableMessage(type) && !isRecallMessage(type) && userStore.deviceId === data.driverId
 	if (isContinue) return
 
 	const msg = generateMessage({
 		...message,
 		is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK,
-		msg_send_state: MESSAGE_SEND.SEND_SUCCESS
+		msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
+		is_read: !message?.is_read ? MESSAGE_READ.READ : MESSAGE_READ.NOT_READ
 	})
 
 	// 如果是当前会话，需要实时更新到页面
@@ -153,7 +154,6 @@ export async function handlerSocketMessage(data: any) {
 			// 需要拿到最新的消息列表
 			const messageStore = useMessageStore.getState()
 			const message = messageStore.allMessages.find((v) => v?.msg_id === msg?.reply_id)
-			// console.log('更新撤回消息', message, msg)
 			message && messageStore.deleteMessage(message)
 		}
 	}
@@ -164,6 +164,11 @@ export async function handlerSocketMessage(data: any) {
 		isLableMessage(type) && updateLabelCacheMessage(msg)
 		// 如果是撤回消息，需要修改本地消息缓存
 		isRecallMessage(type) && updateRecallCacheMessage(msg)
+	}
+
+	// 更新消息的总未读数
+	if (msg.is_read === MESSAGE_READ.NOT_READ) {
+		cacheStore.updateCacheUnreadCount(cacheStore.unreadCount + 1)
 	}
 }
 
