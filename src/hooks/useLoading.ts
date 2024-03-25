@@ -2,7 +2,7 @@ import { $t } from "@/shared"
 import { f7 } from "framework7-react"
 import { useState } from "react"
 
-function useRequesLoading() {
+function useLoading() {
     const [loading, setLoading] = useState(false);
     // 异步加载钩子
     async function watchAsyncFn<T>(fn: (...args: any[]) => Promise<T>, content: string = '加载中...') {
@@ -20,4 +20,4 @@ function useRequesLoading() {
     }
 }
 
-export default useRequesLoading
+export default useLoading

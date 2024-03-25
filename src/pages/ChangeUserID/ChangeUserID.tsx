@@ -4,6 +4,7 @@ import { $t } from '@/shared'
 import UserService from '@/api/user'
 import useUserStore from '@/stores/user'
 import CommInput from '@/components/CommInput/CommInput'
+import useLoading from '@/hooks/useLoading'
 
 const ChangeUserID: React.FC<RouterProps> = ({ f7router }) => {
 
@@ -12,24 +13,26 @@ const ChangeUserID: React.FC<RouterProps> = ({ f7router }) => {
 	const [verify, setVerify] = useState(true);
 
 	const userStore = useUserStore()
-
+	const {watchAsyncFn} = useLoading()
 	const handlerSubmit = () => {
 		const regex = /^[a-zA-Z0-9_]{10,20}$/
 		if (regex.test(id)) {
 			setVerify(true)
-			UserService.updateUserInfoApi({
-				coss_id: id
-			}).then((res) => {
-
-				if (res.code == 200) {
-					userStore.update({ userInfo: { ...userStore.userInfo, coss_id: id } })
-					f7router.back();
-				} else {
-					f7.dialog.alert($t(res.msg))
-				}
-			}).catch(() => {
-				f7.dialog.alert($t('修改失败'))
+			watchAsyncFn(() => {
+				return UserService.updateUserInfoApi({
+					coss_id: id
+				}).then((res) => {
+					if (res.code == 200) {
+						userStore.update({ userInfo: { ...userStore.userInfo, coss_id: id } })
+						f7router.back();
+					} else {
+						f7.dialog.alert($t(res.msg))
+					}
+				}).catch(() => {
+					f7.dialog.alert($t('修改失败'))
+				})
 			})
+
 		} else setVerify(false)
 
 	}
