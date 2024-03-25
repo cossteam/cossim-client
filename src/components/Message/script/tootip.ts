@@ -78,6 +78,9 @@ async function recall() {
 	try {
 		const message = messageStore.selectedMessage
 		const params = { msg_id: message.msg_id }
+
+		// 记录撤回消息的 id
+
 		const { code, msg } = messageStore.isGroup
 			? await MsgService.revokeGroupMessageApi(params)
 			: await MsgService.revokeUserMessageApi(params)

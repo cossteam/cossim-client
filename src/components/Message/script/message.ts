@@ -11,9 +11,10 @@ import useMessageStore from '@/stores/new_message'
 import { generateMessage } from '@/utils/data'
 
 interface Options {
-	dialog_id: number
-	dialog_receiver_id: string | number
-	isGroup: boolean
+	dialog_id?: number
+	dialog_receiver_id?: string | number
+	isGroup?: boolean
+	content?: string
 }
 
 /**
@@ -40,7 +41,7 @@ export const sendMessage = async (content: string, type: msgType, options?: Opti
 	const dialogId = options?.dialog_id ?? message.dialog_id
 	const isCurrentDialog = dialogId === message.dialog_id
 
-	// 只有处于当前会话需要当前会话
+	// 只有处于当前会话需要当前会话, isUpdate 为 true 时不需要更新，因为为上传文件的预显示
 	isCurrentDialog && (await messageStore.updateMessage(message, dialogId, true))
 
 	const params: any = {
@@ -50,8 +51,6 @@ export const sendMessage = async (content: string, type: msgType, options?: Opti
 		reply_id: message.reply_id,
 		is_burn_after_reading: message.is_burn_after_reading
 	}
-
-	console.log('接收者id', options)
 
 	// 对群聊或私聊消息进行区分
 	if (options?.isGroup || messageStore.isGroup) {
@@ -73,6 +72,8 @@ export const sendMessage = async (content: string, type: msgType, options?: Opti
 		}
 		message.msg_send_state = MESSAGE_SEND.SEND_SUCCESS
 		message.msg_id = data.msg_id
+
+		console.log('message', message)
 	} catch (error: any) {
 		message.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		const errorMessage = generateMessage({ content: error?.message, msg_type: msgType.ERROR })
@@ -80,7 +81,7 @@ export const sendMessage = async (content: string, type: msgType, options?: Opti
 		await messageStore.updateMessage(errorMessage, dialogId, true)
 		// : await cacheStore.addCacheMessage(errorMessage)
 	} finally {
-		await messageStore.updateMessage(message, dialogId, isCurrentDialog ? false : true)
+		await messageStore.updateMessage(message, dialogId, false)
 		//  : await cacheStore.addCacheMessage(message)
 	}
 
@@ -111,6 +112,7 @@ export const editMessage = async (content: string) => {
 		messageStore.updateMessage({ ...message, content }, message?.dialog_id, false)
 	} catch (error: any) {
 		toastMessage(error?.message ?? '编辑失败')
+		messageStore.updateMessage(message, message?.dialog_id, false)
 	}
 }
 

@@ -15,6 +15,7 @@ import clsx from 'clsx'
 import { useMemo } from 'react'
 import useCacheStore from '@/stores/cache'
 import { sendMessage } from '../script/message'
+// import { generateMessage } from '@/utils/data'
 
 const MessageToolbarContent = () => {
 	const messageStore = useMessageStore()
@@ -48,8 +49,14 @@ const MessageToolbarContent = () => {
 					file_id: ''
 				}
 
-				// 发送消息到会话
-				// fileMsg = await sendMessage(JSON.stringify(data), msg_type)
+				// const message = generateMessage({
+				// 	content: JSON.stringify(data),
+				// 	msg_send_state: MESSAGE_SEND.SENDING,
+				// 	msg_type
+				// })
+
+				// 上传前更新到页面
+				// messageStore.updateMessage(message, message.dialog_id, true)
 
 				// 上传文件
 				fileMsg = await uploadFile(file)
@@ -57,6 +64,9 @@ const MessageToolbarContent = () => {
 				data.url = fileMsg.url
 				data.file_id = fileMsg.file_id
 				await sendMessage(JSON.stringify(data), msg_type)
+
+				// 上传成功后删除本地缓存
+				// messageStore.deleteMessage(message)
 			} catch (error: any) {
 				if (!fileMsg) return
 				toastMessage(error?.message ?? '发送失败')
