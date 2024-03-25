@@ -83,6 +83,8 @@ export const sendMessage = async (content: string, type: msgType, options?: Opti
 		await messageStore.updateMessage(message, dialogId, isCurrentDialog ? false : true)
 		//  : await cacheStore.addCacheMessage(message)
 	}
+
+	return message
 }
 
 /**
