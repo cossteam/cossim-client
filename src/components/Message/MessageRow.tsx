@@ -78,7 +78,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const render = () => {
 		switch (type) {
 			case msgType.IMAGE:
-				return <MessageImage />
+				return <MessageImage item={item} />
 			case msgType.AUDIO:
 				return <MessageAudio className={className(is_self)} item={item} />
 			case msgType.VIDEO:
