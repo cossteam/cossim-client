@@ -178,10 +178,11 @@ export type MessageStore = MessageStoreOptions & {
 	update: (options: Partial<MessageStoreOptions>) => void
 	/**
 	 * 更新消息
-	 * @param {any} message
+	 * @param {any} message	消息内容
+	 * @param {number} 会话id
 	 * @param {boolean} isPush 是否是推送消息
 	 */
-	updateMessage: (message: any, isPush?: boolean) => Promise<void>
+	updateMessage: (message: any, dialogId: number, isPush?: boolean) => Promise<void>
 	/**
 	 * 删除消息
 	 *

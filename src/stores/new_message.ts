@@ -76,13 +76,18 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		set((state) => ({ ...state, ...options }))
 	},
 
-	updateMessage: async (message, isPush = true) => {
-		const { tableName, allMessages, messages } = get()
+	updateMessage: async (message, dialogId, isPush = true) => {
+		const { allMessages, messages, dialogId: currentDialog } = get()
+		const tableName = CACHE_MESSAGE + `_${dialogId}`
+
 		const newAllMessages = isPush
 			? [...allMessages, message]
 			: allMessages.map((msg: any) => (msg.msg_id === message.msg_id ? { ...msg, ...message } : msg))
 
-		set({ allMessages: newAllMessages, messages: newAllMessages.slice(-(messages.length + 1)) })
+		// 转发给别人时不需要更新当前会话的消息
+		if (currentDialog === dialogId) {
+			set({ allMessages: newAllMessages, messages: newAllMessages.slice(-(messages.length + 1)) })
+		}
 		await updateCacheMessage(tableName, newAllMessages)
 	},
 

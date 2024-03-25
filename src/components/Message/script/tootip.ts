@@ -54,12 +54,12 @@ async function mark() {
 	const messageStore = useMessageStore.getState()
 	try {
 		const message = messageStore.selectedMessage
-		console.log('message', message)
 
 		const params = {
 			msg_id: message?.msg_id,
 			is_label: message?.is_label === MESSAGE_MARK.MARK ? MESSAGE_MARK.NOT_MARK : MESSAGE_MARK.MARK
 		}
+
 		const { code, msg } = messageStore.isGroup
 			? await MsgService.labelGroupMessageApi(params)
 			: await MsgService.labelUserMessageApi(params)

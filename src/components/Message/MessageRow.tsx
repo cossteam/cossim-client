@@ -1,4 +1,4 @@
-import { isMe, msgType } from '@/shared'
+import { isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import { useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/new_message'
@@ -19,7 +19,8 @@ import MessageError from './MessageRow/MessageError'
 import MessageLabel from './MessageRow/MessageLabel'
 import useUserStore from '@/stores/user'
 import MessageRecall from './MessageRow/MessageRecall'
-import useLongPress from '@/hooks/useLongPress'
+import { ListItem } from 'framework7-react'
+import { useLongPress } from '@reactuses/core'
 
 interface MessageRowProps {
 	item: { [key: string]: any }
@@ -46,19 +47,33 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 
 	const [showTippy, setShowTippy] = useState<boolean>(false)
 
-	useLongPress(longPressRef, {
-		callback: () => {
+	const longPressEvent = useLongPress(
+		() => {
 			setShowTippy(true)
-
 			// 全选内容文字内容
 			const selection = window?.getSelection()
 			selection?.selectAllChildren(longPressRef.current!)
 		},
-		delay: 300
-	})
+		{ isPreventDefault: true, delay: 300 }
+	)
 
 	// 点击其他地方移除提示框
-	useClickOutside(longPressRef, () => setTimeout(() => setShowTippy(false), 100))
+	useClickOutside(longPressRef, () =>
+		setTimeout(() => {
+			setShowTippy(false)
+		}, 100)
+	)
+
+	// 选中消息时的处理
+	const handlerSelectChange = (checked: boolean, item: any) => {
+		const selectedMessages = checked
+			? [...messageStore.selectedMessages, item]
+			: messageStore.selectedMessages.filter((msg: any) => msg.msg_id !== item.msg_id)
+		messageStore.update({ selectedMessages })
+	}
+
+	// 是否多选
+	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
 
 	const render = () => {
 		switch (type) {
@@ -87,9 +102,13 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	if (type === msgType.RECALL) return <MessageRecall item={item} />
 
 	return (
-		<>
+		<ListItem
+			className="list-none"
+			checkbox={isSelect}
+			onChange={(e) => handlerSelectChange(e.target.checked, item)}
+		>
 			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')}>
-				<div className={clsx('max-w-[80%] flex-1 py-2 flex', is_self ? 'justify-end' : 'justify-start')}>
+				<div className={clsx('max-w-[80%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>
 					<div className={clsx('flex items-start', is_self ? 'justify-end pr-2' : 'justify-start pl-2')}>
 						<img
 							src={is_self ? userStore?.userInfo?.avatar : item?.sender_info?.avatar}
@@ -120,7 +139,9 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								ref={longPressRef}
 								visible={showTippy}
 							>
-								<div className="relative">{render()}</div>
+								<div className="relative" {...longPressEvent} onContextMenu={(e) => e.preventDefault()}>
+									{render()}
+								</div>
 							</Tippy>
 
 							<MessageTime item={item} is_self={is_self} />
@@ -128,7 +149,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 					</div>
 				</div>
 			</div>
-		</>
+		</ListItem>
 	)
 }
 

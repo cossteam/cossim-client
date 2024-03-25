@@ -1,3 +1,7 @@
+/**
+ * 转发需要字段，会话id，如果是个人就是receiver_id，群聊是group_id, 还需要判断要转发的人是否是阅后即焚的
+ */
+
 import { $t, customSort } from '@/shared'
 import {
 	Button,
@@ -46,12 +50,8 @@ const MessageForward: React.FC<MessageForwardProps> = (props) => {
 	const [selectList, setSelectList] = useState<any[]>([])
 
 	const dialogChange = (checked: boolean, item: any) => {
-		if (checked) {
-			const index = selectList.findIndex((i) => i.dialog_id === item.dialog_id)
-			if (index !== -1) setSelectList([...selectList, item])
-		} else {
-			setSelectList(selectList.filter((i) => i.dialog_id !== item.dialog_id))
-		}
+		const list = checked ? [...selectList, item] : selectList.filter((i) => i.dialog_id !== item.dialog_id)
+		setSelectList(list)
 	}
 
 	return (

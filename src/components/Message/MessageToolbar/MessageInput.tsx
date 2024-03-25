@@ -28,7 +28,8 @@ const MessageInput = () => {
 		const handlerFocus = async () => {
 			// 如果是插入表情触发的聚焦，不做处理
 			if (isEmojiFocus.current) return
-			// TODO: 后续根据需求修改，如果是web就不需要弹起
+
+			// 如果是web端就不需要弹起
 			const web = await isWeb()
 			if (!web) {
 				messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
@@ -36,16 +37,16 @@ const MessageInput = () => {
 			// messageStore.update({ toolbarType: emojiOrMore.NONE })
 		}
 
-		const handlerBlur = () => {
-			// messageStore.update({ toolbarType: emojiOrMore.NONE })
-		}
+		// const handlerBlur = () => {
+		// messageStore.update({ toolbarType: emojiOrMore.NONE })
+		// }
 
 		quill.root.addEventListener('focus', handlerFocus)
-		quill.root.addEventListener('blur', handlerBlur)
+		// quill.root.addEventListener('blur', handlerBlur)
 
 		return () => {
 			quill.root.removeEventListener('focus', handlerFocus)
-			quill.root.removeEventListener('blur', handlerBlur)
+			// quill.root.removeEventListener('blur', handlerBlur)
 		}
 	}, [toolEditorRef.current])
 
