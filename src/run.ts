@@ -132,7 +132,7 @@ export async function handlerSocketMessage(data: any) {
 
 	// 如果是当前会话，需要实时更新到页面
 	if (message?.dialog_id === messageStore.dialogId) {
-		await messageStore.updateMessage(msg)
+		await messageStore.updateMessage(msg, message?.dialog_id, true)
 
 		// 更新标注消息
 		if (isLableMessage(type)) {
@@ -145,6 +145,7 @@ export async function handlerSocketMessage(data: any) {
 						...messages,
 						is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK
 					},
+					message?.dialog_id,
 					false
 				)
 		}
