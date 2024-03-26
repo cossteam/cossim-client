@@ -1,6 +1,6 @@
 import { isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
-import { useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/new_message'
 import { ReadEditor } from '@/Editor'
 import MessageImage from './MessageRow/MessageImage'
@@ -21,7 +21,6 @@ import useUserStore from '@/stores/user'
 import MessageRecall from './MessageRow/MessageRecall'
 import { ListItem } from 'framework7-react'
 import { useLongPress } from '@reactuses/core'
-
 interface MessageRowProps {
 	item: { [key: string]: any }
 }
@@ -54,7 +53,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			const selection = window?.getSelection()
 			selection?.selectAllChildren(longPressRef.current!)
 		},
-		{ isPreventDefault: true, delay: 300 }
+		{ isPreventDefault: false, delay: 300 }
 	)
 
 	// 点击其他地方移除提示框
@@ -63,6 +62,8 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	// 		setShowTippy(false)
 	// 	}, 100)
 	// )
+
+	// const [isMove, setIsMove] = useState(false)
 
 	// 选中消息时的处理
 	const handlerSelectChange = (checked: boolean, item: any) => {
@@ -75,20 +76,20 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	// 是否多选
 	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
 
-	const render = () => {
+	const render = useCallback(() => {
 		switch (type) {
 			case msgType.IMAGE:
 				return <MessageImage item={item} />
 			case msgType.AUDIO:
 				return <MessageAudio className={className(is_self)} item={item} />
 			case msgType.VIDEO:
-				return <MessageVideo />
+				return <MessageVideo item={item} />
 			case msgType.FILE:
 				return <MessageFile />
 			default:
 				return <ReadEditor content={item?.content} className={className(is_self)} />
 		}
-	}
+	}, [])
 
 	// 无内容
 	if (type === msgType.NONE) return null
@@ -128,7 +129,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								<span className="mb-1 text-[0.75rem] text-gray-500">{item?.sender_info?.name}</span>
 							)}
 							<Tippy
-								content={<MessageTooltip item={item} setShow={setShowTippy} />}
+								content={<MessageTooltip item={item} setShow={setShowTippy} el={longPressRef} />}
 								arrow={false}
 								interactive={true}
 								appendTo={document.body}
@@ -139,7 +140,12 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								ref={longPressRef}
 								visible={showTippy}
 							>
-								<div className="relative" {...longPressEvent} onContextMenu={(e) => e.preventDefault()}>
+								<div
+									className="relative"
+									{...longPressEvent}
+									onContextMenu={(e) => e.preventDefault()}
+									// onTouchMove={() => setIsMove(true)}
+								>
 									{render()}
 								</div>
 							</Tippy>
