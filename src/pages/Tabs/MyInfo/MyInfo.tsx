@@ -66,7 +66,7 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 					onClick={() => f7router.navigate(`/user_info/${info?.user_id}/`)}
 				>
 					<div className="w-12 h-12" slot="media">
-						<Avatar className="w-12 h-12" src={info?.avatar} />
+						<Avatar src={info?.avatar} />
 					</div>
 					<Qrcode
 						slot="after"

@@ -9,6 +9,7 @@ import useUserStore from '@/stores/user'
 import '../MyInfo.scss'
 import { Qrcode } from 'framework7-icons/react'
 import Cropper from '@/components/Cropper/Cropper'
+import Avatar from '@/components/Avatar/Avatar.tsx'
 
 const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 	const [userInfo, setUserInfo] = useState<any>({})
@@ -125,7 +126,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 							/>
 						</div> */}
 						<div className="w-16 h-16 rounded-full overflow-hidden bg-black bg-opacity-10 flex justify-center items-center">
-							<img src={userInfo?.avatar} alt="" className="h-full object-cover bg-black bg-opacity-10" />
+							<Avatar src={userInfo?.avatar} />
 						</div>
 					</div>
 				</ListItem>

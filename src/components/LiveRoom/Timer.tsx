@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 
 interface TimerProps {
+	className?: string
 	timeout?: number
 	onTimeout?: () => void
 }
 
-const Timer: React.FC<TimerProps> = ({ timeout, onTimeout }) => {
+const Timer: React.FC<TimerProps> = ({ className, timeout, onTimeout }) => {
 	const [seconds, setSeconds] = useState<number>(0)
 	const timerRef = useRef<NodeJS.Timeout>()
 
@@ -32,7 +33,7 @@ const Timer: React.FC<TimerProps> = ({ timeout, onTimeout }) => {
 
 	return (
 		<>
-			<span>
+			<span className={className}>
 				{/* {timeout ? '超时模式: ' : '计时模式: '} */}
 				{formatTime()}
 			</span>

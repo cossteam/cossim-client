@@ -38,11 +38,11 @@ const MessageToolbar = () => {
 				ref={toolbarRef}
 				// style={{ transform: `translateY(${height}px)` }}
 			>
-				<div className={clsx('w-full flex items-end gap-1 px-[6px] py-2', isSelect && 'hidden')}>
+				<div className={clsx('w-full flex items-end gap-1 pl-[6px] py-2', isSelect && 'hidden')}>
 					{/* 文本输入框 */}
 					<MessageInput />
 
-					<div className="min-w-[108px] flex items-center">
+					<div className="min-w-[108px] flex items-center" onContextMenu={(e) => e.preventDefault()}>
 						{/* 表情*/}
 						{messageStore.toolbarType === emojiOrMore.EMOJI ? (
 							<KeyboardIcon
