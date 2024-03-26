@@ -76,10 +76,15 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		set((state) => ({ ...state, ...options }))
 	},
 
+	createMessage: async (message) => {
+		const { allMessages, messages } = get()
+		const newAllMessages = [...allMessages, message]
+		set({ allMessages: newAllMessages, messages: [...messages, message] })
+	},
+
 	updateMessage: async (message, dialogId, isPush = true) => {
 		const { allMessages, messages, dialogId: currentDialog } = get()
 		const tableName = CACHE_MESSAGE + `_${dialogId}`
-
 		const isCurrentDialog = dialogId === currentDialog
 
 		const tableMessages = isCurrentDialog ? allMessages : (await cacheStore.get(tableName)) ?? []
