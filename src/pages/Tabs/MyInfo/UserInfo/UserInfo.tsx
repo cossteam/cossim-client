@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { f7, Page, Navbar, List, ListItem, Button, Block, Popup } from 'framework7-react'
 import { useClipboard } from '@reactuses/core'
 
-import { $t, exportKeyPair } from '@/shared'
+import { $t, exportKeyPair, toastMessage } from '@/shared'
 import UserService from '@/api/user'
 import { removeAllCookie } from '@/utils/cookie'
 import useUserStore from '@/stores/user'
@@ -24,7 +24,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 					login_number: userInfo?.login_number
 				})
 			} catch (error) {
-				f7.dialog.alert($t('退出登录失败'))
+				toastMessage($t('退出登录失败'))
 			} finally {
 				removeAllCookie()
 				f7router.navigate('/auth/')
@@ -40,11 +40,11 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 			if (keyPair) {
 				const text = exportKeyPair(keyPair)
 				copy(text)
-				return f7.dialog.alert($t('已经成功导出到剪切板'))
+				return toastMessage($t('已经成功导出到剪切板'))
 			}
-			f7.dialog.alert($t('导出身份信息失败'))
+			toastMessage($t('导出身份信息失败'))
 		} catch (error) {
-			f7.dialog.alert($t('导出身份信息失败'))
+			toastMessage($t('导出身份信息失败'))
 		}
 	}
 
@@ -55,35 +55,33 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 		if (fileInput) {
 			fileInput.click()
 		}
-		
 	}
 
-	const handlerComplete = (blob: any) => {
-		const file = new File([blob], 'avatar.png',{type: 'image/png'})
-		console.log('blob转file', file);
+	const handlerComplete = (blob: Blob) => {
+		const file = new File([blob], 'avatar.png', { type: 'image/png' })
 		UserService.updateAvatarApi({ file }).then(async (res) => {
-				if (res.code == 200) {
-
-					f7.dialog.alert($t('修改成功'))
-					setOpened(false)
-					userStore.update({
-						userInfo: {
-							...userInfo,
-							...res.data
-						}
-					})
-				} else {
-					f7.dialog.alert($t('修改失败'))
+			if (res.code == 200) {
+				setOpened(false)
+				const _userInfo = {
+					...userInfo,
+					...res.data
 				}
-			})
+				setUserInfo(_userInfo)
+				userStore.update({
+					userInfo: _userInfo
+				})
+				toastMessage($t('修改成功'))
+			} else {
+				toastMessage($t('修改失败'))
+			}
+		})
 	}
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		// 处理文件选择器的文件变化事件
 		const selectedFile = event.target.files?.[0]
 		if (selectedFile) {
-			console.log('图片文件',selectedFile);
-			const blob = new Blob([selectedFile]);
+			const blob = new Blob([selectedFile])
 			const blobUrl = URL.createObjectURL(blob)
 			setFiles(blobUrl)
 			setOpened(true)
@@ -201,8 +199,8 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 				</Button>
 			</Block>
 
-			<Popup className=' bg-black' opened={isOpened}>
-				<Cropper image={files} onCancel={() => setOpened(false)} onComplete={handlerComplete} /> 
+			<Popup className=" bg-black" opened={isOpened}>
+				<Cropper image={files} onCancel={() => setOpened(false)} onComplete={handlerComplete} />
 			</Popup>
 		</Page>
 	)
