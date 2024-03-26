@@ -114,3 +114,25 @@ export const uploadFile = (file: File) => {
 			})
 	})
 }
+
+/**
+ * 获取图片或视频宽高
+ *
+ * @param file
+ */
+export const getImageOrVideoSize = (url: string) => {
+	return new Promise<{ width: number; height: number }>((resolve) => {
+		const img = new Image()
+		img.src = url
+
+		img.onload = () => {
+			resolve({ width: img.width, height: img.height })
+			img.remove()
+		}
+
+		img.onerror = () => {
+			resolve({ width: 200, height: 300 })
+			img.remove()
+		}
+	})
+}

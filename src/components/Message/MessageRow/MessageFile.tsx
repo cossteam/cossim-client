@@ -1,3 +1,5 @@
+import { tooltipType } from '@/shared'
+import useMessageStore from '@/stores/new_message'
 import clsx from 'clsx'
 import { Icon } from 'framework7-react'
 import { useMemo } from 'react'
@@ -8,6 +10,8 @@ interface MessageFileProps {
 }
 
 const MessageFile: React.FC<MessageFileProps> = ({ className, item }) => {
+	const messageStore = useMessageStore()
+
 	const content = useMemo(() => {
 		try {
 			return JSON.parse(item.content)
@@ -23,6 +27,7 @@ const MessageFile: React.FC<MessageFileProps> = ({ className, item }) => {
 		if (size <= 0) return '0KB'
 		return Math.ceil(size).toFixed(2) + 'MB'
 	}, [content?.size])
+	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [])
 
 	const download = () => {
 		if (!url) return
@@ -30,7 +35,7 @@ const MessageFile: React.FC<MessageFileProps> = ({ className, item }) => {
 	}
 
 	return (
-		<div className={clsx('flex items-center', className)} onClick={download}>
+		<div className={clsx('flex items-center', className)} onClick={() => (isSelect ? '' : download())}>
 			{/* 文件 */}
 			<Icon className="mr-2" f7="doc_fill" size="42" />
 			<div>

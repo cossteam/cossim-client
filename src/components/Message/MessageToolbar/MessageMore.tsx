@@ -58,6 +58,8 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 	useAsyncEffect(
 		async () => {
 			if (!files || !files?.length) return
+			// console.log('files', files)
+
 			props.onSelectFiles && props.onSelectFiles(files)
 		},
 		() => {},

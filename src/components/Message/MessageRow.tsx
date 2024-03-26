@@ -48,6 +48,9 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 
 	const longPressEvent = useLongPress(
 		() => {
+			// 当前状态为多选
+			if (messageStore.manualTipType === tooltipType.SELECT) return
+
 			setShowTippy(true)
 			// 全选内容文字内容
 			const selection = window?.getSelection()
@@ -73,13 +76,19 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		messageStore.update({ selectedMessages })
 	}
 
-	// 是否多选
-	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
+	// 是否可以多选
+	const isSelect = useMemo(
+		() =>
+			messageStore.manualTipType === tooltipType.SELECT &&
+			![msgType.CALL, msgType.AUDIO, msgType.VOICE].includes(item.msg_type),
+
+		[messageStore.manualTipType]
+	)
 
 	const render = useCallback(() => {
 		switch (type) {
 			case msgType.IMAGE:
-				return <MessageImage className={clsx(className(is_self), '!px-0 py-0')} item={item} />
+				return <MessageImage className={clsx(className(is_self), '')} item={item} />
 			case msgType.AUDIO:
 				return <MessageAudio className={className(is_self)} item={item} />
 			case msgType.VIDEO:

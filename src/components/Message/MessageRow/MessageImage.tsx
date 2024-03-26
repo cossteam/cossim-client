@@ -20,13 +20,19 @@ const MessageImage: React.FC<MessageImageProps> = ({ className, item }) => {
 
 	const previewStore = usePreviewStore()
 
+	// console.log('content', content)
+
+	// const Mexwidth = useMemo(() => (content?.width > content?.height ? content?.width : content?.height), [content])
+	// const height = useMemo(() => (content?.width > content?.height ? content?.height : content?.width), [content])
+
 	return (
 		<>
 			<div
-				className={clsx('size-48 overflow-hidden flex justify-center items-center', className)}
+				className={clsx('flex justify-center items-center max-w-[200px] max-h-[220px]', className)}
 				onClick={() => previewStore.preview({ url, type: 'image' })}
+				// style={{  }}
 			>
-				<img className="h-full object-cover" src={url} />
+				<img className="rounded object-cover max-h-[200px]" src={url} />
 			</div>
 		</>
 	)

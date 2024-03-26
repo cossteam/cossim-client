@@ -27,7 +27,7 @@ async function copy(text: string) {
  *
  * @param {any[]} selectMessages 选中的消息列表
  */
-async function del(selectMessages: any[]) {
+export async function del(selectMessages: any[]) {
 	const messageStore = useMessageStore.getState()
 	try {
 		if (!selectMessages.length) selectMessages = messageStore.selectedMessages
