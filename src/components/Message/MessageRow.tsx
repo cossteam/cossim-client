@@ -27,7 +27,7 @@ interface MessageRowProps {
 
 const className = (is_self: boolean) => {
 	return clsx(
-		'py-2 px-3 rounded-lg break-all',
+		'py-2 px-3 rounded-lg break-all overflow-hidden',
 		is_self ? 'bg-primary text-white rounded-tr-none' : 'bg-bgPrimary rounded-tl-none'
 	)
 }
@@ -79,15 +79,15 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const render = useCallback(() => {
 		switch (type) {
 			case msgType.IMAGE:
-				return <MessageImage item={item} />
+				return <MessageImage className={clsx(className(is_self), '!px-0 py-0')} item={item} />
 			case msgType.AUDIO:
 				return <MessageAudio className={className(is_self)} item={item} />
 			case msgType.VIDEO:
-				return <MessageVideo item={item} />
+				return <MessageVideo className={clsx(className(is_self), '!px-0 py-0')} item={item} />
 			case msgType.FILE:
-				return <MessageFile />
+				return <MessageFile className={clsx(className(is_self), '!px-2 py-1')} item={item} />
 			default:
-				return <ReadEditor content={item?.content} className={className(is_self)} />
+				return <ReadEditor className={className(is_self)} content={item?.content} />
 		}
 	}, [])
 

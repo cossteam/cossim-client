@@ -43,7 +43,10 @@ const LiveRoomNew: React.FC = () => {
 	// 房间状态
 	const liveRoomStore = useLiveRoomStore()
 	const isBackend = useMemo(() => {
-		return !liveRoomStore.opened && liveRoomStore.state !== LiveRoomStates.IDLE
+		return (
+			!liveRoomStore.opened &&
+			[LiveRoomStates.WAITING, LiveRoomStates.BUSY, LiveRoomStates.JOINING].includes(liveRoomStore.state)
+		)
 	}, [liveRoomStore.opened, liveRoomStore.state])
 	const isGroup = useMemo(() => {
 		return liveRoomStore.isGroup
@@ -163,6 +166,7 @@ const LiveRoomNew: React.FC = () => {
 		client.current.on(RoomEvent.Disconnected, () => {
 			console.log('断开连接', client.current)
 			// liveRoomStore.hangup()
+			liveRoomStore.updateState(LiveRoomStates.ERROR)
 		})
 	}
 	// 配置音频
@@ -236,7 +240,10 @@ const LiveRoomNew: React.FC = () => {
 					break
 				case LiveRoomStates.ERROR:
 					console.log('错误')
-					// liveRoomStore.hangup()
+					setTimeout(() => {
+						liveRoomStore.hangup()
+						liveRoomStore.resetState()
+					}, 2000)
 					break
 			}
 		},

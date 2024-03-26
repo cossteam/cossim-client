@@ -1,12 +1,14 @@
 import { usePreviewStore } from '@/stores/preview'
+import clsx from 'clsx'
 import { Link } from 'framework7-react'
 import { useMemo } from 'react'
 
 interface MessageVideoProps {
+	className?: string
 	item: { [key: string]: any }
 }
 
-const MessageVideo: React.FC<MessageVideoProps> = ({ item }) => {
+const MessageVideo: React.FC<MessageVideoProps> = ({ className, item }) => {
 	const content = useMemo(() => {
 		try {
 			const _content = JSON.parse(item.content)
@@ -24,11 +26,10 @@ const MessageVideo: React.FC<MessageVideoProps> = ({ item }) => {
 	return (
 		<>
 			<div
-				className="max-h-32 overflow-hidden flex justify-center items-center relative"
+				className={clsx('size-48 overflow-hidden flex justify-center items-center relative', className)}
 				onClick={() => previewStore.preview({ url, type: 'video' })}
 			>
-				<img className="h-full" src={cover}></img>
-				{/* <video className="h-full" muted autoPlay loop src={url} /> */}
+				<img className="h-full object-cover" src={cover} />
 				<div className="w-full h-full bg-[rgba(0,0,0,.3)]  flex justify-center items-center absolute top-0 left-0">
 					<Link className="rotate-90 text-white" iconF7="arrowtriangle_up_circle" />
 				</div>
