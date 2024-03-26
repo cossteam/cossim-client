@@ -1,6 +1,6 @@
 import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MessageBurnAfterRead, msgType } from '@/shared'
 import useMessageStore from '@/stores/new_message'
-// import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 import useUserStore from '@/stores/user'
 
 /**
@@ -14,6 +14,7 @@ export function generateMessage(message?: any) {
 	// TODO：查找好友，更具消息中的接收者 id 去查找对应的好友信息
 
 	const msg: any = {
+		uid: uuidv4(),
 		msg_id: Date.now(),
 		sender_id: userStore.userId,
 		receiver_id: messageStore.receiverId,

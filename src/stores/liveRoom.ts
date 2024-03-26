@@ -246,6 +246,8 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 			state: LiveRoomStates.HANGUP
 		})
 		const { recipient, isGroup } = get()
+		console.log('get', get())
+
 		const createRoomParams: any = {}
 		!isGroup && (createRoomParams['user_id'] = recipient)
 		isGroup && (createRoomParams['group_id'] = Number(recipient))

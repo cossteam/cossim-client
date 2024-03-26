@@ -12,7 +12,7 @@ import {
 } from 'framework7-icons/react'
 import { Link } from 'framework7-react'
 import useMessageStore from '@/stores/new_message'
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo } from 'react'
 import tooltipStatMachine from '../script/tootip'
 import useUserStore from '@/stores/user'
 import { useClickOutside } from '@reactuses/core'
@@ -20,16 +20,19 @@ import { useClickOutside } from '@reactuses/core'
 interface MessageTooltipProps {
 	item: any
 	setShow: (show: boolean) => void
+	el: React.RefObject<Element>
 }
 
-const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow }) => {
+const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) => {
 	const messageStore = useMessageStore()
 	const userStore = useUserStore()
 
-	const tooltipRef = useRef<HTMLDivElement | null>(null)
-
 	// 点击其他地方移除提示框
-	useClickOutside(tooltipRef, () => setShow(false))
+	useClickOutside(el, () => {
+		setTimeout(() => {
+			setShow(false)
+		}, 100)
+	})
 
 	const tips = [
 		{
@@ -112,11 +115,11 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow }) => {
 
 		tooltipStatMachine(data.name, item)
 
-		setShow(false)
+		// setShow(false)
 	}
 
 	return (
-		<div className="h-auto py-3 w-auto rounded relative z-[100] flex items-center justify-center" ref={tooltipRef}>
+		<div className="h-auto py-3 w-auto rounded relative z-[100] flex items-center justify-center">
 			<div className="flex flex-wrap max-w-[250px]">
 				{tooltips.map((item, index) => (
 					<Link

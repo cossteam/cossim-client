@@ -10,6 +10,8 @@ import { CACHE_MESSAGE, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, SocketEvent, m
 import useMessageStore from './stores/new_message'
 import { generateMessage } from './utils/data'
 import cacheStore from './utils/cache'
+import GroupService from './api/group'
+import RelationService from './api/relation'
 
 /**
  * 获取远程会话
@@ -36,6 +38,19 @@ export async function getRemoteSession() {
 	} catch (error) {
 		console.error('获取远程会话失败：', error)
 	}
+}
+
+export async function getApplyList() {
+	const userStore = useUserStore.getState()
+	const cacheStore = useCacheStore.getState()
+	// 获取申请列表
+	const group = await GroupService.groupRequestListApi({ user_id: userStore.userId })
+	const friend = await RelationService.friendApplyListApi({ user_id: userStore.userId })
+	const applyList: any[] = []
+	group.data && applyList.push(...group.data)
+	friend.data && applyList.push(...friend.data)
+	const len = applyList.filter((v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId).length
+	cacheStore.updateCacheApplyCount(len)
 }
 
 /**
@@ -174,6 +189,16 @@ export async function handlerSocketMessage(data: any) {
 }
 
 /**
+ * 处理好友请求
+ * @param data
+ */
+export function handlerSocketRequest(data: any) {
+	console.log('处理好友请求', data)
+	const cacheStore = useCacheStore.getState()
+	cacheStore.updateCacheApplyCount(cacheStore.applyCount + 1)
+}
+
+/**
  * 处理 socket
  *
  * @param {any} e  socket Event
@@ -203,6 +228,7 @@ function run() {
 		if (firstOpened) {
 			getBehindMessage()
 			getRemoteSession()
+			getApplyList()
 			cacheStore.updateFirstOpened(false)
 		}
 	})

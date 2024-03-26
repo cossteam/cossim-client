@@ -73,9 +73,14 @@ export type CacheStore = CacheStoreOptions & {
 	updateKeyboardHeight: (keyboardHeight: number) => void
 	/**
 	 * @description 更新未读消息数
-	 * @param {number} UnreadCount 未读消息数
+	 * @param {number} unreadCount 未读消息数
 	 */
-	updateCacheUnreadCount: (UnreadCount: number) => void
+	updateCacheUnreadCount: (unreadCount: number) => void
+	/**
+	 * @description 更新未处理请求
+	 * @param {number} applyCount 未处理请求数
+	 */
+	updateCacheApplyCount: (applyCount: number) => void
 	/**
 	 * @description 更新搜索表
 	 */

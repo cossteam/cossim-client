@@ -91,11 +91,11 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 
 		const newAllMessages = isPush
 			? [...tableMessages, message]
-			: tableMessages.map((msg: any) => (msg.msg_id === message.msg_id ? { ...msg, ...message } : msg))
+			: tableMessages.map((msg: any) => (msg?.msg_id === message?.msg_id ? { ...msg, ...message } : msg))
 
 		// 转发给别人时不需要更新当前会话的消息
 		if (isCurrentDialog) {
-			set({ allMessages: newAllMessages, messages: newAllMessages.slice(-(messages.length + 1)) })
+			set({ allMessages: newAllMessages, messages: newAllMessages.slice(-messages.length) })
 		}
 
 		await updateCacheMessage(tableName, newAllMessages)

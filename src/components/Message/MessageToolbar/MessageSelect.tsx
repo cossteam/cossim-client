@@ -1,7 +1,9 @@
+import { Icon } from 'framework7-react'
+
 const MessageSelect = () => {
 	return (
 		<div className="w-full flex items-center">
-			<div className="">duoxuan1</div>
+			<Icon f7="arrowshape_turn_up_right_circle" />
 		</div>
 	)
 }
