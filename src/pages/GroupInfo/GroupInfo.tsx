@@ -41,6 +41,7 @@ import { Icon, List, ListItem, Navbar, Page, Toggle, f7 } from 'framework7-react
 import { useEffect, useState } from 'react'
 import GroupService from '@/api/group'
 import { getCookie } from '@/utils/cookie'
+import Avatar from '@/components/Avatar/Avatar.tsx'
 
 const user_id = getCookie(USER_ID) || ''
 
@@ -151,10 +152,15 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 						<div className="mb-1 w-full grid grid-cols-5 gap-6">
 							{members.slice(0, 23).map((item: any) => (
 								<div key={item.user_id} className="w-12 h-[144rpx] flex flex-col items-center">
-									<div className="min-w-12 min-h-12 bg-gray-200 rounded-lg overflow-hidden">
-										<img src={item.avatar} alt="" />
+									<div className="min-w-12 min-h-12 overflow-hidden">
+										<Avatar size={50} square src={item.avatar} />
 									</div>
-									<div className="w-12 min-w-12 min-h-6 flex-1 text-sm text-gray-400 max-w-12 overflow-hidden text-ellipsis">
+
+									<div style={{
+										whiteSpace: 'nowrap',
+										overflow: 'hidden',
+										textOverflow: 'ellipsis'
+									}} className="w-12 min-w-12 min-h-6 flex-1 text-sm text-gray-400 max-w-12 overflow-hidden text-ellipsis">
 										{item.nickname}
 									</div>
 								</div>
@@ -201,7 +207,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 				</ListItem>
 				<ListItem link={`/group_notice/${GroupId}/?identity=${identity}`} title="群公告"></ListItem>
 				<ListItem link={`/group_qrcode/?group_id=${GroupId}`} title="群二维码"></ListItem>
-				<ListItem link={`/group_user_display_name/?group_id=${GroupId}&remark=${groupInfo?.preferences.remark}`} title='我在群组的昵称' after={groupInfo?.preferences.remark} />
+				<ListItem link={`/group_user_display_name/?group_id=${GroupId}&remark=${groupInfo?.preferences.remark}`} title="我在群组的昵称" after={groupInfo?.preferences.remark} />
 			</List>
 			<List className="m-0 mb-3 bg-white" strong dividers outline noChevron>
 				<ListItem title="消息免打扰">
