@@ -340,6 +340,5 @@ export const updateDialog = async (message: any) => {
  */
 export const updateCacheMessage = async (tableName: string, messages: any[]) => {
 	await cacheStore.set(tableName, messages)
-	console.log('updateCacheMessage', messages)
 	await updateDialog(messages.at(-1))
 }

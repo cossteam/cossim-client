@@ -1,61 +1,120 @@
-import { MicCircleFill } from 'framework7-icons/react'
-import { Link } from 'framework7-react'
-import { useRef, useState } from 'react'
+import { MicFill } from 'framework7-icons/react'
+import { useEffect, useRef, useState } from 'react'
 
 // @See: https://github.com/tchvu3/capacitor-voice-recorder#readme
 import { VoiceRecorder, RecordingData, GenericResponse } from 'capacitor-voice-recorder'
-import { useAsyncEffect, useLongPress } from '@reactuses/core'
+import { useAsyncEffect, useClickOutside, useLongPress } from '@reactuses/core'
 import { toastMessage } from '@/shared'
+import clsx from 'clsx'
+import useTouch from '@/hooks/useTouch'
+import Timer from '@/components/LiveRoom/Timer'
 
 const MessageSendAudio = () => {
 	const audioRef = useRef<HTMLDivElement | null>(null)
-
+	// 首次渲染
 	const [isFristRender, setIsFristRender] = useState<boolean>(true)
+	// 是否正在录音
 	const [isRecording, setIsRecording] = useState<boolean>(false)
+	// 是否有权限
+	const [isPermission, setIsPermission] = useState<boolean>(false)
+	// 录音数据
+	const [recordingData, setRecordingData] = useState<RecordingData | null>(null)
+	const touch = useTouch()
 
-	const longPressEvent = useLongPress(async () => {
-		// 请求权限
-		const voiceRecord = await VoiceRecorder.requestAudioRecordingPermission()
-
-		if (voiceRecord.value) {
-			setIsRecording(true)
-		} else {
-			toastMessage('当前设备不支持录音')
-			setIsRecording(false)
-		}
-	}, {})
+	// 长按
+	const longPressEvent = useLongPress(
+		async () => {
+			try {
+				// 请求权限
+				if (!isPermission) {
+					const voiceRecord = await VoiceRecorder.requestAudioRecordingPermission()
+					if (voiceRecord) setIsRecording(true)
+					else throw new Error('请求权限失败')
+				} else {
+					setIsRecording(true)
+				}
+			} catch {
+				toastMessage('当前设备不支持录音')
+				setIsRecording(false)
+			}
+		},
+		{ delay: 500 }
+	)
 
 	useAsyncEffect(
 		async () => {
-			if (isFristRender) return setIsFristRender(false)
-
-			if (isRecording) {
-				VoiceRecorder.startRecording()
-					.then((result: GenericResponse) => console.log('start', result.value))
-					.catch(() => toastMessage('录音失败'))
-			} else {
-				VoiceRecorder.stopRecording()
-					.then((result: RecordingData) => console.log('stop', result.value))
-					.catch()
-			}
+			const isPermission = await VoiceRecorder.hasAudioRecordingPermission()
+			setIsPermission(isPermission.value)
 		},
 		() => {},
-		[isRecording]
+		[]
 	)
 
+	// 监听
+	useEffect(() => {
+		if (isFristRender) return setIsFristRender(false)
+
+		if (isRecording) {
+			VoiceRecorder.startRecording()
+				.then((result: GenericResponse) => console.log('start', result.value))
+				.catch(() => toastMessage('录音失败'))
+			touch.start(document.getElementsByTagName('html')[0])
+		} else {
+			VoiceRecorder.stopRecording()
+				.then((result: RecordingData) => setRecordingData(result))
+				.catch()
+		}
+	}, [isRecording])
+
+	useAsyncEffect(
+		async () => {
+			if (!recordingData || !recordingData.value) return
+			console.log('recordingData', recordingData.value)
+			// const { code, data, msg: message } = await StorageService.uploadFile({ file: audioData!.file, type: 0 })
+			console.log('touch', touch.x, touch.y)
+		},
+		() => {},
+		[recordingData]
+	)
+
+	useClickOutside(audioRef, () => setIsRecording(false))
+
 	return (
-		<div
-			ref={audioRef}
-			{...longPressEvent}
-			onTouchEnd={() => setIsRecording(false)}
-			onTouchEndCapture={() => setIsRecording(false)}
-			onContextMenu={(e) => e.preventDefault()}
-			className="h-full flex items-center"
-		>
-			<Link>
-				<MicCircleFill className="toolbar-btn animate__animated animate__zoomIn" />
-			</Link>
-		</div>
+		<>
+			<div
+				ref={audioRef}
+				{...longPressEvent}
+				onTouchEnd={() => setIsRecording(false)}
+				onContextMenu={(e) => e.preventDefault()}
+				className={clsx('flex items-center bg-primary rounded-full w-8 h-8 justify-center relative')}
+			>
+				{/* isRecording && 'absolute !w-16 !h-16 right-1' */}
+				<div
+					className={clsx(
+						'bg-primary rounded-full w-8 h-8 flex justify-center items-center',
+						isRecording && 'absolute -top-4 -left-4 !w-16 !h-16 '
+					)}
+				>
+					<MicFill
+						onContextMenu={(e) => e.preventDefault()}
+						className={clsx('toolbar-btn text-white text-2xl')}
+					/>
+				</div>
+				{isRecording && (
+					<div
+						className={clsx(
+							'w-40 h-24 bg-white p-4 rounded-lg select-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col justify-center items-center',
+							touch.y < 750 && 'bg-red-400 text-white'
+						)}
+					>
+						<div className="flex-1 flex flex-col justify-center items-center">
+							<Timer className="text-2xl font-bold" />
+						</div>
+						<span>{touch.y < 750 ? '松开取消' : '向上滑动取消录音'}</span>
+					</div>
+				)}
+			</div>
+		</>
 	)
 }
 
