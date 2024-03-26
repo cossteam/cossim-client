@@ -10,7 +10,7 @@ import MessageFile from './MessageRow/MessageFile'
 import MessageTime from './MessageRow/MessageTime'
 import MessageTooltip from './MessageRow/MessageTooltip'
 import Tippy from '@tippyjs/react'
-import { useClickOutside } from '@reactuses/core'
+// import { useClickOutside } from '@reactuses/core'
 import 'tippy.js/dist/tippy.css'
 import 'tippy.js/themes/light.css'
 import 'tippy.js/animations/shift-away-subtle.css'
@@ -58,11 +58,11 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	)
 
 	// 点击其他地方移除提示框
-	useClickOutside(longPressRef, () =>
-		setTimeout(() => {
-			setShowTippy(false)
-		}, 100)
-	)
+	// useClickOutside(longPressRef, () =>
+	// 	setTimeout(() => {
+	// 		setShowTippy(false)
+	// 	}, 100)
+	// )
 
 	// 选中消息时的处理
 	const handlerSelectChange = (checked: boolean, item: any) => {
@@ -128,7 +128,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								<span className="mb-1 text-[0.75rem] text-gray-500">{item?.sender_info?.name}</span>
 							)}
 							<Tippy
-								content={<MessageTooltip item={item} />}
+								content={<MessageTooltip item={item} setShow={setShowTippy} />}
 								arrow={false}
 								interactive={true}
 								appendTo={document.body}

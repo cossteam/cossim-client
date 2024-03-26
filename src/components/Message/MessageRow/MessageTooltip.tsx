@@ -12,17 +12,24 @@ import {
 } from 'framework7-icons/react'
 import { Link } from 'framework7-react'
 import useMessageStore from '@/stores/new_message'
-import { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import tooltipStatMachine from '../script/tootip'
 import useUserStore from '@/stores/user'
+import { useClickOutside } from '@reactuses/core'
 
 interface MessageTooltipProps {
 	item: any
+	setShow: (show: boolean) => void
 }
 
-const MessageTooltip: React.FC<MessageTooltipProps> = ({ item }) => {
+const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow }) => {
 	const messageStore = useMessageStore()
 	const userStore = useUserStore()
+
+	const tooltipRef = useRef<HTMLDivElement | null>(null)
+
+	// 点击其他地方移除提示框
+	useClickOutside(tooltipRef, () => setShow(false))
 
 	const tips = [
 		{
@@ -104,10 +111,12 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item }) => {
 		messageStore.update({ selectedMessage: item })
 
 		tooltipStatMachine(data.name, item)
+
+		setShow(false)
 	}
 
 	return (
-		<div className="h-auto py-3 w-auto rounded relative z-[100] flex items-center justify-center">
+		<div className="h-auto py-3 w-auto rounded relative z-[100] flex items-center justify-center" ref={tooltipRef}>
 			<div className="flex flex-wrap max-w-[250px]">
 				{tooltips.map((item, index) => (
 					<Link

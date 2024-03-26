@@ -14,35 +14,34 @@ interface Options {
 	dialog_id?: number
 	dialog_receiver_id?: string | number
 	isGroup?: boolean
-	content?: string
+	content: string
+	msg_type: msgType
+	isUpdate?: boolean
 }
 
 /**
  * @description 发送消息
- * @param {string} content 消息内容
- * @param {msgType} type 消息类型
  * @param {Options} options 其他配置
  */
-export const sendMessage = async (content: string, type: msgType, options?: Options) => {
+export const sendMessage = async ({ content, msg_type, isUpdate = true, ...options }: Options) => {
 	const messageStore = useMessageStore.getState()
 
 	// 是否是回复消息
 	const isReply = messageStore.manualTipType === tooltipType.REPLY
+	// 会话 id
+	const dialogId = options?.dialog_id ?? messageStore.dialogId
 
 	// 生成消息对象
 	const message = generateMessage({
-		content,
+		content: content,
 		msg_send_state: MESSAGE_SEND.SENDING,
-		msg_type: type,
-		reply_id: isReply ? messageStore.selectedMessage?.msg_id : 0
+		msg_type,
+		reply_id: isReply ? messageStore.selectedMessage?.msg_id : 0,
+		dialog_id: dialogId
 	})
 
-	// 是否当前会话
-	const dialogId = options?.dialog_id ?? message.dialog_id
-	const isCurrentDialog = dialogId === message.dialog_id
-
-	// 只有处于当前会话需要当前会话, isUpdate 为 true 时不需要更新，因为为上传文件的预显示
-	isCurrentDialog && (await messageStore.updateMessage(message, dialogId, true))
+	// 如果不需要在发送前创建一条消息，就把 isUpdate 设置为 false
+	isUpdate && (await messageStore.createMessage(message))
 
 	const params: any = {
 		type: message.msg_type,
@@ -61,6 +60,7 @@ export const sendMessage = async (content: string, type: msgType, options?: Opti
 		params['receiver_id'] = options?.dialog_receiver_id ?? message.receiver_id
 	}
 
+	// 发送消息
 	try {
 		const { code, data, msg } = messageStore.isGroup
 			? await MsgService.sendGroupMessageApi(params)
@@ -72,17 +72,13 @@ export const sendMessage = async (content: string, type: msgType, options?: Opti
 		}
 		message.msg_send_state = MESSAGE_SEND.SEND_SUCCESS
 		message.msg_id = data.msg_id
-
-		console.log('message', message)
 	} catch (error: any) {
 		message.msg_send_state = MESSAGE_SEND.SEND_FAILED
+		// 生成错误信息并添加至会话
 		const errorMessage = generateMessage({ content: error?.message, msg_type: msgType.ERROR })
-		// isCurrentDialog
 		await messageStore.updateMessage(errorMessage, dialogId, true)
-		// : await cacheStore.addCacheMessage(errorMessage)
 	} finally {
-		await messageStore.updateMessage(message, dialogId, false)
-		//  : await cacheStore.addCacheMessage(message)
+		await messageStore.updateMessage(message, dialogId, isUpdate ? false : true)
 	}
 
 	return message
@@ -116,27 +112,6 @@ export const editMessage = async (content: string) => {
 	}
 }
 
-// interface Options {
-// 	/** 回复 id */
-// 	replyId?: number
-// 	/** 是否是群聊 */
-// 	isGroup?: boolean
-// 	/** 接收者 id， 如果是群就是群 id */
-// 	receiverId: string
-// 	/** 会话 id */
-// 	dialogId?: number
-// 	/** 是否 at 全体成员 */
-// 	atAllUser?: number
-// 	/** at 的成员 id */
-// 	atUsers?: string[]
-// 	/** 是否阅后即焚 */
-// 	isBurnAfterReading?: number
-// 	/** 消息类型 */
-// 	msgType: msgType
-// 	/** 消息内容 */
-// 	content: string
-// }
-
 /**
  * 转发消息
  *
@@ -144,12 +119,26 @@ export const editMessage = async (content: string) => {
  */
 export const forwardMessage = async () => {
 	const messageStore = useMessageStore.getState()
-	// 选中的人员
-	messageStore.selectedForwardUsers.map((item) => {
-		messageStore.selectedMessages.map((msg) => {
-			sendMessage(msg.content, msg.msg_type, item)
-		})
-	})
-	// 清空选中的消息
-	messageStore.update({ selectedMessages: [], selectedForwardUsers: [] })
+	try {
+		for (let i = 0; i < messageStore.selectedForwardUsers.length; i++) {
+			const item = messageStore.selectedForwardUsers[i]
+
+			for (let j = 0; j < messageStore.selectedMessages.length; j++) {
+				const msg = messageStore.selectedMessages[j]
+
+				await sendMessage({
+					content: msg.content,
+					msg_type: msg.msg_type,
+					isUpdate: item?.dialog_receiver_id === messageStore.receiverId,
+					...item
+				})
+			}
+		}
+		toastMessage('转发成功')
+	} catch (error: any) {
+		toastMessage(error.message ?? '转发失败')
+	} finally {
+		// 清空选中的消息
+		messageStore.update({ selectedMessages: [], selectedForwardUsers: [] })
+	}
 }

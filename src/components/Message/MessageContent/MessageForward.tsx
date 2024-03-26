@@ -36,7 +36,7 @@ interface MessageForwardProps {
 const generateSelectContent = (selectList: any[]) => {
 	return selectList.map((item) => {
 		const isGroup = item?.group_id ? true : false
-		const dialogReceiverId = isGroup ? item?.group_id : item.last_message?.receiver_info?.user_id
+		const dialogReceiverId = isGroup ? item?.group_id : item?.user_id
 		return {
 			dialog_id: item.dialog_id,
 			dialog_receiver_id: dialogReceiverId,
@@ -52,6 +52,7 @@ const MessageForward: React.FC<MessageForwardProps> = (props) => {
 	const dialogChange = (checked: boolean, item: any) => {
 		const list = checked ? [...selectList, item] : selectList.filter((i) => i.dialog_id !== item.dialog_id)
 		setSelectList(list)
+		console.log('cacheStore.cacheDialogs.', cacheStore.cacheDialogs)
 	}
 
 	return (

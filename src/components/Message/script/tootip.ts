@@ -10,9 +10,6 @@ import { Clipboard } from '@capacitor/clipboard'
 import { extractTextFromHTML } from './shared'
 import MsgService from '@/api/msg'
 
-// const ManualCloseList = [tooltipType.EDIT, tooltipType.FORWARD, tooltipType.REPLY, tooltipType.SELECT]
-// let ManualType = tooltipType.NONE
-
 /**
  * 复制文本
  *

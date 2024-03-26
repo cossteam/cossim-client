@@ -46,27 +46,20 @@ const MessageToolbarContent = () => {
 					url: await fileBase64(file),
 					size: file.size,
 					name: file.name,
-					file_id: ''
+					file_id: '',
+					height: 0,
+					width: 0
 				}
-
-				// const message = generateMessage({
-				// 	content: JSON.stringify(data),
-				// 	msg_send_state: MESSAGE_SEND.SENDING,
-				// 	msg_type
-				// })
-
-				// 上传前更新到页面
-				// messageStore.updateMessage(message, message.dialog_id, true)
 
 				// 上传文件
 				fileMsg = await uploadFile(file)
 
 				data.url = fileMsg.url
 				data.file_id = fileMsg.file_id
-				await sendMessage(JSON.stringify(data), msg_type)
-
-				// 上传成功后删除本地缓存
-				// messageStore.deleteMessage(message)
+				await sendMessage({
+					content: JSON.stringify(data),
+					msg_type
+				})
 			} catch (error: any) {
 				if (!fileMsg) return
 				toastMessage(error?.message ?? '发送失败')
