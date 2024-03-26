@@ -1,17 +1,18 @@
 import QRCode from 'qrcode.react'
 import { Navbar, Page } from 'framework7-react'
-import { useLiveQuery } from 'dexie-react-hooks'
-import CommonStore from '@/db/common.ts'
-import { getCookie } from '@/utils/cookie.ts'
-import { USER_ID } from '@/shared'
+import useUserStore from '@/stores/user'
+import { useEffect, useState } from 'react'
 
 const MyQrCode = () => {
-	const userId: string | null = localStorage.getItem('__USER_ID__')
+	const userStore = useUserStore()
+	const [userInfo, setUserInfo] = useState<any>({})
 
-	const user = useLiveQuery(async () => {
-		return await CommonStore.findOneById(CommonStore.tables.users, 'user_id', getCookie(USER_ID)!)
-	})
-	const userInfo = user?.user_info
+	useEffect(() => {
+		console.log(userInfo)
+		if (userStore.userInfo) {
+			setUserInfo(userStore.userInfo)
+		}
+	}, [userStore.userInfo])
 
 	return (
 		<Page noToolbar>
@@ -28,12 +29,21 @@ const MyQrCode = () => {
 						<span className="text-neutral-400">地区</span>
 					</div>
 				</div>
-				<div>
-					<QRCode style={{ margin: '0 auto' }} value={'user_id:' + userId!} size={256} level={'H'} />
-				</div>
-				<div className="flex justify-center mt-10 text-neutral-400">
-					<span>通过扫描上面的二维码，即可添加好友</span>
-				</div>
+				{userInfo.user_id && (
+					<>
+						<div>
+							<QRCode
+								style={{ margin: '0 auto' }}
+								value={'user_id:' + userInfo.user_id}
+								size={256}
+								level={'H'}
+							/>
+						</div>
+						<div className="flex justify-center mt-10 text-neutral-400">
+							<span>通过扫描上面的二维码，即可添加好友</span>
+						</div>
+					</>
+				)}
 			</div>
 		</Page>
 	)
