@@ -1,7 +1,6 @@
 import { Link, Toolbar, View, Views } from 'framework7-react'
 import { useRef, useState } from 'react'
 import $ from 'dom7'
-import { useStateStore } from '@/stores/state'
 import useCacheStore from '@/stores/cache'
 
 const Layout: React.FC = () => {
@@ -21,8 +20,6 @@ const Layout: React.FC = () => {
 	}
 
 	// 全局状态（未读消息）
-	const stateStore = useStateStore()
-
 	const cacheStore = useCacheStore()
 
 	return (
@@ -45,7 +42,7 @@ const Layout: React.FC = () => {
 					tabLink="#view-contacts"
 					iconF7="phone"
 					text="联系人"
-					badge={stateStore?.unread?.apply || 0}
+					badge={cacheStore.applyCount}
 					badgeColor="red"
 					onClick={() => onTabLinkClick('contacts')}
 				/>

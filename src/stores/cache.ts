@@ -63,6 +63,12 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		set({ unreadCount })
 	},
 
+	updateCacheApplyCount: async (applyCount) => {
+		console.log('applyCount', applyCount)
+		await cacheStore.set(CACHE_APPLY_COUNT, applyCount)
+		set({ applyCount })
+	},
+
 	updateKeyboardHeight: async (keyboardHeight) => {
 		await cacheStore.set(CACHE_KEYBOARD_HEIGHT, keyboardHeight)
 		set({ keyboardHeight })

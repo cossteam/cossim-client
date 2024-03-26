@@ -253,6 +253,8 @@ export enum SocketEvent {
 	GroupChatsEvent = 4,
 	/** 接收到自己发送的消息 */
 	SelfChatsEvent = 12,
+	/** 接收群邀请 */
+	GroupApplyListEvent = 11,
 	/** 接收好友申请 */
 	ApplyListEvent = 6,
 	/** 接收好友同意或拒绝 */

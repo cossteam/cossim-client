@@ -6,17 +6,16 @@ import RelationService from '@/api/relation'
 import { getCookie } from '@/utils/cookie'
 import UserStore from '@/db/user'
 import { useEffect, useState } from 'react'
-import GroupService from '@/api/group'
 import { useStateStore } from '@/stores/state'
 import { isEmpty } from 'lodash-es'
 import { useMessageStore } from '@/stores/message'
+import useCacheStore from '@/stores/cache'
 
 const user_id = getCookie(USER_ID) || ''
 
 const ContactList: React.FC<RouterProps> = ({ f7router }) => {
+	const cacheStore = useCacheStore()
 	const [contact, setContact] = useState<any[]>([])
-	const [applyTotal, setApplyTotal] = useState<number>(0)
-
 	const { is_contacts_update, updateContacts } = useStateStore()
 
 	// 消息列表
@@ -28,27 +27,8 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 		return friends
 	}
 
-	// 全局状态（未读消息）
-	const stateStore = useStateStore()
-	const updateApplyTotal = async () => {
-		// 获取申请列表
-		const group = await GroupService.groupRequestListApi({ user_id })
-		const friend = await RelationService.friendApplyListApi({ user_id })
-		const applyList: any[] = []
-		group.data && applyList.push(...group.data)
-		friend.data && applyList.push(...friend.data)
-		const len = applyList.filter((v) => [0, 4].includes(v?.status) && v?.sender_id !== user_id).length
-		stateStore.updateUnread({
-			...stateStore.unread,
-			apply: len
-		})
-		setApplyTotal(len)
-	}
-
 	const updateContactInit = async () => {
 		// 异步去执行
-		updateApplyTotal()
-
 		const friends = await updateContact()
 		const { data } = await RelationService.getFriendListApi({ user_id })
 
@@ -118,7 +98,7 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 			</Navbar>
 
 			<List contactsList noChevron dividers outline className="h-full bg-bgPrimary">
-				<ListItem link="/apply_list/" badge={applyTotal} badgeColor="red">
+				<ListItem link="/apply_list/" badge={cacheStore.applyCount} badgeColor="red">
 					<PersonBadgePlusFill slot="media" className="text-primary text-2xl" />
 					<span slot="title" className="text-color-primary">
 						{$t('新请求')}

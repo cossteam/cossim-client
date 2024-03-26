@@ -8,7 +8,6 @@ import {
 	$t,
 	TOKEN,
 	SocketClient,
-	handlerRequestSocket,
 	// handlerMessageSocket,
 	SocketEvent,
 	handlerLabelSocket,
@@ -32,7 +31,7 @@ import LiveRoomNew from '@/components/LiveRoom'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
-import run, { handlerSocketMessage } from './run'
+import run, { handlerSocketMessage, handlerSocketRequest } from './run'
 import { isWeb } from './utils'
 import { Toaster } from 'react-hot-toast'
 
@@ -106,7 +105,9 @@ function App() {
 					handlerSocketMessage(data)
 					break
 				case SocketEvent.ApplyListEvent:
-					handlerRequestSocket(data)
+				case SocketEvent.GroupApplyListEvent:
+					// handlerRequestSocket(data) // 废弃
+					handlerSocketRequest(data)
 					break
 				case SocketEvent.ApplyAcceptEvent:
 					handlerRequestResultSocket(data)
