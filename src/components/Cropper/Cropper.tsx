@@ -4,7 +4,7 @@ import Cropper, { Area } from 'react-easy-crop'
 import getCroppedImg from './cropImage'
 
 const CropperDemo = ({
-	image = 'https://img.huffingtonpost.com/asset/5ab4d4ac2000007d06eb2c56.jpeg?cache=sih0jwle4e&ops=1910_1000',
+	image = '',
 	onComplete,
 	onCancel
 }: {
@@ -39,7 +39,7 @@ const CropperDemo = ({
 					zoom={zoom}
 					rotation={rotation}
 					cropShape="round"
-					aspect={1 / 1}
+					aspect={1}
 					onCropChange={setCrop}
 					onRotationChange={setRotation}
 					onCropComplete={onCropComplete}

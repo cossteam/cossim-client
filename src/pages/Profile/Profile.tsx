@@ -9,6 +9,7 @@ import RelationService from '@/api/relation'
 import { useStateStore } from '@/stores/state'
 import { useMessageStore } from '@/stores/message'
 import { useLiveRoomStore } from '@/stores/liveRoom'
+import Avatar from '@/components/Avatar/Avatar.tsx'
 
 const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const user_id = f7route.params.user_id as string
@@ -269,7 +270,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			<Navbar title={$t('用户信息')} backLink className="bg-bgPrimary hidden-navbar-bg" />
 
 			<div className="mb-3 p-4 bg-white flex flex-col justify-center items-center">
-				<img className="mb-2 size-20 rounded-full bg-black bg-opacity-10" src={userInfo?.avatar} alt="" />
+				<Avatar size={70} src={userInfo?.avatar} />
 				<div className="mb-2 flex flex-col items-center">
 					<span className="">{`@${userInfo?.nickname || ''}`}</span>
 					<span className="">{`${userInfo?.email || ''}`}</span>
