@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { RefObject, useCallback, useEffect, useRef } from 'react'
 
 interface LongPressOptions {
 	callback?: (data: any) => void
@@ -6,7 +6,7 @@ interface LongPressOptions {
 	data?: any
 }
 
-const useLongPress = (el: HTMLElement | null, options?: LongPressOptions) => {
+const useLongPress = (el: RefObject<HTMLElement | null>, options?: LongPressOptions) => {
 	const timerRef = useRef<NodeJS.Timeout | null>(null)
 	const scrollingRef = useRef<boolean>(false)
 
@@ -36,21 +36,20 @@ const useLongPress = (el: HTMLElement | null, options?: LongPressOptions) => {
 
 	useEffect(() => {
 		if (!el) return
-		console.log('e', el)
-		el?.addEventListener('touchstart', handleTouchStart, { passive: false })
-		el?.addEventListener('touchend', clearTimer)
-		el?.addEventListener('touchmove', handleScroll)
-		el?.addEventListener('contextmenu', handleContextmenu)
+		el.current?.addEventListener('touchstart', handleTouchStart, { passive: false })
+		el.current?.addEventListener('touchend', clearTimer)
+		el.current?.addEventListener('touchmove', handleScroll)
+		el.current?.addEventListener('contextmenu', handleContextmenu)
 
 		// 在组件卸载或者长按事件触发时清除定时器
 		return () => {
-			el?.removeEventListener('touchstart', handleTouchStart)
-			el?.removeEventListener('touchend', clearTimer)
-			el?.removeEventListener('touchmove', handleScroll)
-			el?.removeEventListener('contextmenu', handleContextmenu)
+			el.current?.removeEventListener('touchstart', handleTouchStart)
+			el.current?.removeEventListener('touchend', clearTimer)
+			el.current?.removeEventListener('touchmove', handleScroll)
+			el.current?.removeEventListener('contextmenu', handleContextmenu)
 			if (timerRef.current) clearTimeout(timerRef.current)
 		}
-	}, [el])
+	}, [el.current])
 
 	const stop = () => {
 		if (timerRef.current) clearTimeout(timerRef.current)
