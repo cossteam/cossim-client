@@ -40,6 +40,9 @@ export const sendMessage = async ({ content, msg_type, isUpdate = true, ...optio
 		dialog_id: dialogId
 	})
 
+	// 是否是当前会话
+	// const isCurrentDialog = dialogId === messageStore.dialogId
+
 	// 如果不需要在发送前创建一条消息，就把 isUpdate 设置为 false
 	isUpdate && (await messageStore.createMessage(message))
 
