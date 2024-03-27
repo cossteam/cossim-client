@@ -37,6 +37,8 @@ export interface CacheStoreOptions {
 	cacheDialogs: any[]
 	/** 缓存联系人列表 */
 	cacheContacts: any[]
+	/** 联系人对象列表 */
+	cacheContactsObj: any
 	/** 缓存共享密钥 */
 	cacheShareKeys: Array<{ user_id: string; shareKey: string }>
 	/** 缓存群信息列表 */
@@ -85,23 +87,29 @@ export type CacheStore = CacheStoreOptions & {
 	 * @description 更新搜索表
 	 */
 	updateCacheSearchMessage: (tableName: string) => void
-
 	/**
 	 * @description 更新消息列表
 	 */
 	updateCacheMessage: (cacheDialogs: any[]) => void
-
 	/**
 	 * @description 更新落后消息
 	 */
 	updateBehindMessage: (behindMessage: any[]) => void
-
 	/**
 	 * @description 添加缓存消息
-	 *
 	 * @param {any} message 消息
 	 */
 	addCacheMessage: (message: any) => Promise<void>
+	/**
+	 * @description 更新好友列表
+	 * @param {any} message 消息
+	 */
+	updateCacheContacts: (contacts: any[]) => void
+	/**
+	 * @description 更新好友对象列表
+	 * @param {any} message 消息
+	 */
+	updateCacheContactsObj: (contacts: any[]) => void
 }
 
 /**
@@ -193,15 +201,16 @@ export type MessageStore = MessageStoreOptions & {
 	 * @param {boolean} isPush 是否是推送消息
 	 */
 	updateMessage: (message: any, dialogId: number, isPush?: boolean) => Promise<void>
-	// /**
-	//  * 添加缓存消息
-	//  * @param {any} message 消息
-	//  */
-	// addCacheMessage: (message: any) => Promise<void>
 	/**
 	 * 删除消息
 	 *
 	 * @param {any} message
 	 */
 	deleteMessage: (message: any) => void
+	/**
+	 * 删除本地所有消息
+	 *
+	 * @param {number} dialogId 会话 id
+	 */
+	deleteAllMessage: (dialogId: number) => Promise<void>
 }

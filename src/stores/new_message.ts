@@ -71,17 +71,14 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 
 		console.log('init message store', options)
 	},
-
 	update: (options) => {
 		set((state) => ({ ...state, ...options }))
 	},
-
 	createMessage: async (message) => {
 		const { allMessages, messages } = get()
 		const newAllMessages = [...allMessages, message]
 		set({ allMessages: newAllMessages, messages: [...messages, message] })
 	},
-
 	updateMessage: async (message, dialogId, isPush = true) => {
 		const { allMessages, messages, dialogId: currentDialog } = get()
 		const tableName = CACHE_MESSAGE + `_${dialogId}`
@@ -100,12 +97,15 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 
 		await updateCacheMessage(tableName, newAllMessages)
 	},
-
 	deleteMessage: async (message) => {
 		const { tableName, allMessages, messages } = get()
 		const newAllMessages = allMessages.filter((msg) => msg.msg_id !== message.msg_id)
 		set({ allMessages: newAllMessages, messages: newAllMessages.slice(-(messages.length + 1)) })
 		await updateCacheMessage(tableName, newAllMessages)
+	},
+	deleteAllMessage: async (dialogId) => {
+		const tableName = CACHE_MESSAGE + `_${dialogId}`
+		cacheStore.set(tableName, [])
 	}
 }))
 
