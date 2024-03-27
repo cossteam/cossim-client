@@ -12,9 +12,7 @@ const defaultOptions: UserStoreOptions = {
 
 const userStore = (set: any): UserStore => ({
 	...defaultOptions,
-	update: (options) => {
-        set((state: UserStore) => ({ ...state, ...options }))
-    }
+	update: (options) => set((state: UserStore) => ({ ...state, ...options }))
 })
 
 const useUserStore = create(

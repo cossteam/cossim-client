@@ -3,9 +3,10 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
 import 'quill/dist/quill.core.css'
 import './ToolEditor.scss'
 import GroupService from '@/api/group'
-import { useMessageStore } from '@/stores/message'
+// import { useMessageStore } from '@/stores/message'
 import 'quill-mention-react'
 import Quill from 'quill'
+import useMessageStore from '@/stores/new_message'
 
 interface ToolEditorProps {
 	className?: string
@@ -28,7 +29,8 @@ export interface ToolEditorMethods {
 const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorProps> = (props, ref) => {
 	const EditorRef = useRef<HTMLDivElement | null>(null)
 	const [quill, setQuill] = useState<Quill>()
-	const msgStore = useMessageStore()
+	// const msgStore = useMessageStore()
+	const messageStore = useMessageStore()
 
 	useEffect(() => {
 		if (!EditorRef.current) return
@@ -51,10 +53,13 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 				onSelect: (item: any) => {
 					console.log('index', item)
 					if (item.id === 0) {
-						msgStore.updateAtAllUser(true)
+						// msgStore.updateAtAllUser(true)
+						messageStore.update({ atAllUser: 1 })
 					} else {
-						msgStore.updateAtAllUser(false)
-						msgStore.updateAtUsers(item.user_id)
+						// const atUsers = messageStore.atUsers.
+						messageStore.update({ atAllUser: 0, atUsers: [...messageStore.atUsers, item.user_id] })
+						// msgStore.updateAtAllUser(false)
+						// msgStore.updateAtUsers(item.user_id)
 					}
 				}
 			}
@@ -72,7 +77,7 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 			}
 		})
 
-		if(props.defaultValue) {
+		if (props.defaultValue) {
 			quill.root.innerHTML = props.defaultValue
 		}
 

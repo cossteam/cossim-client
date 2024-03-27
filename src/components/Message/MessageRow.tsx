@@ -104,7 +104,7 @@ const MessageRow: React.FC<RouterProps & MessageRowProps> = ({ item }) => {
 			default:
 				return <ReadEditor className={className(is_self)} content={item?.content} />
 		}
-	}, [])
+	}, [messageStore.messages])
 
 	const search = async (keyWord: string) => {
 		try {
