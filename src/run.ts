@@ -14,12 +14,29 @@ import GroupService from './api/group'
 import RelationService from './api/relation'
 
 /**
+ * 更新本地缓存消息，如果一开始没有消息，就添加会话中的最后一条消息
+ *
+ * @param dialogs 会话列表
+ */
+async function updateCacheMessage(dialogs: any[]) {
+	for (let i = 0; i < dialogs.length; i++) {
+		const item = dialogs[i]
+		const tableName = item.dialog_id
+		const tableData = (await cacheStore.get(tableName)) ?? []
+		if (!tableData.length) {
+			cacheStore.set(tableName, [{ ...item?.last_message, dialog_id: item?.dialog_id }])
+		}
+	}
+}
+
+/**
  * 获取远程会话
  */
 export async function getRemoteSession() {
 	try {
 		const { code, data } = await MsgService.getDialogApi()
 		if (code !== 200) return
+
 		const cacheStore = useCacheStore.getState()
 
 		const dialogs = data.map((item: any) => ({
@@ -33,8 +50,8 @@ export async function getRemoteSession() {
 		// 更新缓存
 		cacheStore.updateCacheDialogs(dialogs)
 		cacheStore.updateCacheUnreadCount(unreadCount)
-		// 如果是第一次打开就更新缓存消息，如果没有改对话消息缓存，就自动添加一个
-		cacheStore.updateCacheMessage(dialogs)
+
+		updateCacheMessage(dialogs)
 	} catch (error) {
 		console.error('获取远程会话失败：', error)
 	}
@@ -146,7 +163,7 @@ async function updateRecallCacheMessage(message: any) {
  * @param {any} data	推送消息
  */
 export async function handlerSocketMessage(data: any) {
-	console.log('handlerSocketMessage', data)
+	// console.log('handlerSocketMessage', data)
 
 	const userStore = useUserStore.getState()
 	const messageStore = useMessageStore.getState()
@@ -170,7 +187,7 @@ export async function handlerSocketMessage(data: any) {
 
 	// 如果是当前会话，需要实时更新到页面
 	if (message?.dialog_id === messageStore.dialogId) {
-		await messageStore.updateMessage(msg, message?.dialog_id, true)
+		await messageStore.createMessage(msg)
 
 		// 更新标注消息
 		if (isLableMessage(type)) {
@@ -182,9 +199,9 @@ export async function handlerSocketMessage(data: any) {
 					{
 						...messages,
 						is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK
-					},
-					message?.dialog_id,
-					false
+					}
+					// message?.dialog_id,
+					// false
 				)
 		}
 
@@ -197,13 +214,14 @@ export async function handlerSocketMessage(data: any) {
 		}
 	}
 	// 更新到缓存消息里面去
-	else {
-		cacheStore.updateCacheMessage(msg)
-		// 如果是标注消息，需要修改本地消息缓存
-		isLableMessage(type) && updateLabelCacheMessage(msg)
-		// 如果是撤回消息，需要修改本地消息缓存
-		isRecallMessage(type) && updateRecallCacheMessage(msg)
-	}
+	// else {
+	// }
+
+	cacheStore.updateCacheMessage(msg)
+	// 如果是标注消息，需要修改本地消息缓存
+	isLableMessage(type) && updateLabelCacheMessage(msg)
+	// 如果是撤回消息，需要修改本地消息缓存
+	isRecallMessage(type) && updateRecallCacheMessage(msg)
 
 	// 更新消息的总未读数
 	if (msg.is_read === MESSAGE_READ.NOT_READ) {

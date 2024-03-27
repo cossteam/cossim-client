@@ -89,12 +89,14 @@ export type CacheStore = CacheStoreOptions & {
 	updateCacheSearchMessage: (tableName: string) => void
 	/**
 	 * @description 更新消息列表
+	 * @param {number} dialogId 会话id
+	 * @param {any} message 消息
 	 */
-	updateCacheMessage: (cacheDialogs: any[]) => void
+	updateCacheMessage: (message: any) => Promise<void>
 	/**
 	 * @description 更新落后消息
 	 */
-	updateBehindMessage: (behindMessage: any[]) => void
+	updateBehindMessage: (behindMessage: any[]) => Promise<void>
 	/**
 	 * @description 添加缓存消息
 	 * @param {any} message 消息
@@ -200,7 +202,7 @@ export type MessageStore = MessageStoreOptions & {
 	 * @param {number} 会话id
 	 * @param {boolean} isPush 是否是推送消息
 	 */
-	updateMessage: (message: any, dialogId: number, isPush?: boolean) => Promise<void>
+	updateMessage: (message: any) => Promise<void>
 	/**
 	 * 删除消息
 	 *
@@ -213,4 +215,18 @@ export type MessageStore = MessageStoreOptions & {
 	 * @param {number} dialogId 会话 id
 	 */
 	deleteAllMessage: (dialogId: number) => Promise<void>
+	// /**
+	//  * 添加缓存消息
+	//  *
+	//  * @param {any} message 消息
+	//  * @param {number} dialogId 会话id
+	//  */
+	// createCacheMessage: (message: any, dialogId: number) => Promise<void>
+	// /**
+	//  * 更新缓存消息
+	//  *
+	//  * @param {any} message 消息
+	//  * @param {number} dialogId 会话id
+	//  */
+	// updateCacheMessage: (messages: any, dialogId: number) => Promise<void>
 }

@@ -5,31 +5,52 @@
  */
 
 import MsgService from '@/api/msg'
-import { MESSAGE_SEND, msgType, toastMessage, tooltipType } from '@/shared'
+import { MESSAGE_SEND, MessageBurnAfterRead, msgType, toastMessage, tooltipType, updateDialog } from '@/shared'
+import useCacheStore from '@/stores/cache'
 import useMessageStore from '@/stores/new_message'
-// import useUserStore from '@/stores/user'
 import { generateMessage } from '@/utils/data'
 
 interface Options {
+	/** 会话 id */
 	dialog_id?: number
+	/** 接收者 id，如果是群就是群 id */
 	dialog_receiver_id?: string | number
+	/** 收否是群聊 */
 	isGroup?: boolean
+	/** 内容 */
 	content: string
+	/** 消息类型 */
 	msg_type: msgType
-	isUpdate?: boolean
+	/** 是否先创建一条消息，默认为 true，同时会在发送成功后更新发送状态 */
+	isCreateMessage?: boolean
+	/** 是否保存到缓存消息中，默认为 true */
+	isCreateCacheMessage?: boolean
 }
 
 /**
  * @description 发送消息
  * @param {Options} options 其他配置
  */
-export const sendMessage = async ({ content, msg_type, isUpdate = true, ...options }: Options) => {
+export const sendMessage = async ({
+	content,
+	msg_type,
+	isCreateMessage = true,
+	isCreateCacheMessage = true,
+	...options
+}: Options) => {
+	// 消息仓库
 	const messageStore = useMessageStore.getState()
-
+	// 缓存仓库
+	const cacheStore = useCacheStore.getState()
 	// 是否是回复消息
 	const isReply = messageStore.manualTipType === tooltipType.REPLY
 	// 会话 id
 	const dialogId = options?.dialog_id ?? messageStore.dialogId
+
+	// 获取是否阅后即焚
+	const isBurnAfterReading =
+		cacheStore.cacheContacts.find((item) => item.dialog_id === dialogId)?.preferences?.open_burn_after_reading ??
+		MessageBurnAfterRead.NO
 
 	// 生成消息对象
 	const message = generateMessage({
@@ -37,15 +58,17 @@ export const sendMessage = async ({ content, msg_type, isUpdate = true, ...optio
 		msg_send_state: MESSAGE_SEND.SENDING,
 		msg_type,
 		reply_id: isReply ? messageStore.selectedMessage?.msg_id : 0,
-		dialog_id: dialogId
+		dialog_id: dialogId,
+		is_burn_after_reading: isBurnAfterReading
 	})
 
-	// 是否是当前会话
-	// const isCurrentDialog = dialogId === messageStore.dialogId
+	// 是否预先创建一条消息
+	if (isCreateMessage) {
+		await cacheStore.addCacheMessage(message)
+		await messageStore.createMessage(message)
+	}
 
-	// 如果不需要在发送前创建一条消息，就把 isUpdate 设置为 false
-	isUpdate && (await messageStore.createMessage(message))
-
+	// 基本参数
 	const params: any = {
 		type: message.msg_type,
 		content: message.content,
@@ -54,7 +77,7 @@ export const sendMessage = async ({ content, msg_type, isUpdate = true, ...optio
 		is_burn_after_reading: message.is_burn_after_reading
 	}
 
-	// 对群聊或私聊消息进行区分
+	// 对群聊或私聊消息参数进行区分
 	if (options?.isGroup || messageStore.isGroup) {
 		params['at_all_user'] = messageStore.atAllUser
 		params['at_users'] = messageStore.atUsers
@@ -79,9 +102,15 @@ export const sendMessage = async ({ content, msg_type, isUpdate = true, ...optio
 		message.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		// 生成错误信息并添加至会话
 		const errorMessage = generateMessage({ content: error?.message, msg_type: msgType.ERROR })
-		await messageStore.updateMessage(errorMessage, dialogId, true)
+		await message.createMessage(errorMessage)
+		await cacheStore.addCacheMessage(errorMessage)
 	} finally {
-		await messageStore.updateMessage(message, dialogId, isUpdate ? false : true)
+		console.log('message.msg_send_state', message)
+
+		if (isCreateMessage) await messageStore.updateMessage(message)
+		if (isCreateCacheMessage) await cacheStore.updateCacheMessage(message)
+		// 更新本地会话
+		updateDialog(message)
 	}
 
 	return message
@@ -90,10 +119,10 @@ export const sendMessage = async ({ content, msg_type, isUpdate = true, ...optio
 /**
  * 修改消息
  * @param {string}	content 消息内容
- *
  */
 export const editMessage = async (content: string) => {
 	const messageStore = useMessageStore.getState()
+	const cacheStore = useCacheStore.getState()
 	const message = messageStore.selectedMessage
 	if (!message) return
 	try {
@@ -102,16 +131,20 @@ export const editMessage = async (content: string) => {
 			content,
 			msg_id: message?.msg_id
 		}
+
+		const newMessage = { ...message, content }
+		await messageStore.updateMessage(newMessage)
+		await cacheStore.updateCacheMessage(newMessage)
+
 		const { code, msg } = messageStore.isGroup
 			? await MsgService.editGroupMessageApi(params)
 			: await MsgService.editUserMessageApi(params)
 
 		if (code !== 200) throw new Error(msg)
-
-		messageStore.updateMessage({ ...message, content }, message?.dialog_id, false)
 	} catch (error: any) {
 		toastMessage(error?.message ?? '编辑失败')
-		messageStore.updateMessage(message, message?.dialog_id, false)
+		await messageStore.updateMessage(message)
+		await cacheStore.updateCacheMessage(message)
 	}
 }
 
@@ -132,7 +165,7 @@ export const forwardMessage = async () => {
 				await sendMessage({
 					content: msg.content,
 					msg_type: msg.msg_type,
-					isUpdate: item?.dialog_receiver_id === messageStore.receiverId,
+					isCreateMessage: item?.dialog_receiver_id === messageStore.receiverId,
 					...item
 				})
 			}

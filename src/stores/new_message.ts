@@ -36,16 +36,14 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 	...defaultOptions,
 
 	init: async (options) => {
-		const tableName = CACHE_MESSAGE + `_${options.dialogId}`
-
+		const tableName = `${options.dialogId}`
 		const allMessages = (await cacheStore.get(tableName)) ?? []
 
 		// 添加到搜索消息表名中
 		const cache = useCacheStore.getState()
 		if (!cache.cacheSearchMessage.includes(tableName)) {
-			useCacheStore.getState().updateCacheSearchMessage(tableName)
+			cache.updateCacheSearchMessage(tableName)
 		}
-
 		const messages = allMessages.slice(-15)
 
 		set({ allMessages, messages, isNeedPull: !allMessages.length, tableName, ...options })
@@ -69,7 +67,7 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		// 	set({ total })
 		// })
 
-		console.log('init message store', options)
+		// console.log('init message store', options)
 	},
 	update: (options) => {
 		set((state) => ({ ...state, ...options }))
@@ -79,27 +77,19 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		const newAllMessages = [...allMessages, message]
 		set({ allMessages: newAllMessages, messages: [...messages, message] })
 	},
-	updateMessage: async (message, dialogId, isPush = true) => {
-		const { allMessages, messages, dialogId: currentDialog } = get()
-		const tableName = CACHE_MESSAGE + `_${dialogId}`
-		const isCurrentDialog = dialogId === currentDialog
-
-		const tableMessages = isCurrentDialog ? allMessages : (await cacheStore.get(tableName)) ?? []
-
-		const newAllMessages = isPush
-			? [...tableMessages, message]
-			: tableMessages.map((msg: any) => (msg?.msg_id === message?.msg_id ? { ...msg, ...message } : msg))
-
-		// 转发给别人时不需要更新当前会话的消息
-		if (isCurrentDialog) {
-			set({ allMessages: newAllMessages, messages: newAllMessages.slice(-messages.length) })
-		}
-
-		await updateCacheMessage(tableName, newAllMessages)
+	updateMessage: async (message) => {
+		const { allMessages, messages } = get()
+		const newAllMessages = allMessages.map((msg: any) =>
+			msg?.msg_id === message?.msg_id || msg?.uid === message?.uid ? { ...msg, ...message } : msg
+		)
+		set({
+			allMessages: newAllMessages,
+			messages: newAllMessages.slice(-(messages.length + 1))
+		})
 	},
 	deleteMessage: async (message) => {
 		const { tableName, allMessages, messages } = get()
-		const newAllMessages = allMessages.filter((msg) => msg.msg_id !== message.msg_id)
+		const newAllMessages = allMessages.filter((msg) => msg.msg_id !== message.msg_id || msg?.uid !== message?.uid)
 		set({ allMessages: newAllMessages, messages: newAllMessages.slice(-(messages.length + 1)) })
 		await updateCacheMessage(tableName, newAllMessages)
 	},

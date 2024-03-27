@@ -4,11 +4,6 @@
 @import './variables.scss';
 @import './f7-custom.scss';
 
-// body {
-//     transition: all 0.3s ease-in;
-//     background: #f36;
-// }
-
 .app {
 	.toolbar {
 		.badge {
@@ -20,6 +15,7 @@
 		}
 	}
 }
+
 /** 防止消息页显示底部导航栏 */
 .toolbar-hidden {
 	display: none;

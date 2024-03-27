@@ -7,7 +7,7 @@ import {
 	CACHE_DIALOGS,
 	CACHE_GROUP,
 	CACHE_KEYBOARD_HEIGHT,
-	CACHE_MESSAGE,
+	// CACHE_MESSAGE,
 	CACHE_SEARCH_MESSAGE,
 	CACHE_SHARE_KEYS,
 	CACHE_UNREAD_COUNT,
@@ -83,33 +83,25 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		set({ cacheSearchMessage })
 		await cacheStore.set(CACHE_SEARCH_MESSAGE, cacheSearchMessage)
 	},
-	updateCacheMessage: async (cacheDialogs) => {
-		const { updateCacheSearchMessage } = get()
-		if (!cacheDialogs.length) return
-
-		cacheDialogs?.map(async (item) => {
-			const tableName = CACHE_MESSAGE + `_${item.dialog_id}`
-			const messages = (await cacheStore.get(tableName)) ?? []
-
-			// 如果没有消息就添加一个
-			if (!messages.length) {
-				cacheStore.set(tableName, [item?.last_message])
-			}
-
-			updateCacheSearchMessage(tableName)
-		})
-	},
 	updateBehindMessage: async (behindMessages) => {
 		behindMessages?.map(async (item) => {
-			const tableName = CACHE_MESSAGE + `_${item.dialog_id}`
+			const tableName = `${item.dialog_id}`
 			const messages = (await cacheStore.get(tableName)) ?? []
 			cacheStore.set(tableName, [...messages, ...item.msg_list])
 		})
 	},
 	addCacheMessage: async (message) => {
-		const tableName = CACHE_MESSAGE + `_${message.dialog_id}`
+		const tableName = `${message.dialog_id}`
 		const messages = (await cacheStore.get(tableName)) ?? []
 		await cacheStore.set(tableName, [...messages, message])
+	},
+	updateCacheMessage: async (message) => {
+		const tableName = `${message.dialog_id}`
+		const allMessages = (await cacheStore.get(tableName)) ?? []
+		const messages = allMessages.map((item: any) =>
+			item?.msg_id === message?.msg_id || item?.uid === message?.uid ? { ...item, ...message } : item
+		)
+		await cacheStore.set(tableName, messages)
 	},
 	updateCacheContacts: async (cacheContacts) => {
 		await cacheStore.set(CACHE_CONTACTS, cacheContacts)
@@ -118,7 +110,6 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 	updateCacheContactsObj: async (cacheContacts) => {
 		const cacheContactsObj = arrayToGroups(cacheContacts)
 		await cacheStore.set(CACHE_CONTACTS, cacheContactsObj)
-		console.log('cacheContactsObj', cacheContactsObj, cacheContacts)
 		set({ cacheContacts, cacheContactsObj })
 	}
 }))

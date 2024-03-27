@@ -98,7 +98,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			default:
 				return <ReadEditor className={className(is_self)} content={item?.content} />
 		}
-	}, [])
+	}, [messageStore.messages])
 
 	// 无内容
 	if (type === msgType.NONE) return null
