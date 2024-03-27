@@ -5,7 +5,7 @@ import UserService from '@/api/user'
 import { isEqual } from 'lodash-es'
 import { v4 as uuidv4 } from 'uuid'
 import { PrivateChats } from '@/types/db/user-db'
-import { $t, MESSAGE_TYPE } from '.'
+import { $t, MESSAGE_TYPE, msgType } from '.'
 import MsgService from '@/api/msg'
 import CommonStore from '@/db/common'
 import useCacheStore from '@/stores/cache'
@@ -340,5 +340,7 @@ export const updateDialog = async (message: any) => {
  */
 export const updateCacheMessage = async (tableName: string, messages: any[]) => {
 	await cacheStore.set(tableName, messages)
-	await updateDialog(messages.at(-1))
+	const msg = messages.at(-1)
+	if ([msgType.ERROR, msgType.CANCEL_LABEL, msgType.LABEL, msgType.RECALL].includes(msg.msg_type)) return
+	await updateDialog(msg)
 }

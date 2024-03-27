@@ -2,6 +2,7 @@ import useMessageStore from '@/stores/new_message'
 import MessageEmojis from './MessageEmojis'
 import MessageMore from './MessageMore'
 import {
+	MESSAGE_SEND,
 	emojiOrMore,
 	fileBase64,
 	fileMessageType,
@@ -17,7 +18,6 @@ import { useMemo } from 'react'
 import useCacheStore from '@/stores/cache'
 import { sendMessage } from '../script/message'
 import { generateMessage } from '@/utils/data'
-// import { generateMessage } from '@/utils/data'
 
 const MessageToolbarContent = () => {
 	const messageStore = useMessageStore()
@@ -28,8 +28,6 @@ const MessageToolbarContent = () => {
 	const isMore = useMemo(() => messageStore.toolbarType === emojiOrMore.MORE, [messageStore.toolbarType])
 
 	const handlerSelectFiles = async (files: FileList) => {
-		// console.log('files', files)
-
 		for (const file of files) {
 			let fileMsg
 			const type = file.type
@@ -37,21 +35,6 @@ const MessageToolbarContent = () => {
 			if (file.size > 1024 * 1024 * 500) {
 				toastMessage('文件过大[仅支持不超过500M的文件]')
 			}
-
-			// console.log('file', file)
-
-			// if (file) {
-			//     const { width, height } = await cacheStore.getImageSize(file)
-			// 	const reader = new FileReader()
-			// 	reader.onload = function () {
-			//         const img = new Image()
-			//         img.src = reader.result as string
-			// 		img.onload = function () {
-			// 			console.log('宽度:', img.width, '高度:', img.height)
-			// 		}
-			// 	}
-			// 	reader.readAsDataURL(file)
-			// }
 
 			try {
 				const msg_type = fileMessageType(type)
@@ -70,10 +53,11 @@ const MessageToolbarContent = () => {
 
 				const message = generateMessage({
 					content: JSON.stringify(data),
-					msg_type
+					msg_type,
+					msg_send_state: MESSAGE_SEND.SENDING
 				})
 
-				messageStore.createMessage(message)
+				await messageStore.createMessage(message)
 
 				// 上传文件
 				fileMsg = await uploadFile(file)
@@ -88,10 +72,10 @@ const MessageToolbarContent = () => {
 				await sendMessage({
 					content: JSON.stringify({ ...data, width, height }),
 					msg_type,
-					isUpdate: false
+					isCreateMessage: false
 				})
+				await messageStore.updateMessage({ ...message, msg_send_state: MESSAGE_SEND.SEND_SUCCESS })
 			} catch (error: any) {
-				// if (!fileMsg) return
 				toastMessage(error?.message ?? '发送失败')
 			}
 		}

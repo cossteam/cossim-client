@@ -4,22 +4,8 @@ import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
 import Layout from './components/Layout'
-import {
-	$t,
-	TOKEN,
-	SocketClient,
-	// handlerMessageSocket,
-	SocketEvent,
-	handlerLabelSocket,
-	handlerRequestResultSocket,
-	handlerEditSocket,
-	DEVICE_ID,
-	burnAfterReading,
-	handlerRecallSocket
-} from '@/shared'
+import { $t, TOKEN, SocketClient, SocketEvent, DEVICE_ID, burnAfterReading, toastMessage } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
-import { useMessageStore, MessageStore } from './stores/message'
-// import { useStateStore } from '@/stores/state'
 import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import localNotification, { LocalNotificationType } from '@/utils/notification'
@@ -31,19 +17,17 @@ import LiveRoomNew from '@/components/LiveRoom'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
-import run, { handlerSocketMessage, handlerSocketRequest } from './run'
+import run, { handlerSocketEdit, handlerSocketMessage, handlerSocketRequest } from './run'
 import { isWeb } from './utils'
 import { Toaster } from 'react-hot-toast'
-
-let store: MessageStore | null = null
+import useMessageStore from './stores/new_message'
 
 function App() {
-	const msgStore = useMessageStore()
-	// const stateStore = useStateStore()
-
-	const toastRef = useRef(null)
-
 	const router = useRef<Router.Router | null>(null)
+
+	const messageStore = useMessageStore()
+	const liveRoomStore = useLiveRoomStore()
+	const cacheStore = useCacheStore()
 
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
@@ -67,7 +51,6 @@ function App() {
 		}
 	})
 
-	const liveRoomStore = useLiveRoomStore()
 	useEffect(() => {
 		// 修复手机上的视口比例
 		if ((f7.device.ios || f7.device.android) && f7.device.standalone) {
@@ -79,7 +62,7 @@ function App() {
 		const handlerInit = async (e: any) => {
 			const data = JSON.parse(e.data)
 			const event = data.event
-			// console.log('接收到所有 sokect 通知：', data)
+			console.log('接收到所有 sokect 通知：', data)
 			switch (event) {
 				case SocketEvent.OnlineEvent:
 					setCookie(DEVICE_ID, data.driverId)
@@ -91,7 +74,7 @@ function App() {
 						const msg = data?.data || {}
 						// msg 的发送者不是自己并且当前不在会话中
 						// console.log(Number(msg.dialog_id), Number(store!.dialog_id))
-						if (Number(msg.dialog_id) !== Number(store!.dialog_id)) {
+						if (Number(msg.dialog_id) !== Number(messageStore.dialogId)) {
 							// 本地通知
 							const dom = document.createElement('p')
 							dom.innerHTML = DOMPurify.sanitize(msg.content || '')
@@ -101,16 +84,14 @@ function App() {
 					} catch {
 						console.log('发送本地通知失败')
 					}
-					// handlerMessageSocket(data, store!, stateStore)
 					handlerSocketMessage(data)
 					break
 				case SocketEvent.ApplyListEvent:
 				case SocketEvent.GroupApplyListEvent:
-					// handlerRequestSocket(data) // 废弃
 					handlerSocketRequest(data)
 					break
 				case SocketEvent.ApplyAcceptEvent:
-					handlerRequestResultSocket(data)
+					// handlerRequestResultSocket(data)
 					break
 				// 通话事件
 				case SocketEvent.UserCallReqEvent:
@@ -121,71 +102,50 @@ function App() {
 				case SocketEvent.GroupCallHangupEvent:
 					liveRoomStore.handlerEvent(event, data)
 					break
-				case SocketEvent.MessageLabelEvent:
-					handlerLabelSocket(data, store!)
-					break
 				case SocketEvent.MessageEditEvent:
-					console.log('消息编辑', data)
-					handlerEditSocket(data, store!)
+					// console.log('消息编辑', data)
+					handlerSocketEdit(data)
+					// handlerEditSocket(data, store!)
 					break
-				case SocketEvent.MessageRecallEvent:
-					handlerRecallSocket(data, store!)
-					break
+				// case SocketEvent.MessageRecallEvent:
+				// 	// handlerRecallSocket(data, store!)
+				// 	break
 			}
 		}
 
 		// 连接 socket
 		if (hasCookie(TOKEN)) {
+			cacheStore.init()
 			run()
 			SocketClient.connect()
-
-			// TODO: 迁移下面监听到新的处理文件里面
 			SocketClient.addListener('onWsMessage', handlerInit)
-
-			// SocketClient.addListener('onWsMessage', handleSocket)
 		}
-
-		// 计算页面高度
-		msgStore.updateHeight(document.documentElement.clientHeight)
 
 		return () => {
 			SocketClient.removeListener('onWsMessage', handlerInit)
-			// SocketClient.removeListener('onWsMessage', handleSocket)
 		}
 	}, [])
 
 	let backListener: PluginListenerHandle
 	let appStateListener: PluginListenerHandle
 
-	// const [isActive, setIsActive] = useState(true)
-
 	useAsyncEffect(
 		async () => {
 			let backNumber = 0
 			let timer: NodeJS.Timeout | null = null
-
-			// @ts-ignore
-			toastRef.current = f7.toast.create({
-				text: $t('再按一次退出程序'),
-				closeTimeout: 1000,
-				position: 'center'
-			})
 
 			const historyRoutes = ['/dialog/', '/contact/', '/my/']
 
 			const backButtonHandler = () => {
 				timer && clearTimeout(timer)
 				backNumber++
-				// @ts-ignore
-				// !router.current &&
 
 				timer = setTimeout(() => {
 					backNumber = 0
 				}, 1000)
 
 				const flag = historyRoutes.includes(router.current?.currentRoute.url ?? '')
-				// @ts-ignore
-				if (flag) toastRef.current?.open()
+				if (flag) toastMessage('再按一次退出程序')
 				if (backNumber > 1) {
 					if (flag) {
 						CapApp.minimizeApp()
@@ -221,10 +181,6 @@ function App() {
 		[]
 	)
 
-	useEffect(() => {
-		store = msgStore
-	}, [msgStore])
-
 	useAsyncEffect(
 		async () => {
 			try {
@@ -245,13 +201,6 @@ function App() {
 		() => {},
 		[liveRoomStore.opened]
 	)
-
-	// 获取缓存
-	const cacheStore = useCacheStore()
-
-	useEffect(() => {
-		cacheStore.init()
-	}, [])
 
 	return (
 		<AppComponent {...f7params}>
