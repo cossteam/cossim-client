@@ -82,6 +82,8 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 				return '[视频]'
 			case MESSAGE_TYPE.FILE:
 				return '[文件]'
+			case MESSAGE_TYPE.AUDIO:
+				return '[语音]'
 			default:
 				return (
 					<ReadEditor
