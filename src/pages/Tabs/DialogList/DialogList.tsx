@@ -11,7 +11,7 @@ import {
 	PageContent
 } from 'framework7-react'
 import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill, Search } from 'framework7-icons/react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { $t, customSort, formatDialogListTime, MESSAGE_TYPE } from '@/shared'
 import RelationService from '@/api/relation'
 import './DialogList.scss'
@@ -20,11 +20,21 @@ import clsx from 'clsx'
 import useCacheStore from '@/stores/cache'
 import { getRemoteSession } from '@/run'
 import useMessageStore from '@/stores/new_message'
+import useRouterStore from '@/stores/router.ts'
+import Avatar from '@/components/Avatar/Avatar.tsx'
 
 const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const messageStore = useMessageStore()
 	const cacheStore = useCacheStore()
+	const { router, setRouter } = useRouterStore()
 
+	useEffect(() => {
+		setRouter(f7router)
+		console.log('路由', router)
+	}, [])
+
+
+	// console.log(router)
 	// 置顶对话
 	const topDialog = async (item: any) => {
 		await RelationService.topDialogApi({ dialog_id: item.dialog_id, action: item?.top_at ? 0 : 1 })
@@ -156,6 +166,8 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 				<div className="h-full bg-bgPrimary pb-12 overflow-y-auto" onScroll={onDialogListScroll}>
 					<List contactsList noChevron mediaList dividers className="">
 						{cacheStore.cacheDialogs.sort(customSort).map((item, index) => {
+							// @ts-ignore
+							// @ts-ignore
 							return (
 								<ListItem
 									className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
@@ -174,7 +186,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 										await messageStore.init({
 											dialogId: item?.dialog_id ?? 0,
 											receiverId: item?.user_id ?? item?.group_id ?? 0,
-											isGroup: item?.user_id ? false : true,
+											isGroup: !!item?.user_id,
 											receiverInfo: item
 										})
 										f7router?.navigate(
@@ -182,12 +194,13 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 										)
 									}}
 								>
-									<img
-										slot="media"
-										src={`${item?.dialog_avatar}`}
-										loading="lazy"
-										className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"
-									/>
+									<Avatar slot='media' src={`${item?.dialog_avatar}`} />
+									{/*<img*/}
+									{/*	slot="media"*/}
+									{/*	src={`${item?.dialog_avatar}`}*/}
+									{/*	loading="lazy"*/}
+									{/*	className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"*/}
+									{/*/>*/}
 									<div
 										slot="text"
 										className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap"
