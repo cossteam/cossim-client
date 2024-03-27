@@ -24,7 +24,7 @@ interface Options {
 	/** 是否先创建一条消息，默认为 true，同时会在发送成功后更新发送状态 */
 	isCreateMessage?: boolean
 	/** 是否保存到缓存消息中，默认为 true */
-	isCreateCacheMessage?: boolean
+	// isCreateCacheMessage?: boolean
 }
 
 /**
@@ -35,7 +35,7 @@ export const sendMessage = async ({
 	content,
 	msg_type,
 	isCreateMessage = true,
-	isCreateCacheMessage = true,
+	// isCreateCacheMessage = true,
 	...options
 }: Options) => {
 	// 消息仓库
@@ -64,8 +64,8 @@ export const sendMessage = async ({
 
 	// 是否预先创建一条消息
 	if (isCreateMessage) {
-		await cacheStore.addCacheMessage(message)
-		await messageStore.createMessage(message)
+		// await cacheStore.addCacheMessage(message,true)
+		await messageStore.createMessage(message, true)
 	}
 
 	// 基本参数
@@ -102,13 +102,13 @@ export const sendMessage = async ({
 		message.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		// 生成错误信息并添加至会话
 		const errorMessage = generateMessage({ content: error?.message, msg_type: msgType.ERROR })
-		await message.createMessage(errorMessage)
+		await messageStore.createMessage(errorMessage)
 		await cacheStore.addCacheMessage(errorMessage)
 	} finally {
-		console.log('message.msg_send_state', message)
-
+		// console.log('message.msg_send_state', message)
 		if (isCreateMessage) await messageStore.updateMessage(message)
-		if (isCreateCacheMessage) await cacheStore.updateCacheMessage(message)
+		// 手动触发更新
+		// if (isCreateCacheMessage) await cacheStore.updateCacheMessage(message)
 		// 更新本地会话
 		updateDialog(message)
 	}

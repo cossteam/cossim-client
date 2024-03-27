@@ -190,19 +190,19 @@ export type MessageStore = MessageStoreOptions & {
 	 * 更新所有仓库信息, 可以只更新部分信息
 	 * @param { Partial<MessageStoreOptions>} options
 	 */
-	update: (options: Partial<MessageStoreOptions>) => void
+	update: (options: Partial<MessageStoreOptions>) => Promise<void>
 	/**
 	 * 创建一条消息
 	 * @param {any} message 消息内容
+	 * @param {boolean} isCreateCacheMessage 是否创建缓存消息，默认为 true
 	 */
-	createMessage: (message: any) => Promise<void>
+	createMessage: (message: any, isCreateCacheMessage?: boolean) => Promise<void>
 	/**
 	 * 更新消息
 	 * @param {any} message	消息内容
-	 * @param {number} 会话id
-	 * @param {boolean} isPush 是否是推送消息
+	 * @param {isupdateCacheMessage} 是否更新本地缓存消息，默认为 true
 	 */
-	updateMessage: (message: any) => Promise<void>
+	updateMessage: (message: any, isupdateCacheMessage?: boolean) => Promise<void>
 	/**
 	 * 删除消息
 	 *

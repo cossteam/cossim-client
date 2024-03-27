@@ -21,7 +21,7 @@ import RelationService from './api/relation'
 async function updateCacheMessage(dialogs: any[]) {
 	for (let i = 0; i < dialogs.length; i++) {
 		const item = dialogs[i]
-		const tableName = item.dialog_id
+		const tableName = `${item.dialog_id}`
 		const tableData = (await cacheStore.get(tableName)) ?? []
 		if (!tableData.length) {
 			cacheStore.set(tableName, [{ ...item?.last_message, dialog_id: item?.dialog_id }])
@@ -163,7 +163,7 @@ async function updateRecallCacheMessage(message: any) {
  * @param {any} data	推送消息
  */
 export async function handlerSocketMessage(data: any) {
-	// console.log('handlerSocketMessage', data)
+	console.log('handlerSocketMessage', data)
 
 	const userStore = useUserStore.getState()
 	const messageStore = useMessageStore.getState()
@@ -195,14 +195,10 @@ export async function handlerSocketMessage(data: any) {
 			const messageStore = useMessageStore.getState()
 			const messages = messageStore.allMessages.find((v) => v?.msg_id === msg?.reply_id)
 			messages &&
-				messageStore.updateMessage(
-					{
-						...messages,
-						is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK
-					}
-					// message?.dialog_id,
-					// false
-				)
+				messageStore.updateMessage({
+					...messages,
+					is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK
+				})
 		}
 
 		// 更新撤回消息
@@ -213,9 +209,6 @@ export async function handlerSocketMessage(data: any) {
 			message && messageStore.deleteMessage(message)
 		}
 	}
-	// 更新到缓存消息里面去
-	// else {
-	// }
 
 	cacheStore.updateCacheMessage(msg)
 	// 如果是标注消息，需要修改本地消息缓存
@@ -226,6 +219,40 @@ export async function handlerSocketMessage(data: any) {
 	// 更新消息的总未读数
 	if (msg.is_read === MESSAGE_READ.NOT_READ) {
 		cacheStore.updateCacheUnreadCount(cacheStore.unreadCount + 1)
+	}
+}
+
+/**
+ * 编辑消息
+ * @param {any} data
+ */
+export async function handlerSocketEdit(data: any) {
+	const userStore = useUserStore.getState()
+	if (userStore.deviceId === data.driverId) return
+
+	// console.log('编辑消息', data)
+	const cacheStore = useCacheStore.getState()
+	const messageStore = useMessageStore.getState()
+
+	const message = data.data
+
+	const msg = {
+		msg_id: message?.id ?? message?.msg_id,
+		content: message.content
+	}
+
+	// const msg = generateMessage({
+	// 	msg_id: message?.id ?? message?.msg_id,
+	// 	...message
+	// })
+
+	// 如果是当前会话，需要实时更新到页面
+	if (message?.dialog_id === messageStore.dialogId) {
+		console.log('会话', msg, message)
+
+		await messageStore.updateMessage(msg)
+	} else {
+		await cacheStore.updateCacheMessage(msg)
 	}
 }
 

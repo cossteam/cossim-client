@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { MessageStore, MessageStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
-import { CACHE_MESSAGE, emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
+import { emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
 import useCacheStore from './cache'
 
 const defaultOptions: MessageStoreOptions = {
@@ -67,17 +67,22 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		// 	set({ total })
 		// })
 
-		// console.log('init message store', options)
+		console.log('init message store', options)
 	},
-	update: (options) => {
+	update: async (options) => {
 		set((state) => ({ ...state, ...options }))
 	},
-	createMessage: async (message) => {
+	createMessage: async (message, isCreateCacheMessage = true) => {
 		const { allMessages, messages } = get()
 		const newAllMessages = [...allMessages, message]
 		set({ allMessages: newAllMessages, messages: [...messages, message] })
+
+		if (isCreateCacheMessage) {
+			const cacheStore = useCacheStore.getState()
+			await cacheStore.addCacheMessage(message)
+		}
 	},
-	updateMessage: async (message) => {
+	updateMessage: async (message, isupdateCacheMessage = true) => {
 		const { allMessages, messages } = get()
 		const newAllMessages = allMessages.map((msg: any) =>
 			msg?.msg_id === message?.msg_id || msg?.uid === message?.uid ? { ...msg, ...message } : msg
@@ -86,6 +91,11 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 			allMessages: newAllMessages,
 			messages: newAllMessages.slice(-(messages.length + 1))
 		})
+
+		if (isupdateCacheMessage) {
+			const cacheStore = useCacheStore.getState()
+			await cacheStore.updateCacheMessage(message)
+		}
 	},
 	deleteMessage: async (message) => {
 		const { tableName, allMessages, messages } = get()
@@ -94,8 +104,7 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		await updateCacheMessage(tableName, newAllMessages)
 	},
 	deleteAllMessage: async (dialogId) => {
-		const tableName = CACHE_MESSAGE + `_${dialogId}`
-		cacheStore.set(tableName, [])
+		cacheStore.set(`${dialogId}`, [])
 	}
 }))
 

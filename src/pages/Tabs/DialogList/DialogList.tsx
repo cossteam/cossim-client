@@ -33,7 +33,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		console.log('路由', router)
 	}, [])
 
-
 	// console.log(router)
 	// 置顶对话
 	const topDialog = async (item: any) => {
@@ -166,7 +165,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 										await messageStore.init({
 											dialogId: item?.dialog_id ?? 0,
 											receiverId: item?.user_id ?? item?.group_id ?? 0,
-											isGroup: !!item?.user_id,
+											isGroup: item?.group_id ? true : false,
 											receiverInfo: item
 										})
 										f7router?.navigate(
@@ -174,7 +173,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 										)
 									}}
 								>
-									<Avatar slot='media' src={`${item?.dialog_avatar}`} />
+									<Avatar slot="media" src={`${item?.dialog_avatar}`} />
 									{/*<img*/}
 									{/*	slot="media"*/}
 									{/*	src={`${item?.dialog_avatar}`}*/}

@@ -7,7 +7,6 @@ import {
 	CACHE_DIALOGS,
 	CACHE_GROUP,
 	CACHE_KEYBOARD_HEIGHT,
-	// CACHE_MESSAGE,
 	CACHE_SEARCH_MESSAGE,
 	CACHE_SHARE_KEYS,
 	CACHE_UNREAD_COUNT,
@@ -40,13 +39,6 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const unreadCount = (await cacheStore.get(CACHE_UNREAD_COUNT)) ?? 0
 		const applyCount = (await cacheStore.get(CACHE_APPLY_COUNT)) ?? 0
 		const keyboardHeight = (await cacheStore.get(CACHE_KEYBOARD_HEIGHT)) ?? 300
-
-		// console.log(
-		// 	'cacheContacts',
-		// 	// cacheContacts,
-		// 	groupsToArray(cacheContacts)
-		// 	// arrayToGroups(groupsToArray(cacheContacts))
-		// )
 
 		set({
 			cacheDialogs,

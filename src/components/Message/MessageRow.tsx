@@ -1,4 +1,4 @@
-import { $t, isMe, msgType, tooltipType } from '@/shared'
+import { isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/new_message'
@@ -10,7 +10,6 @@ import MessageFile from './MessageRow/MessageFile'
 import MessageTime from './MessageRow/MessageTime'
 import MessageTooltip from './MessageRow/MessageTooltip'
 import Tippy from '@tippyjs/react'
-// import { useClickOutside } from '@reactuses/core'
 import 'tippy.js/dist/tippy.css'
 import 'tippy.js/themes/light.css'
 import 'tippy.js/animations/shift-away-subtle.css'
@@ -19,11 +18,13 @@ import MessageError from './MessageRow/MessageError'
 import MessageLabel from './MessageRow/MessageLabel'
 import useUserStore from '@/stores/user'
 import MessageRecall from './MessageRow/MessageRecall'
-import { f7, ListItem } from 'framework7-react'
+import { ListItem } from 'framework7-react'
 import { useLongPress } from '@reactuses/core'
-import Avatar from '@/components/Avatar/Avatar.tsx'
-import UserStore from '@/db/user.ts'
-import useRouterStore from '@/stores/router.ts'
+import Avatar from '@/components/Avatar/Avatar'
+import useRouterStore from '@/stores/router'
+import './styles/MessageRow.scss'
+import useLoading from '@/hooks/useLoading'
+import useCacheStore from '@/stores/cache'
 
 interface MessageRowProps {
 	item: { [key: string]: any }
@@ -36,19 +37,21 @@ const className = (is_self: boolean) => {
 	)
 }
 
-const MessageRow: React.FC<RouterProps & MessageRowProps> = ({ item }) => {
+const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const longPressRef = useRef<HTMLDivElement>(null)
 
-	const {router} = useRouterStore()
+	const { router } = useRouterStore()
+	const { watchAsyncFn } = useLoading()
 
 	const type = useMemo(() => item?.msg_type, [item?.msg_type])
 	const is_self = useMemo(
-		() => isMe(item?.sender_info?.user_id ?? item?.sender_id),
+		() => isMe(item?.sender_id ?? item?.sender_info?.user_id),
 		[item?.sender_info?.user_id, item?.sender_id]
 	)
 
 	const messageStore = useMessageStore()
 	const userStore = useUserStore()
+	const cacheStore = useCacheStore()
 
 	const [showTippy, setShowTippy] = useState<boolean>(false)
 
@@ -65,15 +68,6 @@ const MessageRow: React.FC<RouterProps & MessageRowProps> = ({ item }) => {
 		{ isPreventDefault: false, delay: 300 }
 	)
 
-	// 点击其他地方移除提示框
-	// useClickOutside(longPressRef, () =>
-	// 	setTimeout(() => {
-	// 		setShowTippy(false)
-	// 	}, 100)
-	// )
-
-	// const [isMove, setIsMove] = useState(false)
-
 	// 选中消息时的处理
 	const handlerSelectChange = (checked: boolean, item: any) => {
 		const selectedMessages = checked
@@ -85,8 +79,7 @@ const MessageRow: React.FC<RouterProps & MessageRowProps> = ({ item }) => {
 	// 是否可以多选
 	const isSelect = useMemo(
 		() =>
-			messageStore.manualTipType === tooltipType.SELECT &&
-			![msgType.CALL, msgType.AUDIO, msgType.VOICE].includes(item.msg_type),
+			messageStore.manualTipType === tooltipType.SELECT && ![msgType.CALL, msgType.VOICE].includes(item.msg_type),
 
 		[messageStore.manualTipType]
 	)
@@ -106,30 +99,12 @@ const MessageRow: React.FC<RouterProps & MessageRowProps> = ({ item }) => {
 		}
 	}, [messageStore.messages])
 
-	const search = async (keyWord: string) => {
-		try {
-			f7.dialog.preloader($t('搜索中...'))
-
-			// 先查找本地好友列表，查看是否是自己好友
-			const user = await UserStore.findOneById(UserStore.tables.friends, 'user_id', keyWord)
-			const userId = localStorage.getItem('__USER_ID__')
-
-			if (userId == keyWord) {
-				// 本人
-				return
-			}else if (user) {
-				// 好友资料
-				router?.navigate(`/profile/${user.user_id}/`)
-			} else {
-				// 加好友
-				router?.navigate(`/personal_detail/${keyWord}/`)
-			}
-		} catch (error) {
-			console.error('搜索用户失败', error)
-			f7.dialog.alert($t('搜索用户失败'))
-		} finally {
-			f7.dialog.close()
-		}
+	const search = async (userId: string) => {
+		watchAsyncFn(async () => {
+			if (userId === userStore.userId) return
+			const friend = cacheStore.cacheContacts?.find((item) => item.user_id === userId)
+			friend ? router?.navigate(`/profile/${friend?.user_id}/`) : router?.navigate(`/personal_detail/${userId}/`)
+		}, '搜索中...')
 	}
 
 	// 无内容
@@ -152,11 +127,14 @@ const MessageRow: React.FC<RouterProps & MessageRowProps> = ({ item }) => {
 			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')}>
 				<div className={clsx('max-w-[80%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>
 					<div className={clsx('flex items-start', is_self ? 'justify-end pr-2' : 'justify-start pl-2')}>
-						<div onClick={() => search(item.sender_info.user_id)} className={clsx(
-							'w-10 h-10 rounded-full object-cover',
-							is_self ? 'order-last ml-2' : 'order-first mr-2'
-						)}>
-							<Avatar size={50} src={is_self ? userStore?.userInfo?.avatar : item?.sender_info?.avatar} />
+						<div
+							onClick={() => search(item.sender_info.user_id)}
+							className={clsx(
+								'rounded-full object-cover',
+								is_self ? 'order-last ml-[6px]' : 'order-first mr-[6px]'
+							)}
+						>
+							<Avatar size={38} src={is_self ? userStore?.userInfo?.avatar : item?.sender_info?.avatar} />
 						</div>
 
 						<div

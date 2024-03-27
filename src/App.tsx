@@ -17,7 +17,7 @@ import LiveRoomNew from '@/components/LiveRoom'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
-import run, { handlerSocketMessage, handlerSocketRequest } from './run'
+import run, { handlerSocketEdit, handlerSocketMessage, handlerSocketRequest } from './run'
 import { isWeb } from './utils'
 import { Toaster } from 'react-hot-toast'
 import useMessageStore from './stores/new_message'
@@ -103,7 +103,8 @@ function App() {
 					liveRoomStore.handlerEvent(event, data)
 					break
 				case SocketEvent.MessageEditEvent:
-					console.log('消息编辑', data)
+					// console.log('消息编辑', data)
+					handlerSocketEdit(data)
 					// handlerEditSocket(data, store!)
 					break
 				// case SocketEvent.MessageRecallEvent:
