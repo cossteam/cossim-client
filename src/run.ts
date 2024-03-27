@@ -6,7 +6,7 @@
 import useCacheStore from '@/stores/cache'
 import MsgService from '@/api/msg'
 import useUserStore from './stores/user'
-import { CACHE_MESSAGE, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, SocketEvent, msgType } from './shared'
+import { CACHE_MESSAGE, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, msgType } from './shared'
 import useMessageStore from './stores/new_message'
 import { generateMessage } from './utils/data'
 import cacheStore from './utils/cache'
@@ -40,17 +40,24 @@ export async function getRemoteSession() {
 	}
 }
 
+/**
+ * 获取申请列表
+ */
 export async function getApplyList() {
-	const userStore = useUserStore.getState()
-	const cacheStore = useCacheStore.getState()
-	// 获取申请列表
-	const group = await GroupService.groupRequestListApi({ user_id: userStore.userId })
-	const friend = await RelationService.friendApplyListApi({ user_id: userStore.userId })
-	const applyList: any[] = []
-	group.data && applyList.push(...group.data)
-	friend.data && applyList.push(...friend.data)
-	const len = applyList.filter((v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId).length
-	cacheStore.updateCacheApplyCount(len)
+	try {
+		const userStore = useUserStore.getState()
+		const cacheStore = useCacheStore.getState()
+		// 获取申请列表
+		const group = await GroupService.groupRequestListApi({ user_id: userStore.userId })
+		const friend = await RelationService.friendApplyListApi({ user_id: userStore.userId })
+		const applyList: any[] = []
+		group.data && applyList.push(...group.data)
+		friend.data && applyList.push(...friend.data)
+		const len = applyList.filter((v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId).length
+		cacheStore.updateCacheApplyCount(len)
+	} catch (error) {
+		console.error('获取申请列表', error)
+	}
 }
 
 /**
@@ -70,6 +77,22 @@ export async function getBehindMessage() {
 		cacheStore.updateBehindMessage(data)
 	} catch (error) {
 		console.error('获取落后消息失败：', error)
+	}
+}
+
+/**
+ * 获取好友列表
+ */
+export async function getFriendList() {
+	try {
+		const userStore = useUserStore.getState()
+		const cacheStore = useCacheStore.getState()
+		const { code, data } = await RelationService.getFriendListApi({ user_id: userStore.userId })
+		if (code !== 200) return
+		console.log('好友申请列表', data)
+		cacheStore.updateCacheContacts(data)
+	} catch (error) {
+		console.error('获取好友列表', error)
 	}
 }
 
@@ -199,25 +222,6 @@ export function handlerSocketRequest(data: any) {
 }
 
 /**
- * 处理 socket
- *
- * @param {any} e  socket Event
- */
-export async function handleSocket(e: any) {
-	const data = JSON.parse(e.data)
-	const event = data.event
-	// console.log('接收到所有 sokect 通知：', data)
-
-	switch (event) {
-		case SocketEvent.PrivateChatsEvent:
-		case SocketEvent.GroupChatsEvent:
-		case SocketEvent.SelfChatsEvent:
-			handlerSocketMessage(data)
-			break
-	}
-}
-
-/**
  * 主入口
  */
 function run() {
@@ -229,6 +233,7 @@ function run() {
 			getBehindMessage()
 			getRemoteSession()
 			getApplyList()
+			getFriendList()
 			cacheStore.updateFirstOpened(false)
 		}
 	})

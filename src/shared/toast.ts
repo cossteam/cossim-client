@@ -28,7 +28,7 @@ export function toastMessage(message: string, options?: Toast.Parameters) {
 export function confirmMessage(message: string, title: string, ok?: () => void, cancel?: () => void) {
 	f7.dialog.confirm(
 		$t(message),
-		title,
+		$t(title),
 		() => ok && ok(),
 		() => cancel && cancel()
 	)

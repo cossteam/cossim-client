@@ -161,4 +161,28 @@ service.interceptors.response.use(
 	}
 )
 
+// interface requestConfig {
+// 	/** 是否取消重复请求 */
+// 	isCancelRepeat?: boolean
+// }
+
+// /**
+//  * @param config
+//  * @returns
+//  */
+// function request(config: InternalAxiosRequestConfig & requestConfig) {
+// 	const { isCancelRepeat = true } = config
+// 	// // 如果需要取消重复请求
+// 	// if (isCancelRepeat) {
+// 	// 	cancelTokenSource.cancel('取消重复请求')
+// 	// 	config.cancelToken = cancelTokenSource.token
+// 	// }
+
+// 	// 去除自定义参数
+// 	// delete config.isCancelRepeat
+// 	const cancelTokenSource = axios.CancelToken.source()
+
+// 	return service({ ...config, cancelToken: isCancelRepeat ? cancelTokenSource.token : undefined })
+// }
+
 export default service
