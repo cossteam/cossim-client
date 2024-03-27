@@ -4,14 +4,13 @@ import { useState } from 'react'
 import { $t } from '@/shared'
 import './AddFriend.scss'
 import UserService from '@/api/user'
-import { validEmail } from '@/utils/validate'
 import UserStore from '@/db/user'
 
 const AddFriend: React.FC<RouterProps> = ({ f7router }) => {
 	const [keyWord, setKeyword] = useState<string>('')
 
 	const search = async () => {
-		if (!validEmail(keyWord)) return f7.dialog.alert($t('请输入正确的邮箱地址'))
+		// if (!validEmail(keyWord)) return f7.dialog.alert($t('请输入正确的邮箱地址'))
 		try {
 			f7.dialog.preloader($t('搜索中...'))
 

@@ -1,4 +1,4 @@
-import { isMe, msgType, tooltipType } from '@/shared'
+import { $t, isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/new_message'
@@ -19,8 +19,12 @@ import MessageError from './MessageRow/MessageError'
 import MessageLabel from './MessageRow/MessageLabel'
 import useUserStore from '@/stores/user'
 import MessageRecall from './MessageRow/MessageRecall'
-import { ListItem } from 'framework7-react'
+import { f7, ListItem } from 'framework7-react'
 import { useLongPress } from '@reactuses/core'
+import Avatar from '@/components/Avatar/Avatar.tsx'
+import UserStore from '@/db/user.ts'
+import useRouterStore from '@/stores/router.ts'
+
 interface MessageRowProps {
 	item: { [key: string]: any }
 }
@@ -32,8 +36,10 @@ const className = (is_self: boolean) => {
 	)
 }
 
-const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
+const MessageRow: React.FC<RouterProps & MessageRowProps> = ({ item }) => {
 	const longPressRef = useRef<HTMLDivElement>(null)
+
+	const {router} = useRouterStore()
 
 	const type = useMemo(() => item?.msg_type, [item?.msg_type])
 	const is_self = useMemo(
@@ -100,6 +106,32 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		}
 	}, [messageStore.messages])
 
+	const search = async (keyWord: string) => {
+		try {
+			f7.dialog.preloader($t('搜索中...'))
+
+			// 先查找本地好友列表，查看是否是自己好友
+			const user = await UserStore.findOneById(UserStore.tables.friends, 'user_id', keyWord)
+			const userId = localStorage.getItem('__USER_ID__')
+
+			if (userId == keyWord) {
+				// 本人
+				return
+			}else if (user) {
+				// 好友资料
+				router?.navigate(`/profile/${user.user_id}/`)
+			} else {
+				// 加好友
+				router?.navigate(`/personal_detail/${keyWord}/`)
+			}
+		} catch (error) {
+			console.error('搜索用户失败', error)
+			f7.dialog.alert($t('搜索用户失败'))
+		} finally {
+			f7.dialog.close()
+		}
+	}
+
 	// 无内容
 	if (type === msgType.NONE) return null
 	// 通知
@@ -120,14 +152,13 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')}>
 				<div className={clsx('max-w-[80%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>
 					<div className={clsx('flex items-start', is_self ? 'justify-end pr-2' : 'justify-start pl-2')}>
-						<img
-							src={is_self ? userStore?.userInfo?.avatar : item?.sender_info?.avatar}
-							alt="avatar"
-							className={clsx(
-								'w-10 h-10 rounded-full object-cover',
-								is_self ? 'order-last ml-2' : 'order-first mr-2'
-							)}
-						/>
+						<div onClick={() => search(item.sender_info.user_id)} className={clsx(
+							'w-10 h-10 rounded-full object-cover',
+							is_self ? 'order-last ml-2' : 'order-first mr-2'
+						)}>
+							<Avatar size={50} src={is_self ? userStore?.userInfo?.avatar : item?.sender_info?.avatar} />
+						</div>
+
 						<div
 							className={clsx(
 								'overflow-hidden relative flex flex-col',
