@@ -98,9 +98,9 @@ const MessageRow: React.FC<RouterProps & MessageRowProps> = ({ item }) => {
 			case msgType.AUDIO:
 				return <MessageAudio className={className(is_self)} item={item} />
 			case msgType.VIDEO:
-				return <MessageVideo className={clsx(className(is_self), '!px-0 py-0')} item={item} />
+				return <MessageVideo className={clsx(className(is_self), '!px-2 !py-2')} item={item} />
 			case msgType.FILE:
-				return <MessageFile className={clsx(className(is_self), '!px-2 py-1')} item={item} />
+				return <MessageFile className={clsx(className(is_self), '!px-2 !py-2')} item={item} />
 			default:
 				return <ReadEditor className={className(is_self)} content={item?.content} />
 		}

@@ -1,8 +1,8 @@
 // 用户的备注
-import { f7, Link, Navbar, NavRight, Page } from 'framework7-react'
+import { Link, Navbar, NavRight, Page } from 'framework7-react'
 import { useState } from 'react'
 import RelationService from '@/api/relation'
-import { $t } from '@/shared'
+import { toastMessage } from '@/shared'
 import CommInput from '@/components/CommInput/CommInput'
 import useLoading from '@/hooks/useLoading'
 
@@ -11,7 +11,6 @@ const UserRemark: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const [remark, setRemark] = useState()
 	const userId = f7route.query.user_id
 	const { watchAsyncFn } = useLoading()
-	console.log(userId, remark)
 
 	const handlerSubmit = () => {
 		watchAsyncFn(() =>
@@ -20,10 +19,10 @@ const UserRemark: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				remark: remark!
 			})
 				.then(() => {
-					f7router.back()
+					f7router.back(`/profile/${userId}/`)
 				})
 				.catch(() => {
-					f7.dialog.alert($t('修改失败'))
+					toastMessage('修改失败')
 				})
 		)
 	}

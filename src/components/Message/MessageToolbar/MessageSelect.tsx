@@ -12,7 +12,6 @@ const MessageSelect = () => {
 	}
 	// 删除
 	const deleteMessage = () => {
-		console.log('删除')
 		del([])
 	}
 
