@@ -42,7 +42,7 @@ const MessageToolbar = () => {
 					{/* 文本输入框 */}
 					<MessageInput />
 
-					<div className="min-w-[108px] flex items-center" onContextMenu={(e) => e.preventDefault()}>
+					<div className="min-w-[108px] flex items-center pr-3" onContextMenu={(e) => e.preventDefault()}>
 						{/* 表情*/}
 						{messageStore.toolbarType === emojiOrMore.EMOJI ? (
 							<KeyboardIcon

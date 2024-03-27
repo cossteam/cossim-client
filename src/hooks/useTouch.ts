@@ -4,6 +4,8 @@ const useTouch = () => {
 	const el = useRef<HTMLElement | null>(null)
 	const [x, setX] = useState(0)
 	const [y, setY] = useState(0)
+	const endCall = useRef<() => void>()
+	const [isCancel, setIsCancel] = useState(false)
 
 	const started = (event: any) => {
 		event.preventDefault() // 防止默认行为，例如滚动屏幕
@@ -18,6 +20,11 @@ const useTouch = () => {
 		// console.log('Touch moved to: ' + touch.pageX + ', ' + touch.pageY)
 		setX(touch.pageX)
 		setY(touch.pageY)
+		console.log(el.current?.clientHeight ? el.current?.clientHeight / 2 : 500)
+
+		setIsCancel(
+			touch.pageY <= (el.current?.clientHeight ? el.current?.clientHeight - el.current?.clientHeight / 3 : 500)
+		)
 	}
 	const ended = () => {
 		if (el.current === null) return
@@ -25,10 +32,16 @@ const useTouch = () => {
 		el.current.removeEventListener('touchstart', started)
 		el.current.removeEventListener('touchmove', moved)
 		el.current.removeEventListener('touchend', ended)
+		endCall.current && endCall.current()
+		setTimeout(() => {
+			setIsCancel(false)
+		}, 200)
 	}
 
-	const start = (element: HTMLElement) => {
+	const start = (element: HTMLElement, call?: () => void) => {
 		el.current = element
+		call && (endCall.current = call)
+		setIsCancel(false)
 		// 添加 touchstart 事件监听器
 		element.addEventListener('touchstart', started)
 		// 添加 touchmove 事件监听器
@@ -40,7 +53,8 @@ const useTouch = () => {
 	return {
 		x,
 		y,
-		start
+		start,
+		isCancel
 	}
 }
 

@@ -64,7 +64,6 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 	},
 
 	updateCacheApplyCount: async (applyCount) => {
-		console.log('applyCount', applyCount)
 		await cacheStore.set(CACHE_APPLY_COUNT, applyCount)
 		set({ applyCount })
 	},

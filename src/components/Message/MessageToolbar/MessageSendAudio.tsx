@@ -4,10 +4,15 @@ import { useEffect, useRef, useState } from 'react'
 // @See: https://github.com/tchvu3/capacitor-voice-recorder#readme
 import { VoiceRecorder, RecordingData, GenericResponse } from 'capacitor-voice-recorder'
 import { useAsyncEffect, useClickOutside, useLongPress } from '@reactuses/core'
-import { toastMessage } from '@/shared'
+import { MESSAGE_SEND, msgType, toastMessage } from '@/shared'
 import clsx from 'clsx'
 import useTouch from '@/hooks/useTouch'
 import Timer from '@/components/LiveRoom/Timer'
+import StorageService from '@/api/storage'
+import { Base64 } from 'js-base64'
+import useMessageStore from '@/stores/new_message'
+import { generateMessage } from '@/utils/data'
+import { sendMessage } from '../script/message'
 
 const MessageSendAudio = () => {
 	const audioRef = useRef<HTMLDivElement | null>(null)
@@ -15,11 +20,14 @@ const MessageSendAudio = () => {
 	const [isFristRender, setIsFristRender] = useState<boolean>(true)
 	// 是否正在录音
 	const [isRecording, setIsRecording] = useState<boolean>(false)
+	// 划动监听
+	const touch = useTouch()
 	// 是否有权限
 	const [isPermission, setIsPermission] = useState<boolean>(false)
 	// 录音数据
 	const [recordingData, setRecordingData] = useState<RecordingData | null>(null)
-	const touch = useTouch()
+
+	const messageStore = useMessageStore()
 
 	// 长按
 	const longPressEvent = useLongPress(
@@ -68,10 +76,49 @@ const MessageSendAudio = () => {
 
 	useAsyncEffect(
 		async () => {
-			if (!recordingData || !recordingData.value) return
-			console.log('recordingData', recordingData.value)
-			// const { code, data, msg: message } = await StorageService.uploadFile({ file: audioData!.file, type: 0 })
-			console.log('touch', touch.x, touch.y)
+			if (!recordingData || !recordingData.value || touch.isCancel) return
+			try {
+				console.log('recordingData', recordingData.value)
+				// 将Base64数据解码为二进制数据
+				const decodedData = Base64.toUint8Array(recordingData.value.recordDataBase64)
+				// 将解码后的数据包装为Blob对象
+				const blob = new Blob([decodedData], { type: 'audio/webm' })
+				const fileType = recordingData.value.mimeType.split(';')[0]
+				const fileExten = fileType.split('/')[1]
+				const file = new File([blob], `audio.${fileExten}`, { type: fileType })
+				const messageContent = {
+					mimeType: recordingData.value.mimeType,
+					msDuration: recordingData.value.msDuration,
+					recordDataBase64: recordingData.value.recordDataBase64,
+					url: '',
+					isBlob: false
+				}
+				const message = generateMessage({
+					content: JSON.stringify(messageContent),
+					msg_type: msgType.AUDIO,
+					msg_send_state: MESSAGE_SEND.SENDING
+				})
+				messageStore.createMessage(message)
+				const { code, data, msg } = await StorageService.uploadFile({ file, type: 0 })
+				if (code !== 200) {
+					toastMessage(msg)
+					return
+				}
+				console.log(data)
+				sendMessage({
+					content: JSON.stringify({
+						...messageContent,
+						// recordDataBase64: '',
+						url: data.url,
+						isBlob: true
+					}),
+					msg_type: msgType.AUDIO,
+					isUpdate: false
+				})
+			} catch (error) {
+				console.log(error)
+				toastMessage('发送失败')
+			}
 		},
 		() => {},
 		[recordingData]
@@ -103,14 +150,14 @@ const MessageSendAudio = () => {
 				{isRecording && (
 					<div
 						className={clsx(
-							'w-40 h-24 bg-white p-4 rounded-lg select-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col justify-center items-center',
-							touch.y < 750 && 'bg-red-400 text-white'
+							'w-40 h-24 p-4 rounded-lg select-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col justify-center items-center',
+							touch.isCancel ? 'bg-red-400 text-white' : ' bg-white text-black'
 						)}
 					>
 						<div className="flex-1 flex flex-col justify-center items-center">
 							<Timer className="text-2xl font-bold" />
 						</div>
-						<span>{touch.y < 750 ? '松开取消' : '向上滑动取消录音'}</span>
+						<span>{touch.isCancel ? '松开手指取消' : '向上滑动取消录音'}</span>
 					</div>
 				)}
 			</div>

@@ -1,32 +1,34 @@
 <!doctype html>
 <html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover"
+		/>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<!-- 播放本地 Blob 文件 -->
 
-<head>
-	<meta charset="UTF-8" />
-	<meta http-equiv="Content-Security-Policy"
-		content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;" />
-	<meta name="viewport"
-		content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" />
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<!-- 播放本地 Blob 文件 -->
-
-	<!-- <meta http-equiv="Content-Security-Policy"
+		<!-- <meta http-equiv="Content-Security-Policy"
 		content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;"> -->
-	<!--
+		<!--
 	<meta http-equiv="Content-Security-Policy"
 		content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;"> -->
 
-	<meta name="theme-color" content="#fff" />
-	<meta name="format-detection" content="telephone=no" />
-	<meta name="msapplication-tap-highlight" content="no" />
-	<title>COSS</title>
-	<link rel="manifest" href="./manifest.json" />
+		<meta name="theme-color" content="#fff" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="msapplication-tap-highlight" content="no" />
+		<title>COSS</title>
+		<link rel="manifest" href="./manifest.json" />
 
-
-	<!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
-	<!-- <title>COSS</title> -->
-	<!-- <base href="/" /> -->
-	<!-- <meta http-equiv="Content-Security-Policy"
+		<!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
+		<!-- <title>COSS</title> -->
+		<!-- <base href="/" /> -->
+		<!-- <meta http-equiv="Content-Security-Policy"
     content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: content:" />
 
 	<meta name="color-scheme" content="light dark" />
@@ -42,17 +44,16 @@
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-title" content="coss" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black" /> -->
-</head>
+	</head>
 
-<body>
-	<div id="root"></div>
-	<script type="module" src="/src/main.ts"></script>
+	<body>
+		<div id="root"></div>
+		<script type="module" src="/src/main.ts"></script>
 
-	<!-- <script src="node_modules/eruda/eruda.js"></script> -->
-	<script src="//cdn.jsdelivr.net/npm/eruda"></script>
-	<script>
-		eruda.init();
-	</script>
-</body>
-
+		<script src="node_modules/eruda/eruda.js"></script>
+		<!-- <script src="//cdn.jsdelivr.net/npm/eruda"></script> -->
+		<script>
+			eruda.init()
+		</script>
+	</body>
 </html>
