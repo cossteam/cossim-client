@@ -185,10 +185,10 @@ function App() {
 		async () => {
 			try {
 				if (await isWeb()) return
-				if (liveRoomStore.opened) {
-					await StatusBar.hide()
-					return
-				}
+				// if (liveRoomStore.opened) {
+				// 	await StatusBar.hide()
+				// 	return
+				// }
 				// 设置状态栏样式
 				StatusBar.setBackgroundColor({ color: '#ffffff' }) // 设置状态栏背景颜色为白色
 				StatusBar.setOverlaysWebView({ overlay: false }) // 如果您使用的是原生状态栏，则需设置为 false
