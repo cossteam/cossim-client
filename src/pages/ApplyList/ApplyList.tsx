@@ -1,10 +1,21 @@
-import { Button, List, ListItem, NavTitle, Navbar, Page, Segmented, f7 } from 'framework7-react'
+import {
+	Button,
+	List,
+	ListItem,
+	NavTitle,
+	Navbar,
+	Page,
+	Segmented,
+	SwipeoutActions,
+	SwipeoutButton,
+	f7
+} from 'framework7-react'
 import { useEffect, useState } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
 import { isEqual } from 'lodash-es'
 
 import RelationService from '@/api/relation'
-import { $t, ApplyStatus, ApplyType, USER_ID, MangageApplyStatus, GroupApplyStatus } from '@/shared'
+import { $t, ApplyStatus, ApplyType, USER_ID, MangageApplyStatus, GroupApplyStatus, toastMessage } from '@/shared'
 import { getCookie } from '@/utils/cookie'
 import GroupService from '@/api/group'
 import UserStore from '@/db/user'
@@ -169,6 +180,25 @@ const ApplyList = () => {
 		return type === ApplyType.FRIEND ? sender_info.user_id === user_id : status === ApplyStatus.INVITE_SENDER
 	}
 
+	/**
+	 * 删除申请
+	 * @param item 好友请求信息
+	 */
+	const deleteApply = async (item: any) => {
+		console.log('deleteApply', item)
+		try {
+			const isFriend = type === ApplyType.FRIEND
+			const id = isFriend ? item.id : Number((item.id ?? '').split('_')[1])
+			const { code, msg } = isFriend
+				? await RelationService.deleteFriendApplyApi({ id })
+				: await RelationService.deleteGroupApplyApi({ id })
+			toastMessage(code === 200 ? '删除成功' : msg)
+		} catch (error) {
+			console.log(error)
+			toastMessage('删除失败')
+		}
+	}
+
 	return (
 		<Page noToolbar className="bg-bgTertiary" onPageBeforeOut={() => updateContacts(true)}>
 			<Navbar backLink className="coss_applylist_navbar bg-bgPrimary hidden-navbar-bg">
@@ -199,7 +229,7 @@ const ApplyList = () => {
 					// 区分好友申请和群申请
 					type === ApplyType.FRIEND ? (
 						// 好友
-						<ListItem key={index} text={$t(item?.remark || '对方没有留言')}>
+						<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
 							<div slot="media" className="w-12 h-12">
 								<img
 									src={item?.receiver_info?.user_avatar}
@@ -231,10 +261,18 @@ const ApplyList = () => {
 									</>
 								)}
 							</div>
+							<SwipeoutActions right>
+								{/* <SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
+									{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
+								</SwipeoutButton> */}
+								<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
+									{$t('删除')}
+								</SwipeoutButton>
+							</SwipeoutActions>
 						</ListItem>
 					) : (
 						// 群聊
-						<ListItem key={index} text={$t(item?.remark || '对方没有留言')}>
+						<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
 							<div slot="media" className="w-12 h-12">
 								<img
 									src={item?.receiver_info?.user_avatar}
@@ -252,7 +290,6 @@ const ApplyList = () => {
 								{!isOperate(item) ? (
 									<Button className="text-sm text-gray-500" onClick={() => {}}>
 										{getStatusText(item.status)}
-										{`(${item.status})`}
 									</Button>
 								) : (
 									<>
@@ -271,6 +308,14 @@ const ApplyList = () => {
 									</>
 								)}
 							</div>
+							<SwipeoutActions right>
+								{/* <SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
+									{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
+								</SwipeoutButton> */}
+								<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
+									{$t('删除')}
+								</SwipeoutButton>
+							</SwipeoutActions>
 						</ListItem>
 					)
 				)}
