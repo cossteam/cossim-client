@@ -65,12 +65,24 @@ export async function getApplyList() {
 		const userStore = useUserStore.getState()
 		const cacheStore = useCacheStore.getState()
 		// 获取申请列表
-		const group = await GroupService.groupRequestListApi({ user_id: userStore.userId })
 		const friend = await RelationService.friendApplyListApi({ user_id: userStore.userId })
-		const applyList: any[] = []
-		group.data && applyList.push(...group.data)
-		friend.data && applyList.push(...friend.data)
-		const len = applyList.filter((v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId).length
+		const group = await GroupService.groupRequestListApi({ user_id: userStore.userId })
+
+		const friendApply: any = []
+		const groupApply: any = []
+		friend.data && friendApply.push(...friend.data)
+		group.data && groupApply.push(...group.data)
+		// 统计未读数
+		const len = [...friendApply, ...groupApply].filter(
+			(v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId
+		).length
+		// 缓存申请列表
+		cacheStore.update({
+			friendApply,
+			groupApply
+		})
+
+		// 未读长度
 		cacheStore.updateCacheApplyCount(len)
 	} catch (error) {
 		console.error('获取申请列表', error)
