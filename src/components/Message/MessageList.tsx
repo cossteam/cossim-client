@@ -9,10 +9,11 @@ const MessageList = () => {
 
 	// 滚动到底部
 	useEffect(() => {
+		if (isLoading.current) return
 		messageStore.container?.scrollTo({
 			top: messageStore.container?.scrollHeight
 		})
-	}, [messageStore.container])
+	}, [messageStore.container, messageStore.messages])
 
 	useEffect(() => {
 		if (messageStore.toolbarType === emojiOrMore.NONE) return
@@ -51,6 +52,8 @@ const MessageList = () => {
 	const loadingMessage = useCallback(async () => {
 		await messageStore.unshiftMessage()
 		isLoading.current = false
+		// 滚动到距离顶部的 100px
+		setTimeout(() => messageStore.container?.scrollTo({ top: 300 }), 0)
 	}, [])
 
 	const row = useCallback((item: any, index: number) => <MessageRow item={item} key={index} />, [])

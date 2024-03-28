@@ -24,7 +24,7 @@ const defaultOptions: CacheStoreOptions = {
 	cacheSearchMessage: [],
 	unreadCount: 0,
 	applyCount: 0,
-	keyboardHeight: 300,
+	keyboardHeight: 417,
 	friendApply: [],
 	groupApply: []
 }

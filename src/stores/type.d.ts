@@ -47,7 +47,7 @@ export interface CacheStoreOptions {
 	unreadCount: number
 	/** 好友或群聊申请数 */
 	applyCount: number
-	/** 缓存的键盘高度, 默认 300 */
+	/** 缓存的键盘高度, 默认 417 */
 	keyboardHeight: number
 	/** 搜索消息表名，主要用与搜索时获取对应表名的数据 */
 	cacheSearchMessage: string[]
