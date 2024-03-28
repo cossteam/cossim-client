@@ -24,8 +24,8 @@ const Layout: React.FC = () => {
 	// 全局状态（未读消息）
 	const cacheStore = useCacheStore()
 
-	const element = useRef<HTMLButtonElement>(null);
-	const dialog = useRef<HTMLButtonElement>(null);
+	const element = useRef<HTMLButtonElement>(null)
+	const dialog = useRef<HTMLButtonElement>(null)
 	useDoubleClick({
 		target: element,
 		onSingleClick: () => {
@@ -35,8 +35,8 @@ const Layout: React.FC = () => {
 		onDoubleClick: () => {
 			router.navigate('/add_friend/')
 			console.log('双击')
-		},
-	});
+		}
+	})
 	useDoubleClick({
 		target: dialog,
 		onSingleClick: () => {
@@ -46,12 +46,11 @@ const Layout: React.FC = () => {
 		onDoubleClick: () => {
 			router.navigate('/add_friend/')
 			console.log('双击')
-		},
-	});
+		}
+	})
 
-
-	const contactRef = useRef()
-	const dialogRef = useRef()
+	const contactRef = useRef<any>()
+	const dialogRef = useRef<any>()
 
 	return (
 		<Views tabs className="safe-area app">
@@ -60,7 +59,7 @@ const Layout: React.FC = () => {
 			<View id="view-my" onTabShow={() => setTabActive('my')} tab url="/my/" />
 
 			<Toolbar tabbar icons bottom>
-				<button on ref={dialog}>
+				<button ref={dialog}>
 					<Link
 						ref={dialogRef}
 						tabLink="#view-dialog"
@@ -73,7 +72,7 @@ const Layout: React.FC = () => {
 					/>
 				</button>
 
-				<button ref={element} >
+				<button ref={element}>
 					<Link
 						ref={contactRef}
 						tabLink="#view-contacts"
