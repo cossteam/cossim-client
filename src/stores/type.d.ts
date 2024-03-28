@@ -51,6 +51,10 @@ export interface CacheStoreOptions {
 	keyboardHeight: number
 	/** 搜索消息表名，主要用与搜索时获取对应表名的数据 */
 	cacheSearchMessage: string[]
+	/** 好友申请列表 */
+	friendApply: any[]
+	/** 群聊申请列表 */
+	groupApply: any[]
 }
 
 /**
@@ -112,6 +116,11 @@ export type CacheStore = CacheStoreOptions & {
 	 * @param {any} message 消息
 	 */
 	updateCacheContactsObj: (contacts: any[]) => void
+	/**
+	 * 更新所有缓存信息, 可以只更新部分信息
+	 * @param { Partial<CacheStoreOptions>} options
+	 */
+	update: (options: Partial<CacheStoreOptions>) => Promise<void>
 }
 
 /**
