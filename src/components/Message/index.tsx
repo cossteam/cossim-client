@@ -19,8 +19,6 @@ const Message: React.FC<RouterProps> = () => {
 	// TODO：需优化处理键盘
 	useKeyboard()
 
-	// const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
-
 	// 转发组件
 	const messageForward = useMemo(() => {
 		return (

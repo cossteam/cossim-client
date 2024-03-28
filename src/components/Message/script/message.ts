@@ -124,6 +124,13 @@ export const sendMessage = async (options: Options) => {
 		updateDialog(message, dialogId)
 	}
 
+	// // 以防万一，在10秒后再次更新消息状态
+	// setTimeout(() => {
+	// 	if (message.msg_send_state === MESSAGE_SEND.SEND_SUCCESS) return
+	// 	message.msg_send_state = MESSAGE_SEND.SEND_FAILED
+	// 	messageStore.updateMessage(message)
+	// }, 10000)
+
 	return message
 }
 
