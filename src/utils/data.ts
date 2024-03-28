@@ -7,7 +7,7 @@ import useUserStore from '@/stores/user'
  * 生成消息
  * @param message 消息内容
  */
-export function generateMessage(message?: any) {
+export function generateMessage(message?: Partial<Message>): Message {
 	const userStore = useUserStore.getState()
 	const messageStore = useMessageStore.getState()
 
@@ -32,7 +32,7 @@ export function generateMessage(message?: any) {
 		sender_info: {
 			user_id: userStore.userId,
 			avatar: userStore.userInfo?.avatar,
-			name: userStore.userInfo?.name
+			name: userStore.userInfo?.nickname
 		},
 		receiver_info: {
 			user_id: messageStore.receiverId,

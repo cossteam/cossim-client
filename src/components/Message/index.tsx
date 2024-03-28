@@ -19,7 +19,7 @@ const Message: React.FC<RouterProps> = () => {
 	// TODO：需优化处理键盘
 	useKeyboard()
 
-	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
+	// const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
 
 	// 转发组件
 	const messageForward = useMemo(() => {
@@ -30,7 +30,9 @@ const Message: React.FC<RouterProps> = () => {
 				selectComplate={(selectList) =>
 					messageStore.update({
 						selectedForwardUsers: selectList,
-						selectedMessages: [isSelect ? messageStore.selectedMessages : messageStore.selectedMessage]
+						selectedMessages: !messageStore.selectedMessages.length
+							? [messageStore.selectedMessage]
+							: messageStore.selectedMessages
 					})
 				}
 			/>

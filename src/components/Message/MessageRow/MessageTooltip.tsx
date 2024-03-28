@@ -114,8 +114,6 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) =>
 		messageStore.update({ selectedMessage: item })
 
 		tooltipStatMachine(data.name, item)
-
-		// setShow(false)
 	}
 
 	return (
@@ -126,7 +124,7 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) =>
 						onClick={() => handlerClick(item)}
 						aria-expanded="true"
 						key={item.name}
-						className={clsx('flex min-w-[50px] py-3 px-1 text-[1rem]', index > 4 ? 'pb-0' : 'pt-0')}
+						className={clsx('flex min-w-[50px] px-1 text-[1rem]', index > 4 ? 'pb-0' : 'pt-0')}
 					>
 						<div className="flex flex-col items-center justify-center">
 							<div className="mb-[6px]">{item?.icon}</div>

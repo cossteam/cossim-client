@@ -7,11 +7,7 @@
     /** 动画时长 */
     --animate-duration: 0.3s;
 
-
     .page-content {
-        // padding-top: calc(var(--f7-page-navbar-offset, 0px) + var(--f7-page-toolbar-top-offset, 0px) + var(--f7-page-subnavbar-offset, 0px) + var(--f7-page-searchbar-offset, 0px) + var(--f7-page-content-extra-padding-top, 0px));
-        // padding-top: 88px;
-        // test
         padding: 0;
 
         &::-webkit-scrollbar {
@@ -22,39 +18,18 @@
             align-items: flex-start;
 
             .icon-checkbox {
-                margin-top: 20px;
+                margin: 10px;
             }
+
+            .item-inner {
+                padding: 6px 0;
+            }
+
+
         }
 
         .coss_toolbar {
             background-color: var(--coss-background-primary);
-            // background-color: rgba(var(--f7-navbar-bg-color-rgb, var(--f7-bars-bg-color-rgb)), var(--f7-bars-translucent-opacity));
-            // -webkit-backdrop-filter: saturate(180%) blur(var(--f7-bars-translucent-blur));
-            // backdrop-filter: saturate(180%) blur(var(--f7-bars-translucent-blur));
-        }
-    }
-
-
-    .coss_message_editor {
-        @apply max-w-full;
-
-        p {
-            @apply text-ellipsis whitespace-nowrap overflow-hidden text-[0.75rem] w-[85%] text-textTertiary;
-        }
-    }
-
-    .message-bg {
-        animation: bgAnimation 0.3s ease forwards;
-    }
-
-    @keyframes bgAnimation {
-        0% {
-            opacity: 1;
-            z-index: -1;
-        } 
-        100% {
-            opacity: 0;
-            z-index: -1;
         }
     }
 
@@ -78,14 +53,11 @@
         background-color: transparent;
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
-        // background-color: var(--coss-background-primary);
         margin-top: 0;
         padding: 0;
-        // margin-top: -12px;
         font-size: 14px;
         border-bottom: none;
         padding-top: 6px;
-        // box-sizing: border-box;
         height: auto;
 
         .subnavbar-inner {
@@ -109,13 +81,5 @@
         &:after {
             background: none;
         }
-    }
-}
-
-.reply_editor {
-    @apply text-ellipsis overflow-hidden w-fit text-textTertiary line-clamp-1 max-w-[70%];
-
-    p {
-        @apply text-ellipsis overflow-hidden w-fit text-textTertiary line-clamp-1 max-w-[70%];
     }
 }

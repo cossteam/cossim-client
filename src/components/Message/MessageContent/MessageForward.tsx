@@ -52,7 +52,6 @@ const MessageForward: React.FC<MessageForwardProps> = (props) => {
 	const dialogChange = (checked: boolean, item: any) => {
 		const list = checked ? [...selectList, item] : selectList.filter((i) => i.dialog_id !== item.dialog_id)
 		setSelectList(list)
-		console.log('cacheStore.cacheDialogs.', cacheStore.cacheDialogs)
 	}
 
 	return (

@@ -8,6 +8,7 @@ interface ReadEditorProps {
 	replyContent?: string
 	replyName?: string
 	className?: string
+	replyClassName?: string
 }
 
 const ReadEditor: React.FC<ReadEditorProps> = (props) => {
@@ -27,7 +28,6 @@ const ReadEditor: React.FC<ReadEditorProps> = (props) => {
 		}
 
 		ReadEditorRef.current.innerHTML = content
-
 	}, [props.content])
 
 	return <div ref={ReadEditorRef} className={clsx('read-editor', props.className)} />

@@ -93,6 +93,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const messages = allMessages.map((item: any) =>
 			item?.msg_id === message?.msg_id || item?.uid === message?.uid ? { ...item, ...message } : item
 		)
+
 		await cacheStore.set(tableName, messages)
 	},
 	updateCacheContacts: async (cacheContacts) => {
