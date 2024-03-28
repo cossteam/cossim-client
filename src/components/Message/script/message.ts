@@ -22,9 +22,10 @@ interface Options {
 	/** 消息类型 */
 	msg_type: msgType
 	/** 是否先创建一条消息，默认为 true，同时会在发送成功后更新发送状态 */
-	isCreateMessage?: boolean
+	// isCreateMessage?: boolean
 	/** 是否保存到缓存消息中，默认为 true */
 	// isCreateCacheMessage?: boolean
+	uid?: string
 }
 
 /**
@@ -34,7 +35,7 @@ interface Options {
 export const sendMessage = async ({
 	content,
 	msg_type,
-	isCreateMessage = true,
+	uid,
 	// isCreateCacheMessage = true,
 	...options
 }: Options) => {
@@ -61,6 +62,9 @@ export const sendMessage = async ({
 		dialog_id: dialogId,
 		is_burn_after_reading: isBurnAfterReading
 	})
+
+	const isCreateMessage = !uid
+	if (!isCreateMessage) message.uid = uid
 
 	// 是否预先创建一条消息
 	if (isCreateMessage) {
@@ -105,8 +109,8 @@ export const sendMessage = async ({
 		await messageStore.createMessage(errorMessage)
 		await cacheStore.addCacheMessage(errorMessage)
 	} finally {
+		await messageStore.updateMessage(message)
 		// console.log('message.msg_send_state', message)
-		if (isCreateMessage) await messageStore.updateMessage(message)
 		// 手动触发更新
 		// if (isCreateCacheMessage) await cacheStore.updateCacheMessage(message)
 		// 更新本地会话

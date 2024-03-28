@@ -38,7 +38,7 @@ const MessageAudio: React.FC<MessageAudioProps> = ({ className, item, isSelf }) 
 	// 图标
 	const icons = useMemo(() => ['speaker', 'speaker_1', 'speaker_2', 'speaker_3'], [])
 	const [iconIndex, setIconIndex] = useState(3)
-	const [timer, setTimer] = useState<any>(null)
+	// const [timer, setTimer] = useState<any>(null)
 	// 播放
 	const [isPlay, setIsPlay] = useState<boolean>(false)
 	const play = () => {
