@@ -11,11 +11,21 @@ import { $t } from '@/shared'
 // import { useMessageStore } from '@/stores/message'
 import useCacheStore from '@/stores/cache'
 import { getFriendList } from '@/run'
+import useRouterStore from '@/stores/router.ts'
+import { useEffect } from 'react'
 
 // const user_id = getCookie(USER_ID) || ''
 
-const ContactList: React.FC<RouterProps> = () => {
+const ContactList: React.FC<RouterProps> = ({f7router}) => {
 	const cacheStore = useCacheStore()
+
+	const { router, setRouter } = useRouterStore()
+
+	useEffect(() => {
+		setRouter(f7router)
+		console.log('2路由', router)
+	}, [])
+
 	// const [contact, setContact] = useState<any[]>([])
 	// const { is_contacts_update, updateContacts } = useStateStore()
 

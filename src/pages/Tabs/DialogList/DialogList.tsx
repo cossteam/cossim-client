@@ -20,17 +20,32 @@ import clsx from 'clsx'
 import useCacheStore from '@/stores/cache'
 import { getRemoteSession } from '@/run'
 import useMessageStore from '@/stores/new_message'
-import useRouterStore from '@/stores/router.ts'
 import Avatar from '@/components/Avatar/Avatar.tsx'
+import useRouterStore from '@/stores/router.ts'
+import useToolbarStore from '@/stores/toolbar.ts'
 
 const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const messageStore = useMessageStore()
 	const cacheStore = useCacheStore()
 	const { router, setRouter } = useRouterStore()
+	const { singleClick, doubleClick, longClick,setDoubleClick, setSingleClick, setLongClick } = useToolbarStore()
+
+	useEffect(() => {
+		if (singleClick) {//
+		} else if (doubleClick) {
+			const unread = cacheStore.cacheDialogs.find((item) => item.dialog_unread_count > 0)
+			scrollTo(unread.dialog_id)
+		} else if (longClick) {//
+			// 长按清除消息
+		}
+		setSingleClick(false)
+		setDoubleClick(false)
+		setLongClick(false)
+	},[singleClick, doubleClick, longClick])
 
 	useEffect(() => {
 		setRouter(f7router)
-		console.log('路由', router)
+		console.log('1路由', router)
 	}, [])
 
 	// console.log(router)
@@ -106,6 +121,32 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 				)
 		}
 	}
+
+	function heightToTop(ele: any){
+		//ele为指定跳转到该位置的DOM节点
+		const root: HTMLElement = document.body;
+		let height = 0;
+		do{
+			height += ele.offsetTop;
+			ele = ele.offsetParent;
+		}while( ele !== root )
+		return height;
+	}
+
+	function scrollTo(id: string) {
+		const el: any = document.getElementById(id)
+
+		const element: any = document.getElementById('dialog-box')
+
+		element.scrollTo({
+			top: heightToTop(el) - 50,
+			left: 0,
+			behavior: "smooth",
+		});
+		// el.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" });
+	}
+
+
 	return (
 		<Page
 			ptr={ptrRefresh}
@@ -144,13 +185,14 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 				</List>
 			</Popover>
 			<PageContent className="p-0 max-h-full h-full">
-				<div className="h-full bg-bgPrimary pb-12 overflow-y-auto" onScroll={onDialogListScroll}>
+				<div id='dialog-box' className="h-full bg-bgPrimary pb-12 overflow-y-auto" onScroll={onDialogListScroll}>
 					<List contactsList noChevron mediaList dividers className="">
 						{cacheStore.cacheDialogs.sort(customSort).map((item, index) => {
 							// @ts-ignore
 							// @ts-ignore
 							return (
 								<ListItem
+									id={item.dialog_id}
 									className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
 									key={item?.dialog_id + `${index}`}
 									title={item?.dialog_name}
@@ -167,7 +209,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 										await messageStore.init({
 											dialogId: item?.dialog_id ?? 0,
 											receiverId: item?.user_id ?? item?.group_id ?? 0,
-											isGroup: item?.group_id ? true : false,
+											isGroup: !!item?.group_id,
 											receiverInfo: item
 										})
 										f7router?.navigate(
@@ -176,12 +218,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 									}}
 								>
 									<Avatar slot="media" src={`${item?.dialog_avatar}`} />
-									{/*<img*/}
-									{/*	slot="media"*/}
-									{/*	src={`${item?.dialog_avatar}`}*/}
-									{/*	loading="lazy"*/}
-									{/*	className="w-12 h-12 rounded-full object-cover bg-black bg-opacity-10"*/}
-									{/*/>*/}
 									<div
 										slot="text"
 										className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap"
