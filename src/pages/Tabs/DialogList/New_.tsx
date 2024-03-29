@@ -136,7 +136,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 			{/*加号弹窗*/}
 			<Popover className="popover-menu w-[160px] bg-black z-[9999]" backdrop={false} arrow={false}>
 				<List className="text-white" dividersIos outlineIos strongIos>
-					<ListItem link="/add_group/" popoverClose className="coss_dialog_list">
+					<ListItem link="/create_group/" popoverClose className="coss_dialog_list">
 						<Person2Alt className="coss_dialog_list__icon" />
 						<span className="coss_dialog_list__text">{$t('发起群聊')}</span>
 					</ListItem>

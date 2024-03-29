@@ -83,8 +83,8 @@ const routes: Router.RouteParameters[] = [
 		asyncComponent: () => import('@/pages/ApplyList/ApplyList')
 	},
 	{
-		path: '/add_group/',
-		asyncComponent: () => import('@/pages/AddGroup/AddGroup')
+		path: '/create_group/',
+		asyncComponent: () => import('@/pages/CreateGroup/CreateGroup.tsx')
 	},
 	{
 		path: '/group_info/:group_id/',
@@ -129,6 +129,10 @@ const routes: Router.RouteParameters[] = [
 	{
 		path: '/user_remark/',
 		asyncComponent: () => import('@/pages/UserRemark/UserRemark')
+	},
+	{
+		path: '/add_group',
+		asyncComponent: () => import('@/pages/AddGroup/AddGroup')
 	},
 	{
 		path: '/test',

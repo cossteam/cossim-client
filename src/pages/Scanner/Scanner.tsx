@@ -66,6 +66,10 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 		}
 	}
 
+	const addGroup = (groupId: string) => {
+		f7router?.navigate(`/add_group/${groupId}/`)
+	}
+
 	const handleScanner = (text: string) => {
 		const type: any = text.match(/.*(?=:)/)?.[0]
 		const content: any = text.match(/(?<=.*:).*/)?.[0]
@@ -73,6 +77,7 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 
 		switch (type) {
 			case 'group_id':
+				addGroup(content)
 				break
 			case 'user_id':
 				addPersional(content)

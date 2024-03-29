@@ -269,6 +269,18 @@ class RelationServiceImpl {
 			data
 		})
 	}
+
+	/**
+	 * 加入群聊
+	 * @param groupId
+	 */
+	addGruop(groupId: string): Promise<DataResponse> {
+		return request({
+			url: `${this.relationGroup}/join`,
+			method: 'POST',
+			data: {group_id: groupId}
+		})
+	}
 }
 
 const RelationService = new RelationServiceImpl()

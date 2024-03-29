@@ -200,7 +200,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 				</ListItem>
 			</List>
 			<List className="m-0 mb-3 bg-white" strong dividers outline>
-				<ListItem title="群聊名称" link={identity === 2 ? `/add_group/?id=${groupInfo?.id}` : ''}>
+				<ListItem title="群聊名称" link={identity === 2 ? `/create_group/?id=${groupInfo?.id}` : ''}>
 					<div slot="after">
 						<span>{groupInfo?.name}</span>
 					</div>

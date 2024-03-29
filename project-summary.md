@@ -79,7 +79,7 @@ The following files and folders do not follow the standard naming convention:
 - /pages/AddFriend/AddFriend.scss
 - /pages/AddFriend/AddFriend.tsx
 - /pages/AddGroup/AddGroup.scss
-- /pages/AddGroup/AddGroup.tsx
+- /pages/AddGroup/CreateGroup.tsx
 - /pages/ApplyList/ApplyList.scss
 - /pages/ApplyList/ApplyList.tsx
 - /pages/Auth/Auth.scss
