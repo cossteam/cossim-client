@@ -3,18 +3,33 @@ import { useRef, useState } from 'react'
 import $ from 'dom7'
 import useCacheStore from '@/stores/cache'
 import useRouterStore from '@/stores/router.ts'
-import { useDoubleClick } from '@reactuses/core'
+import useToolbarStore from '@/stores/toolbar.ts'
+import useLongPress from '@/hooks/useLongPress.ts'
 
 const Layout: React.FC = () => {
 	const [tabActive, setTabActive] = useState<string>('dialog')
 	const previousTab = useRef<string>('dialog')
 	const { router } = useRouterStore()
+	const { setDoubleClick } = useToolbarStore()
 	const onTabLinkClick = (tabName: string) => {
 		if (previousTab.current !== tabActive) {
 			previousTab.current = tabActive
 			return
 		}
 		if (tabActive === tabName) {
+			console.log(router)
+			console.log('双击')
+			switch (tabName) {
+				case 'dialog':
+					setDoubleClick(true)
+					break
+				case 'contacts':
+					router.navigate('/add_friend/')
+					break
+				case 'my':
+					break
+			}
+
 			// @ts-ignore
 			$(`#view-${tabName}`)[0].f7View.router.back()
 		}
@@ -24,32 +39,21 @@ const Layout: React.FC = () => {
 	// 全局状态（未读消息）
 	const cacheStore = useCacheStore()
 
-	const element = useRef<HTMLButtonElement>(null)
-	const dialog = useRef<HTMLButtonElement>(null)
-	useDoubleClick({
-		target: element,
-		onSingleClick: () => {
-			console.log('单击')
-			contactRef.current.el.click()
-		},
-		onDoubleClick: () => {
-			router.navigate('/add_friend/')
-			console.log('双击')
-		}
-	})
-	useDoubleClick({
-		target: dialog,
-		onSingleClick: () => {
-			console.log('单击')
-			dialogRef.current.el.click()
-		},
-		onDoubleClick: () => {
-			router.navigate('/add_friend/')
-			console.log('双击')
+	const buttonRef = useRef<HTMLButtonElement | null>(null)
+
+	// 长按全部已读
+	useLongPress(buttonRef, {
+		callback: () => {
+			const store = useCacheStore.getState()
+			const list = store.cacheDialogs.map((item: any) => {
+				return { ...item, dialog_unread_count: 0 }
+			})
+			store.updateCacheDialogs(list)
+			store.updateCacheUnreadCount(0)
+
 		}
 	})
 
-	const contactRef = useRef<any>()
 	const dialogRef = useRef<any>()
 
 	return (
@@ -59,7 +63,7 @@ const Layout: React.FC = () => {
 			<View id="view-my" onTabShow={() => setTabActive('my')} tab url="/my/" />
 
 			<Toolbar tabbar icons bottom>
-				<button ref={dialog}>
+				<button ref={buttonRef}>
 					<Link
 						ref={dialogRef}
 						tabLink="#view-dialog"
@@ -71,10 +75,8 @@ const Layout: React.FC = () => {
 						onClick={() => onTabLinkClick('dialog')}
 					/>
 				</button>
-
-				<button ref={element}>
+				<button>
 					<Link
-						ref={contactRef}
 						tabLink="#view-contacts"
 						iconF7="phone"
 						text="联系人"
