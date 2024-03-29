@@ -53,14 +53,15 @@ const MessageList = () => {
 		await messageStore.unshiftMessage()
 		isLoading.current = false
 		// 滚动到距离顶部的 100px
-		setTimeout(() => messageStore.container?.scrollTo({ top: 300 }), 0)
+		// setTimeout(() => messageStore.container?.scrollTo({ top: 300 }), 0)
 	}, [])
 
-	const row = useCallback((item: any, index: number) => <MessageRow item={item} key={index} />, [])
+	const row = useCallback((item: Message, index: number) => <MessageRow item={item} key={index} />, [])
 
 	return (
 		<div className="w-full h-auto relative">
 			<div className="w-full h-10 absolute top -z-1" ref={placeholderRef} />
+			{messageStore.isGroupAnnouncement && <div className="h-10" />}
 			<List className="m-0">{messageStore.messages.map((item, index) => row(item, index))}</List>
 		</div>
 	)
