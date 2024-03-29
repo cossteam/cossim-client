@@ -12,6 +12,7 @@ import { generateMessage } from './utils/data'
 import cacheStore from './utils/cache'
 import GroupService from './api/group'
 import RelationService from './api/relation'
+import _ from 'lodash-es'
 
 /**
  * 更新本地缓存消息，如果一开始没有消息，就添加会话中的最后一条消息
@@ -101,7 +102,7 @@ export async function getBehindMessage() {
 		}))
 		const { code, data } = await MsgService.getBehindMessageApi(params)
 		if (code !== 200) return
-		console.log('落后消息', data)
+		// console.log('落后消息', data)
 		// 更新本地缓存消息
 		cacheStore.updateBehindMessage(data)
 	} catch (error) {
@@ -118,7 +119,7 @@ export async function getFriendList() {
 		const cacheStore = useCacheStore.getState()
 		const { code, data } = await RelationService.getFriendListApi({ user_id: userStore.userId })
 		if (code !== 200) return
-		console.log('好友申请列表', data)
+		// console.log('好友申请列表', data)
 		cacheStore.updateCacheContacts(data)
 	} catch (error) {
 		console.error('获取好友列表', error)
@@ -272,10 +273,30 @@ export async function handlerSocketEdit(data: any) {
  * 处理好友请求
  * @param data
  */
-export function handlerSocketRequest(data: any) {
-	console.log('处理好友请求', data)
+export function handlerSocketRequest() {
+	// console.log('处理好友请求', data)
 	const cacheStore = useCacheStore.getState()
 	cacheStore.updateCacheApplyCount(cacheStore.applyCount + 1)
+}
+
+/**
+ * 阅后即焚
+ * @param data
+ */
+export function handlerDestroyMessage() {
+	console.log('处理阅后即焚')
+	const cacheStore = useCacheStore.getState()
+	console.log(cacheStore.cacheContacts)
+	cacheStore.cacheContacts.map((item) => {
+		const preferences = {
+			dialog_id: item.dialog_id,
+			..._.pick(item, ['preferences']).preferences
+		}
+		console.log(
+			`会话【${preferences.dialog_id}】${preferences.open_burn_after_reading ? '已开启阅后即焚' : '已关闭阅后即焚'}`,
+			`${preferences.open_burn_after_reading_time_out}s`
+		)
+	})
 }
 
 /**
@@ -291,6 +312,7 @@ function run() {
 			getRemoteSession()
 			getApplyList()
 			getFriendList()
+			handlerDestroyMessage()
 			cacheStore.updateFirstOpened(false)
 		}
 	})
