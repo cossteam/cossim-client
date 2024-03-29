@@ -20,7 +20,7 @@ import { useAsyncEffect } from '@reactuses/core'
 
 import { $t, arrayToGroups } from '@/shared'
 import './Contact.scss'
-import UserStore from '@/db/user'
+import useCacheStore from '@/stores/cache.ts'
 
 interface ContactProps {
 	completed: (list: any) => void
@@ -36,7 +36,7 @@ const Contact: React.FC<ContactProps> = ({ completed, defaults, opened, setOpene
 	const isChecked = (item: any, data?: any[]) => (data || defaults!)?.some((v) => v?.dialog_id === item?.dialog_id)
 
 	const updateFriends = async () => {
-		const friends = await UserStore.findAll(UserStore.tables.friends)
+		const friends = useCacheStore.getState().cacheContacts
 		if (friends) setFriends(arrayToGroups(friends))
 		setSelects(defaults! || [])
 	}
