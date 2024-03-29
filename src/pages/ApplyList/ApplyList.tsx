@@ -10,79 +10,30 @@ import {
 	SwipeoutButton,
 	f7
 } from 'framework7-react'
-import { useEffect, useState } from 'react'
-import { useAsyncEffect } from '@reactuses/core'
-import { isEqual } from 'lodash-es'
+import { useMemo, useState } from 'react'
 
 import RelationService from '@/api/relation'
 import { $t, ApplyStatus, ApplyType, USER_ID, MangageApplyStatus, GroupApplyStatus, toastMessage } from '@/shared'
 import { getCookie } from '@/utils/cookie'
 import GroupService from '@/api/group'
 import UserStore from '@/db/user'
-import { useStateStore } from '@/stores/state'
-import { useLiveQuery } from 'dexie-react-hooks'
+import Empty from '@/components/Empty'
+import useCacheStore from '@/stores/cache'
+import { getApplyList } from '@/run'
+import { useAsyncEffect } from '@reactuses/core'
 
 const user_id = getCookie(USER_ID) || ''
 
 const ApplyList = () => {
 	const [type, setType] = useState<ApplyType>(ApplyType.FRIEND)
-	const [applyList, setApplyList] = useState<any[]>([])
-
-	const { updateContacts } = useStateStore()
-
-	const allApplyList = useLiveQuery(() => UserStore.findAll(UserStore.tables.apply_list)) || []
-
-	const updateApplyList = async () => {
-		const applyList = await UserStore.findAll(UserStore.tables.apply_list)
-		const newApplyList = applyList.filter((v) => (type === ApplyType.FRIEND ? v?.sender_id : !v?.sender_id))
-		// console.log(newApplyList)
-		setApplyList(
-			newApplyList.sort((a, b) => b.request_at - a.request_at)
-			// newApplyList
-		)
-		return newApplyList
-	}
-
-	const updateApplyListInit = async () => {
-		try {
-			const applyList = await updateApplyList()
-
-			const { data } =
-				type === ApplyType.FRIEND
-					? await RelationService.friendApplyListApi({ user_id })
-					: await GroupService.groupRequestListApi({ user_id })
-			// console.log(data)
-			data.map(async (item: any) => {
-				const apply = applyList.find((v) => {
-					// console.log(v.id, v)
-					return v.id === (type === ApplyType.FRIEND ? item?.id : `group_${item?.id}`)
-				})
-				// console.log('apply', Boolean(apply), apply?.status, apply)
-				if (apply) {
-					// console.log(isEqual(apply, item), apply, item)
-					!isEqual(apply, item) && (await UserStore.update(UserStore.tables.apply_list, 'id', item?.id, item))
-				} else {
-					await UserStore.add(UserStore.tables.apply_list, {
-						...item,
-						id: type === ApplyType.FRIEND ? item.id : `group_${item.id}`
-					})
-				}
-			})
-		} catch (error: any) {
-			console.error('获取申请列表失败', error?.message)
-		}
-	}
-
-	useEffect(() => {
-		if (!allApplyList.length) return
-		updateApplyList()
-		// const newApplyList = applyList.filter((v) => (type === ApplyType.FRIEND ? v?.sender_id : !v?.sender_id))
-		// setApplyList(newApplyList)
-	}, [allApplyList])
+	const cacheStore = useCacheStore()
+	const applyList = useMemo(() => {
+		return type === ApplyType.FRIEND ? cacheStore.friendApply : cacheStore.groupApply
+	}, [type])
 
 	useAsyncEffect(
 		async () => {
-			await updateApplyListInit()
+			await getApplyList()
 		},
 		() => {},
 		[type]
@@ -115,12 +66,12 @@ const ApplyList = () => {
 						? await GroupService.manageGroupRequestApi({
 								group_id: item.group_id,
 								action,
-								id: parseInt(item.id.split('_')[1])
+								id: item.id // parseInt(item.id.split('_')[1])
 							})
 						: await GroupService.manageGroupRequestAdminApi({
 								group_id: item.group_id,
 								action,
-								id: parseInt(item.id.split('_')[1])
+								id: item.id // parseInt(item.id.split('_')[1])
 							})
 
 			if (code !== 200) {
@@ -135,10 +86,7 @@ const ApplyList = () => {
 			})
 
 			// 更新数据
-			await updateApplyListInit()
-
-			// 更新好友列表
-			updateContacts(true)
+			await getApplyList()
 		} catch (error) {
 			console.error('处理好友请求失败', error)
 			f7.dialog.alert($t('处理好友请求失败'))
@@ -185,10 +133,9 @@ const ApplyList = () => {
 	 * @param item 好友请求信息
 	 */
 	const deleteApply = async (item: any) => {
-		console.log('deleteApply', item)
 		try {
 			const isFriend = type === ApplyType.FRIEND
-			const id = isFriend ? item.id : Number((item.id ?? '').split('_')[1])
+			const id = item.id // isFriend ? item.id : Number((item.id ?? '').split('_')[1])
 			const { code, msg } = isFriend
 				? await RelationService.deleteFriendApplyApi({ id })
 				: await RelationService.deleteGroupApplyApi({ id })
@@ -200,126 +147,120 @@ const ApplyList = () => {
 	}
 
 	return (
-		<Page noToolbar className="bg-bgTertiary" onPageBeforeOut={() => updateContacts(true)}>
+		<Page noToolbar className="bg-bgTertiary">
 			<Navbar backLink className="coss_applylist_navbar bg-bgPrimary hidden-navbar-bg">
 				<NavTitle>
 					<Segmented strong>
 						<Button active={type === ApplyType.FRIEND} onClick={() => setType(ApplyType.FRIEND)}>
 							{$t('好友申请')}
-							{/* {applyFriendTotal !== 0 && (
-								<Badge color="red" className="ml-1">
-									{applyFriendTotal}
-								</Badge>
-							)} */}
 						</Button>
 						<Button active={type === ApplyType.GROUP} onClick={() => setType(ApplyType.GROUP)}>
 							{$t('群聊申请')}
-							{/* {applyGroupTotal !== 0 && (
-								<Badge color="red" className="ml-1">
-									{applyGroupTotal}
-								</Badge>
-							)} */}
 						</Button>
 					</Segmented>
 				</NavTitle>
 			</Navbar>
 
-			<List strongIos className="mt-0" mediaList>
-				{applyList.map((item, index) =>
-					// 区分好友申请和群申请
-					type === ApplyType.FRIEND ? (
-						// 好友
-						<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
-							<div slot="media" className="w-12 h-12">
-								<img
-									src={item?.receiver_info?.user_avatar}
-									className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
-								/>
-							</div>
-							<div slot="title">
-								<span>{$t(item?.receiver_info?.user_name)}</span>
-							</div>
-							<div slot="content" className="pr-2 flex">
-								{!isOperate(item) ? (
-									<Button className="text-sm text-gray-500" onClick={() => {}}>
-										{getStatusText(item.status)}
-									</Button>
-								) : (
-									<>
-										<Button
-											className="text-sm text-red-500"
-											onClick={() => manageFriendApply(item, MangageApplyStatus.REFUSE)}
-										>
-											拒绝
+			{applyList.length <= 0 ? (
+				<Empty />
+			) : (
+				<List strongIos className="m-0" mediaList>
+					{applyList.map((item, index) =>
+						// 区分好友申请和群申请
+						type === ApplyType.FRIEND ? (
+							// 好友
+							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
+								<div slot="media" className="w-12 h-12">
+									<img
+										src={item?.receiver_info?.user_avatar}
+										className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
+									/>
+								</div>
+								<div slot="title">
+									<span>{$t(item?.receiver_info?.user_name)}</span>
+								</div>
+								<div slot="content" className="pr-2 flex">
+									{!isOperate(item) ? (
+										<Button className="text-sm text-gray-500" onClick={() => {}}>
+											{getStatusText(item.status)}
 										</Button>
-										<Button
-											className="text-sm text-primary"
-											onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
-										>
-											同意
-										</Button>
-									</>
-								)}
-							</div>
-							<SwipeoutActions right>
-								{/* <SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
+									) : (
+										<>
+											<Button
+												className="text-sm text-red-500"
+												onClick={() => manageFriendApply(item, MangageApplyStatus.REFUSE)}
+											>
+												拒绝
+											</Button>
+											<Button
+												className="text-sm text-primary"
+												onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
+											>
+												同意
+											</Button>
+										</>
+									)}
+								</div>
+								<SwipeoutActions right>
+									{/* <SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
 									{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
 								</SwipeoutButton> */}
-								<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
-									{$t('删除')}
-								</SwipeoutButton>
-							</SwipeoutActions>
-						</ListItem>
-					) : (
-						// 群聊
-						<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
-							<div slot="media" className="w-12 h-12">
-								<img
-									src={item?.receiver_info?.user_avatar}
-									className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
-								/>
-							</div>
-							<div slot="title">
-								<span>{$t(isRreceiver(item) ? '你' : item?.sender_info?.user_name)}</span>
-								<span>{$t('邀请')}</span>
-								<span>{$t(isRreceiver(item) ? item?.receiver_info?.user_name : '你')}</span>
-								<span>{$t('加入')}</span>
-								<span>{$t(item?.group_name)}</span>
-							</div>
-							<div slot="content" className="pr-2 flex">
-								{!isOperate(item) ? (
-									<Button className="text-sm text-gray-500" onClick={() => {}}>
-										{getStatusText(item.status)}
-									</Button>
-								) : (
-									<>
-										<Button
-											className="text-sm text-red-500"
-											onClick={() => manageFriendApply(item, MangageApplyStatus.REFUSE)}
-										>
-											拒绝
+									<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
+										{$t('删除')}
+									</SwipeoutButton>
+								</SwipeoutActions>
+							</ListItem>
+						) : (
+							// 群聊
+							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
+								<div slot="media" className="w-12 h-12">
+									<img
+										src={item?.receiver_info?.user_avatar}
+										className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
+									/>
+								</div>
+								<div slot="title">
+									<span>{$t(isRreceiver(item) ? '你' : item?.sender_info?.user_name)}</span>
+									<span>{$t('邀请')}</span>
+									<span>{$t(isRreceiver(item) ? item?.receiver_info?.user_name : '你')}</span>
+									<span>{$t('加入')}</span>
+									<span>{$t(item?.group_name)}</span>
+								</div>
+								<div slot="content" className="pr-2 flex">
+									{!isOperate(item) ? (
+										<Button className="text-sm text-gray-500" onClick={() => {}}>
+											{getStatusText(item.status)}
 										</Button>
-										<Button
-											className="text-sm text-primary"
-											onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
-										>
-											同意
-										</Button>
-									</>
-								)}
-							</div>
-							<SwipeoutActions right>
-								{/* <SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
+									) : (
+										<>
+											<Button
+												className="text-sm text-red-500"
+												onClick={() => manageFriendApply(item, MangageApplyStatus.REFUSE)}
+											>
+												拒绝
+											</Button>
+											<Button
+												className="text-sm text-primary"
+												onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
+											>
+												同意
+											</Button>
+										</>
+									)}
+								</div>
+								<SwipeoutActions right>
+									{/* <SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
 									{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
 								</SwipeoutButton> */}
-								<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
-									{$t('删除')}
-								</SwipeoutButton>
-							</SwipeoutActions>
-						</ListItem>
-					)
-				)}
-			</List>
+									<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
+										{$t('删除')}
+									</SwipeoutButton>
+								</SwipeoutActions>
+							</ListItem>
+						)
+					)}
+				</List>
+			)}
 		</Page>
 	)
 }
