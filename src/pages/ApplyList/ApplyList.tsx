@@ -29,7 +29,7 @@ const ApplyList = () => {
 	const cacheStore = useCacheStore()
 	const applyList = useMemo(() => {
 		return type === ApplyType.FRIEND ? cacheStore.friendApply : cacheStore.groupApply
-	}, [type])
+	}, [type, cacheStore.friendApply, cacheStore.groupApply])
 
 	useAsyncEffect(
 		async () => {
@@ -140,6 +140,8 @@ const ApplyList = () => {
 				? await RelationService.deleteFriendApplyApi({ id })
 				: await RelationService.deleteGroupApplyApi({ id })
 			toastMessage(code === 200 ? '删除成功' : msg)
+			if (code !== 200) return
+			await getApplyList()
 		} catch (error) {
 			console.log(error)
 			toastMessage('删除失败')
@@ -169,7 +171,7 @@ const ApplyList = () => {
 						// 区分好友申请和群申请
 						type === ApplyType.FRIEND ? (
 							// 好友
-							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
+							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout={!isOperate(item)}>
 								<div slot="media" className="w-12 h-12">
 									<img
 										src={item?.receiver_info?.user_avatar}
@@ -201,18 +203,17 @@ const ApplyList = () => {
 										</>
 									)}
 								</div>
-								<SwipeoutActions right>
-									{/* <SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
-									{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
-								</SwipeoutButton> */}
-									<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
-										{$t('删除')}
-									</SwipeoutButton>
-								</SwipeoutActions>
+								{!isOperate(item) && (
+									<SwipeoutActions right>
+										<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
+											{$t('删除')}
+										</SwipeoutButton>
+									</SwipeoutActions>
+								)}
 							</ListItem>
 						) : (
 							// 群聊
-							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
+							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout={!isOperate(item)}>
 								<div slot="media" className="w-12 h-12">
 									<img
 										src={item?.receiver_info?.user_avatar}
@@ -248,14 +249,13 @@ const ApplyList = () => {
 										</>
 									)}
 								</div>
-								<SwipeoutActions right>
-									{/* <SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
-									{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
-								</SwipeoutButton> */}
-									<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
-										{$t('删除')}
-									</SwipeoutButton>
-								</SwipeoutActions>
+								{!isOperate(item) && (
+									<SwipeoutActions right>
+										<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
+											{$t('删除')}
+										</SwipeoutButton>
+									</SwipeoutActions>
+								)}
 							</ListItem>
 						)
 					)}
