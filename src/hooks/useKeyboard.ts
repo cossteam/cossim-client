@@ -1,5 +1,6 @@
 import useCacheStore from '@/stores/cache'
 import { Keyboard } from '@capacitor/keyboard'
+// import { Keyboard } from 'coss-keyboard'
 import { Device } from '@capacitor/device'
 import { useRef } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
@@ -16,17 +17,17 @@ const useKeyboard = () => {
 	const pageHeight = useRef<number>(0)
 	const isWeb = useRef<boolean>(true)
 
-	const handlerWindowResize = () => {
-		// 获取页面高度
-		const innerHeight = window.innerHeight
-		const keyboardHeight = pageHeight.current - innerHeight
-		if (keyboardHeight > 0) {
-			// console.log('键盘弹起', keyboardHeight)
-			cacheStore.updateKeyboardHeight(keyboardHeight)
-			window.removeEventListener('resize', handlerWindowResize)
-		}
-		// console.log('键盘弹起', pageHeight.current, innerHeight)
-	}
+	// const handlerWindowResize = () => {
+	// 	// 获取页面高度
+	// 	const innerHeight = window.innerHeight
+	// 	const keyboardHeight = pageHeight.current - innerHeight
+	// 	if (keyboardHeight > 0) {
+	// 		// console.log('键盘弹起', keyboardHeight)
+	// 		cacheStore.updateKeyboardHeight(keyboardHeight)
+	// 		window.removeEventListener('resize', handlerWindowResize)
+	// 	}
+	// 	// console.log('键盘弹起', pageHeight.current, innerHeight)
+	// }
 
 	useAsyncEffect(
 		async () => {
@@ -36,9 +37,12 @@ const useKeyboard = () => {
 
 			isWeb.current = platform.platform !== 'web'
 
-			// console.log('当前欢快', isWeb.current, platform.platform, Keyboard)
+			// console.log('当前欢快', isWeb.curre
 
 			if (isWeb.current) {
+				// Keyboard.setKeyboardMode({ mode: KeyboardResize.None })
+				// Keyboard.setResizeMode({ mode: KeyboardResize.None })
+				// Keyboard.setKeyboardMode('NONE')
 				Keyboard?.addListener('keyboardWillShow', (info) => {
 					console.log('键盘躺起', info)
 					cacheStore.updateKeyboardHeight(info.keyboardHeight)
@@ -56,12 +60,12 @@ const useKeyboard = () => {
 				// 	console.log('keyboard did hide')
 				// })
 			} else {
-				window.addEventListener('resize', handlerWindowResize)
+				// window.addEventListener('resize', handlerWindowResize)
 			}
 		},
 		() => {
 			// isWeb.current && Keyboard?.removeAllListeners()
-			window.removeEventListener('resize', handlerWindowResize)
+			// window.removeEventListener('resize', handlerWindowResize)
 		},
 		[]
 	)
