@@ -4,25 +4,14 @@ import $ from 'dom7'
 import useCacheStore from '@/stores/cache'
 import useRouterStore from '@/stores/router.ts'
 import useToolbarStore from '@/stores/toolbar.ts'
-import { useLongPress } from '@reactuses/core'
+import useLongPress from '@/hooks/useLongPress.ts'
 
 const Layout: React.FC = () => {
 	const [tabActive, setTabActive] = useState<string>('dialog')
 	const previousTab = useRef<string>('dialog')
 	const { router } = useRouterStore()
-	const { setDoubleClick, setLongClick } = useToolbarStore()
+	const { setDoubleClick } = useToolbarStore()
 	const onTabLinkClick = (tabName: string) => {
-		// 单击
-		switch (tabName) {
-			case 'dialog':
-				// setSingleClick(true)
-				break
-			case 'contacts':
-
-				break
-			case 'my':
-				break
-		}
 		if (previousTab.current !== tabActive) {
 			previousTab.current = tabActive
 			return
@@ -50,17 +39,22 @@ const Layout: React.FC = () => {
 	// 全局状态（未读消息）
 	const cacheStore = useCacheStore()
 
-	const onLongPress = () => {
-		console.log('长按')
-		setLongClick(true)
-	};
+	const buttonRef = useRef<HTMLButtonElement | null>(null)
 
-	const defaultOptions = {
-		isPreventDefault: true,
-		delay: 300,
-	};
-	const longPressEvent = useLongPress(onLongPress, defaultOptions);
+	// 长按全部已读
+	useLongPress(buttonRef, {
+		callback: () => {
+			const store = useCacheStore.getState()
+			const list = store.cacheDialogs.map((item: any) => {
+				return { ...item, dialog_unread_count: 0 }
+			})
+			store.updateCacheDialogs(list)
+			store.updateCacheUnreadCount(0)
 
+		}
+	})
+
+	const dialogRef = useRef<any>()
 
 	return (
 		<Views tabs className="safe-area app">
@@ -69,8 +63,9 @@ const Layout: React.FC = () => {
 			<View id="view-my" onTabShow={() => setTabActive('my')} tab url="/my/" />
 
 			<Toolbar tabbar icons bottom>
-				<button {...longPressEvent}>
+				<button ref={buttonRef}>
 					<Link
+						ref={dialogRef}
 						tabLink="#view-dialog"
 						iconF7="chat_bubble_2"
 						text="聊天"
@@ -80,7 +75,6 @@ const Layout: React.FC = () => {
 						onClick={() => onTabLinkClick('dialog')}
 					/>
 				</button>
-
 				<button>
 					<Link
 						tabLink="#view-contacts"

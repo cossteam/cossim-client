@@ -28,20 +28,15 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const messageStore = useMessageStore()
 	const cacheStore = useCacheStore()
 	const { router, setRouter } = useRouterStore()
-	const { singleClick, doubleClick, longClick,setDoubleClick, setSingleClick, setLongClick } = useToolbarStore()
+	const { doubleClick,setDoubleClick } = useToolbarStore()
 
 	useEffect(() => {
-		if (singleClick) {//
-		} else if (doubleClick) {
+		if (doubleClick) {
 			const unread = cacheStore.cacheDialogs.find((item) => item.dialog_unread_count > 0)
-			scrollTo(unread.dialog_id)
-		} else if (longClick) {//
-			// 长按清除消息
+			unread && scrollTo(unread.dialog_id)
 		}
-		setSingleClick(false)
 		setDoubleClick(false)
-		setLongClick(false)
-	},[singleClick, doubleClick, longClick])
+	},[doubleClick])
 
 	useEffect(() => {
 		setRouter(f7router)
@@ -146,7 +141,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		// el.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" });
 	}
 
-
 	return (
 		<Page
 			ptr={ptrRefresh}
@@ -189,7 +183,6 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 					<List contactsList noChevron mediaList dividers className="">
 						{cacheStore.cacheDialogs.sort(customSort).map((item, index) => {
 							// @ts-ignore
-							// @ts-ignore
 							return (
 								<ListItem
 									id={item.dialog_id}
@@ -217,6 +210,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 										)
 									}}
 								>
+									{/*@ts-ignore*/}
 									<Avatar slot="media" src={`${item?.dialog_avatar}`} />
 									<div
 										slot="text"
