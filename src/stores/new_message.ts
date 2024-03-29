@@ -29,7 +29,8 @@ const defaultOptions: MessageStoreOptions = {
 	manualTipType: tooltipType.NONE,
 	atAllUser: 0,
 	atUsers: [],
-	selectedForwardUsers: []
+	selectedForwardUsers: [],
+	isLoading: false
 }
 
 const useMessageStore = create<MessageStore>((set, get) => ({
@@ -106,6 +107,11 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 	deleteAllMessage: async (dialogId) => {
 		set({ messages: [], allMessages: [] })
 		cacheStore.set(`${dialogId}`, [])
+	},
+	unshiftMessage: async () => {
+		const { allMessages, messages } = get()
+		const newMessages = allMessages.slice(-messages.length - 15)
+		set({ messages: newMessages })
 	}
 }))
 

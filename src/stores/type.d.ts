@@ -47,7 +47,7 @@ export interface CacheStoreOptions {
 	unreadCount: number
 	/** 好友或群聊申请数 */
 	applyCount: number
-	/** 缓存的键盘高度, 默认 300 */
+	/** 缓存的键盘高度, 默认 417 */
 	keyboardHeight: number
 	/** 搜索消息表名，主要用与搜索时获取对应表名的数据 */
 	cacheSearchMessage: string[]
@@ -177,6 +177,8 @@ export interface MessageStoreOptions {
 	atUsers: string[]
 	/** 选中要转发的人员 */
 	selectedForwardUsers: any[]
+	/** 是否加载中 */
+	isLoading: boolean
 }
 
 interface initOptions {
@@ -224,18 +226,8 @@ export type MessageStore = MessageStoreOptions & {
 	 * @param {number} dialogId 会话 id
 	 */
 	deleteAllMessage: (dialogId: number) => Promise<void>
-	// /**
-	//  * 添加缓存消息
-	//  *
-	//  * @param {any} message 消息
-	//  * @param {number} dialogId 会话id
-	//  */
-	// createCacheMessage: (message: any, dialogId: number) => Promise<void>
-	// /**
-	//  * 更新缓存消息
-	//  *
-	//  * @param {any} message 消息
-	//  * @param {number} dialogId 会话id
-	//  */
-	// updateCacheMessage: (messages: any, dialogId: number) => Promise<void>
+	/**
+	 * 从头部添加消息，每次添加 15 条
+	 */
+	unshiftMessage: () => Promise<void>
 }
