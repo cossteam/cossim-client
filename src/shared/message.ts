@@ -5,7 +5,7 @@ import UserService from '@/api/user'
 import { isEqual } from 'lodash-es'
 import { v4 as uuidv4 } from 'uuid'
 import { PrivateChats } from '@/types/db/user-db'
-import { $t, MESSAGE_TYPE, msgType } from '.'
+import { $t, MESSAGE_READ, MESSAGE_TYPE, msgType } from '.'
 import MsgService from '@/api/msg'
 import CommonStore from '@/db/common'
 import useCacheStore from '@/stores/cache'
@@ -375,4 +375,41 @@ export const isLastMessage = (message: Message) => {
 	const msg = cacheStore.cacheDialogs.find((dialog) => dialog.dialog_id === message.dialog_id)
 	if (!msg) return false
 	return msg.last_message.msg_id === message.msg_id
+}
+
+/**
+ * 一键全部已读
+ * @param {number[]} dialogId		会话 id
+ */
+export const dialogRead = async (dialogId: number, groupId?: number) => {
+	const messages = await cacheStore.get(`${dialogId}`)
+	// 获取未读消息的 id
+	const unreadList = messages.filter(
+		(message: Message) => !message?.is_read || message?.is_read === MESSAGE_READ.NOT_READ
+	)
+	// 获取未读消息列表 id
+	const unreadIds = unreadList.map((message: Message) => message.msg_id)
+
+	try {
+		const params: any = { msg_ids: unreadIds, dialog_id: dialogId }
+		if (groupId) params['group_id'] = Number(groupId)
+
+		const { code } = groupId
+			? await MsgService.readGroupMessageApi(params)
+			: await MsgService.readUserMessageApi(params)
+
+		if (code !== 200) return
+
+		const messageList = messages.map((message: Message) => {
+			if (unreadIds.includes(message.msg_id)) {
+				message.is_read = MESSAGE_READ.READ
+			}
+			return message
+		})
+
+		// 更新未读消息列表
+		await cacheStore.set(`${dialogId}`, messageList)
+	} catch (error) {
+		console.error('一键已读失败', error)
+	}
 }

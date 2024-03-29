@@ -179,6 +179,10 @@ export interface MessageStoreOptions {
 	selectedForwardUsers: any[]
 	/** 是否加载中 */
 	isLoading: boolean
+	/** 未读列表 id */
+	unreadList: number[]
+	/** 是否有群公告 */
+	isGroupAnnouncement: boolean
 }
 
 interface initOptions {
@@ -230,4 +234,9 @@ export type MessageStore = MessageStoreOptions & {
 	 * 从头部添加消息，每次添加 15 条
 	 */
 	unshiftMessage: () => Promise<void>
+	/**
+	 * 更新未读列表
+	 * @param {number} msgId 消息 id
+	 */
+	updateUnreadList: (msgId: number) => Promise<void>
 }

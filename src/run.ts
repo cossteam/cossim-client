@@ -187,14 +187,15 @@ export async function handlerSocketMessage(data: any) {
 	const type = message?.msg_type
 
 	// 是否需要继续操作，如果是标注、撤回时需要继续操作,如果都不是且是自己当前设备发的就不处理
-	const isContinue = !isLableMessage(type) && !isRecallMessage(type) && userStore.deviceId === data.driverId
+	const isDrivered: boolean = userStore.deviceId === data.driverId
+	const isContinue = !isLableMessage(type) && !isRecallMessage(type) && isDrivered
 	if (isContinue) return
 
 	const msg = generateMessage({
 		...message,
 		is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK,
 		msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
-		is_read: !message?.is_read ? MESSAGE_READ.READ : MESSAGE_READ.NOT_READ
+		is_read: !isDrivered ? MESSAGE_READ.NOT_READ : MESSAGE_READ.READ
 	})
 
 	// 如果是当前会话，需要实时更新到页面

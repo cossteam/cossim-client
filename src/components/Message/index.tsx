@@ -11,6 +11,7 @@ import useMessageStore from '@/stores/new_message'
 import { useEffect, useMemo } from 'react'
 import { tooltipType } from '@/shared'
 import { forwardMessage } from './script/message'
+import { debounce } from 'lodash-es'
 
 const Message: React.FC<RouterProps> = () => {
 	const { height } = useWindowSize()
@@ -42,6 +43,18 @@ const Message: React.FC<RouterProps> = () => {
 		if (!messageStore.selectedForwardUsers.length) return
 		forwardMessage()
 	}, [messageStore.selectedForwardUsers])
+
+	// 已读消息
+	const read = debounce(() => {
+		console.log('已读')
+	}, 1000)
+	useEffect(() => {
+		if (!messageStore.unreadList.length) return
+		console.log('messageStore.unreadList', messageStore.unreadList)
+		read()
+		// 在组件卸载或下一次 effect 运行之前取消 debounce 函数
+		// return () => read.cancel()
+	}, [messageStore.unreadList])
 
 	return (
 		<Page noToolbar className="coss_message transition-all relative">

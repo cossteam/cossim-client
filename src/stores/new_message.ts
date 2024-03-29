@@ -30,7 +30,9 @@ const defaultOptions: MessageStoreOptions = {
 	atAllUser: 0,
 	atUsers: [],
 	selectedForwardUsers: [],
-	isLoading: false
+	isLoading: false,
+	unreadList: [],
+	isGroupAnnouncement: false
 }
 
 const useMessageStore = create<MessageStore>((set, get) => ({
@@ -112,6 +114,10 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		const { allMessages, messages } = get()
 		const newMessages = allMessages.slice(-messages.length - 15)
 		set({ messages: newMessages })
+	},
+	updateUnreadList: async (msgId) => {
+		const { unreadList } = get()
+		if (!unreadList.includes(msgId)) unreadList.push(msgId)
 	}
 }))
 

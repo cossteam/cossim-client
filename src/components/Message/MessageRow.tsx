@@ -1,4 +1,4 @@
-import { isMe, msgType, tooltipType } from '@/shared'
+import { MESSAGE_READ, isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/new_message'
@@ -19,7 +19,7 @@ import MessageLabel from './MessageRow/MessageLabel'
 import useUserStore from '@/stores/user'
 import MessageRecall from './MessageRow/MessageRecall'
 import { ListItem } from 'framework7-react'
-import { useLongPress } from '@reactuses/core'
+import { useIntersectionObserver, useLongPress } from '@reactuses/core'
 import Avatar from '@/components/Avatar/Avatar'
 import useRouterStore from '@/stores/router'
 import useLoading from '@/hooks/useLoading'
@@ -127,6 +127,21 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		}, '搜索中...')
 	}
 
+	const itemRef = useRef<HTMLDivElement | null>(null)
+	//
+	const stop = useIntersectionObserver(itemRef, (entry) => {
+		// setEntry(entry)
+		if (entry[0].isIntersecting) {
+			// messageStore.update({ lastReadId: item.msg_id })
+			console.log('进入可视区域')
+			if (item.is_read === MESSAGE_READ.NOT_READ) {
+				messageStore.updateUnreadList(item.msg_id)
+			} else {
+				stop()
+			}
+		}
+	})
+
 	// 无内容
 	if (type === msgType.NONE) return null
 	// 通知
@@ -144,7 +159,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			checkbox={isSelect}
 			onChange={(e) => handlerSelectChange(e.target.checked, item)}
 		>
-			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')}>
+			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')} ref={itemRef}>
 				<div className={clsx('max-w-[80%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>
 					<div className={clsx('flex items-start', is_self ? 'justify-end pr-2' : 'justify-start pl-2')}>
 						<div
