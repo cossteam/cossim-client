@@ -19,6 +19,7 @@ import { LiveRoomStates, useLiveRoomStore } from '@/stores/liveRoom'
 import Timer from './Timer'
 import useUserStore from '@/stores/user'
 import { VideoStyle } from './types'
+import { toastMessage } from '@/shared'
 
 interface TrackList {
 	track: LocalTrack | RemoteTrack
@@ -70,7 +71,7 @@ const LiveRoomNew: React.FC = () => {
 	const [audioEnable, setAudioEnable] = useState(true)
 	const [videoEnable, setVideoEnable] = useState(true)
 	// 频道
-	const [, setAudioTracks] = useState<TrackList[]>([])
+	const [audioTracks, setAudioTracks] = useState<TrackList[]>([])
 	const [videoTracks, setVideoTracks] = useState<TrackList[]>([])
 
 	// 初始化房间
@@ -141,10 +142,11 @@ const LiveRoomNew: React.FC = () => {
 				name: remoteParticipant.name ?? '-'
 			}
 			if (remoteTrack.kind === 'video') {
-				// @ts-ignore
-				console.log('是否存在 lastDimensions', remoteTrack.lastDimensions!)
-				// @ts-ignore
-				const { width, height } = remoteTrack.lastDimensions
+				console.log('是否存在 dimensions', remotePublication.dimensions!)
+				const { width, height } = remotePublication.dimensions || {
+					width: 0,
+					height: 0
+				}
 				setVideoTracks([
 					...videoTracks,
 					{
@@ -163,34 +165,50 @@ const LiveRoomNew: React.FC = () => {
 			})
 		})
 		// 监听断开事件
-		client.current.on(RoomEvent.Disconnected, () => {
+		let errorCount = 0
+		const onDisconnected = async () => {
 			console.log('断开连接', client.current)
-			// liveRoomStore.hangup()
-			liveRoomStore.updateState(LiveRoomStates.ERROR)
-		})
+			if ([LiveRoomStates.BUSY, LiveRoomStates.JOINING, LiveRoomStates.WAITING].includes(liveRoomStore.state))
+				return
+			// 错误次数大于3次，提示错误
+			if (errorCount >= 3) {
+				liveRoomStore.updateState(LiveRoomStates.ERROR)
+				f7.dialog.alert('连接失败，请重试')
+				errorCount = 0
+				return
+			}
+			try {
+				toastMessage(`连接失败，重试中(${errorCount})...`)
+				await joinRoom()
+			} catch {
+				errorCount++
+			}
+		}
+		client.current.on(RoomEvent.Disconnected, onDisconnected)
 	}
 	// 配置音频
 	const configAudio = (audioEnable: boolean, options?: AudioCaptureOptions, publishOptions?: TrackPublishOptions) => {
-		client.current?.localParticipant.setMicrophoneEnabled(
-			audioEnable,
-			options ?? {
-				echoCancellation: true,
-				noiseSuppression: true,
-				autoGainControl: true
-			},
-			publishOptions ?? {}
-		)
+		//  ?? {
+		// 		echoCancellation: true,
+		// 		noiseSuppression: true,
+		// 		autoGainControl: true
+		// 	}
+		// client.current?.localParticipant.setMicrophoneEnabled(audioEnable, options, publishOptions ?? {})
+		console.log('配置音频', audioEnable, options, publishOptions)
+		client.current?.localParticipant.setMicrophoneEnabled(audioEnable)
+		audioTracks.map((item) => {
+			console.log(item)
+		})
 	}
 	// 配置视频
 	const configVideo = (videoEnable: boolean, options?: VideoCaptureOptions, publishOptions?: TrackPublishOptions) => {
-		client.current?.localParticipant.setCameraEnabled(
-			videoEnable,
-			options ?? {
-				resolution: VideoPresets.h720.resolution,
-				facingMode: 'user' // "user" | "environment" | "left" | "right" | undefined
-			},
-			publishOptions ?? {}
-		)
+		//  ?? {
+		// 		resolution: VideoPresets.h720.resolution,
+		// 		facingMode: 'user' // "user" | "environment" | "left" | "right" | undefined
+		// 	},
+		// client.current?.localParticipant.setCameraEnabled(videoEnable, options, publishOptions ?? {})
+		console.log('配置视频', videoEnable, options, publishOptions)
+		client.current?.localParticipant.setCameraEnabled(videoEnable)
 	}
 	// 加入房间
 	const joinRoom = async () => {
@@ -199,9 +217,12 @@ const LiveRoomNew: React.FC = () => {
 			f7.dialog.alert('房间链接错误', '请检查房间链接和凭证是否正确')
 			return
 		}
+		await client.current?.prepareConnection(liveRoomStore.url, liveRoomStore.token)
 		return await client.current?.connect(liveRoomStore.url, liveRoomStore.token).then(() => {
 			console.log('加入房间成功', { audioEnable, videoEnable })
 			liveRoomStore.updateState(LiveRoomStates.BUSY)
+			console.log('媒体开启状态', { audioEnable, videoEnable })
+
 			configAudio(audioEnable)
 			configVideo(videoEnable)
 		})
@@ -219,6 +240,13 @@ const LiveRoomNew: React.FC = () => {
 					break
 				case LiveRoomStates.WAITING:
 					await initRoom()
+					break
+				case LiveRoomStates.TIMEOUT:
+					console.log('超时')
+					liveRoomStore.refuse()
+					setTimeout(() => {
+						liveRoomStore.resetState()
+					}, 2000)
 					break
 				case LiveRoomStates.JOINING:
 					await joinRoom()
@@ -253,6 +281,7 @@ const LiveRoomNew: React.FC = () => {
 
 	// 音视频开关
 	useEffect(() => {
+		console.log('音视频开关', { audioEnable, videoEnable })
 		configAudio(audioEnable)
 		configVideo(videoEnable)
 		// if (!videoEnable) {
@@ -299,12 +328,9 @@ const LiveRoomNew: React.FC = () => {
 							<div>
 								{(isWaiting || isJoining) && (
 									<Timer
-										timeout={60}
+										timeout={5}
 										onTimeout={() => {
 											liveRoomStore.updateState(LiveRoomStates.TIMEOUT)
-											setTimeout(() => {
-												liveRoomStore.resetState()
-											}, 2000)
 										}}
 									/>
 								)}

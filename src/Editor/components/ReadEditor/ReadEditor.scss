@@ -2,7 +2,7 @@
 	@apply text-[1rem] overflow-hidden px-2 break-all;
 
 	.read-editor-reply {
-		@apply border-l-[2px] border-l-bgPrimary px-[0.5rem] mb-[0.5rem]  block max-w-[200px] overflow-hidden;
+		@apply border-l-[2px] border-l-bgPrimary px-[0.5rem] mb-[0.5rem] block max-w-[200px] overflow-hidden;
 
 		p {
 			@apply text-ellipsis whitespace-nowrap overflow-hidden w-full;
@@ -24,6 +24,7 @@
 	}
 }
 
+
 .reply-read-editor {
 	font-size: 0.9rem;
 	color: #999;
@@ -40,3 +41,11 @@
 		@apply text-ellipsis whitespace-nowrap overflow-hidden w-full text-[0.925rem] px-0;
 	}
 }
+
+// .read-editor-reply {
+// 	@apply text-ellipsis overflow-hidden w-fit text-textTertiary line-clamp-1 max-w-[70%] border-l-2 border-l-primary;
+
+// 	p {
+// 		@apply text-ellipsis overflow-hidden w-fit text-textTertiary line-clamp-1 max-w-[70%];
+// 	}
+// }

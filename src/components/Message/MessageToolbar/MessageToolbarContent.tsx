@@ -72,9 +72,10 @@ const MessageToolbarContent = () => {
 				await sendMessage({
 					content: JSON.stringify({ ...data, width, height }),
 					msg_type,
-					isCreateMessage: false
+					// isCreateMessage: false
+					uid: message.uid
 				})
-				await messageStore.updateMessage({ ...message, msg_send_state: MESSAGE_SEND.SEND_SUCCESS })
+				// await messageStore.updateMessage({ ...message, msg_send_state: MESSAGE_SEND.SEND_SUCCESS })
 			} catch (error: any) {
 				toastMessage(error?.message ?? '发送失败')
 			}

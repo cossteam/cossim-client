@@ -105,16 +105,20 @@ const MessageSendAudio = () => {
 					return
 				}
 				console.log(data)
-				sendMessage({
-					content: JSON.stringify({
-						...messageContent,
-						// recordDataBase64: '',
-						url: data.url,
-						isBlob: true
-					}),
-					msg_type: msgType.AUDIO,
-					isUpdate: false
+
+				message.content = JSON.stringify({
+					...messageContent,
+					// recordDataBase64: '',
+					url: data.url,
+					isBlob: true
 				})
+
+				sendMessage({
+					content: message.content,
+					msg_type: msgType.AUDIO,
+					uid: message.uid
+				})
+				// await messageStore.updateMessage({ ...message, msg_send_state: MESSAGE_SEND.SEND_SUCCESS })
 			} catch (error) {
 				console.log(error)
 				toastMessage('发送失败')

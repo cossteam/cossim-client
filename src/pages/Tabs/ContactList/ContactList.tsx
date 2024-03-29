@@ -138,7 +138,7 @@ const ContactList: React.FC<RouterProps> = ({f7router}) => {
 								key={index}
 								footer={contact?.signature}
 								popupClose
-								link={`/profile/${contact.user_id}/`}
+								link={`/profile/${contact.user_id}/?dialog_id=${contact?.dialog_id}`}
 								// onClick={async () => {
 								// await msgStore.initMessage(
 								// 	contact?.group_id ? true : false,

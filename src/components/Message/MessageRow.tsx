@@ -1,4 +1,4 @@
-import { isMe, msgType, tooltipType } from '@/shared'
+import { MESSAGE_READ, isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/new_message'
@@ -19,10 +19,9 @@ import MessageLabel from './MessageRow/MessageLabel'
 import useUserStore from '@/stores/user'
 import MessageRecall from './MessageRow/MessageRecall'
 import { ListItem } from 'framework7-react'
-import { useLongPress } from '@reactuses/core'
+import { useIntersectionObserver, useLongPress } from '@reactuses/core'
 import Avatar from '@/components/Avatar/Avatar'
 import useRouterStore from '@/stores/router'
-import './styles/MessageRow.scss'
 import useLoading from '@/hooks/useLoading'
 import useCacheStore from '@/stores/cache'
 
@@ -32,7 +31,7 @@ interface MessageRowProps {
 
 const className = (is_self: boolean) => {
 	return clsx(
-		'py-2 px-3 rounded-lg break-all overflow-hidden',
+		'py-2 px-3 rounded-lg break-all overflow-hidden select-none',
 		is_self ? 'bg-primary text-white rounded-tr-none' : 'bg-bgPrimary rounded-tl-none'
 	)
 }
@@ -61,6 +60,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			if (messageStore.manualTipType === tooltipType.SELECT) return
 
 			setShowTippy(true)
+
 			// 全选内容文字内容
 			const selection = window?.getSelection()
 			selection?.selectAllChildren(longPressRef.current!)
@@ -84,6 +84,19 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		[messageStore.manualTipType]
 	)
 
+	const replyMessage = useMemo(() => {
+		const reply = { replyName: '', replyContent: '' }
+		if (!item?.reply_id) return reply
+		const message = messageStore.allMessages.find((msg) => msg?.msg_id === item?.reply_id)
+		if (!message) {
+			reply.replyContent = '消息已删除'
+		} else {
+			reply.replyName = message?.sender_info?.name
+			reply.replyContent = message?.content
+		}
+		return reply
+	}, [item?.reply_id])
+
 	const render = useCallback(() => {
 		switch (type) {
 			case msgType.IMAGE:
@@ -95,17 +108,39 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			case msgType.FILE:
 				return <MessageFile className={clsx(className(is_self), '!px-2 !py-2')} item={item} />
 			default:
-				return <ReadEditor className={className(is_self)} content={item?.content} />
+				return (
+					<ReadEditor
+						className={clsx(className(is_self), !is_self ? 'read-editor-no-slef' : '')}
+						content={item?.content}
+						{...replyMessage}
+					/>
+				)
 		}
 	}, [messageStore.messages])
 
 	const search = async (userId: string) => {
+		if (messageStore.manualTipType === tooltipType.SELECT) return
 		watchAsyncFn(async () => {
 			if (userId === userStore.userId) return
 			const friend = cacheStore.cacheContacts?.find((item) => item.user_id === userId)
 			friend ? router?.navigate(`/profile/${friend?.user_id}/`) : router?.navigate(`/personal_detail/${userId}/`)
 		}, '搜索中...')
 	}
+
+	const itemRef = useRef<HTMLDivElement | null>(null)
+	//
+	const stop = useIntersectionObserver(itemRef, (entry) => {
+		// setEntry(entry)
+		if (entry[0].isIntersecting) {
+			// messageStore.update({ lastReadId: item.msg_id })
+			console.log('进入可视区域')
+			if (item.is_read === MESSAGE_READ.NOT_READ) {
+				messageStore.updateUnreadList(item.msg_id)
+			} else {
+				stop()
+			}
+		}
+	})
 
 	// 无内容
 	if (type === msgType.NONE) return null
@@ -124,7 +159,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			checkbox={isSelect}
 			onChange={(e) => handlerSelectChange(e.target.checked, item)}
 		>
-			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')}>
+			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')} ref={itemRef}>
 				<div className={clsx('max-w-[80%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>
 					<div className={clsx('flex items-start', is_self ? 'justify-end pr-2' : 'justify-start pl-2')}>
 						<div
@@ -158,12 +193,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								ref={longPressRef}
 								visible={showTippy}
 							>
-								<div
-									className="relative"
-									{...longPressEvent}
-									onContextMenu={(e) => e.preventDefault()}
-									// onTouchMove={() => setIsMove(true)}
-								>
+								<div className="relative" {...longPressEvent} onContextMenu={(e) => e.preventDefault()}>
 									{render()}
 								</div>
 							</Tippy>

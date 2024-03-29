@@ -69,6 +69,33 @@ class RelationServiceImpl {
 	}
 
 	/**
+	 * 删除好友请求 API 调用。
+	 * @param data.id
+	 * @returns
+	 */
+	deleteFriendApplyApi(data: any): Promise<DataResponse> {
+		console.log(this.baseUrl)
+		return request({
+			url: `${this.baseUrl}/delete_friend_record`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
+	 * 删除群组请求 API 调用。
+	 * @param data.id
+	 * @returns
+	 */
+	deleteGroupApplyApi(data: any): Promise<DataResponse> {
+		return request({
+			url: `${this.relationGroup}/delete_friend_record`,
+			method: 'POST',
+			data
+		})
+	}
+
+	/**
 	 * 管理好友请求
 	 *
 	 * @param {ManageFriendData} data
@@ -203,7 +230,7 @@ class RelationServiceImpl {
 
 	/**
 	 * 设置阅后即焚的时间
-	 * 
+	 *
 	 * @param data
 	 * @param {string} data.friend_id
 	 * @param {number} data.open_burn_after_reading_time_out
@@ -219,10 +246,10 @@ class RelationServiceImpl {
 
 	/**
 	 * 设置用户在群聊的昵称
-	 * @param data 
-	 * @returns 
+	 * @param data
+	 * @returns
 	 */
-	setGroupUserDisplayName(data: {group_id: number, remark: string}): Promise<DataResponse> {
+	setGroupUserDisplayName(data: { group_id: number; remark: string }): Promise<DataResponse> {
 		return request({
 			url: `${this.relationGroup}/remark/set`,
 			method: 'POST',
@@ -232,10 +259,10 @@ class RelationServiceImpl {
 
 	/**
 	 * 设置好友备注
-	 * @param data 
-	 * @returns 
+	 * @param data
+	 * @returns
 	 */
-	setUserRemark(data: {remark: string, user_id: string}): Promise<DataResponse> {
+	setUserRemark(data: { remark: string; user_id: string }): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/remark/set`,
 			method: 'POST',

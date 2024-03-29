@@ -47,10 +47,14 @@ export interface CacheStoreOptions {
 	unreadCount: number
 	/** 好友或群聊申请数 */
 	applyCount: number
-	/** 缓存的键盘高度, 默认 300 */
+	/** 缓存的键盘高度, 默认 417 */
 	keyboardHeight: number
 	/** 搜索消息表名，主要用与搜索时获取对应表名的数据 */
 	cacheSearchMessage: string[]
+	/** 好友申请列表 */
+	friendApply: any[]
+	/** 群聊申请列表 */
+	groupApply: any[]
 }
 
 /**
@@ -112,6 +116,11 @@ export type CacheStore = CacheStoreOptions & {
 	 * @param {any} message 消息
 	 */
 	updateCacheContactsObj: (contacts: any[]) => void
+	/**
+	 * 更新所有缓存信息, 可以只更新部分信息
+	 * @param { Partial<CacheStoreOptions>} options
+	 */
+	update: (options: Partial<CacheStoreOptions>) => Promise<void>
 }
 
 /**
@@ -168,6 +177,12 @@ export interface MessageStoreOptions {
 	atUsers: string[]
 	/** 选中要转发的人员 */
 	selectedForwardUsers: any[]
+	/** 是否加载中 */
+	isLoading: boolean
+	/** 未读列表 id */
+	unreadList: number[]
+	/** 是否有群公告 */
+	isGroupAnnouncement: boolean
 }
 
 interface initOptions {
@@ -215,18 +230,13 @@ export type MessageStore = MessageStoreOptions & {
 	 * @param {number} dialogId 会话 id
 	 */
 	deleteAllMessage: (dialogId: number) => Promise<void>
-	// /**
-	//  * 添加缓存消息
-	//  *
-	//  * @param {any} message 消息
-	//  * @param {number} dialogId 会话id
-	//  */
-	// createCacheMessage: (message: any, dialogId: number) => Promise<void>
-	// /**
-	//  * 更新缓存消息
-	//  *
-	//  * @param {any} message 消息
-	//  * @param {number} dialogId 会话id
-	//  */
-	// updateCacheMessage: (messages: any, dialogId: number) => Promise<void>
+	/**
+	 * 从头部添加消息，每次添加 15 条
+	 */
+	unshiftMessage: () => Promise<void>
+	/**
+	 * 更新未读列表
+	 * @param {number} msgId 消息 id
+	 */
+	updateUnreadList: (msgId: number) => Promise<void>
 }

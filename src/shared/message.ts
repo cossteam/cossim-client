@@ -5,7 +5,7 @@ import UserService from '@/api/user'
 import { isEqual } from 'lodash-es'
 import { v4 as uuidv4 } from 'uuid'
 import { PrivateChats } from '@/types/db/user-db'
-import { $t, MESSAGE_TYPE, msgType } from '.'
+import { $t, MESSAGE_READ, MESSAGE_TYPE, msgType } from '.'
 import MsgService from '@/api/msg'
 import CommonStore from '@/db/common'
 import useCacheStore from '@/stores/cache'
@@ -320,12 +320,13 @@ export const customSort = (a: any, b: any) => {
 
 /**
  * 更新会话窗内容
- * @param {any} message
+ * @param {any} message		消息内容
+ * @param {number} dialogId	会话 id
  */
-export const updateDialog = async (message: any) => {
+export const updateDialog = async (message: any, dialogId: number) => {
 	const cacheStore = useCacheStore.getState()
 	const cacheDialogs = cacheStore.cacheDialogs.map((dialog) => {
-		if (dialog.dialog_id === message.dialog_id) {
+		if (dialog.dialog_id === dialogId) {
 			return { ...dialog, last_message: { ...dialog.last_message, ...message } }
 		}
 		return dialog
@@ -337,10 +338,78 @@ export const updateDialog = async (message: any) => {
  * 更新缓存消息和会话
  * @param {string} tableName	表名
  * @param {any[]} messages		消息列表
+ * @param {number} dialogId		会话 id
  */
-export const updateCacheMessage = async (tableName: string, messages: any[]) => {
+export const updateCacheMessage = async (tableName: string, messages: any[], dialogId: number) => {
 	await cacheStore.set(tableName, messages)
-	const msg = messages.at(-1)
-	if ([msgType.ERROR, msgType.CANCEL_LABEL, msgType.LABEL, msgType.RECALL].includes(msg.msg_type)) return
-	await updateDialog(msg)
+	const msg = findMessage(messages)
+	await updateDialog(msg, dialogId)
+}
+
+/**
+ * 查找消息
+ * @param {Message[]} messages	消息列表
+ * @param {number} index		索引
+ * @returns any[]
+ */
+export const findMessage = (messages: any[], index: number = -1): Message => {
+	const message = messages.at(index)
+
+	// 如果索引超出范围，返回最后一条消息
+	if (Math.abs(index) > messages.length) return messages.at(-1)
+
+	// 如果消息类型是错误、取消标签、标签或召回，则继续查找
+	if ([msgType.ERROR, msgType.CANCEL_LABEL, msgType.LABEL, msgType.RECALL].includes(message.msg_type)) {
+		return findMessage(messages, index - 1)
+	}
+
+	return message
+}
+
+/**
+ * 判断当前消息是否最新消息
+ * @param {Message} message		消息
+ */
+export const isLastMessage = (message: Message) => {
+	const cacheStore = useCacheStore.getState()
+	const msg = cacheStore.cacheDialogs.find((dialog) => dialog.dialog_id === message.dialog_id)
+	if (!msg) return false
+	return msg.last_message.msg_id === message.msg_id
+}
+
+/**
+ * 一键全部已读
+ * @param {number[]} dialogId		会话 id
+ */
+export const dialogRead = async (dialogId: number, groupId?: number) => {
+	const messages = await cacheStore.get(`${dialogId}`)
+	// 获取未读消息的 id
+	const unreadList = messages.filter(
+		(message: Message) => !message?.is_read || message?.is_read === MESSAGE_READ.NOT_READ
+	)
+	// 获取未读消息列表 id
+	const unreadIds = unreadList.map((message: Message) => message.msg_id)
+
+	try {
+		const params: any = { msg_ids: unreadIds, dialog_id: dialogId }
+		if (groupId) params['group_id'] = Number(groupId)
+
+		const { code } = groupId
+			? await MsgService.readGroupMessageApi(params)
+			: await MsgService.readUserMessageApi(params)
+
+		if (code !== 200) return
+
+		const messageList = messages.map((message: Message) => {
+			if (unreadIds.includes(message.msg_id)) {
+				message.is_read = MESSAGE_READ.READ
+			}
+			return message
+		})
+
+		// 更新未读消息列表
+		await cacheStore.set(`${dialogId}`, messageList)
+	} catch (error) {
+		console.error('一键已读失败', error)
+	}
 }

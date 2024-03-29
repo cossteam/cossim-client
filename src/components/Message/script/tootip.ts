@@ -40,7 +40,12 @@ export async function del(selectMessages: any[]) {
 	} catch {
 		toastMessage('删除失败')
 	} finally {
-		messageStore.update({ selectedMessages: [], selectedMessage: {}, tipType: tooltipType.NONE })
+		messageStore.update({
+			selectedMessages: [],
+			selectedMessage: {},
+			tipType: tooltipType.NONE,
+			manualTipType: tooltipType.NONE
+		})
 	}
 }
 
@@ -79,6 +84,7 @@ async function recall() {
 			? await MsgService.revokeGroupMessageApi(params)
 			: await MsgService.revokeUserMessageApi(params)
 		if (code !== 200) throw new Error(msg)
+		messageStore.deleteMessage(message)
 	} catch (error: any) {
 		toastMessage(error?.message ?? '撤回失败')
 	}

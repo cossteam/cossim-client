@@ -9,12 +9,10 @@ const MessageSelect = () => {
 	// 转发
 	const forward = async () => {
 		await messageStore.update({ manualTipType: tooltipType.FORWARD })
-		messageStore.update({ manualTipType: tooltipType.NONE, tipType: tooltipType.NONE })
 	}
 	// 删除
 	const deleteMessage = async () => {
 		await del([])
-		messageStore.update({ manualTipType: tooltipType.NONE, tipType: tooltipType.NONE })
 	}
 
 	return (

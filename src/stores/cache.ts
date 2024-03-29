@@ -24,7 +24,9 @@ const defaultOptions: CacheStoreOptions = {
 	cacheSearchMessage: [],
 	unreadCount: 0,
 	applyCount: 0,
-	keyboardHeight: 300
+	keyboardHeight: 417,
+	friendApply: [],
+	groupApply: []
 }
 
 const useCacheStore = create<CacheStore>((set, get) => ({
@@ -93,6 +95,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const messages = allMessages.map((item: any) =>
 			item?.msg_id === message?.msg_id || item?.uid === message?.uid ? { ...item, ...message } : item
 		)
+
 		await cacheStore.set(tableName, messages)
 	},
 	updateCacheContacts: async (cacheContacts) => {
@@ -103,6 +106,9 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const cacheContactsObj = arrayToGroups(cacheContacts)
 		await cacheStore.set(CACHE_CONTACTS, cacheContactsObj)
 		set({ cacheContacts, cacheContactsObj })
+	},
+	update: async (options) => {
+		return set((state: CacheStoreOptions) => ({ ...state, ...options }))
 	}
 }))
 

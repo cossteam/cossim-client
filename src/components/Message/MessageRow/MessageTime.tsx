@@ -1,7 +1,8 @@
 import { MESSAGE_SEND, formatTime, formatTimeFull } from '@/shared'
+import useMessageStore from '@/stores/new_message'
 import clsx from 'clsx'
 import { Exclamationmark, Flag, Gobackward } from 'framework7-icons/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface MessageTimeProps {
 	item: any
@@ -23,6 +24,18 @@ const MessageTime: React.FC<MessageTimeProps> = ({ item, is_self }) => {
 			setMessageTime(time)
 		}
 	}
+
+	const messageStore = useMessageStore()
+
+	// 如果该消息的发送时间超过10秒，还是在发送中，就显示重新发送
+	useEffect(() => {
+		if (item?.msg_send_state === MESSAGE_SEND.SENDING) {
+			const now = new Date().getTime()
+			if (now - create_at > 10000) {
+				messageStore.updateMessage({ ...item, msg_send_state: MESSAGE_SEND.SEND_FAILED })
+			}
+		}
+	}, [item?.msg_send_state])
 
 	return (
 		<div

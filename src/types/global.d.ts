@@ -11,4 +11,12 @@ export declare global {
 		f7route: Router.Route
 		f7router: Router.Router
 	}
+
+	/**
+	 * @description 消息类型
+	 */
+	interface Message {
+		msg_id: string
+		[key: string]: any
+	}
 }

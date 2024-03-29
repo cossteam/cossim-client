@@ -6,7 +6,7 @@
 import useCacheStore from '@/stores/cache'
 import MsgService from '@/api/msg'
 import useUserStore from './stores/user'
-import { CACHE_MESSAGE, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, msgType } from './shared'
+import { CACHE_MESSAGE, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, isLastMessage, msgType, updateDialog } from './shared'
 import useMessageStore from './stores/new_message'
 import { generateMessage } from './utils/data'
 import cacheStore from './utils/cache'
@@ -65,12 +65,24 @@ export async function getApplyList() {
 		const userStore = useUserStore.getState()
 		const cacheStore = useCacheStore.getState()
 		// 获取申请列表
-		const group = await GroupService.groupRequestListApi({ user_id: userStore.userId })
 		const friend = await RelationService.friendApplyListApi({ user_id: userStore.userId })
-		const applyList: any[] = []
-		group.data && applyList.push(...group.data)
-		friend.data && applyList.push(...friend.data)
-		const len = applyList.filter((v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId).length
+		const group = await GroupService.groupRequestListApi({ user_id: userStore.userId })
+
+		const friendApply: any = []
+		const groupApply: any = []
+		friend.data && friendApply.push(...friend.data)
+		group.data && groupApply.push(...group.data)
+		// 统计未读数
+		const len = [...friendApply, ...groupApply].filter(
+			(v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId
+		).length
+		// 缓存申请列表
+		cacheStore.update({
+			friendApply,
+			groupApply
+		})
+
+		// 未读长度
 		cacheStore.updateCacheApplyCount(len)
 	} catch (error) {
 		console.error('获取申请列表', error)
@@ -163,7 +175,7 @@ async function updateRecallCacheMessage(message: any) {
  * @param {any} data	推送消息
  */
 export async function handlerSocketMessage(data: any) {
-	console.log('handlerSocketMessage', data)
+	// console.log('handlerSocketMessage', data)
 
 	const userStore = useUserStore.getState()
 	const messageStore = useMessageStore.getState()
@@ -175,14 +187,15 @@ export async function handlerSocketMessage(data: any) {
 	const type = message?.msg_type
 
 	// 是否需要继续操作，如果是标注、撤回时需要继续操作,如果都不是且是自己当前设备发的就不处理
-	const isContinue = !isLableMessage(type) && !isRecallMessage(type) && userStore.deviceId === data.driverId
+	const isDrivered: boolean = userStore.deviceId === data.driverId
+	const isContinue = !isLableMessage(type) && !isRecallMessage(type) && isDrivered
 	if (isContinue) return
 
 	const msg = generateMessage({
 		...message,
 		is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK,
 		msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
-		is_read: !message?.is_read ? MESSAGE_READ.READ : MESSAGE_READ.NOT_READ
+		is_read: !isDrivered ? MESSAGE_READ.NOT_READ : MESSAGE_READ.READ
 	})
 
 	// 如果是当前会话，需要实时更新到页面
@@ -220,6 +233,9 @@ export async function handlerSocketMessage(data: any) {
 	if (msg.is_read === MESSAGE_READ.NOT_READ) {
 		cacheStore.updateCacheUnreadCount(cacheStore.unreadCount + 1)
 	}
+
+	// 更新本地会话
+	updateDialog(message, message.dialog_id)
 }
 
 /**
@@ -230,7 +246,6 @@ export async function handlerSocketEdit(data: any) {
 	const userStore = useUserStore.getState()
 	if (userStore.deviceId === data.driverId) return
 
-	// console.log('编辑消息', data)
 	const cacheStore = useCacheStore.getState()
 	const messageStore = useMessageStore.getState()
 
@@ -238,22 +253,19 @@ export async function handlerSocketEdit(data: any) {
 
 	const msg = {
 		msg_id: message?.id ?? message?.msg_id,
-		content: message.content
+		content: message.content,
+		dialog_id: message.dialog_id
 	}
-
-	// const msg = generateMessage({
-	// 	msg_id: message?.id ?? message?.msg_id,
-	// 	...message
-	// })
 
 	// 如果是当前会话，需要实时更新到页面
 	if (message?.dialog_id === messageStore.dialogId) {
-		console.log('会话', msg, message)
-
 		await messageStore.updateMessage(msg)
 	} else {
 		await cacheStore.updateCacheMessage(msg)
 	}
+
+	// 更新本地会话
+	if (isLastMessage(msg)) updateDialog(message, message.dialog_id)
 }
 
 /**
