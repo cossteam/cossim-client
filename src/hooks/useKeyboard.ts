@@ -1,6 +1,6 @@
 import useCacheStore from '@/stores/cache'
-import { Keyboard } from '@capacitor/keyboard'
-// import { Keyboard } from 'coss-keyboard'
+// import { Keyboard } from '@capacitor/keyboard'
+import { Keyboard } from 'keyboard-coss'
 import { Device } from '@capacitor/device'
 import { useRef } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
@@ -48,9 +48,10 @@ const useKeyboard = () => {
 					cacheStore.updateKeyboardHeight(info.keyboardHeight)
 				})
 
-				// Keyboard?.addListener('keyboardDidShow', (info) => {
-				// 	console.log('keyboard did show with height:', info.keyboardHeight)
-				// })
+				Keyboard?.addListener('keyboardDidShow', (info) => {
+					console.log('keyboard did show with height:', info.keyboardHeight)
+					cacheStore.updateKeyboardHeight(info.keyboardHeight)
+				})
 
 				// Keyboard?.addListener('keyboardWillHide', () => {
 				// 	cacheStore.updateKeyboardHeight(300)
@@ -58,6 +59,7 @@ const useKeyboard = () => {
 
 				// Keyboard?.addListener('keyboardDidHide', () => {
 				// 	console.log('keyboard did hide')
+				// 	cacheStore.updateKeyboardHeight(0)
 				// })
 			} else {
 				// window.addEventListener('resize', handlerWindowResize)
