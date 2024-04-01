@@ -8,8 +8,6 @@ import { $t, TOKEN, SocketClient, SocketEvent, DEVICE_ID, burnAfterReading, toas
 import { hasCookie, setCookie } from '@/utils/cookie'
 import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
-import localNotification, { LocalNotificationType } from '@/utils/notification'
-import DOMPurify from 'dompurify'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 import Preview from './components/Preview/Preview'
@@ -20,12 +18,10 @@ import useCacheStore from '@/stores/cache'
 import run, { handlerSocketEdit, handlerSocketMessage, handlerSocketRequest } from './run'
 import { isWeb } from './utils'
 import { Toaster } from 'react-hot-toast'
-import useMessageStore from './stores/new_message'
 
 function App() {
 	const router = useRef<Router.Router | null>(null)
 
-	const messageStore = useMessageStore()
 	const liveRoomStore = useLiveRoomStore()
 	const cacheStore = useCacheStore()
 
@@ -70,20 +66,6 @@ function App() {
 				case SocketEvent.PrivateChatsEvent:
 				case SocketEvent.GroupChatsEvent:
 				case SocketEvent.SelfChatsEvent:
-					try {
-						const msg = data?.data || {}
-						// msg 的发送者不是自己并且当前不在会话中
-						// console.log(Number(msg.dialog_id), Number(store!.dialog_id))
-						if (Number(msg.dialog_id) !== Number(messageStore.dialogId)) {
-							// 本地通知
-							const dom = document.createElement('p')
-							dom.innerHTML = DOMPurify.sanitize(msg.content || '')
-							localNotification(LocalNotificationType.MESSAGE, msg.sender_info.name, dom.innerText)
-							// 本地通知 END
-						}
-					} catch {
-						console.log('发送本地通知失败')
-					}
 					handlerSocketMessage(data)
 					break
 				case SocketEvent.ApplyListEvent:

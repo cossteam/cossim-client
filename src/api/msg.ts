@@ -231,8 +231,12 @@ class MsgServiceImpl {
 	 * @param data
 	 * @param isGroup
 	 */
-	readMessagesApi(data: {dialog_id: number | string, msg_ids: [], read_all?: boolean}, isGroup?: boolean) {
-		return request({ ///msg/group/read/set
+	readMessagesApi(
+		data: { dialog_id: number | string; msg_ids: (number | string)[]; read_all?: boolean },
+		isGroup?: boolean
+	) {
+		return request({
+			///msg/group/read/set
 			url: !isGroup ? `${this.baseUrl}/read/user` : `${this.baseUrl}/read/group`,
 			method: 'POST',
 			data

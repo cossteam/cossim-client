@@ -11,7 +11,6 @@ import useMessageStore from '@/stores/new_message'
 import { useEffect, useMemo } from 'react'
 import { tooltipType } from '@/shared'
 import { forwardMessage } from './script/message'
-import { debounce } from 'lodash-es'
 
 const Message: React.FC<RouterProps> = () => {
 	const { height } = useWindowSize()
@@ -44,17 +43,33 @@ const Message: React.FC<RouterProps> = () => {
 		forwardMessage()
 	}, [messageStore.selectedForwardUsers])
 
-	// 已读消息
-	const read = debounce(() => {
-		console.log('已读')
-	}, 1000)
-	useEffect(() => {
-		if (!messageStore.unreadList.length) return
-		console.log('messageStore.unreadList', messageStore.unreadList)
-		read()
-		// 在组件卸载或下一次 effect 运行之前取消 debounce 函数
-		// return () => read.cancel()
-	}, [messageStore.unreadList])
+	// // 已读消息
+	// const read = async () => {
+	// 	await MsgService.readMessagesApi({
+	// 		dialog_id: messageStore.dialogId,
+	// 		msg_ids: messageStore.unreadList
+	// 	})
+	// 	// 更新本地消息状态
+	// 	const dialogMsgs = await cacheStore.get(`${messageStore.dialogId}`)
+	// 	const newMsgs = dialogMsgs.map((msg: any) => {
+	// 		if (!messageStore.unreadList.includes(msg.msg_id)) {
+	// 			return msg
+	// 		}
+	// 		return {
+	// 			...msg,
+	// 			is_read: 1,
+	// 			read_at: Date.now()
+	// 		}
+	// 	})
+	// 	await cacheStore.set(`${messageStore.dialogId}`, newMsgs)
+	// 	// 清空未读消息
+	// 	await messageStore.update({ unreadList: [] })
+	// }
+	// useEffect(() => {
+	// 	console.log('未读列表', messageStore.unreadList)
+	// 	if (!messageStore.unreadList.length) return
+	//     read()
+	// }, [messageStore.unreadList])
 
 	return (
 		<Page noToolbar className="coss_message transition-all relative">

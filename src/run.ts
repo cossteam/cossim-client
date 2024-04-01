@@ -13,6 +13,8 @@ import cacheStore from './utils/cache'
 import GroupService from './api/group'
 import RelationService from './api/relation'
 import _ from 'lodash-es'
+import DOMPurify from 'dompurify'
+import localNotification, { LocalNotificationType } from './utils/notification'
 
 /**
  * 更新本地缓存消息，如果一开始没有消息，就添加会话中的最后一条消息
@@ -102,7 +104,7 @@ export async function getBehindMessage() {
 		}))
 		const { code, data } = await MsgService.getBehindMessageApi(params)
 		if (code !== 200) return
-		// console.log('落后消息', data)
+		console.log('落后消息', data)
 		// 更新本地缓存消息
 		cacheStore.updateBehindMessage(data)
 	} catch (error) {
@@ -183,9 +185,24 @@ export async function handlerSocketMessage(data: any) {
 	const cacheStore = useCacheStore.getState()
 
 	// 获取消息
-	const message = data.data
+	const message = data?.data || {}
 	// 获取消息类型
 	const type = message?.msg_type
+
+	// 本地通知
+	try {
+		// msg 的发送者不是自己并且当前不在会话中
+		const dialogId = Number(messageStore.dialogId)
+		if (dialogId !== 0 && Number(message.dialog_id) !== dialogId) {
+			// 本地通知
+			const dom = document.createElement('p')
+			dom.innerHTML = DOMPurify.sanitize(message.content || '')
+			localNotification(LocalNotificationType.MESSAGE, message.sender_info.name, dom.innerText)
+			// 本地通知 END
+		}
+	} catch {
+		console.log('发送本地通知失败')
+	}
 
 	// 是否需要继续操作，如果是标注、撤回时需要继续操作,如果都不是且是自己当前设备发的就不处理
 	const isDrivered: boolean = userStore.deviceId === (data?.driver_id ?? data?.driverId)
