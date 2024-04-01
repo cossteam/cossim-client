@@ -24,6 +24,8 @@ import Avatar from '@/components/Avatar/Avatar'
 import useRouterStore from '@/stores/router'
 import useLoading from '@/hooks/useLoading'
 import useCacheStore from '@/stores/cache'
+import MsgService from '@/api/msg'
+import _ from 'lodash-es'
 
 interface MessageRowProps {
 	item: { [key: string]: any }
@@ -127,20 +129,36 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		}, '搜索中...')
 	}
 
+	// 监听消息是否进入可视区域
+	// 已读
 	const itemRef = useRef<HTMLDivElement | null>(null)
-	//
-	const stop = useIntersectionObserver(itemRef, (entry) => {
-		// setEntry(entry)
-		if (entry[0].isIntersecting) {
-			// messageStore.update({ lastReadId: item.msg_id })
-			console.log('进入可视区域')
-			if (item.is_read === MESSAGE_READ.NOT_READ) {
-				messageStore.updateUnreadList(item.msg_id)
-			} else {
-				stop()
+	const stop = useIntersectionObserver(
+		itemRef,
+		_.debounce(async (entry) => {
+			if (entry[0].isIntersecting && !is_self) {
+				if (item.is_read === MESSAGE_READ.READ) {
+					stop()
+					return
+				}
+				console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
+				// console.table(_.pick(item, ['msg_id', 'is_read', 'content']))
+				// messageStore.updateUnreadList(item.msg_id)
+				await MsgService.readMessagesApi({
+					dialog_id: item.dialog_id,
+					msg_ids: [item.msg_id]
+				})
+				const msg = messageStore.isGroup
+					? () => {}
+					: (await cacheStore.getDialogMessages(item.dialog_id, item.msg_id))[0]
+				// 更新消息状态
+				await cacheStore.updateCacheMessage({
+					...msg,
+					is_read: 1,
+					read_at: Date.now()
+				})
 			}
-		}
-	})
+		}, 1000)
+	)
 
 	// 无内容
 	if (type === msgType.NONE) return null

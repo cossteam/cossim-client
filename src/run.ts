@@ -102,7 +102,7 @@ export async function getBehindMessage() {
 		}))
 		const { code, data } = await MsgService.getBehindMessageApi(params)
 		if (code !== 200) return
-		// console.log('落后消息', data)
+		console.log('落后消息', data)
 		// 更新本地缓存消息
 		cacheStore.updateBehindMessage(data)
 	} catch (error) {
@@ -273,7 +273,7 @@ export async function handlerSocketEdit(data: any) {
  * 处理好友请求
  * @param data
  */
-export function handlerSocketRequest(data:any) {
+export function handlerSocketRequest(data: any) {
 	console.log('处理好友请求', data)
 	const cacheStore = useCacheStore.getState()
 	cacheStore.updateCacheApplyCount(cacheStore.applyCount + 1)

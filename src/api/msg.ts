@@ -230,7 +230,7 @@ class MsgServiceImpl {
 	 * 设置已读消息
 	 * @param data
 	 */
-	readMessagesApi(data: {dialog_id: number | string, msg_ids: [], read_all?: boolean}) {
+	readMessagesApi(data: { dialog_id: number | string; msg_ids: (number | string)[]; read_all?: boolean }) {
 		return request({
 			url: `${this.baseUrl}/read/user`,
 			method: 'POST',

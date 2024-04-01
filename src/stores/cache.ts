@@ -111,7 +111,19 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 	update: async (options) => {
 		return set((state: CacheStoreOptions) => ({ ...state, ...options }))
 	},
-	get: async (key) => (await cacheStore.get(key)) ?? []
+	get: async (key) => (await cacheStore.get(key)) ?? [],
+	getDialogMessages: async (dialogId: number, ...ids: number[]) => {
+		console.log(dialogId, ids)
+		const tableName = `${dialogId}`
+		const allMessages = (await cacheStore.get(tableName)) ?? []
+		if (ids.length === 0) {
+			return allMessages
+		}
+		return allMessages.filter((item: any) => ids.includes(item?.msg_id))
+	},
+	set: async (key: string, value: any) => {
+		await cacheStore.set(key, value)
+	}
 }))
 
 export default useCacheStore
