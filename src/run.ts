@@ -188,7 +188,7 @@ export async function handlerSocketMessage(data: any) {
 	const type = message?.msg_type
 
 	// 是否需要继续操作，如果是标注、撤回时需要继续操作,如果都不是且是自己当前设备发的就不处理
-	const isDrivered: boolean = userStore.deviceId === data.driverId
+	const isDrivered: boolean = userStore.deviceId === (data?.driver_id ?? data?.driverId)
 	const isContinue = !isLableMessage(type) && !isRecallMessage(type) && isDrivered
 	if (isContinue) return
 

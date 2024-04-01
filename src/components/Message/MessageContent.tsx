@@ -8,6 +8,7 @@ const MessageContent = () => {
 
 	useEffect(() => {
 		if (!container.current) return
+		// container.current.click()
 		messageStore.update({ container: container.current })
 	}, [container.current])
 
