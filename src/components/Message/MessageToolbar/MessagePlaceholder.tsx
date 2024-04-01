@@ -15,15 +15,13 @@ const MessagePlaceholder = () => {
 
 	useEffect(() => {
 		if (messageStore.toolbarType !== emojiOrMore.NONE) {
-			messageStore.update({ placeholderHeight: cacheStore.keyboardHeight })
-		} else {
 			messageStore.update({ placeholderHeight: 0 })
+		} else {
+			messageStore.update({ placeholderHeight: cacheStore.keyboardHeight })
 		}
 	}, [messageStore.toolbarType])
 
-	return (
-		<div style={{ height: messageStore.placeholderHeight + 56 }} />
-	)
+	return <div style={{ height: messageStore.placeholderHeight }} />
 }
 
 export default MessagePlaceholder

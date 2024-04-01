@@ -2,13 +2,16 @@ import ToolEditor, { ToolEditorMethods } from '@/Editor'
 import { $t, emojiOrMore, msgSendType } from '@/shared'
 import { useEffect, useRef } from 'react'
 import useMessageStore from '@/stores/new_message'
+import useCacheStore from '@/stores/cache'
 import Quill from 'quill'
 import MessageBlockquote from './MessageBlockquote'
-import { isWeb } from '@/utils'
+// import { isWeb } from '@/utils'
 
 const MessageInput = () => {
 	const toolEditorRef = useRef<ToolEditorMethods | null>(null)
 	const messageStore = useMessageStore()
+	const cacheStore = useCacheStore()
+
 	const inputRef = useRef<HTMLDivElement | null>(null)
 
 	const isEmojiFocus = useRef<boolean>(false)
@@ -25,15 +28,17 @@ const MessageInput = () => {
 
 		const quill = toolEditorRef.current.quill
 
-		const handlerFocus = async () => {
+		const handlerFocus = () => {
 			// 如果是插入表情触发的聚焦，不做处理
 			if (isEmojiFocus.current) return
 
+			messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
+
 			// 如果是web端就不需要弹起
-			const web = await isWeb()
-			if (!web) {
-				messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
-			}
+			// const web = await isWeb()
+			// if (!web) {
+			// 	messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
+			// }
 			// messageStore.update({ toolbarType: emojiOrMore.NONE })
 		}
 
@@ -80,6 +85,20 @@ const MessageInput = () => {
 		if (!quill) return
 		quill.focus()
 	}, [messageStore.toolbarType])
+
+	// 监听收起
+	useEffect(() => {
+		const quill = toolEditorRef.current?.quill
+		if (!quill) return
+
+		if (!cacheStore.keyboardShow && quill.hasFocus()) {
+			quill.blur()
+		}
+
+		if (!cacheStore.keyboardShow && messageStore.toolbarType === emojiOrMore.KEYBOARD) {
+			messageStore.update({ toolbarType: emojiOrMore.NONE })
+		}
+	}, [cacheStore.keyboardShow])
 
 	return (
 		<div className="flex-1 max-w-[calc(100%-108px)]">
