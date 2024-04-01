@@ -110,9 +110,6 @@ dependencies:
   js-cookie:
     specifier: ^3.0.5
     version: 3.0.5
-  keyboard-coss:
-    specifier: ^1.0.5
-    version: 1.0.5(@capacitor/core@5.7.0)
   livekit-client:
     specifier: ^1.15.11
     version: 1.15.11
@@ -3516,14 +3513,6 @@ packages:
       - debug
       - supports-color
       - utf-8-validate
-    dev: false
-
-  /keyboard-coss@1.0.5(@capacitor/core@5.7.0):
-    resolution: {integrity: sha512-eph336M0paaKmtq3nECrtBIWiGLZbjf2UCdaHf6cquPN337gKxOWCY7Z8qc7cPH3Sr2qz03df+jdlNocHxXR9g==}
-    peerDependencies:
-      '@capacitor/core': ^5.0.0
-    dependencies:
-      '@capacitor/core': 5.7.0
     dev: false
 
   /keyv@4.5.4:
