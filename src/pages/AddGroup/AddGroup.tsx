@@ -6,7 +6,7 @@ import Avatar from '@/components/Avatar/Avatar.tsx'
 import { $t, toastMessage } from '@/shared'
 
 const AddGroup: React.FC<RouterProps> = ({ f7route }) => {
-	const groupId = f7route.params.group_id as string
+	const groupId = f7route.query.group_id as string
 	const [groupInfo, setGroupInfo] = useState<any>()
 	useEffect(() => {
 		GroupService.groupInfoApi({
