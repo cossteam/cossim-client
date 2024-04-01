@@ -5,10 +5,10 @@ android {
         debug {
             // storeFile file('/Users/mac-os12/Documents/project/im/coss/COSS_KEYS')
             // storeFile file('G:/im/coss/COSS_KEYS')
-            // YuHong
-//            storeFile file("/Users/macos-13/Desktop/IM/key/COSS_KEYS")
+            // YuHong mac
+            storeFile file("/Users/macos-13/Desktop/IM/key/COSS_KEYS")
             // YuHong win
-            storeFile file("D:/workspace/IM/COSS_KEYS")
+//            storeFile file("D:/workspace/IM/COSS_KEYS")
             storePassword 'hitosea.coss'
             keyPassword 'hitosea.coss'
             keyAlias 'hitosea_coss'

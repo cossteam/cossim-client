@@ -15,17 +15,29 @@ import {
 } from '@/shared'
 import clsx from 'clsx'
 import { useMemo } from 'react'
-import useCacheStore from '@/stores/cache'
+// import useCacheStore from '@/stores/cache'
 import { sendMessage } from '../script/message'
 import { generateMessage } from '@/utils/data'
 
 const MessageToolbarContent = () => {
 	const messageStore = useMessageStore()
-	const cacheStore = useCacheStore()
+	// const cacheStore = useCacheStore()
 
 	const isNone = useMemo(() => messageStore.toolbarType === emojiOrMore.NONE, [messageStore.toolbarType])
 	const isEmoji = useMemo(() => messageStore.toolbarType === emojiOrMore.EMOJI, [messageStore.toolbarType])
 	const isMore = useMemo(() => messageStore.toolbarType === emojiOrMore.MORE, [messageStore.toolbarType])
+	// const isKeyboard = useMemo(() => messageStore.toolbarType === emojiOrMore.KEYBOARD, [messageStore.toolbarType])
+
+	// const [height, setHeight] = useState<number>(0)
+
+	// useEffect(() => {
+	// 	if (cacheStore.keyboardHeight === 0) {
+	// 		if (isNone || isKeyboard) setHeight(0)
+	// 		if (isKeyboard && cacheStore.keyboardShow) setHeight(0)
+	// 		return
+	// 	}
+	// 	setHeight(cacheStore.keyboardHeight)
+	// }, [cacheStore.keyboardHeight, cacheStore.keyboardShow])
 
 	const handlerSelectFiles = async (files: FileList) => {
 		for (const file of files) {
@@ -85,7 +97,7 @@ const MessageToolbarContent = () => {
 	return (
 		<div
 			className={clsx('w-full h-[300px] flex overflow-hidden', isNone && 'hidden')}
-			style={{ height: cacheStore.keyboardHeight }}
+			style={{ height: messageStore.placeholderHeight === 0 ? 318 : messageStore.placeholderHeight }}
 		>
 			<MessageEmojis
 				onSelectEmojis={(emoji) => messageStore.update({ selectedEmojis: emoji.native })}

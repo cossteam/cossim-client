@@ -1,9 +1,11 @@
 import useCacheStore from '@/stores/cache'
-// import { Keyboard } from '@capacitor/keyboard'
-import { Keyboard } from 'keyboard-coss'
+import { Keyboard } from '@capacitor/keyboard'
+// import { Keyboard } from 'keyboard-coss'
 import { Device } from '@capacitor/device'
 import { useRef } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
+import useMessageStore from '@/stores/new_message'
+// import { emojiOrMore } from '@/shared'
 
 /**
  * 键盘变化
@@ -12,6 +14,7 @@ import { useAsyncEffect } from '@reactuses/core'
  */
 const useKeyboard = () => {
 	const cacheStore = useCacheStore.getState()
+	const messageStore = useMessageStore()
 	// const { height } = useWindowSize()
 	// const [pageHeight, setPageHeight] = useState(height)
 	const pageHeight = useRef<number>(0)
@@ -44,23 +47,39 @@ const useKeyboard = () => {
 				// Keyboard.setResizeMode({ mode: KeyboardResize.None })
 				// Keyboard.setKeyboardMode('NONE')
 				Keyboard?.addListener('keyboardWillShow', (info) => {
-					console.log('键盘躺起', info)
 					cacheStore.updateKeyboardHeight(info.keyboardHeight)
+					if (messageStore.placeholderHeight === 0) {
+						messageStore.update({ placeholderHeight: info.keyboardHeight })
+					}
 				})
 
 				Keyboard?.addListener('keyboardDidShow', (info) => {
 					console.log('keyboard did show with height:', info.keyboardHeight)
 					cacheStore.updateKeyboardHeight(info.keyboardHeight)
+					cacheStore.update({ keyboardShow: true })
+					if (messageStore.placeholderHeight === 0) {
+						messageStore.update({ placeholderHeight: info.keyboardHeight })
+					}
 				})
 
-				// Keyboard?.addListener('keyboardWillHide', () => {
-				// 	cacheStore.updateKeyboardHeight(300)
-				// })
+				Keyboard?.addListener('keyboardWillHide', () => {
+					cacheStore.updateKeyboardHeight(0)
+					console.log('键盘开始隐藏', messageStore.toolbarType)
+					cacheStore.update({ keyboardShow: false })
+					// if (messageStore.toolbarType === emojiOrMore.KEYBOARD) {
+					// 	messageStore.update({ toolbarType: emojiOrMore.NONE })
+					// 	messageStore.container?.click()
+					// }
+				})
 
-				// Keyboard?.addListener('keyboardDidHide', () => {
-				// 	console.log('keyboard did hide')
-				// 	cacheStore.updateKeyboardHeight(0)
-				// })
+				Keyboard?.addListener('keyboardDidHide', () => {
+					console.log('keyboard did hide')
+					cacheStore.updateKeyboardHeight(0)
+					cacheStore.update({ keyboardShow: false })
+					// if (messageStore.toolbarType === emojiOrMore.KEYBOARD) {
+					// messageStore.update({ toolbarType: emojiOrMore.NONE })
+					// }
+				})
 			} else {
 				// window.addEventListener('resize', handlerWindowResize)
 			}

@@ -55,6 +55,8 @@ export interface CacheStoreOptions {
 	friendApply: any[]
 	/** 群聊申请列表 */
 	groupApply: any[]
+	/** 键盘是否显示 */
+	keyboardShow: boolean
 }
 
 /**
@@ -121,6 +123,11 @@ export type CacheStore = CacheStoreOptions & {
 	 * @param { Partial<CacheStoreOptions>} options
 	 */
 	update: (options: Partial<CacheStoreOptions>) => Promise<void>
+	/**
+	 * 获取缓存的内容
+	 * @param {string} key 键
+	 */
+	get: (key: string) => Promise<any>
 }
 
 /**

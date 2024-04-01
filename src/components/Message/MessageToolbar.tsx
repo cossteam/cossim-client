@@ -11,6 +11,7 @@ import { useMemo, useRef } from 'react'
 import { useClickOutside } from '@reactuses/core'
 import clsx from 'clsx'
 import MessageSelect from './MessageToolbar/MessageSelect'
+// import MessagePlaceholder from './MessageToolbar/MessagePlaceholder'
 // import useCacheStore from '@/stores/cache'
 
 const MessageToolbar = () => {
@@ -73,6 +74,8 @@ const MessageToolbar = () => {
 
 				{/* 表情或者更多内容切换 */}
 				<MessageToolbarContent />
+
+				{/* <MessagePlaceholder /> */}
 			</div>
 		</>
 	)
