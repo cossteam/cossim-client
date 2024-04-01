@@ -8,7 +8,7 @@ import { emojiOrMore, msgSendType, tooltipType } from '@/shared'
 import { KeyboardIcon } from '@/components/Icon/Icon'
 import { FaceSmiling, PlusCircle } from 'framework7-icons/react'
 import { useMemo, useRef } from 'react'
-import { useClickOutside } from '@reactuses/core'
+import { useClickOutside, useIntersectionObserver } from '@reactuses/core'
 import clsx from 'clsx'
 import MessageSelect from './MessageToolbar/MessageSelect'
 // import MessagePlaceholder from './MessageToolbar/MessagePlaceholder'
@@ -31,6 +31,23 @@ const MessageToolbar = () => {
 	// }, [messageStore.placeholderHeight])
 
 	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
+
+	useIntersectionObserver(
+		toolbarRef,
+		(entry) => {
+			// setEntry(entry)
+			if (entry[0].isIntersecting) {
+				// messageStore.update({ lastReadId: item.msg_id })
+				console.log('进入可视区域', entry[0])
+			} else {
+				console.log('离开可视区域', entry[0])
+			}
+		},
+		{
+			threshold: [1.0]
+			// trackVisibility: true
+		}
+	)
 
 	return (
 		<>

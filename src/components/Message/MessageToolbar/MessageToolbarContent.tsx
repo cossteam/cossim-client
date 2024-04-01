@@ -26,7 +26,7 @@ const MessageToolbarContent = () => {
 	const isNone = useMemo(() => messageStore.toolbarType === emojiOrMore.NONE, [messageStore.toolbarType])
 	const isEmoji = useMemo(() => messageStore.toolbarType === emojiOrMore.EMOJI, [messageStore.toolbarType])
 	const isMore = useMemo(() => messageStore.toolbarType === emojiOrMore.MORE, [messageStore.toolbarType])
-	// const isKeyboard = useMemo(() => messageStore.toolbarType === emojiOrMore.KEYBOARD, [messageStore.toolbarType])
+	const isKeyboard = useMemo(() => messageStore.toolbarType === emojiOrMore.KEYBOARD, [messageStore.toolbarType])
 
 	// const [height, setHeight] = useState<number>(0)
 
@@ -96,7 +96,7 @@ const MessageToolbarContent = () => {
 
 	return (
 		<div
-			className={clsx('w-full h-[300px] flex overflow-hidden', isNone && 'hidden')}
+			className={clsx('w-full h-[300px] flex overflow-hidden', (isNone || isKeyboard) && 'hidden')}
 			style={{ height: messageStore.placeholderHeight === 0 ? 318 : messageStore.placeholderHeight }}
 		>
 			<MessageEmojis

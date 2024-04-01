@@ -25,6 +25,3 @@ project(':capacitor-status-bar').projectDir = new File('../node_modules/.pnpm/@c
 
 include ':capacitor-voice-recorder'
 project(':capacitor-voice-recorder').projectDir = new File('../node_modules/.pnpm/capacitor-voice-recorder@5.0.0_@capacitor+core@5.7.0/node_modules/capacitor-voice-recorder/android')
-
-include ':keyboard-coss'
-project(':keyboard-coss').projectDir = new File('../node_modules/.pnpm/keyboard-coss@1.0.5_@capacitor+core@5.7.0/node_modules/keyboard-coss/android')
