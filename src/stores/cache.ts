@@ -113,7 +113,6 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 	},
 	get: async (key) => (await cacheStore.get(key)) ?? [],
 	getDialogMessages: async (dialogId: number, ...ids: number[]) => {
-		console.log(dialogId, ids)
 		const tableName = `${dialogId}`
 		const allMessages = (await cacheStore.get(tableName)) ?? []
 		if (ids.length === 0) {

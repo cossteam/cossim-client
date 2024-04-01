@@ -150,12 +150,15 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 					},
 					messageStore.isGroup
 				)
-				const msg = (await cacheStore.getDialogMessages(item.dialog_id, item.msg_id))[0]
+				const oldMsg = (await cacheStore.getDialogMessages(item.dialog_id, item.msg_id))[0]
 				// 更新消息状态
-				msg['is_read'] = 1
-				msg['read_at'] = Date.now()
-				await messageStore.updateMessage(msg)
-				await cacheStore.updateCacheMessage(msg)
+				const newMsg = {
+					...oldMsg,
+					is_read: 1,
+					read_at: Date.now()
+				}
+				await messageStore.updateMessage(newMsg)
+				await cacheStore.updateCacheMessage(newMsg)
 			}
 		}, 1000)
 	)
