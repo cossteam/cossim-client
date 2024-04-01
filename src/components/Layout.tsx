@@ -5,6 +5,7 @@ import useCacheStore from '@/stores/cache'
 import useRouterStore from '@/stores/router.ts'
 import useToolbarStore from '@/stores/toolbar.ts'
 import useLongPress from '@/hooks/useLongPress.ts'
+import MsgService from '@/api/msg.ts'
 
 const Layout: React.FC = () => {
 	const [tabActive, setTabActive] = useState<string>('dialog')
@@ -41,13 +42,19 @@ const Layout: React.FC = () => {
 
 	const buttonRef = useRef<HTMLButtonElement | null>(null)
 
+	const promiseList: any = []
 	// 长按全部已读
 	useLongPress(buttonRef, {
 		callback: () => {
 			const store = useCacheStore.getState()
 			const list = store.cacheDialogs.map((item: any) => {
+				// 有未读的对话
+				if (item.dialog_unread_count > 0) {
+					promiseList.push(MsgService.readMessagesApi({dialog_id: item.dialog_id, msg_ids: [], read_all: true}))
+				}
 				return { ...item, dialog_unread_count: 0 }
 			})
+			Promise.all(promiseList)
 			store.updateCacheDialogs(list)
 			store.updateCacheUnreadCount(0)
 
