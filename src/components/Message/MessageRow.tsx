@@ -143,19 +143,19 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 				console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
 				// console.table(_.pick(item, ['msg_id', 'is_read', 'content']))
 				// messageStore.updateUnreadList(item.msg_id)
-				await MsgService.readMessagesApi({
-					dialog_id: item.dialog_id,
-					msg_ids: [item.msg_id]
-				})
-				const msg = messageStore.isGroup
-					? () => {}
-					: (await cacheStore.getDialogMessages(item.dialog_id, item.msg_id))[0]
+				await MsgService.readMessagesApi(
+					{
+						dialog_id: item.dialog_id,
+						msg_ids: [item.msg_id]
+					},
+					messageStore.isGroup
+				)
+				const msg = (await cacheStore.getDialogMessages(item.dialog_id, item.msg_id))[0]
 				// 更新消息状态
-				await cacheStore.updateCacheMessage({
-					...msg,
-					is_read: 1,
-					read_at: Date.now()
-				})
+				msg['is_read'] = 1
+				msg['read_at'] = Date.now()
+				await messageStore.updateMessage(msg)
+				await cacheStore.updateCacheMessage(msg)
 			}
 		}, 1000)
 	)
