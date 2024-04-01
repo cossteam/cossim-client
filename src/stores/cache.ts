@@ -26,7 +26,8 @@ const defaultOptions: CacheStoreOptions = {
 	applyCount: 0,
 	keyboardHeight: 417,
 	friendApply: [],
-	groupApply: []
+	groupApply: [],
+	keyboardShow: false
 }
 
 const useCacheStore = create<CacheStore>((set, get) => ({
@@ -109,7 +110,8 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 	},
 	update: async (options) => {
 		return set((state: CacheStoreOptions) => ({ ...state, ...options }))
-	}
+	},
+	get: async (key) => (await cacheStore.get(key)) ?? []
 }))
 
 export default useCacheStore
