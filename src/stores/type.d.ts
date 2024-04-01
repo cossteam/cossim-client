@@ -128,6 +128,20 @@ export type CacheStore = CacheStoreOptions & {
 	 * @param {string} key 键
 	 */
 	get: (key: string) => Promise<any>
+	/**
+	 * 获取会话的消息
+	 * @param dialogId
+	 * @param ids
+	 * @returns
+	 */
+	getDialogMessages: (dialogId: number, ...ids: number[]) => Promise<any[]>
+	/**
+	 * 设置缓存的内容
+	 * @param key
+	 * @param value
+	 * @returns
+	 */
+	set: (key: string, value: any) => Promise<void>
 }
 
 /**

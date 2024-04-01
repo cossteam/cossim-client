@@ -50,7 +50,7 @@ const Layout: React.FC = () => {
 			const list = store.cacheDialogs.map((item: any) => {
 				// 有未读的对话
 				if (item.dialog_unread_count > 0) {
-					promiseList.push(MsgService.readMessagesApi({dialog_id: item.dialog_id, msg_ids: [], read_all: true}))
+					promiseList.push(MsgService.readMessagesApi({dialog_id: item.dialog_id, msg_ids: [], read_all: true}, item.dialog_type == 1))
 				}
 				return { ...item, dialog_unread_count: 0 }
 			})

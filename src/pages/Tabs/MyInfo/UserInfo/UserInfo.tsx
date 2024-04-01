@@ -189,6 +189,11 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 					title={$t('更改密码')}
 					className="coss_item__bottom"
 				/>
+				<ListItem
+					link={`/switch_account/`}
+					title={$t('切换账号')}
+					className="coss_item__bottom"
+				/>
 			</List>
 
 			<Block>
