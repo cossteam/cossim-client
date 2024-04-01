@@ -273,8 +273,8 @@ export async function handlerSocketEdit(data: any) {
  * 处理好友请求
  * @param data
  */
-export function handlerSocketRequest() {
-	// console.log('处理好友请求', data)
+export function handlerSocketRequest(data:any) {
+	console.log('处理好友请求', data)
 	const cacheStore = useCacheStore.getState()
 	cacheStore.updateCacheApplyCount(cacheStore.applyCount + 1)
 }

@@ -76,7 +76,7 @@ class RelationServiceImpl {
 	deleteFriendApplyApi(data: any): Promise<DataResponse> {
 		console.log(this.baseUrl)
 		return request({
-			url: `${this.baseUrl}/delete_friend_record`,
+			url: `${this.baseUrl}/delete_request_record`,
 			method: 'POST',
 			data
 		})
@@ -89,7 +89,7 @@ class RelationServiceImpl {
 	 */
 	deleteGroupApplyApi(data: any): Promise<DataResponse> {
 		return request({
-			url: `${this.relationGroup}/delete_friend_record`,
+			url: `${this.relationGroup}/delete_request_record`,
 			method: 'POST',
 			data
 		})
@@ -278,7 +278,7 @@ class RelationServiceImpl {
 		return request({
 			url: `${this.relationGroup}/join`,
 			method: 'POST',
-			data: {group_id: groupId}
+			data: { group_id: groupId }
 		})
 	}
 }
