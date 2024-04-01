@@ -5,6 +5,7 @@ import useMessageStore from '@/stores/new_message'
 import useCacheStore from '@/stores/cache'
 import Quill from 'quill'
 import MessageBlockquote from './MessageBlockquote'
+// import { Keyboard, KeyboardResize } from '@capacitor/keyboard'
 // import { isWeb } from '@/utils'
 
 const MessageInput = () => {
@@ -29,6 +30,23 @@ const MessageInput = () => {
 		const quill = toolEditorRef.current.quill
 
 		const handlerFocus = () => {
+			// const rect = quill.root.getBoundingClientRect()
+			// const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+
+			// console.log('rect.bottom', rect.bottom)
+
+			// // 判断输入框底部是否在视口上方
+			// if (rect.bottom > viewportHeight) {
+			// 	console.log('Input field is covered by the keyboard.')
+			// 	// 此时输入框被软键盘覆盖
+			// 	// 可以执行相应的操作，如页面滚动或其他处理
+			// } else {
+			// 	console.log('Input field is visible.')
+			// 	// 输入框可见
+			// }
+
+			// setTimeout(() => Keyboard.setResizeMode({ mode: KeyboardResize.None }
+
 			// 如果是插入表情触发的聚焦，不做处理
 			if (isEmojiFocus.current) return
 
@@ -42,16 +60,18 @@ const MessageInput = () => {
 			// messageStore.update({ toolbarType: emojiOrMore.NONE })
 		}
 
-		// const handlerBlur = () => {
-		// messageStore.update({ toolbarType: emojiOrMore.NONE })
-		// }
+		const handlerBlur = () => {
+			// messageStore.update({ toolbarType: emojiOrMore.NONE })
+			// Keyboard.setResizeMode({ mode: KeyboardResize.Native })
+			console.log(' 离开')
+		}
 
 		quill.root.addEventListener('focus', handlerFocus)
-		// quill.root.addEventListener('blur', handlerBlur)
+		quill.root.addEventListener('blur', handlerBlur)
 
 		return () => {
 			quill.root.removeEventListener('focus', handlerFocus)
-			// quill.root.removeEventListener('blur', handlerBlur)
+			quill.root.removeEventListener('blur', handlerBlur)
 		}
 	}, [toolEditorRef.current])
 
@@ -99,6 +119,25 @@ const MessageInput = () => {
 			messageStore.update({ toolbarType: emojiOrMore.NONE })
 		}
 	}, [cacheStore.keyboardShow])
+
+	useEffect(() => {
+		// 获取输入框元素
+		// const inputField = document.getElementById('your-input-field-id')
+		// 监听输入框获得焦点事件
+		// inputField.addEventListener('focus', () => {
+		// 	const rect = inputField.getBoundingClientRect()
+		// 	const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+		// 	// 判断输入框底部是否在视口上方
+		// 	if (rect.bottom > viewportHeight) {
+		// 		console.log('Input field is covered by the keyboard.')
+		// 		// 此时输入框被软键盘覆盖
+		// 		// 可以执行相应的操作，如页面滚动或其他处理
+		// 	} else {
+		// 		console.log('Input field is visible.')
+		// 		// 输入框可见
+		// 	}
+		// })
+	}, [])
 
 	return (
 		<div className="flex-1 max-w-[calc(100%-108px)]">
