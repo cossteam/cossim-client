@@ -229,10 +229,11 @@ class MsgServiceImpl {
 	/**
 	 * 设置已读消息
 	 * @param data
+	 * @param isGroup
 	 */
-	readMessagesApi(data: {dialog_id: number | string, msg_ids: [], read_all?: boolean}) {
-		return request({
-			url: `${this.baseUrl}/read/user`,
+	readMessagesApi(data: {dialog_id: number | string, msg_ids: [], read_all?: boolean}, isGroup?: boolean) {
+		return request({ ///msg/group/read/set
+			url: !isGroup ? `${this.baseUrl}/read/user` : `${this.baseUrl}/read/group`,
 			method: 'POST',
 			data
 		})
