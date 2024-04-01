@@ -143,6 +143,10 @@ const routes: Router.RouteParameters[] = [
 		asyncComponent: () => import('@/pages/Search/Search')
 	},
 	{
+		path: '/switch_account/',
+		asyncComponent: () => import('@/pages/SwitchAccount/SwitchAccount')
+	},
+	{
 		path: '(.*)',
 		component: NotFound
 	}

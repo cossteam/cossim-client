@@ -17,11 +17,13 @@ interface LoginScreenProps {
 	defaultData?: RegisterData
 }
 
-const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defaultData }) => {
+const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7route, defaultData }) => {
 	const [fromData, setFromData] = useState<LoginData>({
 		email: '',
 		password: ''
 	})
+
+	const switchAccount = f7route.query?.switch_account
 
 	// 错误提示
 	const [emailError, setEmailError] = useState<string>('')
@@ -81,6 +83,15 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, defau
 			}
 
 			const user_id = data?.user_info?.user_id
+
+			const userList: any = localStorage.getItem('user_list')
+			if (userList && switchAccount) {
+				const temp = JSON.parse(userList)
+				temp.push({...data.user_info, ...fromData})
+				localStorage.setItem('user_list', JSON.stringify([...temp]))
+			} else {
+				localStorage.setItem('user_list', JSON.stringify([{...data.user_info, ...fromData}]))
+			}
 
 			console.log('user_id', user_id)
 
