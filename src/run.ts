@@ -315,13 +315,26 @@ export function handlerSocketRequest(data: any) {
 	cacheStore.updateCacheApplyCount(cacheStore.applyCount + 1)
 }
 
+// 计算两个时间戳之间的差值（以秒为单位）
+function diffInSeconds(timestamp1: number, timestamp2: number) {
+	const diffInMilliseconds = Math.abs(timestamp1 - timestamp2)
+	return Math.floor(diffInMilliseconds / 1000)
+}
+
+// 检查两个时间戳是否相差超过指定的秒数
+function isDifferenceGreaterThanSeconds(timestamp1: number, timestamp2: number, seconds: number) {
+	const diff = diffInSeconds(timestamp1, timestamp2)
+	return diff > seconds
+}
+
 /**
-//  * 阅后即焚
+//  * 阅后即焚(临时使用，后续渲染每一条消息之前判断时候已读并且已过期)
  * @param data
  */
 export const handlerDestroyMessage = _.debounce(() => {
 	// console.log('处理阅后即焚')
 	const cacheStore = useCacheStore.getState()
+	const messageStore = useMessageStore.getState()
 	// 查找每一个开启阅后即焚设置的会话
 	cacheStore.cacheContacts.map(async (item) => {
 		const preferences = {
@@ -337,12 +350,27 @@ export const handlerDestroyMessage = _.debounce(() => {
 		// 遍历消息列表，查找开启阅后即焚以后已读的消息
 		const allMsg = await cacheStore.get(`${item.dialog_id}`)
 		// console.log(
-		// 	'已读',
-		// 	allMsg.filter((i: any) => i.is_read === MESSAGE_READ.READ && i.read_at >= Date.now())
+		// 	// '已读且超时',
+		// 	`未读(${item.dialog_id})`,
+		// 	allMsg.filter(
+		// 		(i: any) =>
+		// 			i.is_read === MESSAGE_READ.NOT_READ ||
+		// 			!isDifferenceGreaterThanSeconds(i.read_at, Date.now(), preferences.open_burn_after_reading_time_out)
+		// 	)
 		// )
+
 		await cacheStore.set(
 			`${item.dialog_id}`,
-			allMsg.filter((i: any) => i.is_read === MESSAGE_READ.NOT_READ || i.read_at < Date.now())
+			// 保留未读消息
+			allMsg.filter((i: any) => {
+				const readAndTimeout = isDifferenceGreaterThanSeconds(
+					i.read_at,
+					Date.now(),
+					preferences.open_burn_after_reading_time_out
+				)
+				readAndTimeout && messageStore.deleteMessage(i)
+				return i.is_read === MESSAGE_READ.NOT_READ || !readAndTimeout
+			})
 		)
 	})
 }, 1000)
@@ -351,22 +379,18 @@ export const handlerDestroyMessage = _.debounce(() => {
  * 主入口
  */
 function run() {
-	console.log('run...')
 	const cacheStore = useCacheStore.getState()
 
 	// 订阅 firstOpened 状态
 	useCacheStore.subscribe(async ({ firstOpened }) => {
 		if (firstOpened) {
-			getBehindMessage()
+			getBehindMessage() // 获取落后消息
 			getRemoteSession()
 			getApplyList()
 			getFriendList()
-
-			// getRemoteSession()
-			// getFriendList()
-			// getApplyList()
-			// getBehindMessage() // 获取落后消息
-			handlerDestroyMessage() // 阅后即焚
+			setInterval(() => {
+				handlerDestroyMessage() // 阅后即焚
+			}, 2000)
 			cacheStore.updateFirstOpened(false)
 		}
 	})
