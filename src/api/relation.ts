@@ -274,7 +274,7 @@ class RelationServiceImpl {
 	 * 加入群聊
 	 * @param groupId
 	 */
-	addGruop(groupId: string): Promise<DataResponse> {
+	addGruop(groupId: number): Promise<DataResponse> {
 		return request({
 			url: `${this.relationGroup}/join`,
 			method: 'POST',

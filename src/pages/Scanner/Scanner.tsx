@@ -67,7 +67,9 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 	}
 
 	const addGroup = (groupId: string) => {
-		f7router?.navigate(`/add_group/?group_id=${groupId}/`)
+		console.log('群id', groupId, typeof groupId)
+		console.log('群id', Number(groupId), typeof Number(groupId))
+		f7router?.navigate(`/add_group/?group_id=${groupId}`)
 	}
 
 	const handleScanner = (text: string) => {

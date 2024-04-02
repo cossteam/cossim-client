@@ -160,7 +160,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 				await messageStore.updateMessage(newMsg)
 				await cacheStore.updateCacheMessage(newMsg)
 			}
-		}, 1000)
+		}, 500)
 	)
 
 	// 无内容
