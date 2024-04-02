@@ -26,9 +26,6 @@ dependencies:
   '@capacitor/ios':
     specifier: ^5.7.0
     version: 5.7.0(@capacitor/core@5.7.0)
-  '@capacitor/keyboard':
-    specifier: ^5.0.8
-    version: 5.0.8(@capacitor/core@5.7.0)
   '@capacitor/local-notifications':
     specifier: ^5.0.7
     version: 5.0.7(@capacitor/core@5.7.0)
@@ -65,6 +62,9 @@ dependencies:
   axios:
     specifier: ^1.6.7
     version: 1.6.7
+  capacitor-keyboard:
+    specifier: ^1.0.0
+    version: 1.0.0(@capacitor/core@5.7.0)
   capacitor-voice-recorder:
     specifier: ^5.0.0
     version: 5.0.0(@capacitor/core@5.7.0)
@@ -604,14 +604,6 @@ packages:
     resolution: {integrity: sha512-zoEdsYQHI1zz2vjKsTpu5bSfxQQ5jrk3Qs6Op9MYcckZZ2QWIs0YpL99p+zODXNpkkyLG73NXEIrOjvyI9jx8A==}
     peerDependencies:
       '@capacitor/core': ^5.7.0
-    dependencies:
-      '@capacitor/core': 5.7.0
-    dev: false
-
-  /@capacitor/keyboard@5.0.8(@capacitor/core@5.7.0):
-    resolution: {integrity: sha512-XYyBzGlzjgLPqyPVdu5McGLYV6+G2efVR4I3l5cF1B27M6U/oFqv9CQU74WNG08nee28bfccboNpv6eWCLYn1A==}
-    peerDependencies:
-      '@capacitor/core': ^5.0.0
     dependencies:
       '@capacitor/core': 5.7.0
     dev: false
@@ -1948,6 +1940,14 @@ packages:
   /caniuse-lite@1.0.30001585:
     resolution: {integrity: sha512-yr2BWR1yLXQ8fMpdS/4ZZXpseBgE7o4g41x3a6AJOqZuOi+iE/WdJYAuZ6Y95i4Ohd2Y+9MzIWRR+uGABH4s3Q==}
     dev: true
+
+  /capacitor-keyboard@1.0.0(@capacitor/core@5.7.0):
+    resolution: {integrity: sha512-VS9HPqj8JKzMCpRrKA0rXfnhvVT8OKhUhm2qWp7gApFkferqeWcZBv+/5bu+vooYSraSoDMtTgyuhBQmLLy0ig==}
+    peerDependencies:
+      '@capacitor/core': '>=5.0.0'
+    dependencies:
+      '@capacitor/core': 5.7.0
+    dev: false
 
   /capacitor-voice-recorder@5.0.0(@capacitor/core@5.7.0):
     resolution: {integrity: sha512-rCZgbmdmj9eXlotziRnIXWoo+7/aGKM1dSeSrgaEmayu9aTs8xkwhpx9eeVe24VDC6sfMHTnwMl5311Ryr/yFA==}

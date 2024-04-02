@@ -1,6 +1,3 @@
-import { emojiOrMore } from '@/shared'
-import useMessageStore from '@/stores/new_message'
-import { useEffect } from 'react'
 import useCacheStore from '@/stores/cache'
 
 /**
@@ -10,18 +7,8 @@ import useCacheStore from '@/stores/cache'
  * @returns
  */
 const MessagePlaceholder = () => {
-	const messageStore = useMessageStore()
 	const cacheStore = useCacheStore()
-
-	useEffect(() => {
-		if (messageStore.toolbarType !== emojiOrMore.NONE) {
-			messageStore.update({ placeholderHeight: 0 })
-		} else {
-			messageStore.update({ placeholderHeight: cacheStore.keyboardHeight })
-		}
-	}, [messageStore.toolbarType])
-
-	return <div style={{ height: messageStore.placeholderHeight }} />
+	return <div style={{ height: cacheStore.keyboardHeight }} />
 }
 
 export default MessagePlaceholder
