@@ -157,10 +157,27 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 					is_read: 1,
 					read_at: Date.now()
 				}
-				await messageStore.updateMessage(newMsg)
 				await cacheStore.updateCacheMessage(newMsg)
+				await messageStore.updateMessage(newMsg)
+				// 更新对话列表
+				cacheStore.updateCacheDialogs(
+					cacheStore.cacheDialogs.map((i) => {
+						if (i.dialog_id === newMsg.dialog_id) {
+							const unreadCount = --i.dialog_unread_count
+							return {
+								...i,
+								last_message: newMsg,
+								dialog_unread_count: unreadCount < 0 ? 0 : unreadCount
+							}
+						}
+						return i
+					})
+				)
+				// 更新Tabber未读消息数
+				const unreadCount = cacheStore.unreadCount - 1
+				cacheStore.updateCacheUnreadCount(unreadCount < 0 ? 0 : unreadCount)
 			}
-		}, 500)
+		}, 1000)
 	)
 
 	// 无内容
