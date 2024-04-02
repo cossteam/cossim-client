@@ -248,12 +248,29 @@ export async function handlerSocketMessage(data: any) {
 	isRecallMessage(type) && updateRecallCacheMessage(msg)
 
 	// 更新消息的总未读数
-	if (msg.is_read === MESSAGE_READ.NOT_READ) {
+	if (msg.is_read !== MESSAGE_READ.READ) {
 		cacheStore.updateCacheUnreadCount(cacheStore.unreadCount + 1)
 	}
 
+	cacheStore.updateCacheDialogs(
+		cacheStore.cacheDialogs.map((i) => {
+			if (i.dialog_id === message.dialog_id) {
+				return {
+					...i,
+					dialog_unread_count: ++i.dialog_unread_count
+				}
+			}
+			return i
+		})
+	)
+
+	// let msg_unread_count =
+	// 	cacheStore.cacheDialogs.find((v) => v.dialog_id === message.dialog_id)?.dialog_unread_count ?? 0
+	// console.log('count', count)
+
 	// 更新本地会话
-	updateDialog(message, message.dialog_id)
+	console.log('更新本地会话', message)
+	await updateDialog(message, message.dialog_id)
 }
 
 /**

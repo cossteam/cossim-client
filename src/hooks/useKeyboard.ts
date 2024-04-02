@@ -74,7 +74,7 @@ const useKeyboard = () => {
 
 				Keyboard?.addListener('keyboardDidHide', () => {
 					console.log('keyboard did hide')
-					cacheStore.updateKeyboardHeight(0)
+					// cacheStore.updateKeyboardHeight(0)
 					cacheStore.update({ keyboardShow: false })
 					// if (messageStore.toolbarType === emojiOrMore.KEYBOARD) {
 					// messageStore.update({ toolbarType: emojiOrMore.NONE })

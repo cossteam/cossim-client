@@ -32,22 +32,13 @@ const MessageToolbar = () => {
 
 	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
 
-	useIntersectionObserver(
-		toolbarRef,
-		(entry) => {
-			// setEntry(entry)
-			if (entry[0].isIntersecting) {
-				// messageStore.update({ lastReadId: item.msg_id })
-				console.log('进入可视区域', entry[0])
-			} else {
-				console.log('离开可视区域', entry[0])
-			}
-		},
-		{
-			threshold: [1.0]
-			// trackVisibility: true
+	useIntersectionObserver(toolbarRef, (entry) => {
+		if (entry[0].isIntersecting) {
+			console.log('进入可视区域', entry[0])
+		} else {
+			console.log('离开可视区域', entry[0])
 		}
-	)
+	})
 
 	return (
 		<>
