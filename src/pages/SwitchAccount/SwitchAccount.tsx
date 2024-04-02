@@ -34,13 +34,15 @@ const SwitchAccount: React.FC<RouterProps> = ({ f7router }) => {
 		const { identifier: driver_id } = await Device.getId()
 		console.log(userList.password)
 
-		const { code, data, msg } = await watchAsyncFn(() => UserService.loginApi({
-			password: userList[index].password,
-			email: userList[index].email,
-			driver_id,
-			platform: 'ios',
-			driver_token: '7bd439461e80d13a889e08d0c351fdcfa2c697b920536b4a3787ecf69a5206dc'
-		}))
+		const { code, data, msg } = await watchAsyncFn(() =>
+			UserService.loginApi({
+				password: userList[index].password,
+				email: userList[index].email,
+				driver_id,
+				platform: 'ios',
+				driver_token: '7bd439461e80d13a889e08d0c351fdcfa2c697b920536b4a3787ecf69a5206dc'
+			})
+		)
 
 		if (code !== 200) {
 			f7.dialog.alert(msg)
@@ -76,35 +78,32 @@ const SwitchAccount: React.FC<RouterProps> = ({ f7router }) => {
 		location.reload()
 	}
 
-
 	return (
 		<Page className="bg-bgTertiary" noToolbar>
-			<Navbar className="bg-bgTertiary" backLink />
+			<Navbar className="bg-white" backLink />
 			<h1 className="text-center mt-20 text-2xl">点击头像切换账号</h1>
 			<div className="mt-20">
-				{
-					userList && userList.map((item: any, index: number) => {
+				{userList &&
+					userList.map((item: any, index: number) => {
 						return (
 							<div onClick={() => submit(index)} key={item.user_id} style={style} className="flex">
-								<Avatar square
-										src={item.avatar} />
+								<Avatar square src={item.avatar} />
 								<div className="flex flex-col flex-1 justify-center ml-2">
 									<div className="flex w-full justify-between">
 										<span className="text-lg">{item.nickname}</span>
-										{
-											userId == item.user_id && <span className="text-green-600">目前使用</span>
-										}
+										{userId == item.user_id && <span className="text-green-600">目前使用</span>}
 									</div>
 									<span className="text-textSecondary">{item.coss_id}</span>
 								</div>
 							</div>
 						)
-					})
-				}
-				<div onClick={() => f7router.navigate(`/login/?switch_account=${true}`)} style={style} className="flex items-center">
-					<div
-						className="w-12 h-12 flex flex-col justify-center items-center border-dashed border-[1px] border-gray-400 text-gray-500 rounded-lg"
-					>
+					})}
+				<div
+					onClick={() => f7router.navigate(`/login/?switch_account=${true}`)}
+					style={style}
+					className="flex items-center"
+				>
+					<div className="w-12 h-12 flex flex-col justify-center items-center border-dashed border-[1px] border-gray-400 text-gray-500 rounded-lg">
 						<Icon f7="plus" size={18} />
 					</div>
 					<div className="ml-2 text-textSecondary text-lg">
@@ -114,7 +113,6 @@ const SwitchAccount: React.FC<RouterProps> = ({ f7router }) => {
 			</div>
 		</Page>
 	)
-
 }
 
 export default SwitchAccount

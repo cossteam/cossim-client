@@ -79,6 +79,7 @@ const MessageSendAudio = () => {
 			if (!recordingData || !recordingData.value || touch.isCancel) return
 			try {
 				console.log('recordingData', recordingData.value)
+				if (recordingData.value.msDuration < 1000) return
 				// 将Base64数据解码为二进制数据
 				const decodedData = Base64.toUint8Array(recordingData.value.recordDataBase64)
 				// 将解码后的数据包装为Blob对象
