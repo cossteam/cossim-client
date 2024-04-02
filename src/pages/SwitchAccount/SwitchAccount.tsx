@@ -79,7 +79,7 @@ const SwitchAccount: React.FC<RouterProps> = ({ f7router }) => {
 
 	return (
 		<Page className="bg-bgTertiary" noToolbar>
-			<Navbar backLink />
+			<Navbar className="bg-bgTertiary" backLink />
 			<h1 className="text-center mt-20 text-2xl">点击头像切换账号</h1>
 			<div className="mt-20">
 				{
