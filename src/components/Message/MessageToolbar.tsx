@@ -8,7 +8,7 @@ import { emojiOrMore, msgSendType, tooltipType } from '@/shared'
 import { KeyboardIcon } from '@/components/Icon/Icon'
 import { FaceSmiling, PlusCircle } from 'framework7-icons/react'
 import { useMemo, useRef } from 'react'
-import { useClickOutside, useIntersectionObserver } from '@reactuses/core'
+import { useClickOutside } from '@reactuses/core'
 import clsx from 'clsx'
 import MessageSelect from './MessageToolbar/MessageSelect'
 // import MessagePlaceholder from './MessageToolbar/MessagePlaceholder'
@@ -25,27 +25,13 @@ const MessageToolbar = () => {
 
 	useClickOutside(toolbarRef, () => messageStore.update({ toolbarType: emojiOrMore.NONE }))
 
-	// const height = useMemo(() => {
-	// 	if (messageStore.placeholderHeight === 0) return cacheStore.keyboardHeight
-	// 	return 0
-	// }, [messageStore.placeholderHeight])
-
 	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
-
-	useIntersectionObserver(toolbarRef, (entry) => {
-		if (entry[0].isIntersecting) {
-			console.log('进入可视区域', entry[0])
-		} else {
-			console.log('离开可视区域', entry[0])
-		}
-	})
 
 	return (
 		<>
 			<div
 				className="min-h-14 bg-bgPrimary relative z-50 w-full bottom-0 flex flex-col justify-center transition-all duration-100"
 				ref={toolbarRef}
-				// style={{ transform: `translateY(${height}px)` }}
 			>
 				<div className={clsx('w-full flex items-end gap-1 pl-[6px] py-2', isSelect && 'hidden')}>
 					{/* 文本输入框 */}
@@ -83,6 +69,7 @@ const MessageToolbar = () => {
 				{/* 表情或者更多内容切换 */}
 				<MessageToolbarContent />
 
+				{/* 占位 */}
 				{/* <MessagePlaceholder /> */}
 			</div>
 		</>

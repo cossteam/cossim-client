@@ -15,9 +15,9 @@ def capacitor_pods
   pod 'CapacitorCamera', :path => '../../node_modules/.pnpm/@capacitor+camera@5.0.9_@capacitor+core@5.7.0/node_modules/@capacitor/camera'
   pod 'CapacitorClipboard', :path => '../../node_modules/.pnpm/@capacitor+clipboard@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/clipboard'
   pod 'CapacitorDevice', :path => '../../node_modules/.pnpm/@capacitor+device@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/device'
-  pod 'CapacitorKeyboard', :path => '../../node_modules/.pnpm/@capacitor+keyboard@5.0.8_@capacitor+core@5.7.0/node_modules/@capacitor/keyboard'
   pod 'CapacitorLocalNotifications', :path => '../../node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications'
   pod 'CapacitorStatusBar', :path => '../../node_modules/.pnpm/@capacitor+status-bar@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/status-bar'
+  pod 'CapacitorKeyboard', :path => '../../node_modules/.pnpm/capacitor-keyboard@1.0.0_@capacitor+core@5.7.0/node_modules/capacitor-keyboard'
   pod 'CapacitorVoiceRecorder', :path => '../../node_modules/.pnpm/capacitor-voice-recorder@5.0.0_@capacitor+core@5.7.0/node_modules/capacitor-voice-recorder'
 end
 
