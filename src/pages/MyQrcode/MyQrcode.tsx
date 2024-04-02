@@ -2,6 +2,7 @@ import QRCode from 'qrcode.react'
 import { Navbar, Page } from 'framework7-react'
 import useUserStore from '@/stores/user'
 import { useEffect, useState } from 'react'
+import Avatar from '@/components/Avatar/Avatar.tsx'
 
 const MyQrCode = () => {
 	const userStore = useUserStore()
@@ -19,9 +20,7 @@ const MyQrCode = () => {
 			<Navbar backLink />
 			<div className="h-full pt-32">
 				<div className="flex px-14 mb-10 justify-start items-center gap-5">
-					<div className="w-16 h-16 rounded-full overflow-hidden bg-black bg-opacity-10 flex justify-center items-center">
-						<img src={userInfo?.avatar} alt="" className=" h-full object-cover bg-black bg-opacity-10" />
-					</div>
+					<Avatar src={userInfo.avatar} />
 					<div className="flex flex-col">
 						<span className="font-bold text-lg" style={{ color: 'black', textAlign: 'center' }}>
 							{userInfo?.nickname}

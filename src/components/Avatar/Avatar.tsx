@@ -19,7 +19,7 @@ const Avatar: React.FC<AvatarProps> = ({ src, size, square, ...props }) => {
 
 	return (
 		<div {...props} style={combinedStyles}>
-			<img src={src} style={{ borderRadius: square ? '8%' : '50%' }} alt="" className="w-full h-full" />
+			<img src={src} style={{ borderRadius: square ? '8%' : '50%' }} alt="" className="w-full object-cover h-full" />
 		</div>
 	)
 }
