@@ -19,11 +19,11 @@ import { useEffect } from 'react'
 const ContactList: React.FC<RouterProps> = ({f7router}) => {
 	const cacheStore = useCacheStore()
 
-	const { router, setRouter } = useRouterStore()
+	const { contactRouter, setContactRouter } = useRouterStore()
 
 	useEffect(() => {
-		setRouter(f7router)
-		console.log('2路由', router)
+		setContactRouter(f7router)
+		console.log('2路由', contactRouter)
 	}, [])
 
 	// const [contact, setContact] = useState<any[]>([])

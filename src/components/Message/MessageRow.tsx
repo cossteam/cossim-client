@@ -123,7 +123,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const search = async (userId: string) => {
 		if (messageStore.manualTipType === tooltipType.SELECT) return
 		watchAsyncFn(async () => {
-			if (userId === userStore.userId) return
+			if (userId === userStore.userId) return;
 			const friend = cacheStore.cacheContacts?.find((item) => item.user_id === userId)
 			friend ? router?.navigate(`/profile/${friend?.user_id}/`) : router?.navigate(`/personal_detail/${userId}/`)
 		}, '搜索中...')
