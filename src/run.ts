@@ -178,7 +178,7 @@ async function updateRecallCacheMessage(message: any) {
  * @param {any} data	推送消息
  */
 export async function handlerSocketMessage(data: any) {
-	// console.log('handlerSocketMessage', data)
+	console.log('handlerSocketMessage', data)
 
 	const userStore = useUserStore.getState()
 	const messageStore = useMessageStore.getState()
@@ -239,9 +239,11 @@ export async function handlerSocketMessage(data: any) {
 			const message = messageStore.allMessages.find((v) => v?.msg_id === msg?.reply_id)
 			message && messageStore.deleteMessage(message)
 		}
+	} else {
+		cacheStore.addCacheMessage(msg)
 	}
 
-	cacheStore.updateCacheMessage(msg)
+	// cacheStore.updateCacheMessage(msg)
 	// 如果是标注消息，需要修改本地消息缓存
 	isLableMessage(type) && updateLabelCacheMessage(msg)
 	// 如果是撤回消息，需要修改本地消息缓存
@@ -314,29 +316,42 @@ export function handlerSocketRequest(data: any) {
 }
 
 /**
- * 阅后即焚
+//  * 阅后即焚
  * @param data
  */
-export function handlerDestroyMessage() {
-	console.log('处理阅后即焚')
+export const handlerDestroyMessage = _.debounce(() => {
+	// console.log('处理阅后即焚')
 	const cacheStore = useCacheStore.getState()
-	console.log(cacheStore.cacheContacts)
-	cacheStore.cacheContacts.map((item) => {
+	// 查找每一个开启阅后即焚设置的会话
+	cacheStore.cacheContacts.map(async (item) => {
 		const preferences = {
 			dialog_id: item.dialog_id,
 			..._.pick(item, ['preferences']).preferences
 		}
-		console.log(
-			`会话【${preferences.dialog_id}】${preferences.open_burn_after_reading ? '已开启阅后即焚' : '已关闭阅后即焚'}`,
-			`${preferences.open_burn_after_reading_time_out}s`
+		if (!preferences.open_burn_after_reading) return
+		// console.log(
+		// 	`会话【${preferences.dialog_id}】${preferences.open_burn_after_reading ? '已开启阅后即焚' : '已关闭阅后即焚'}`,
+		// 	`${preferences.open_burn_after_reading_time_out}s`,
+		// 	item
+		// )
+		// 遍历消息列表，查找开启阅后即焚以后已读的消息
+		const allMsg = await cacheStore.get(`${item.dialog_id}`)
+		// console.log(
+		// 	'已读',
+		// 	allMsg.filter((i: any) => i.is_read === MESSAGE_READ.READ && i.read_at >= Date.now())
+		// )
+		await cacheStore.set(
+			`${item.dialog_id}`,
+			allMsg.filter((i: any) => i.is_read === MESSAGE_READ.NOT_READ || i.read_at < Date.now())
 		)
 	})
-}
+}, 1000)
 
 /**
  * 主入口
  */
 function run() {
+	console.log('run...')
 	const cacheStore = useCacheStore.getState()
 
 	// 订阅 firstOpened 状态
@@ -346,7 +361,12 @@ function run() {
 			getRemoteSession()
 			getApplyList()
 			getFriendList()
-			handlerDestroyMessage()
+
+			// getRemoteSession()
+			// getFriendList()
+			// getApplyList()
+			// getBehindMessage() // 获取落后消息
+			handlerDestroyMessage() // 阅后即焚
 			cacheStore.updateFirstOpened(false)
 		}
 	})
