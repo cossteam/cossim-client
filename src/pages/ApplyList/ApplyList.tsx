@@ -8,7 +8,7 @@ import {
 	Segmented,
 	SwipeoutActions,
 	SwipeoutButton,
-	f7
+	f7, NavRight
 } from 'framework7-react'
 import { useMemo, useState } from 'react'
 
@@ -21,6 +21,8 @@ import Empty from '@/components/Empty'
 import useCacheStore from '@/stores/cache'
 import { getApplyList } from '@/run'
 import { useAsyncEffect } from '@reactuses/core'
+import { Plus } from 'framework7-icons/react'
+import Avatar from '@/components/Avatar/Avatar.tsx'
 
 const user_id = getCookie(USER_ID) || ''
 
@@ -35,7 +37,8 @@ const ApplyList = () => {
 		async () => {
 			await getApplyList()
 		},
-		() => {},
+		() => {
+		},
 		[type]
 	)
 
@@ -64,15 +67,15 @@ const ApplyList = () => {
 					? await RelationService.manageFriendApplyApi({ request_id: item.id, action, e2e_public_key })
 					: item?.status === ApplyStatus.INVITE_RECEIVER // 是否是被邀请者
 						? await GroupService.manageGroupRequestApi({
-								group_id: item.group_id,
-								action,
-								id: item.id // parseInt(item.id.split('_')[1])
-							})
+							group_id: item.group_id,
+							action,
+							id: item.id // parseInt(item.id.split('_')[1])
+						})
 						: await GroupService.manageGroupRequestAdminApi({
-								group_id: item.group_id,
-								action,
-								id: item.id // parseInt(item.id.split('_')[1])
-							})
+							group_id: item.group_id,
+							action,
+							id: item.id // parseInt(item.id.split('_')[1])
+						})
 
 			if (code !== 200) {
 				f7.dialog.alert($t(msg))
@@ -161,6 +164,10 @@ const ApplyList = () => {
 						</Button>
 					</Segmented>
 				</NavTitle>
+				<NavRight>
+					<ListItem link="/add_friend/" popoverClose className="coss_dialog_list"><Plus className="w-7 h-7" />
+					</ListItem>
+				</NavRight>
 			</Navbar>
 
 			{applyList.length <= 0 ? (
@@ -173,17 +180,15 @@ const ApplyList = () => {
 							// 好友
 							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout={!isOperate(item)}>
 								<div slot="media" className="w-12 h-12">
-									<img
-										src={item?.receiver_info?.user_avatar}
-										className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
-									/>
+									<Avatar size={50} src={item?.receiver_info?.user_avatar} />
 								</div>
 								<div slot="title">
 									<span>{$t(item?.receiver_info?.user_name)}</span>
 								</div>
 								<div slot="content" className="pr-2 flex">
 									{!isOperate(item) ? (
-										<Button className="text-sm text-gray-500" onClick={() => {}}>
+										<Button className="text-sm text-gray-500" onClick={() => {
+										}}>
 											{getStatusText(item.status)}
 										</Button>
 									) : (
@@ -215,10 +220,7 @@ const ApplyList = () => {
 							// 群聊
 							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout={!isOperate(item)}>
 								<div slot="media" className="w-12 h-12">
-									<img
-										src={item?.receiver_info?.user_avatar}
-										className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
-									/>
+									<Avatar size={50} src={item?.receiver_info?.user_avatar} />
 								</div>
 								<div slot="title">
 									<span>{$t(isRreceiver(item) ? '你' : item?.sender_info?.user_name)}</span>
@@ -229,7 +231,8 @@ const ApplyList = () => {
 								</div>
 								<div slot="content" className="pr-2 flex">
 									{!isOperate(item) ? (
-										<Button className="text-sm text-gray-500" onClick={() => {}}>
+										<Button className="text-sm text-gray-500" onClick={() => {
+										}}>
 											{getStatusText(item.status)}
 										</Button>
 									) : (
