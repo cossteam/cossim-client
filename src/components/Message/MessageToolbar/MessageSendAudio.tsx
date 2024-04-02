@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 
 // @See: https://github.com/tchvu3/capacitor-voice-recorder#readme
 import { VoiceRecorder, RecordingData, GenericResponse } from 'capacitor-voice-recorder'
-import { useAsyncEffect, useClickOutside, useLongPress } from '@reactuses/core'
+import { useAsyncEffect, useClickOutside } from '@reactuses/core'
 import { MESSAGE_SEND, msgType, toastMessage } from '@/shared'
 import clsx from 'clsx'
 import useTouch from '@/hooks/useTouch'
@@ -14,6 +14,8 @@ import useMessageStore from '@/stores/new_message'
 import { generateMessage } from '@/utils/data'
 import { sendMessage } from '../script/message'
 
+let startTime: number
+let endTime: number
 const MessageSendAudio = () => {
 	const audioRef = useRef<HTMLDivElement | null>(null)
 	// 首次渲染
@@ -29,32 +31,13 @@ const MessageSendAudio = () => {
 
 	const messageStore = useMessageStore()
 
-	// 长按
-	const longPressEvent = useLongPress(
-		async () => {
-			try {
-				// 请求权限
-				if (!isPermission) {
-					const voiceRecord = await VoiceRecorder.requestAudioRecordingPermission()
-					if (voiceRecord) setIsRecording(true)
-					else throw new Error('请求权限失败')
-				} else {
-					setIsRecording(true)
-				}
-			} catch {
-				toastMessage('当前设备不支持录音')
-				setIsRecording(false)
-			}
-		},
-		{ delay: 500 }
-	)
-
 	useAsyncEffect(
 		async () => {
 			const isPermission = await VoiceRecorder.hasAudioRecordingPermission()
 			setIsPermission(isPermission.value)
 		},
-		() => {},
+		() => {
+		},
 		[]
 	)
 
@@ -124,19 +107,43 @@ const MessageSendAudio = () => {
 				toastMessage('发送失败')
 			}
 		},
-		() => {},
+		() => {
+		},
 		[recordingData]
 	)
 
 	useClickOutside(audioRef, () => setIsRecording(false))
 
+	const handlerTouchStart = async () => {
+		startTime = new Date().getTime();
+		try {
+			// 请求权限
+			if (!isPermission) {
+				const voiceRecord = await VoiceRecorder.requestAudioRecordingPermission()
+				if (voiceRecord) setIsRecording(true)
+				else throw new Error('请求权限失败')
+			} else {
+				setIsRecording(true)
+			}
+		} catch {
+			toastMessage('当前设备不支持录音')
+			setIsRecording(false)
+		}
+	}
+	const handlerTouchEnd = () => {
+		endTime = new Date().getTime();
+		console.log(endTime,startTime)
+		if (endTime - startTime < 1000) {
+			toastMessage('说话时间太短了！')
+		}setIsRecording(false)
+	}
+
 	return (
 		<>
 			<div
 				ref={audioRef}
-				{...longPressEvent}
-				onTouchEnd={() => setIsRecording(false)}
-				onContextMenu={(e) => e.preventDefault()}
+				onTouchStart={handlerTouchStart}
+				onTouchEnd={handlerTouchEnd}
 				className={clsx('flex items-center bg-primary rounded-full w-8 h-8 justify-center relative')}
 			>
 				{/* isRecording && 'absolute !w-16 !h-16 right-1' */}
