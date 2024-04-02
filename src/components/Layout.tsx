@@ -10,7 +10,7 @@ import MsgService from '@/api/msg.ts'
 const Layout: React.FC = () => {
 	const [tabActive, setTabActive] = useState<string>('dialog')
 	const previousTab = useRef<string>('dialog')
-	const { router } = useRouterStore()
+	const { router, contactRouter } = useRouterStore()
 	const { setDoubleClick } = useToolbarStore()
 	const onTabLinkClick = (tabName: string) => {
 		if (previousTab.current !== tabActive) {
@@ -25,7 +25,8 @@ const Layout: React.FC = () => {
 					setDoubleClick(true)
 					break
 				case 'contacts':
-					router.navigate('/add_friend/')
+					if (cacheStore.applyCount)
+					contactRouter?.navigate('/apply_list/')
 					break
 				case 'my':
 					break

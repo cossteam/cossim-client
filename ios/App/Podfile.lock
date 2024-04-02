@@ -10,7 +10,7 @@ PODS:
   - CapacitorCordova (5.7.0)
   - CapacitorDevice (5.0.7):
     - Capacitor
-  - CapacitorKeyboard (5.0.8):
+  - CapacitorKeyboard (1.0.0):
     - Capacitor
   - CapacitorLocalNotifications (5.0.7):
     - Capacitor
@@ -26,7 +26,7 @@ DEPENDENCIES:
   - "CapacitorClipboard (from `../../node_modules/.pnpm/@capacitor+clipboard@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/clipboard`)"
   - "CapacitorCordova (from `../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios`)"
   - "CapacitorDevice (from `../../node_modules/.pnpm/@capacitor+device@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/device`)"
-  - "CapacitorKeyboard (from `../../node_modules/.pnpm/@capacitor+keyboard@5.0.8_@capacitor+core@5.7.0/node_modules/@capacitor/keyboard`)"
+  - "CapacitorKeyboard (from `../../node_modules/.pnpm/capacitor-keyboard@1.0.0_@capacitor+core@5.7.0/node_modules/capacitor-keyboard`)"
   - "CapacitorLocalNotifications (from `../../node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications`)"
   - "CapacitorStatusBar (from `../../node_modules/.pnpm/@capacitor+status-bar@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/status-bar`)"
   - "CapacitorVoiceRecorder (from `../../node_modules/.pnpm/capacitor-voice-recorder@5.0.0_@capacitor+core@5.7.0/node_modules/capacitor-voice-recorder`)"
@@ -45,7 +45,7 @@ EXTERNAL SOURCES:
   CapacitorDevice:
     :path: "../../node_modules/.pnpm/@capacitor+device@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/device"
   CapacitorKeyboard:
-    :path: "../../node_modules/.pnpm/@capacitor+keyboard@5.0.8_@capacitor+core@5.7.0/node_modules/@capacitor/keyboard"
+    :path: "../../node_modules/.pnpm/capacitor-keyboard@1.0.0_@capacitor+core@5.7.0/node_modules/capacitor-keyboard"
   CapacitorLocalNotifications:
     :path: "../../node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications"
   CapacitorStatusBar:
@@ -60,11 +60,11 @@ SPEC CHECKSUMS:
   CapacitorClipboard: 45e5e25f2271f98712985d422776cdc5a779cca1
   CapacitorCordova: e825fce1a2e14e4b5730641c7e098dccf74397b7
   CapacitorDevice: fc91bdb484dc0e70755e9b621cd557afe642613a
-  CapacitorKeyboard: aec619a578235c6ce279075009a2689c2cf5c42c
+  CapacitorKeyboard: ec88689ea5fe09b9cc4e2d8a5d4d9b1bc8195a78
   CapacitorLocalNotifications: c58afadd159f6bc540ef9b3cbdbc82510a2bf112
   CapacitorStatusBar: f390fbb49b82ffb754ea4b3cf71dc8b048baf3e7
   CapacitorVoiceRecorder: 872ea857b497ce2c71afe3e4eb5de0a74290c0db
 
-PODFILE CHECKSUM: 12ccfb1be762319cca6adeeb8d783ddb2f99c4b1
+PODFILE CHECKSUM: 817cc53d4f15f3b8f6981ce916708cfad10ff76a
 
 COCOAPODS: 1.14.3

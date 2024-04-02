@@ -8,12 +8,11 @@ const MessageContent = () => {
 
 	useEffect(() => {
 		if (!container.current) return
-		// container.current.click()
 		messageStore.update({ container: container.current })
 	}, [container.current])
 
 	return (
-		<div className="flex-1 overflow-y-auto py-4" ref={container}>
+		<div className="flex-1 overflow-y-auto py-4" ref={container} onTouchStart={() => null} onTouchMove={() => null}>
 			<MessageList />
 		</div>
 	)
