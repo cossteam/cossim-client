@@ -8,7 +8,7 @@ import {
 	Segmented,
 	SwipeoutActions,
 	SwipeoutButton,
-	f7
+	f7, NavRight
 } from 'framework7-react'
 import { useMemo, useState } from 'react'
 
@@ -21,6 +21,7 @@ import Empty from '@/components/Empty'
 import useCacheStore from '@/stores/cache'
 import { getApplyList } from '@/run'
 import { useAsyncEffect } from '@reactuses/core'
+import { Plus } from 'framework7-icons/react'
 
 const user_id = getCookie(USER_ID) || ''
 
@@ -35,7 +36,8 @@ const ApplyList = () => {
 		async () => {
 			await getApplyList()
 		},
-		() => {},
+		() => {
+		},
 		[type]
 	)
 
@@ -64,15 +66,15 @@ const ApplyList = () => {
 					? await RelationService.manageFriendApplyApi({ request_id: item.id, action, e2e_public_key })
 					: item?.status === ApplyStatus.INVITE_RECEIVER // 是否是被邀请者
 						? await GroupService.manageGroupRequestApi({
-								group_id: item.group_id,
-								action,
-								id: item.id // parseInt(item.id.split('_')[1])
-							})
+							group_id: item.group_id,
+							action,
+							id: item.id // parseInt(item.id.split('_')[1])
+						})
 						: await GroupService.manageGroupRequestAdminApi({
-								group_id: item.group_id,
-								action,
-								id: item.id // parseInt(item.id.split('_')[1])
-							})
+							group_id: item.group_id,
+							action,
+							id: item.id // parseInt(item.id.split('_')[1])
+						})
 
 			if (code !== 200) {
 				f7.dialog.alert($t(msg))
@@ -161,6 +163,10 @@ const ApplyList = () => {
 						</Button>
 					</Segmented>
 				</NavTitle>
+				<NavRight>
+					<ListItem link="/add_friend/" popoverClose className="coss_dialog_list"><Plus className="w-7 h-7" />
+					</ListItem>
+				</NavRight>
 			</Navbar>
 
 			{applyList.length <= 0 ? (
@@ -183,7 +189,8 @@ const ApplyList = () => {
 								</div>
 								<div slot="content" className="pr-2 flex">
 									{!isOperate(item) ? (
-										<Button className="text-sm text-gray-500" onClick={() => {}}>
+										<Button className="text-sm text-gray-500" onClick={() => {
+										}}>
 											{getStatusText(item.status)}
 										</Button>
 									) : (
@@ -229,7 +236,8 @@ const ApplyList = () => {
 								</div>
 								<div slot="content" className="pr-2 flex">
 									{!isOperate(item) ? (
-										<Button className="text-sm text-gray-500" onClick={() => {}}>
+										<Button className="text-sm text-gray-500" onClick={() => {
+										}}>
 											{getStatusText(item.status)}
 										</Button>
 									) : (
