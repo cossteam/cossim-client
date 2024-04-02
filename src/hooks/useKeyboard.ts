@@ -13,7 +13,7 @@ import { emojiOrMore } from '@/shared'
  */
 const useKeyboard = () => {
 	const cacheStore = useCacheStore.getState()
-	const messageStore = useMessageStore()
+	// const messageStore = useMessageStore()
 	const pageHeight = useRef<number>(0)
 	const isWeb = useRef<boolean>(true)
 
@@ -27,14 +27,17 @@ const useKeyboard = () => {
 
 			if (isWeb.current) {
 				Keyboard?.addListener('keyboardWillShow', (info) => {
+					const messageStore = useMessageStore.getState()
 					cacheStore.updateKeyboardHeight(info.keyboardHeight)
+					// if (!messageStore.selectedEmojis) {
 					messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
+					// }
 				})
 
 				Keyboard?.addListener('keyboardWillHide', () => {
-					const store = useMessageStore.getState()
-					if ([emojiOrMore.KEYBOARD, emojiOrMore.NONE].includes(store.toolbarType)) {
-						store.update({ toolbarType: emojiOrMore.NONE })
+					const messageStore = useMessageStore.getState()
+					if ([emojiOrMore.KEYBOARD, emojiOrMore.NONE].includes(messageStore.toolbarType)) {
+						messageStore.update({ toolbarType: emojiOrMore.NONE })
 					}
 				})
 			}

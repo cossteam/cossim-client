@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react'
 import useMessageStore from '@/stores/new_message'
 import Quill from 'quill'
 import MessageBlockquote from './MessageBlockquote'
+import { theme } from 'framework7-react'
+import { Keyboard } from 'capacitor-keyboard'
 
 const MessageInput = () => {
 	const toolEditorRef = useRef<ToolEditorMethods | null>(null)
@@ -25,26 +27,19 @@ const MessageInput = () => {
 	// 	if (!toolEditorRef.current || !toolEditorRef.current.quill) return
 
 	// 	const quill = toolEditorRef.current.quill
-	// 	// const handlerFocus = () => {
-	// 	// 	// 如果是插入表情触发的聚焦，不做处理
-	// 	// 	if (isEmojiFocus.current) return
-	// 	// 	// messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
-	// 	// 	// 如果是web端就不需要弹起
-	// 	// 	// const web = await isWeb()
-	// 	// 	// if (!web) {
-	// 	// 	// 	messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
-	// 	// 	// }
-	// 	// 	// messageStore.update({ toolbarType: emojiOrMore.NONE })
-	// 	// }
+	// 	const handlerFocus = () => {
+	// 		// 如果是插入表情触发的聚焦，不做处理
+	// 		if (isEmojiFocus.current) return
+	// 	}
 
-	// 	const handlerBlur = () => Keyboard?.hide()
+	// const handlerBlur = () => Keyboard?.hide()
 
-	// 	// quill.root.addEventListener('focus', handlerFocus)
-	// 	quill.root.addEventListener('blur', handlerBlur)
+	// 	quill.root.addEventListener('focus', handlerFocus)
+	// 	// quill.root.addEventListener('blur', handlerBlur)
 
 	// 	return () => {
-	// 		// quill.root.removeEventListener('focus', handlerFocus)
-	// 		quill.root.removeEventListener('blur', handlerBlur)
+	// 		quill.root.removeEventListener('focus', handlerFocus)
+	// 		// quill.root.removeEventListener('blur', handlerBlur)
 	// 	}
 	// }, [toolEditorRef.current])
 
@@ -57,6 +52,7 @@ const MessageInput = () => {
 		quill?.focus()
 		quill?.insertText(quill.getSelection()?.index || 0, messageStore.selectedEmojis, Quill.sources.API)
 		quill?.blur()
+		if (theme.ios) Keyboard?.hide()
 		isEmojiFocus.current = false
 		messageStore.update({ selectedEmojis: '' })
 	}, [messageStore.selectedEmojis])

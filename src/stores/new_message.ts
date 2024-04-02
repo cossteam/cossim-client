@@ -33,6 +33,7 @@ const defaultOptions: MessageStoreOptions = {
 	isLoading: false,
 	unreadList: [],
 	isGroupAnnouncement: false
+	// isEmojiFocus: false
 }
 
 const useMessageStore = create<MessageStore>((set, get) => ({

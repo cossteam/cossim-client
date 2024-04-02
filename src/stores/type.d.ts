@@ -204,6 +204,8 @@ export interface MessageStoreOptions {
 	unreadList: number[]
 	/** 是否有群公告 */
 	isGroupAnnouncement: boolean
+	/** 是否在插入表情 */
+	// isEmojiFocus: boolean
 }
 
 interface initOptions {
