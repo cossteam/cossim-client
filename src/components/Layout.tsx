@@ -25,7 +25,8 @@ const Layout: React.FC = () => {
 					setDoubleClick(true)
 					break
 				case 'contacts':
-					contactRouter?.navigate('/add_friend/')
+					if (cacheStore.applyCount)
+					contactRouter?.navigate('/apply_list/')
 					break
 				case 'my':
 					break

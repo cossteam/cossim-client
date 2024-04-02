@@ -22,6 +22,7 @@ import useCacheStore from '@/stores/cache'
 import { getApplyList } from '@/run'
 import { useAsyncEffect } from '@reactuses/core'
 import { Plus } from 'framework7-icons/react'
+import Avatar from '@/components/Avatar/Avatar.tsx'
 
 const user_id = getCookie(USER_ID) || ''
 
@@ -179,10 +180,7 @@ const ApplyList = () => {
 							// 好友
 							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout={!isOperate(item)}>
 								<div slot="media" className="w-12 h-12">
-									<img
-										src={item?.receiver_info?.user_avatar}
-										className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
-									/>
+									<Avatar size={50} src={item?.receiver_info?.user_avatar} />
 								</div>
 								<div slot="title">
 									<span>{$t(item?.receiver_info?.user_name)}</span>
@@ -222,10 +220,7 @@ const ApplyList = () => {
 							// 群聊
 							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout={!isOperate(item)}>
 								<div slot="media" className="w-12 h-12">
-									<img
-										src={item?.receiver_info?.user_avatar}
-										className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
-									/>
+									<Avatar size={50} src={item?.receiver_info?.user_avatar} />
 								</div>
 								<div slot="title">
 									<span>{$t(isRreceiver(item) ? '你' : item?.sender_info?.user_name)}</span>
