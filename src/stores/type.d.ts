@@ -205,7 +205,7 @@ export interface MessageStoreOptions {
 	/** 是否有群公告 */
 	isGroupAnnouncement: boolean
 	/** 是否在插入表情 */
-	// isEmojiFocus: boolean
+	isEmojiFocus: boolean
 }
 
 interface initOptions {

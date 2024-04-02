@@ -18,7 +18,12 @@ const MessageSendButton = () => {
 			})
 		}
 		// 无论成功与否，清空输入框内容，交给输入组件处理
-		messageStore.update({ isClearContent: true, manualTipType: tooltipType.NONE, tipType: tooltipType.NONE })
+		messageStore.update({
+			isClearContent: true,
+			manualTipType: tooltipType.NONE,
+			tipType: tooltipType.NONE,
+			isEmojiFocus: false
+		})
 	}
 
 	return (

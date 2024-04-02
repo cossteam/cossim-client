@@ -32,8 +32,8 @@ const defaultOptions: MessageStoreOptions = {
 	selectedForwardUsers: [],
 	isLoading: false,
 	unreadList: [],
-	isGroupAnnouncement: false
-	// isEmojiFocus: false
+	isGroupAnnouncement: false,
+	isEmojiFocus: false
 }
 
 const useMessageStore = create<MessageStore>((set, get) => ({

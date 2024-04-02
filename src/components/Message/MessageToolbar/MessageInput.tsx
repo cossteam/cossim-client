@@ -4,8 +4,7 @@ import { useEffect, useRef } from 'react'
 import useMessageStore from '@/stores/new_message'
 import Quill from 'quill'
 import MessageBlockquote from './MessageBlockquote'
-import { theme } from 'framework7-react'
-import { Keyboard } from 'capacitor-keyboard'
+// import { Keyboard } from 'capacitor-keyboard'
 
 const MessageInput = () => {
 	const toolEditorRef = useRef<ToolEditorMethods | null>(null)
@@ -28,11 +27,15 @@ const MessageInput = () => {
 
 	// 	const quill = toolEditorRef.current.quill
 	// 	const handlerFocus = () => {
+	// 		// setIndex(quill.getSelection()?.index ?? 0)
+	// 		// setIsFocus(true)
 	// 		// 如果是插入表情触发的聚焦，不做处理
-	// 		if (isEmojiFocus.current) return
+	// 		// if (isEmojiFocus.current) {
+	// 		// 	quill?.blur()
+	// 		// }
 	// 	}
 
-	// const handlerBlur = () => Keyboard?.hide()
+	// 	// const handlerBlur = () => Keyboard?.hide()
 
 	// 	quill.root.addEventListener('focus', handlerFocus)
 	// 	// quill.root.addEventListener('blur', handlerBlur)
@@ -52,9 +55,8 @@ const MessageInput = () => {
 		quill?.focus()
 		quill?.insertText(quill.getSelection()?.index || 0, messageStore.selectedEmojis, Quill.sources.API)
 		quill?.blur()
-		if (theme.ios) Keyboard?.hide()
 		isEmojiFocus.current = false
-		messageStore.update({ selectedEmojis: '' })
+		messageStore.update({ selectedEmojis: '', isEmojiFocus: true })
 	}, [messageStore.selectedEmojis])
 
 	// 清空文本
@@ -71,8 +73,7 @@ const MessageInput = () => {
 	useEffect(() => {
 		if (messageStore.toolbarType !== emojiOrMore.KEYBOARD) return
 		const quill = toolEditorRef.current?.quill
-		if (!quill) return
-		quill.focus()
+		quill?.focus()
 	}, [messageStore.toolbarType])
 
 	return (

@@ -26,12 +26,13 @@ const useKeyboard = () => {
 			isWeb.current = platform.platform !== 'web'
 
 			if (isWeb.current) {
+				// 以编程方式启用或禁用WebView滚动。在 ios 端
+				platform.platform === 'ios' && Keyboard?.setScroll({ isDisabled: true })
+
 				Keyboard?.addListener('keyboardWillShow', (info) => {
 					const messageStore = useMessageStore.getState()
 					cacheStore.updateKeyboardHeight(info.keyboardHeight)
-					// if (!messageStore.selectedEmojis) {
-					messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
-					// }
+					if (!messageStore.isEmojiFocus) messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
 				})
 
 				Keyboard?.addListener('keyboardWillHide', () => {
