@@ -211,6 +211,9 @@ export interface MessageStore {
 	updateDB: (msg: PrivateChats, error_message: string, isUpdate: boolean) => Promise<void>
 }
 
+/**
+ * @deprecated 已废弃使用，请使用 new_messages
+ */
 export const useMessageStore = create<MessageStore>((set, get) => ({
 	messages: [],
 	all_meesages: [],

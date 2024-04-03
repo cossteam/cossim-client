@@ -2,6 +2,14 @@ import { f7 } from 'framework7-react'
 import { Toast } from 'framework7/types'
 import { useRef } from 'react'
 
+/**
+ *
+ * @deprecated 已废弃,请使用下面例子
+ * @example
+ * import { toastMessage } from '@shared'1
+ *
+ * toastMessage('提示')
+ */
 export const useToast = () => {
 	const toastRef = useRef<any>(null)
 
@@ -9,7 +17,7 @@ export const useToast = () => {
 		toastRef.current = f7.toast.create({
 			text,
 			closeTimeout: 1000,
-            position: 'center',
+			position: 'center',
 			...options
 		})
 		toastRef.current!.open()

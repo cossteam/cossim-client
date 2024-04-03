@@ -85,13 +85,8 @@ function App() {
 					liveRoomStore.handlerEvent(event, data)
 					break
 				case SocketEvent.MessageEditEvent:
-					// console.log('消息编辑', data)
 					handlerSocketEdit(data)
-					// handlerEditSocket(data, store!)
 					break
-				// case SocketEvent.MessageRecallEvent:
-				// 	// handlerRecallSocket(data, store!)
-				// 	break
 			}
 		}
 

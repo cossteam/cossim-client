@@ -12,7 +12,12 @@ const MessageContent = () => {
 	}, [container.current])
 
 	return (
-		<div className="flex-1 overflow-y-auto py-4" ref={container} onTouchStart={() => null} onTouchMove={() => null}>
+		<div
+			className="flex-1 overflow-y-auto py-4"
+			ref={container}
+			onTouchStart={() => messageStore.container?.click()}
+			onTouchMove={() => messageStore.container?.click()}
+		>
 			<MessageList />
 		</div>
 	)

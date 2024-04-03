@@ -35,12 +35,10 @@ class Socket {
 			this.socket.addEventListener('open', (event) => {
 				this.triggerEvent('onWsOpen', event)
 				console.log('WebSocket连接已建立')
-				
 			})
 
 			this.socket.addEventListener('message', (event) => {
 				this.triggerEvent('onWsMessage', event)
-				
 			})
 
 			this.socket.addEventListener('close', (event) => {
@@ -99,6 +97,7 @@ class Socket {
 	 * 重连
 	 */
 	reconnect(time = 5000) {
+		console.log(this.reconnectTimes, this.maxReconnectTimes, this.reconnectTimes < this.maxReconnectTimes)
 		if (this.reconnectTimes < this.maxReconnectTimes) {
 			Socket.timer && clearTimeout(Socket.timer)
 			Socket.timer = setTimeout(() => {
@@ -110,14 +109,13 @@ class Socket {
 
 	/**
 	 * 判断连接是否断开
-	 * 
+	 *
 	 * @returns
 	 */
 	isDisconnect() {
 		return this.socket && this.socket.readyState !== WebSocket.OPEN
 	}
 }
-
 
 const socketUrl = import.meta.env.VITE_WS_URL + `?token=${getCookie(TOKEN)}`
 const SocketClient = new Socket(socketUrl)

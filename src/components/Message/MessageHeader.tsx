@@ -51,7 +51,7 @@ const MessageHeader = () => {
 	return (
 		<div className="min-h-12 bg-bgPrimary sticky top-0 z-50">
 			<Navbar
-				title={messageStore?.receiverInfo?.dialog_name}
+				title={messageStore?.receiverInfo?.dialog_name ?? messageStore?.receiverInfo?.name}
 				subtitle="[在线]"
 				backLink
 				outline={false}

@@ -42,11 +42,13 @@ class UserStoreImpl extends Dexie {
 			messages: '++id, dialog_id, msg_id, &uid, pid',
 			group_members: '++id, user_id, identity, group_id',
 			read_destroy: '++id, msg_id, uid, read_time, self_destruct_time'
-
 		})
 	}
 }
 
+/**
+ * @deprecated 已废弃，请使用最新的 Api，在 stores 目录下
+ */
 const UserStore = new ServiceImpl({
 	db: new UserStoreImpl(COMMON_DATA_BASE_NAME + `_${getCookie(USER_ID)}`)
 })

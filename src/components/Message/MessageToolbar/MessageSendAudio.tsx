@@ -36,8 +36,7 @@ const MessageSendAudio = () => {
 			const isPermission = await VoiceRecorder.hasAudioRecordingPermission()
 			setIsPermission(isPermission.value)
 		},
-		() => {
-		},
+		() => {},
 		[]
 	)
 
@@ -59,7 +58,8 @@ const MessageSendAudio = () => {
 
 	useAsyncEffect(
 		async () => {
-			if (!recordingData || !recordingData.value || touch.isCancel) return
+			if (!recordingData || !recordingData.value || touch.isCancel) return // 取消发送
+
 			try {
 				console.log('recordingData', recordingData.value)
 				if (recordingData.value.msDuration < 1000) return
@@ -108,15 +108,14 @@ const MessageSendAudio = () => {
 				toastMessage('发送失败')
 			}
 		},
-		() => {
-		},
+		() => {},
 		[recordingData]
 	)
 
 	useClickOutside(audioRef, () => setIsRecording(false))
 
 	const handlerTouchStart = async () => {
-		startTime = new Date().getTime();
+		startTime = new Date().getTime()
 		try {
 			// 请求权限
 			if (!isPermission) {
@@ -132,11 +131,12 @@ const MessageSendAudio = () => {
 		}
 	}
 	const handlerTouchEnd = () => {
-		endTime = new Date().getTime();
-		console.log(endTime,startTime)
+		endTime = new Date().getTime()
+		console.log(endTime, startTime)
 		if (endTime - startTime < 1000) {
 			toastMessage('说话时间太短了！')
-		}setIsRecording(false)
+		}
+		setIsRecording(false)
 	}
 
 	return (
