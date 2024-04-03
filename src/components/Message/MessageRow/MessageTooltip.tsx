@@ -110,9 +110,8 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) =>
 		} else {
 			messageStore.update({ tipType: data.name })
 		}
-
 		messageStore.update({ selectedMessage: item })
-
+		// 处理
 		tooltipStatMachine(data.name, item)
 	}
 

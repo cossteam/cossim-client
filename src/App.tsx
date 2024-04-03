@@ -12,8 +12,7 @@ import {
 	DEVICE_ID,
 	burnAfterReading,
 	toastMessage,
-	updateServerPublicKey,
-	generateKeyPair
+	uploadPublicKey
 } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 import { AppState, App as CapApp } from '@capacitor/app'
@@ -104,11 +103,7 @@ function App() {
 			cacheStore.init()
 			run()
 			// 如果上一次登录时间为0，就需要上传公钥
-			if (!cacheStore.lastLoginTime) {
-				const cacheKeyPair = generateKeyPair()
-				cacheStore.update({ cacheKeyPair }, true)
-				updateServerPublicKey()
-			}
+			if (cacheStore.lastLoginTime) uploadPublicKey()
 			SocketClient.connect()
 			SocketClient.addListener('onWsMessage', handlerInit)
 		}

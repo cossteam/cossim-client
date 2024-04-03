@@ -39,10 +39,10 @@ export const performKeyExchange = (myPrivateKey: string, theirPublicKey: string)
  * @returns {string} 加密后的消息
  */
 export const encryptMessage = (message: string, nonce: string, sharedKey: string): string => {
-	const reslut = { msg: message, nonce }
+	const reslut = { content: message, nonce }
 	try {
 		const messageUint8Array = new TextEncoder().encode(message)
-		reslut.msg = fromUint8Array(nacl.box.after(messageUint8Array, toUint8Array(nonce), importKey(sharedKey)))
+		reslut.content = fromUint8Array(nacl.box.after(messageUint8Array, toUint8Array(nonce), importKey(sharedKey)))
 	} catch (error: any) {
 		console.error('加密失败', error?.message)
 		return JSON.stringify(reslut)
@@ -71,11 +71,11 @@ export const decryptMessage = (encryptedMessage: string, nonce: string, sharedKe
  */
 export const decryptMessageWithKey = (encryptedMessage: string, sharedKey: string): string => {
 	let msg = encryptedMessage
-	let data: { msg: string; nonce: Uint8Array }
+	let data: { content: string; nonce: Uint8Array }
 	try {
 		data = JSON.parse(encryptedMessage)
-		msg = data.msg
-		return decryptMessage(data.msg, fromUint8Array(data.nonce), sharedKey)
+		msg = data.content
+		return decryptMessage(data.content, fromUint8Array(data.nonce), sharedKey)
 	} catch {
 		return msg
 	}
@@ -139,6 +139,6 @@ export function test() {
 
 	console.log('msg', msg)
 
-	const decryptedMessage = decryptMessage(msg.msg, msg.nonce, sharedSecret2)
+	const decryptedMessage = decryptMessage(msg.content, msg.nonce, sharedSecret2)
 	console.log('解密消息：', decryptedMessage)
 }

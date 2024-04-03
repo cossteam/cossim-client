@@ -12,8 +12,6 @@ export interface UserStoreOptions {
 	token: string
 	/** 设备 id */
 	deviceId: string
-	/** 密钥对 */
-	keyPair: { privateKey: string; publicKey: string }
 }
 
 /**
