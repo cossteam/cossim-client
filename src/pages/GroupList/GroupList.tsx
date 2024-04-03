@@ -1,13 +1,13 @@
 import GroupService from '@/api/group'
 import { $t } from '@/shared'
-import { useMessageStore } from '@/stores/message'
+import useMessageStore from '@/stores/new_message'
 import { useAsyncEffect } from '@reactuses/core'
 import { List, ListGroup, ListItem, NavTitle, Navbar, Page, f7 } from 'framework7-react'
 import { useState } from 'react'
 
 const GroupListList: React.FC<RouterProps> = ({ f7router }) => {
 	// 消息列表
-	const msgStore = useMessageStore()
+	const messageStore = useMessageStore()
 	const [groups, setGroups] = useState({})
 	useAsyncEffect(
 		async () => {
@@ -45,11 +45,15 @@ const GroupListList: React.FC<RouterProps> = ({ f7router }) => {
 									title={group.name}
 									popupClose
 									onClick={async () => {
-										await msgStore.initMessage(
-											group?.group_id ? true : false,
-											group?.dialog_id,
-											group?.user_id ?? group?.group_id
-										)
+										await messageStore.init({
+											dialogId: group?.dialog_id ?? 0,
+											receiverId: group?.user_id ?? group?.group_id ?? 0,
+											isGroup: !!group?.group_id,
+											receiverInfo: group
+											// group?.group_id ? true : false,
+											// group?.dialog_id,
+											// group?.user_id ?? group?.group_id
+										})
 										f7router.navigate(
 											`/message/${group?.group_id}/${group?.dialog_id}/?is_group=${group?.user_id ? 'false' : 'true'}&dialog_name=${group?.name}`
 										)

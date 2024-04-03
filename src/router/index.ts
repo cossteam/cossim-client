@@ -53,8 +53,8 @@ const routes: Router.RouteParameters[] = [
 		path: '/message/:id/:dialog_id/',
 		component: Message,
 		options: {
-			animate: false
-			// transition: 'f7-push'
+			// animate: true,
+			transition: 'f7-push'
 			// transition: 'f7-custom'
 		}
 		// keepAlive: true
