@@ -6,6 +6,10 @@ interface KeyPair {
 	publicKey: Uint8Array
 }
 
+/**
+ * 生成密钥对
+ * @returns KeyPair
+ */
 export const generateKeyPair = (): KeyPair => {
 	const keypair = nacl.box.keyPair()
 	return {
@@ -33,16 +37,15 @@ export const performKeyExchange = (myPrivateKey: Uint8Array, theirPublicKey: Uin
  * @returns {Uint8Array} 加密后的消息
  */
 export const encryptMessage = (message: string, nonce: string, sharedKey: Uint8Array): string => {
-	const result = { msg: message, nonce }
+	const reslut = { msg: message, nonce }
 	try {
-		const encryptedMessage = nacl.box.before(new TextEncoder().encode(message), toUint8Array(nonce), sharedKey)
-
-		console.log('encryptedMessage', encryptedMessage)
+		const messageUint8Array = new TextEncoder().encode(message)
+		reslut.msg = fromUint8Array(nacl.box.after(messageUint8Array, toUint8Array(nonce), sharedKey))
 	} catch (error: any) {
 		console.error('加密失败', error?.message)
-		return JSON.stringify(result)
+		return JSON.stringify(reslut)
 	}
-	return JSON.stringify(result)
+	return JSON.stringify(reslut)
 }
 
 /**
@@ -55,6 +58,8 @@ export const encryptMessage = (message: string, nonce: string, sharedKey: Uint8A
 export const decryptMessage = (encryptedMessage: string, nonce: string, sharedKey: Uint8Array): string => {
 	const messageUint8Array = toUint8Array(encryptedMessage)
 	const decryptedMessage = nacl.box.open.after(messageUint8Array, toUint8Array(nonce), sharedKey)
+	console.log('decryptedMessage', encryptedMessage, toUint8Array(nonce), sharedKey, decryptedMessage)
+
 	return new TextDecoder()?.decode(decryptedMessage as Uint8Array)
 }
 
@@ -117,4 +122,32 @@ export const importKeyPair = (keyPair: string): KeyPair => {
 		privateKey: importKey(privateKey),
 		publicKey: importKey(publicKey)
 	}
+}
+
+/**
+ * @description 测试函数
+ */
+export function test() {
+	// 生成公私钥
+	const aliceKeyPair = generateKeyPair()
+	const bobKeyPair = generateKeyPair()
+
+	// 交换密钥
+	const sharedSecret1 = performKeyExchange(aliceKeyPair.privateKey, bobKeyPair.publicKey)
+	const sharedSecret2 = performKeyExchange(bobKeyPair.privateKey, aliceKeyPair.publicKey)
+
+	const nonce = cretateNonce()
+
+	const message = 'Hello, Bob!'
+
+	const encryptedMessage = encryptMessage(message, nonce, sharedSecret1)
+
+	console.log('加密消息：', encryptedMessage)
+
+	const msg = JSON.parse(encryptedMessage)
+
+	console.log('msg', msg)
+
+	const decryptedMessage = decryptMessage(msg.msg, msg.nonce, sharedSecret2)
+	console.log('解密消息：', decryptedMessage)
 }
