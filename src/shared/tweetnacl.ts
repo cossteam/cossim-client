@@ -32,10 +32,10 @@ export const performKeyExchange = (myPrivateKey: Uint8Array, theirPublicKey: Uin
  * @param {Uint8Array} sharedKey 共享密钥
  * @returns {Uint8Array} 加密后的消息
  */
-export const encryptMessage = (message: string, nonce: string, sharedKey: Uint8Array): string => {
+export const encryptMessage = (message: string, nonce: string): string => {
 	const result = { msg: message, nonce }
 	try {
-		const encryptedMessage = nacl.box.before(new TextEncoder().encode(message), toUint8Array(nonce), sharedKey)
+		const encryptedMessage = nacl.box.before(new TextEncoder().encode(message), toUint8Array(nonce))
 
 		console.log('encryptedMessage', encryptedMessage)
 	} catch (error: any) {

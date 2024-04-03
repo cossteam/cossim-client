@@ -1,4 +1,4 @@
-import { generateKeyPair, performKeyExchange, cretateNonce, encryptMessage, decryptMessage } from '@/shared/tweetnacl'
+import { generateKeyPair, performKeyExchange, cretateNonce, encryptMessage } from '@/shared/tweetnacl'
 import { describe, it, expect } from 'vitest'
 
 describe('tweetnacl', () => {
@@ -17,7 +17,7 @@ describe('tweetnacl', () => {
 		const nonce = cretateNonce()
 		const message = 'Hello, Bob!'
 
-		const encryptedMessage = encryptMessage(message, nonce, sharedSecret1)
+		const encryptedMessage = encryptMessage(message, nonce)
 
 		console.log('encryptedMessage 加密消息', encryptedMessage)
 
