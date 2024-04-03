@@ -7,14 +7,17 @@ import UserService from '@/api/user'
 import './PersonalDetail.scss'
 import Remark from '@/components/Remark/Remark'
 import RelationService from '@/api/relation'
+import useLoading from '@/hooks/useLoading.ts'
 
-const PersonalDetail: React.FC<RouterProps> = ({ f7route }) => {
+const PersonalDetail: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const user_id = f7route.params.user_id as string
 
 	const pageRef = useRef<{ el: HTMLDivElement | null }>({ el: null })
 	const profileAvatarRef = useRef<HTMLDivElement | null>(null)
 
 	const [userInfo, setUserInfo] = useState<any>({})
+
+	const { watchAsyncFn } = useLoading()
 
 	// 页面安装时将页面滚动到头像大小的一半
 	const onPageInit = () => {
@@ -25,8 +28,14 @@ const PersonalDetail: React.FC<RouterProps> = ({ f7route }) => {
 	useAsyncEffect(
 		async () => {
 			try {
-				const { data } = await UserService.getUserInfoApi({ user_id })
-				setUserInfo(data)
+				const { data, code } = await watchAsyncFn(() => UserService.getUserInfoApi({ user_id }))
+				if (code == 200) {
+					setUserInfo(data)
+					// 已经存在好友关系
+					if (data.preferences) {
+						f7router.navigate(`/profile/${user_id}/`, {reloadCurrent: true})
+					}
+				}
 			} catch (error) {
 				console.error('获取用户信息失败', error)
 			}

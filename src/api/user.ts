@@ -105,8 +105,8 @@ class UserServiceImpl {
 
 	/**
 	 * 修改用户信息
-	 * @param {UpdateUserInfData} data 
-	 * @returns 
+	 * @param {UpdateUserInfData} data
+	 * @returns
 	 */
 	updateUserInfoApi(data: UpdateUserInfData): Promise<DataResponse> {
 		return request({
@@ -164,18 +164,18 @@ class UserServiceImpl {
 		})
 	}
 
-	// /**
-	//  * 获取用户的公钥
-	//  * @param {*} params
-	//  * @param {*} params.user_id
-	//  */
-	// getPublicKeyApi(params) {
-	// 	return request({
-	// 		url: `${baseApi}/bundle/get`,
-	// 		method: 'GET',
-	// 		params
-	// 	})
-	// }
+	/**
+	 * 获取用户的公钥
+	 * @param {*} params
+	 * @param {*} params.user_id
+	 */
+	getPublicKeyApi(params: UserInfoParams): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/bundle/get`,
+			method: 'GET',
+			params
+		})
+	}
 
 	// /**
 	//  * 修改自己的公钥

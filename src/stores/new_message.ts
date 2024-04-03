@@ -4,7 +4,7 @@ import cacheStore from '@/utils/cache'
 import { emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
 import useCacheStore from './cache'
 
-const defaultOptions: MessageStoreOptions = {
+export const defaultOptions: MessageStoreOptions = {
 	messages: [],
 	allMessages: [],
 	dialogId: 0,
@@ -71,7 +71,7 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		// 	set({ total })
 		// })
 
-		// console.log('init message store', options)
+		console.log('init message store', options)
 	},
 	update: async (options) => {
 		set((state) => ({ ...state, ...options }))

@@ -2,8 +2,8 @@ import * as nacl from 'tweetnacl'
 import { fromUint8Array, toUint8Array } from 'js-base64'
 
 interface KeyPair {
-	privateKey: Uint8Array
-	publicKey: Uint8Array
+	privateKey: string
+	publicKey: string
 }
 
 /**
@@ -13,8 +13,8 @@ interface KeyPair {
 export const generateKeyPair = (): KeyPair => {
 	const keypair = nacl.box.keyPair()
 	return {
-		privateKey: keypair.secretKey,
-		publicKey: keypair.publicKey
+		privateKey: exportKey(keypair.secretKey),
+		publicKey: exportKey(keypair.publicKey)
 	}
 }
 
@@ -22,25 +22,27 @@ export const generateKeyPair = (): KeyPair => {
  * 执行密钥交换，得到共享的对称密钥
  * @param {Uint8Array} myPrivateKey 自己的私钥
  * @param {Uint8Array} theirPublicKey 对方的公钥
- * @returns {Uint8Array} 共享的对称密钥
+ * @returns {string} 共享的对称密钥
  */
-export const performKeyExchange = (myPrivateKey: Uint8Array, theirPublicKey: Uint8Array): Uint8Array => {
-	const sharedSecret = nacl.box.before(theirPublicKey, myPrivateKey)
-	return sharedSecret
+export const performKeyExchange = (myPrivateKey: string, theirPublicKey: string): string => {
+	const selfPrivateKey = importKey(myPrivateKey)
+	const FirendPublicKey = importKey(theirPublicKey)
+	const sharedSecret = nacl.box.before(FirendPublicKey, selfPrivateKey)
+	return exportKey(sharedSecret)
 }
 
 /**
  * 使用公钥加密消息
  * @param {string} message 待加密的消息
  * @param {string} nonce 随机的一次性数字
- * @param {Uint8Array} sharedKey 共享密钥
- * @returns {Uint8Array} 加密后的消息
+ * @param {string} sharedKey 共享密钥
+ * @returns {string} 加密后的消息
  */
-export const encryptMessage = (message: string, nonce: string, sharedKey: Uint8Array): string => {
+export const encryptMessage = (message: string, nonce: string, sharedKey: string): string => {
 	const reslut = { msg: message, nonce }
 	try {
 		const messageUint8Array = new TextEncoder().encode(message)
-		reslut.msg = fromUint8Array(nacl.box.after(messageUint8Array, toUint8Array(nonce), sharedKey))
+		reslut.msg = fromUint8Array(nacl.box.after(messageUint8Array, toUint8Array(nonce), importKey(sharedKey)))
 	} catch (error: any) {
 		console.error('加密失败', error?.message)
 		return JSON.stringify(reslut)
@@ -52,24 +54,22 @@ export const encryptMessage = (message: string, nonce: string, sharedKey: Uint8A
  * 使用私钥解密消息
  * @param {string} encryptedMessage 加密的消息
  * @param {string} nonce 随机的一次性数字
- * @param {sharedKey} sharedKey 共享密钥
+ * @param {string} sharedKey 共享密钥
  * @returns {string} 解密后的消息
  */
-export const decryptMessage = (encryptedMessage: string, nonce: string, sharedKey: Uint8Array): string => {
+export const decryptMessage = (encryptedMessage: string, nonce: string, sharedKey: string): string => {
 	const messageUint8Array = toUint8Array(encryptedMessage)
-	const decryptedMessage = nacl.box.open.after(messageUint8Array, toUint8Array(nonce), sharedKey)
-	console.log('decryptedMessage', encryptedMessage, toUint8Array(nonce), sharedKey, decryptedMessage)
-
+	const decryptedMessage = nacl.box.open.after(messageUint8Array, toUint8Array(nonce), importKey(sharedKey))
 	return new TextDecoder()?.decode(decryptedMessage as Uint8Array)
 }
 
 /**
  * 解密序列化字符的消息
  * @param {string} encryptedMessage 加密的消息
- * @param {Uint8Array} sharedKey 共享密钥
+ * @param {string} sharedKey 共享密钥
  * @returns {string} 解密后的消息
  */
-export const decryptMessageWithKey = (encryptedMessage: string, sharedKey: Uint8Array): string => {
+export const decryptMessageWithKey = (encryptedMessage: string, sharedKey: string): string => {
 	let msg = encryptedMessage
 	let data: { msg: string; nonce: Uint8Array }
 	try {
@@ -92,6 +92,7 @@ export const exportKey = (key: Uint8Array): string => {
 /**
  * 导入公钥
  * @param {Uint8Array} key 密钥
+ * @returns Uint8Array
  */
 export const importKey = (key: string): Uint8Array => {
 	return toUint8Array(key)
@@ -106,23 +107,13 @@ export const cretateNonce = (): string => {
  * 导出密钥对
  * @param {Object} keyPair
  */
-export const exportKeyPair = (keyPair: KeyPair): string => {
-	const privateKey = exportKey(keyPair.privateKey)
-	const publicKey = exportKey(keyPair.publicKey)
-	return JSON.stringify({ privateKey, publicKey })
-}
+export const exportKeyPair = (keyPair: KeyPair): string => JSON.stringify(keyPair)
 
 /**
  * 导入密钥对
  * @param {string} keyPair
  */
-export const importKeyPair = (keyPair: string): KeyPair => {
-	const { privateKey, publicKey } = JSON.parse(keyPair)
-	return {
-		privateKey: importKey(privateKey),
-		publicKey: importKey(publicKey)
-	}
-}
+export const importKeyPair = (keyPair: string): KeyPair => JSON.parse(keyPair)
 
 /**
  * @description 测试函数

@@ -4,25 +4,32 @@ import RelationService from '@/api/relation.ts'
 import React, { useEffect, useState } from 'react'
 import Avatar from '@/components/Avatar/Avatar.tsx'
 import { $t, toastMessage } from '@/shared'
+import useLoading from '@/hooks/useLoading.ts'
 
 const AddGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const groupId = f7route.query.group_id as string
 	const [groupInfo, setGroupInfo] = useState<any>()
+	const { watchAsyncFn } = useLoading()
 	useEffect(() => {
-		GroupService.groupInfoApi({
-			group_id: Number(groupId)
-		}).then((res) => {
-			console.log('群信息', res)
-			if (res.code == 200) {
-				setGroupInfo(res.data)
-				// 已经在群聊
-				if (res.data.preferences) {
-					f7router.navigate(`/group_info/${groupId}/`)
+		watchAsyncFn(() =>
+			GroupService.groupInfoApi({
+				group_id: Number(groupId)
+			}).then((res) => {
+				console.log('群信息', res)
+				if (res.code == 200) {
+					setGroupInfo(res.data)
+					// 已经在群聊
+					if (res.data.preferences) {
+						console.log()
+						f7router.navigate(`/group_info/${groupId}/`, {reloadCurrent: true})
+					}
+				} else {
+					toastMessage($t('二维码无效'))
 				}
-			} else {
-				toastMessage($t('二维码无效'))
-			}
-		})
+			}).catch((err) => {
+				console.log('获取群聊失败', err)
+			})
+		)
 	}, [])
 
 	const addGroup = () => {
@@ -40,7 +47,7 @@ const AddGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}
 
 	return (
-		<Page>
+		<Page noToolbar>
 			<Navbar backLink />
 			{groupInfo ? (
 				<div className="flex w-full h-full flex-col items-center">

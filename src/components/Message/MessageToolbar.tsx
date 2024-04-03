@@ -30,7 +30,8 @@ const MessageToolbar = () => {
 	return (
 		<>
 			<div
-				className="min-h-14 bg-bgPrimary relative z-50 w-full bottom-0 flex flex-col justify-center transition-all duration-100"
+				style={{ paddingBottom: 'env( safe-area-inset-bottom)' } }
+				className="min-h-14 bg-bgPrimary relative z-50 w-full bottom-0 flex flex-col justify-center transition-all duration-100 select-none"
 				ref={toolbarRef}
 			>
 				<div className={clsx('w-full flex items-end gap-1 pl-[6px] py-2', isSelect && 'hidden')}>

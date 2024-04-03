@@ -1,4 +1,4 @@
-import { ReadEditor } from '@/Editor'
+import ReadEditor from '@/components/ReadEditor/ReadEditor'
 import Avatar from '@/components/Avatar/Avatar'
 import { $t, MESSAGE_TYPE } from '@/shared'
 import useCacheStore from '@/stores/cache'

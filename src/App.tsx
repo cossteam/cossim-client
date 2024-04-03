@@ -4,7 +4,17 @@ import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
 import Layout from './components/Layout'
-import { $t, TOKEN, SocketClient, SocketEvent, DEVICE_ID, burnAfterReading, toastMessage } from '@/shared'
+import {
+	$t,
+	TOKEN,
+	SocketClient,
+	SocketEvent,
+	DEVICE_ID,
+	burnAfterReading,
+	toastMessage,
+	updateServerPublicKey,
+	generateKeyPair
+} from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
@@ -17,7 +27,6 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
 import run, { handlerSocketEdit, handlerSocketMessage, handlerSocketRequest } from './run'
 import { isWeb } from './utils'
-import { Toaster } from 'react-hot-toast'
 
 function App() {
 	const router = useRef<Router.Router | null>(null)
@@ -85,13 +94,8 @@ function App() {
 					liveRoomStore.handlerEvent(event, data)
 					break
 				case SocketEvent.MessageEditEvent:
-					// console.log('消息编辑', data)
 					handlerSocketEdit(data)
-					// handlerEditSocket(data, store!)
 					break
-				// case SocketEvent.MessageRecallEvent:
-				// 	// handlerRecallSocket(data, store!)
-				// 	break
 			}
 		}
 
@@ -99,6 +103,12 @@ function App() {
 		if (hasCookie(TOKEN)) {
 			cacheStore.init()
 			run()
+			// 如果上一次登录时间为0，就需要上传公钥
+			if (!cacheStore.lastLoginTime) {
+				const cacheKeyPair = generateKeyPair()
+				cacheStore.update({ cacheKeyPair }, true)
+				updateServerPublicKey()
+			}
 			SocketClient.connect()
 			SocketClient.addListener('onWsMessage', handlerInit)
 		}
@@ -195,9 +205,11 @@ function App() {
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />
 			)}
-			<Toaster />
 		</AppComponent>
 	)
 }
 
 export default App
+
+// 94efa55b-ac78-4a85-905c-62c12100c05d
+// 94efa55b-ac78-4a85-905c-62c12100c05d
