@@ -15,9 +15,10 @@ import {
 	decrypt,
 	isLastMessage,
 	msgType,
+	savePublicKey,
 	updateDialog
 } from './shared'
-import useMessageStore from './stores/new_message'
+import useMessageStore from './stores/message'
 import { generateMessage } from './utils/data'
 import cacheStore from './utils/cache'
 import GroupService from './api/group'
@@ -38,11 +39,7 @@ async function updateCacheMessage(dialogs: any[]) {
 		const tableName = `${item.dialog_id}`
 		const tableData = (await cacheStore.get(tableName)) ?? []
 		if (!tableData.length) {
-			// 解密
-			const content = item?.user_id
-				? decrypt(item?.last_message.content, item?.user_id)
-				: item?.last_message.content
-			cacheStore.set(tableName, [{ ...item?.last_message, content, dialog_id: item?.dialog_id }])
+			cacheStore.set(tableName, [{ ...item?.last_message, dialog_id: item?.dialog_id }])
 		}
 	}
 }
@@ -57,10 +54,22 @@ export async function getRemoteSession() {
 
 		const cacheStore = useCacheStore.getState()
 
-		const dialogs = data.map((item: any) => ({
-			...item,
-			shareKey: cacheStore.cacheShareKeys.find((v: any) => v?.id === item?.receiver)?.shareKey ?? null
-		}))
+		const dialogs = []
+
+		for (let i = 0; i < data.length; i++) {
+			const item = data[i]
+			let content = ''
+			try {
+				// 解密消息
+				content = item?.user_id
+					? await decrypt(item?.user_id, item?.last_message?.content)
+					: item?.last_message?.content
+			} catch (error) {
+				content = item?.last_message?.content
+			}
+
+			dialogs.push({ ...item, last_message: { ...item.last_message, content } })
+		}
 
 		// 未读消息数
 		const unreadCount = dialogs.reduce((prev: number, curr: any) => prev + curr?.dialog_unread_count, 0)
@@ -231,8 +240,9 @@ export async function handlerSocketMessage(data: any) {
 		is_read: !isDrivered ? MESSAGE_READ.NOT_READ : MESSAGE_READ.READ
 	})
 
-	// TODO: 解密消息，需要测试
-	msg.content = msg.decrypt(message.content, message.sender_id)
+	msg.content = await decrypt(message?.sender_id, message.content)
+
+	// console.log('msg', msg)
 
 	// 如果是当前会话，需要实时更新到页面
 	if (message?.dialog_id === messageStore.dialogId) {
@@ -289,8 +299,8 @@ export async function handlerSocketMessage(data: any) {
 	// console.log('count', count)
 
 	// 更新本地会话
-	console.log('更新本地会话', message)
-	await updateDialog(message, message.dialog_id)
+	// console.log('更新本地会话', message)
+	await updateDialog(msg, msg.dialog_id)
 }
 
 /**
@@ -328,12 +338,26 @@ export async function handlerSocketEdit(data: any) {
  * @param data
  */
 export function handlerSocketRequest(data: any) {
-	console.log('处理好友请求', data)
+	if (data?.data?.user_id) {
+		savePublicKey(data?.data?.user_id, data?.data?.e2e_public_key)
+	}
 	const cacheStore = useCacheStore.getState()
 	cacheStore.updateCacheApplyCount(cacheStore.applyCount + 1)
 }
 
-// 计算两个时间戳之间的差值（以秒为单位）
+/**
+ * 处理好友同意或者拒绝
+ */
+export function handlerSocketResult(data: any) {
+	console.log('好友同意或拒绝', data)
+}
+
+/**
+ * 计算两个时间戳之间的差值（以秒为单位）
+ * @param timestamp1
+ * @param timestamp2
+ * @returns
+ */
 function diffInSeconds(timestamp1: number, timestamp2: number) {
 	const diffInMilliseconds = Math.abs(timestamp1 - timestamp2)
 	return Math.floor(diffInMilliseconds / 1000)
@@ -398,7 +422,6 @@ export const handlerDestroyMessage = _.debounce(() => {
  */
 function run() {
 	const cacheStore = useCacheStore.getState()
-	// const userStore = useUserStore.getState()
 
 	// 订阅 firstOpened 状态
 	useCacheStore.subscribe(async ({ firstOpened }) => {

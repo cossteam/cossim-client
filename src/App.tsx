@@ -10,7 +10,7 @@ import {
 	SocketClient,
 	SocketEvent,
 	DEVICE_ID,
-	burnAfterReading,
+	// burnAfterReading,
 	toastMessage,
 	uploadPublicKey
 } from '@/shared'
@@ -24,14 +24,16 @@ import LiveRoomNew from '@/components/LiveRoom'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
-import run, { handlerSocketEdit, handlerSocketMessage, handlerSocketRequest } from './run'
+import run, { handlerSocketEdit, handlerSocketMessage, handlerSocketRequest, handlerSocketResult } from './run'
 import { isWeb } from './utils'
+import useUserStore from '@/stores/user'
 
 function App() {
 	const router = useRef<Router.Router | null>(null)
 
 	const liveRoomStore = useLiveRoomStore()
 	const cacheStore = useCacheStore()
+	const userStore = useUserStore()
 
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
@@ -66,6 +68,7 @@ function App() {
 		const handlerInit = async (e: any) => {
 			const data = JSON.parse(e.data)
 			const event = data.event
+
 			console.log('接收到所有 sokect 通知：', data)
 			switch (event) {
 				case SocketEvent.OnlineEvent:
@@ -81,7 +84,8 @@ function App() {
 					handlerSocketRequest(data)
 					break
 				case SocketEvent.ApplyAcceptEvent:
-					// handlerRequestResultSocket(data)
+					handlerSocketResult(data)
+
 					break
 				// 通话事件
 				case SocketEvent.UserCallReqEvent:
@@ -103,7 +107,10 @@ function App() {
 			cacheStore.init()
 			run()
 			// 如果上一次登录时间为0，就需要上传公钥
-			if (cacheStore.lastLoginTime) uploadPublicKey()
+			if (!userStore.lastLoginTime) {
+				uploadPublicKey()
+				userStore.update({ lastLoginTime: Date.now() })
+			}
 			SocketClient.connect()
 			SocketClient.addListener('onWsMessage', handlerInit)
 		}
@@ -147,7 +154,7 @@ function App() {
 
 			const appChange = async (state: AppState) => {
 				if (state.isActive) {
-					burnAfterReading()
+					// burnAfterReading()
 					if (hasCookie(TOKEN) && SocketClient.isDisconnect()) {
 						SocketClient.connect()
 					}
@@ -205,6 +212,3 @@ function App() {
 }
 
 export default App
-
-// 94efa55b-ac78-4a85-905c-62c12100c05d
-// 94efa55b-ac78-4a85-905c-62c12100c05d

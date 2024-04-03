@@ -1,6 +1,6 @@
 import useCacheStore from '@/stores/cache'
 import UserService from '@/api/user'
-import { cretateNonce, decryptMessageWithKey, encryptMessage, generateKeyPair } from '.'
+import { cretateNonce, decryptMessageWithKey, encryptMessage, generateKeyPair, performKeyExchange } from '.'
 
 /**
  * 根据用户 id 获取其共享密钥和共钥
@@ -9,13 +9,16 @@ import { cretateNonce, decryptMessageWithKey, encryptMessage, generateKeyPair } 
  */
 export async function getCacheShareKey(userId: string) {
 	const cacheStore = useCacheStore.getState()
-	const user = cacheStore.cacheContacts.find((v) => v?.user_id === userId)
-	if (!user) return null
 
 	let shareKey: any = cacheStore.cacheShareKeys.find((v) => v.user_id === userId)?.shareKey
 
+	console.log('加密', shareKey)
+
 	if (!shareKey) {
-		shareKey = await getServerPublicKey(userId)
+		const publicKey = await getServerPublicKey(userId)
+		shareKey = performKeyExchange(cacheStore.cacheKeyPair?.privateKey ?? '', publicKey)
+
+		console.log('预共享密钥', shareKey)
 
 		// 更新本地数据库
 		const cacheShareKeys = !cacheStore.cacheShareKeys.length
@@ -80,9 +83,38 @@ export async function encrypt(userId: string, content: string) {
 export async function decrypt(userId: string, content: string) {
 	try {
 		const shareKey = await getCacheShareKey(userId)
-		const message = JSON.parse(decryptMessageWithKey(content, shareKey))
-		return message.content
+		const message = decryptMessageWithKey(content, shareKey)
+		return message
 	} catch {
 		return content
 	}
+}
+
+/**
+ * 添加好友共钥到本地
+ * @param {string} userId 用户 id
+ * @param {string} publicKey 用户公钥
+ */
+export function savePublicKey(userId: string, publicKey: string) {
+	const cacheStore = useCacheStore.getState()
+	const user = cacheStore.cacheShareKeys.find((v) => v?.user_id === userId)
+	if (!cacheStore.cacheKeyPair) return
+
+	const shareKey = performKeyExchange(cacheStore.cacheKeyPair?.privateKey, publicKey)
+
+	// 如果不存在则添加
+	if (!user) {
+		cacheStore.update({ cacheShareKeys: [...cacheStore.cacheShareKeys, { user_id: userId, shareKey }] }, true)
+		return
+	}
+
+	// 如果存在则更新
+	cacheStore.update(
+		{
+			cacheShareKeys: cacheStore.cacheShareKeys.map((item) =>
+				item?.user_id === userId ? { ...item, shareKey } : item
+			)
+		},
+		true
+	)
 }

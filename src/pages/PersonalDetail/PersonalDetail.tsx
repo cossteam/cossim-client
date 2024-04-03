@@ -8,6 +8,7 @@ import './PersonalDetail.scss'
 import Remark from '@/components/Remark/Remark'
 import RelationService from '@/api/relation'
 import useLoading from '@/hooks/useLoading.ts'
+import useCacheStore from '@/stores/cache'
 
 const PersonalDetail: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const user_id = f7route.params.user_id as string
@@ -18,6 +19,8 @@ const PersonalDetail: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const [userInfo, setUserInfo] = useState<any>({})
 
 	const { watchAsyncFn } = useLoading()
+
+	const cacheStore = useCacheStore()
 
 	// 页面安装时将页面滚动到头像大小的一半
 	const onPageInit = () => {
@@ -33,7 +36,7 @@ const PersonalDetail: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					setUserInfo(data)
 					// 已经存在好友关系
 					if (data.preferences) {
-						f7router.navigate(`/profile/${user_id}/`, {reloadCurrent: true})
+						f7router.navigate(`/profile/${user_id}/`, { reloadCurrent: true })
 					}
 				}
 			} catch (error) {
@@ -48,18 +51,20 @@ const PersonalDetail: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const addFriend = async (remark: string) => {
 		try {
 			f7.dialog.preloader($t('添加中...'))
+			console.log('cacheStore.cacheKeyPair?.publicKey ', cacheStore)
+
 			const { code } = await RelationService.addFriendApi({
 				user_id,
 				remark,
-				e2e_public_key: ''
+				e2e_public_key: cacheStore.cacheKeyPair?.publicKey ?? ''
 			})
 
 			if (code !== 200) {
-				toastMessage($t('添加失败'))
+				toastMessage('添加失败')
 				return
 			}
 
-			toastMessage($t('添加成功,等待对方同意'))
+			toastMessage('添加成功,等待对方同意')
 		} catch (error) {
 			console.error(error)
 		} finally {

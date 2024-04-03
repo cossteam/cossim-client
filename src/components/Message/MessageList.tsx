@@ -1,4 +1,4 @@
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import MessageRow from './MessageRow'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { emojiOrMore } from '@/shared'

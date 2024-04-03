@@ -1,4 +1,4 @@
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import MessageInput from './MessageToolbar/MessageInput'
 import MessageSendButton from './MessageToolbar/MessageSendButton'
 import MessageSendAudio from './MessageToolbar/MessageSendAudio'
@@ -30,7 +30,9 @@ const MessageToolbar = () => {
 	return (
 		<>
 			<div
-				style={{ paddingBottom: 'env( safe-area-inset-bottom)' } }
+				style={{
+					paddingBottom: messageStore.toolbarType === emojiOrMore.NONE ? 'env( safe-area-inset-bottom)' : 0
+				}}
 				className="min-h-14 bg-bgPrimary relative z-50 w-full bottom-0 flex flex-col justify-center transition-all duration-100 select-none"
 				ref={toolbarRef}
 			>

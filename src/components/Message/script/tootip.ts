@@ -4,7 +4,7 @@
  * @date 2024/03/21 16:43:00
  */
 import { MESSAGE_MARK, confirmMessage, tooltipType } from '@/shared'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import { toastMessage } from '@/shared'
 import { Clipboard } from '@capacitor/clipboard'
 import { extractTextFromHTML } from './shared'

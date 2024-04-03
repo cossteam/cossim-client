@@ -1,5 +1,5 @@
 import { tooltipType } from '@/shared'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import clsx from 'clsx'
 import { Icon } from 'framework7-react'
 import { useMemo } from 'react'

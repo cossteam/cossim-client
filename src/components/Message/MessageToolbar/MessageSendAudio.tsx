@@ -10,7 +10,7 @@ import useTouch from '@/hooks/useTouch'
 import Timer from '@/components/LiveRoom/Timer'
 import StorageService from '@/api/storage'
 import { Base64 } from 'js-base64'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import { generateMessage } from '@/utils/data'
 import { sendMessage } from '../script/message'
 

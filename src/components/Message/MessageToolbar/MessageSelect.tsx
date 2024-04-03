@@ -1,6 +1,6 @@
 import { Link } from 'framework7-react'
 import { del } from '../script/tootip'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import { tooltipType } from '@/shared'
 
 const MessageSelect = () => {

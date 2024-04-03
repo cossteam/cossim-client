@@ -1,5 +1,5 @@
 import { useLiveRoomStore } from '@/stores/liveRoom'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import { useAsyncEffect, useFileDialog } from '@reactuses/core'
 import clsx from 'clsx'
 import { Icon } from 'framework7-react'

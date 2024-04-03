@@ -5,7 +5,7 @@ import './ToolEditor.scss'
 import GroupService from '@/api/group'
 import 'quill-mention-react'
 import Quill from 'quill'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 
 interface ToolEditorProps {
 	className?: string

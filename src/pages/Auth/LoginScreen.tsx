@@ -18,8 +18,8 @@ interface LoginScreenProps {
 
 const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7route, defaultData }) => {
 	const [fromData, setFromData] = useState<LoginData>({
-		email: '',
-		password: ''
+		email: '2@qq.com',
+		password: '123456qq'
 	})
 
 	const switchAccount = f7route.query?.switch_account
@@ -90,17 +90,16 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 			setCookie(ACCOUNT, data?.user_info?.email)
 			setCookie(TOKEN, data?.token)
 
+			location.reload()
 			userStore.update({
 				userId: data?.user_info?.user_id,
 				token: data?.token,
 				userInfo: data?.user_info,
-				deviceId
+				deviceId,
+				lastLoginTime: data?.user_info?.last_login_time ?? 1
 			})
-
-			location.reload()
 		} catch (error) {
 			console.error('登录失败', error)
-
 			f7.dialog.alert($t('登录失败,请稍后重试'))
 		} finally {
 			setLoading(false)

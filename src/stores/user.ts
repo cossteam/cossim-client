@@ -6,7 +6,8 @@ export const defaultOptions: UserStoreOptions = {
 	userId: '',
 	userInfo: null,
 	token: '',
-	deviceId: ''
+	deviceId: '',
+	lastLoginTime: 1
 }
 
 const userStore = (set: any): UserStore => ({

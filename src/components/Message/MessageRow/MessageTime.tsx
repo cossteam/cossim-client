@@ -1,5 +1,5 @@
 import { MESSAGE_SEND, formatTime, formatTimeFull } from '@/shared'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import clsx from 'clsx'
 import { Exclamationmark, Flag, Gobackward } from 'framework7-icons/react'
 import { useEffect, useState } from 'react'

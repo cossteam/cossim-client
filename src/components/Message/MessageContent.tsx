@@ -1,4 +1,4 @@
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import MessageList from './MessageList'
 import { useEffect, useRef } from 'react'
 

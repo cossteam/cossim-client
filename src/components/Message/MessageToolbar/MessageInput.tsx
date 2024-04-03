@@ -1,7 +1,7 @@
 import ToolEditor, { ToolEditorMethods } from '@/components/ToolEditor/ToolEditor'
 import { $t, emojiOrMore, msgSendType } from '@/shared'
 import { useEffect, useRef } from 'react'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import Quill from 'quill'
 import MessageBlockquote from './MessageBlockquote'
 

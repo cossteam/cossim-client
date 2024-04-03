@@ -12,6 +12,8 @@ export interface UserStoreOptions {
 	token: string
 	/** 设备 id */
 	deviceId: string
+	/** 上一次登录时间 */
+	lastLoginTime: number
 }
 
 /**

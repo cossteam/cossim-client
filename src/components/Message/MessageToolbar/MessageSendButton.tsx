@@ -1,7 +1,7 @@
 import { ArrowRightCircleFill } from 'framework7-icons/react'
 import { Link } from 'framework7-react'
 import { editMessage, sendMessage } from '../script/message'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import { msgType, tooltipType } from '@/shared'
 
 const MessageSendButton = () => {

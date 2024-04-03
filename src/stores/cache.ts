@@ -47,6 +47,8 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const keyboardHeight = (await cacheStore.get(CACHE_KEYBOARD_HEIGHT)) ?? 300
 		const cacheKeyPair = (await cacheStore.get(CACHE_KEY_PAIR)) ?? null
 
+		console.log('cacheKeyPair', cacheKeyPair)
+
 		set({
 			cacheDialogs,
 			cacheContacts: groupsToArray(cacheContacts),

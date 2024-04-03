@@ -11,7 +11,7 @@ import {
 	Trash
 } from 'framework7-icons/react'
 import { Link } from 'framework7-react'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import React, { useMemo } from 'react'
 import tooltipStatMachine from '../script/tootip'
 import useUserStore from '@/stores/user'

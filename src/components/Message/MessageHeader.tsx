@@ -1,5 +1,5 @@
 import { Link, Navbar, NavRight, Subnavbar } from 'framework7-react'
-import useMessageStore, { defaultOptions } from '@/stores/new_message'
+import useMessageStore, { defaultOptions } from '@/stores/message'
 import { $t, getLatestGroupAnnouncement, tooltipType } from '@/shared'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BellFill, ChevronRight, Ellipsis } from 'framework7-icons/react'

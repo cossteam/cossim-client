@@ -1,4 +1,4 @@
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import { extractTextFromHTML } from '../script/shared'
 import { useMemo } from 'react'
 import { $t, tooltipType } from '@/shared'

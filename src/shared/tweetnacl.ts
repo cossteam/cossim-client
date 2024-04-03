@@ -44,7 +44,8 @@ export const encryptMessage = (message: string, nonce: string, sharedKey: string
 		const messageUint8Array = new TextEncoder().encode(message)
 		reslut.content = fromUint8Array(nacl.box.after(messageUint8Array, toUint8Array(nonce), importKey(sharedKey)))
 	} catch (error: any) {
-		console.error('加密失败', error?.message)
+		console.error('加密失败：', error?.message)
+
 		return JSON.stringify(reslut)
 	}
 	return JSON.stringify(reslut)
@@ -60,6 +61,7 @@ export const encryptMessage = (message: string, nonce: string, sharedKey: string
 export const decryptMessage = (encryptedMessage: string, nonce: string, sharedKey: string): string => {
 	const messageUint8Array = toUint8Array(encryptedMessage)
 	const decryptedMessage = nacl.box.open.after(messageUint8Array, toUint8Array(nonce), importKey(sharedKey))
+	if (!decryptedMessage) return encryptedMessage
 	return new TextDecoder()?.decode(decryptedMessage as Uint8Array)
 }
 
@@ -71,11 +73,11 @@ export const decryptMessage = (encryptedMessage: string, nonce: string, sharedKe
  */
 export const decryptMessageWithKey = (encryptedMessage: string, sharedKey: string): string => {
 	let msg = encryptedMessage
-	let data: { content: string; nonce: Uint8Array }
+	let data: { content: string; nonce: string }
 	try {
 		data = JSON.parse(encryptedMessage)
 		msg = data.content
-		return decryptMessage(data.content, fromUint8Array(data.nonce), sharedKey)
+		return decryptMessage(data.content, data.nonce, sharedKey)
 	} catch {
 		return msg
 	}

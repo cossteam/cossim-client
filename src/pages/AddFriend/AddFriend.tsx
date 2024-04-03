@@ -4,10 +4,12 @@ import { useState } from 'react'
 import { $t } from '@/shared'
 import './AddFriend.scss'
 import UserService from '@/api/user'
-import UserStore from '@/db/user'
+import useCacheStore from '@/stores/cache'
 
 const AddFriend: React.FC<RouterProps> = ({ f7router }) => {
 	const [keyWord, setKeyword] = useState<string>('')
+
+	const cacheStore = useCacheStore()
 
 	const search = async () => {
 		// if (!validEmail(keyWord)) return f7.dialog.alert($t('请输入正确的邮箱地址'))
@@ -15,7 +17,8 @@ const AddFriend: React.FC<RouterProps> = ({ f7router }) => {
 			f7.dialog.preloader($t('搜索中...'))
 
 			// 先查找本地好友列表，查看是否是自己好友
-			const user = await UserStore.findOneById(UserStore.tables.friends, 'email', keyWord)
+			const user = cacheStore.cacheContacts.find((v) => v?.email === keyWord)
+
 			if (user) {
 				f7router.navigate(`/profile/${user.user_id}/`)
 				return

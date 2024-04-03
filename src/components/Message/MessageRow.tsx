@@ -1,7 +1,7 @@
 import { MESSAGE_READ, isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import { useCallback, useMemo, useRef, useState } from 'react'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import ReadEditor from '@/components/ReadEditor/ReadEditor'
 import MessageImage from './MessageRow/MessageImage'
 import MessageAudio from './MessageRow/MessageAudio'

@@ -6,7 +6,7 @@
 import MsgService from '@/api/msg'
 import { MESSAGE_SEND, MessageBurnAfterRead, encrypt, msgType, toastMessage, tooltipType, updateDialog } from '@/shared'
 import useCacheStore from '@/stores/cache'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import { generateMessage } from '@/utils/data'
 
 /**

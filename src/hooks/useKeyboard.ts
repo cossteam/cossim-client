@@ -3,7 +3,7 @@ import { Keyboard } from 'capacitor-keyboard'
 import { Device } from '@capacitor/device'
 import { useRef } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import { emojiOrMore } from '@/shared'
 
 /**

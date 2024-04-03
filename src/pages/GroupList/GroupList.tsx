@@ -1,6 +1,6 @@
 import GroupService from '@/api/group'
 import { $t } from '@/shared'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import { useAsyncEffect } from '@reactuses/core'
 import { List, ListGroup, ListItem, NavTitle, Navbar, Page, f7 } from 'framework7-react'
 import { useState } from 'react'

@@ -5,7 +5,7 @@ import UserService from '@/api/user'
 import RelationService from '@/api/relation'
 import { useLiveRoomStore } from '@/stores/liveRoom'
 import Avatar from '@/components/Avatar/Avatar.tsx'
-import useMessageStore from '@/stores/new_message'
+import useMessageStore from '@/stores/message'
 import useCacheStore from '@/stores/cache'
 import useLoading from '@/hooks/useLoading'
 
