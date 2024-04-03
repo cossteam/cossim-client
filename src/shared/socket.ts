@@ -97,7 +97,6 @@ class Socket {
 	 * 重连
 	 */
 	reconnect(time = 5000) {
-		console.log(this.reconnectTimes, this.maxReconnectTimes, this.reconnectTimes < this.maxReconnectTimes)
 		if (this.reconnectTimes < this.maxReconnectTimes) {
 			Socket.timer && clearTimeout(Socket.timer)
 			Socket.timer = setTimeout(() => {

@@ -16,7 +16,7 @@ import { useEffect } from 'react'
 
 // const user_id = getCookie(USER_ID) || ''
 
-const ContactList: React.FC<RouterProps> = ({f7router}) => {
+const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 	const cacheStore = useCacheStore()
 
 	const { contactRouter, setContactRouter } = useRouterStore()
