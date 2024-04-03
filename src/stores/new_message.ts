@@ -4,7 +4,7 @@ import cacheStore from '@/utils/cache'
 import { emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
 import useCacheStore from './cache'
 
-const defaultOptions: MessageStoreOptions = {
+export const defaultOptions: MessageStoreOptions = {
 	messages: [],
 	allMessages: [],
 	dialogId: 0,

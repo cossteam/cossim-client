@@ -1,10 +1,9 @@
-import ToolEditor, { ToolEditorMethods } from '@/Editor'
+import ToolEditor, { ToolEditorMethods } from '@/components/ToolEditor/ToolEditor'
 import { $t, emojiOrMore, msgSendType } from '@/shared'
 import { useEffect, useRef } from 'react'
 import useMessageStore from '@/stores/new_message'
 import Quill from 'quill'
 import MessageBlockquote from './MessageBlockquote'
-// import { Keyboard } from 'capacitor-keyboard'
 
 const MessageInput = () => {
 	const toolEditorRef = useRef<ToolEditorMethods | null>(null)
@@ -60,7 +59,7 @@ const MessageInput = () => {
 	return (
 		<div className="flex-1 max-w-[calc(100%-108px)]">
 			<div
-				className="flex py-2 flex-col justify-center bg-bgTertiary min-h-10 rounded max-h-[150px] overflow-y-auto overflow-x-hidden"
+				className="flex py-2 flex-col justify-center bg-bgTertiary min-h-10 rounded max-h-[150px] overflow-y-auto"
 				ref={inputRef}
 			>
 				<MessageBlockquote />
@@ -70,6 +69,7 @@ const MessageInput = () => {
 					ref={toolEditorRef}
 					defaultValue={messageStore.draft}
 					onChange={handlerChange}
+					is_group={messageStore.isGroup}
 				/>
 			</div>
 		</div>
