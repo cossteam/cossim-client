@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { f7, Page, Navbar, List, ListItem, Button, Block, Popup } from 'framework7-react'
-import { useClipboard } from '@reactuses/core'
+// import { useClipboard } from '@reactuses/core'
 
-import { $t, exportKeyPair, toastMessage } from '@/shared'
+import { $t, toastMessage } from '@/shared'
 import UserService from '@/api/user'
 import { removeAllCookie } from '@/utils/cookie'
-import useUserStore from '@/stores/user'
+import useUserStore, { defaultOptions } from '@/stores/user'
 import '../MyInfo.scss'
 import { Qrcode } from 'framework7-icons/react'
 import Cropper from '@/components/Cropper/Cropper'
@@ -27,6 +27,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 			} catch (error) {
 				toastMessage($t('退出登录失败'))
 			} finally {
+				userStore.update(defaultOptions)
 				removeAllCookie()
 				f7router.navigate('/auth/')
 				f7.dialog.close()
@@ -34,16 +35,17 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 		})
 	}
 
-	const [, copy] = useClipboard()
+	// const [, copy] = useClipboard()
 	const exportPreKey = async () => {
 		try {
-			const keyPair: any = userStore.keyPair
-			if (keyPair) {
-				const text = exportKeyPair(keyPair)
-				copy(text)
-				return toastMessage($t('已经成功导出到剪切板'))
-			}
-			toastMessage($t('导出身份信息失败'))
+			toastMessage($t('暂时不支持导出密钥'))
+			// const keyPair: any = userStore.keyPair
+			// if (keyPair) {
+			// 	const text = exportKeyPair(keyPair)
+			// 	copy(text)
+			// 	return toastMessage($t('已经成功导出到剪切板'))
+			// }
+			// toastMessage($t('导出身份信息失败'))
 		} catch (error) {
 			toastMessage($t('导出身份信息失败'))
 		}

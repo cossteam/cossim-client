@@ -6,7 +6,17 @@
 import useCacheStore from '@/stores/cache'
 import MsgService from '@/api/msg'
 import useUserStore from './stores/user'
-import { CACHE_MESSAGE, MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, isLastMessage, msgType, updateDialog } from './shared'
+import {
+	CACHE_MESSAGE,
+	MESSAGE_MARK,
+	MESSAGE_READ,
+	MESSAGE_SEND,
+	TOKEN,
+	decrypt,
+	isLastMessage,
+	msgType,
+	updateDialog
+} from './shared'
 import useMessageStore from './stores/new_message'
 import { generateMessage } from './utils/data'
 import cacheStore from './utils/cache'
@@ -15,6 +25,7 @@ import RelationService from './api/relation'
 import _ from 'lodash-es'
 import DOMPurify from 'dompurify'
 import localNotification, { LocalNotificationType } from './utils/notification'
+import { hasCookie } from './utils/cookie'
 
 /**
  * 更新本地缓存消息，如果一开始没有消息，就添加会话中的最后一条消息
@@ -27,7 +38,11 @@ async function updateCacheMessage(dialogs: any[]) {
 		const tableName = `${item.dialog_id}`
 		const tableData = (await cacheStore.get(tableName)) ?? []
 		if (!tableData.length) {
-			cacheStore.set(tableName, [{ ...item?.last_message, dialog_id: item?.dialog_id }])
+			// 解密
+			const content = item?.user_id
+				? decrypt(item?.last_message.content, item?.user_id)
+				: item?.last_message.content
+			cacheStore.set(tableName, [{ ...item?.last_message, content, dialog_id: item?.dialog_id }])
 		}
 	}
 }
@@ -216,6 +231,9 @@ export async function handlerSocketMessage(data: any) {
 		is_read: !isDrivered ? MESSAGE_READ.NOT_READ : MESSAGE_READ.READ
 	})
 
+	// TODO: 解密消息，需要测试
+	msg.content = msg.decrypt(message.content, message.sender_id)
+
 	// 如果是当前会话，需要实时更新到页面
 	if (message?.dialog_id === messageStore.dialogId) {
 		await messageStore.createMessage(msg)
@@ -380,10 +398,11 @@ export const handlerDestroyMessage = _.debounce(() => {
  */
 function run() {
 	const cacheStore = useCacheStore.getState()
+	// const userStore = useUserStore.getState()
 
 	// 订阅 firstOpened 状态
 	useCacheStore.subscribe(async ({ firstOpened }) => {
-		if (firstOpened) {
+		if (firstOpened && hasCookie(TOKEN)) {
 			getBehindMessage() // 获取落后消息
 			getRemoteSession()
 			getApplyList()

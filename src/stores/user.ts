@@ -2,12 +2,11 @@ import { create } from 'zustand'
 import { UserStore, UserStoreOptions } from './type'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 
-const defaultOptions: UserStoreOptions = {
+export const defaultOptions: UserStoreOptions = {
 	userId: '',
 	userInfo: null,
 	token: '',
-	deviceId: '',
-	keyPair: { privateKey: '', publicKey: '' }
+	deviceId: ''
 }
 
 const userStore = (set: any): UserStore => ({

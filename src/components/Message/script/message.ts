@@ -4,7 +4,7 @@
  * @date 2024/03/20 16:13:00
  */
 import MsgService from '@/api/msg'
-import { MESSAGE_SEND, MessageBurnAfterRead, msgType, toastMessage, tooltipType, updateDialog } from '@/shared'
+import { MESSAGE_SEND, MessageBurnAfterRead, encrypt, msgType, toastMessage, tooltipType, updateDialog } from '@/shared'
 import useCacheStore from '@/stores/cache'
 import useMessageStore from '@/stores/new_message'
 import { generateMessage } from '@/utils/data'
@@ -16,10 +16,15 @@ export const send = async (message: Message, options?: Options): Promise<Message
 	// 消息仓库
 	const messageStore = useMessageStore.getState()
 
+	// 加密
+	const encryptMessage = messageStore.isGroup
+		? message.content
+		: await encrypt(messageStore.receiverId as string, message.content)
+
 	// 基本参数
 	const params: any = {
 		type: message.msg_type,
-		content: message.content,
+		content: encryptMessage,
 		dialog_id: message.dialog_id,
 		reply_id: message.reply_id,
 		is_burn_after_reading: message.is_burn_after_reading
