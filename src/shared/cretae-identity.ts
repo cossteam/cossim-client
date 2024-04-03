@@ -1,6 +1,7 @@
 import { Device } from '@capacitor/device'
 import { generateKeyPair } from './tweetnacl'
-import CommonStore from '@/db/common'
+// import CommonStore from '@/db/common'
+import useCacheStore from '@/stores/cache'
 
 /**
  * 创建一个身份。
@@ -14,6 +15,8 @@ export const cretaeIdentity = async (user_id: string, account: string, is_update
 	const { identifier: device_id } = await Device.getId()
 	const device_info = await Device.getInfo()
 
+	const cacheStore = useCacheStore.getState()
+
 	let keyPair = null
 	if (!is_update) keyPair = generateKeyPair()
 
@@ -25,7 +28,9 @@ export const cretaeIdentity = async (user_id: string, account: string, is_update
 		device_info
 	}
 
-	!is_update && await CommonStore.add(CommonStore.tables.users, result)
+	!is_update && cacheStore.update({ cacheKeyPair: keyPair })
+
+	// !is_update && (await CommonStore.add(CommonStore.tables.users, result))
 
 	return result
 }

@@ -14,6 +14,8 @@ import 'dayjs/locale/zh-cn'
 
 import 'animate.css'
 
+// import { test } from '@/shared'
+
 dayjs.locale('zh-cn')
 
 // Init F7 React Plugin
@@ -21,3 +23,5 @@ Framework7.use(Framework7React)
 
 const root = createRoot(document.getElementById('root')!)
 root.render(React.createElement(App))
+
+// test()

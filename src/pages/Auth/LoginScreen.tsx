@@ -59,29 +59,23 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 
 	const userStore = useUserStore()
 
-	// import { cloneDeep } from 'lodash-es'
-	// console.dir(cloneDeep(decryptedData));
 	const submit = async () => {
 		try {
 			if (!valid()) return
 
-			const { identifier: driver_id } = await Device.getId()
+			const { identifier: deviceId } = await Device.getId()
 
-			// TODO： 后续希望传入一个唯一设备 id 给后端，后端那边判断是否新设备
 			const { code, data, msg } = await UserService.loginApi({
 				...fromData,
-				driver_id,
-				platform: 'ios',
+				driver_id: deviceId,
+				platform: theme.ios ? 'ios' : 'android',
 				driver_token: '7bd439461e80d13a889e08d0c351fdcfa2c697b920536b4a3787ecf69a5206dc'
 			})
-			console.dir(data)
 
 			if (code !== 200) {
 				f7.dialog.alert(msg)
 				return
 			}
-
-			const user_id = data?.user_info?.user_id
 
 			const userList: any = localStorage.getItem('user_list')
 			if (userList && switchAccount) {
@@ -92,30 +86,6 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 				localStorage.setItem('user_list', JSON.stringify([{ ...data.user_info, ...fromData }]))
 			}
 
-			console.log('user_id', user_id)
-
-			// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-			// if (!user) {
-			// 	// TODO: 进一步验证
-			// 	// f7.dialog.prompt($t('请输入你在旧设备导出的密钥对'), $t('验证新设备'), (name) => {
-			// 	// 	f7.dialog.confirm(`Are you sure that your name is ${name}?`, () => {
-			// 	// 		f7.dialog.alert(`Ok, your name is ${name}`)
-			// 	// 	})
-			// 	// })
-			// 	// return
-			// 	const reslut = await cretaeIdentity(user_id, fromData.email, true)
-			// 	await CommonStore.add(CommonStore.tables.users, {
-			// 		...reslut,
-			// 		// TODO: 验证设备后填充密钥
-			// 		keyPair: null,
-			// 		user_info: data?.user_info
-			// 	})
-			// } else {
-			// 	await CommonStore.update(CommonStore.tables.users, 'user_id', user_id, {
-			// 		...user,
-			// 		user_info: data?.user_info
-			// 	})
-			// }
 			setCookie(USER_ID, data?.user_info?.user_id)
 			setCookie(ACCOUNT, data?.user_info?.email)
 			setCookie(TOKEN, data?.token)
@@ -124,7 +94,7 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 				userId: data?.user_info?.user_id,
 				token: data?.token,
 				userInfo: data?.user_info,
-				deviceId: driver_id
+				deviceId
 			})
 
 			location.reload()
@@ -202,3 +172,6 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 }
 
 export default LoginScreen
+
+// 0bc73fd0-5014-4967-a65b-ee1959aab39a
+// 0bc73fd0-5014-4967-a65b-ee1959aab39a
