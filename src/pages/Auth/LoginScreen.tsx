@@ -3,13 +3,12 @@ import { At, Lock, ChevronLeft } from 'framework7-icons/react'
 import { useEffect, useState } from 'react'
 import clsx from 'clsx'
 
-import { $t, USER_ID, TOKEN, ACCOUNT, cretaeIdentity } from '@/shared'
+import { $t, USER_ID, TOKEN, ACCOUNT } from '@/shared'
 import UserService from '@/api/user'
 import type { LoginData, RegisterData } from '@/types/api/user'
 import { validEmail } from '@/utils/validate'
 import './Auth.scss'
 import { setCookie } from '@/utils/cookie'
-import CommonStore from '@/db/common'
 import { Device } from '@capacitor/device'
 import useUserStore from '@/stores/user'
 
@@ -87,36 +86,36 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 			const userList: any = localStorage.getItem('user_list')
 			if (userList && switchAccount) {
 				const temp = JSON.parse(userList)
-				temp.push({...data.user_info, ...fromData})
+				temp.push({ ...data.user_info, ...fromData })
 				localStorage.setItem('user_list', JSON.stringify([...temp]))
 			} else {
-				localStorage.setItem('user_list', JSON.stringify([{...data.user_info, ...fromData}]))
+				localStorage.setItem('user_list', JSON.stringify([{ ...data.user_info, ...fromData }]))
 			}
 
 			console.log('user_id', user_id)
 
-			const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-			if (!user) {
-				// TODO: 进一步验证
-				// f7.dialog.prompt($t('请输入你在旧设备导出的密钥对'), $t('验证新设备'), (name) => {
-				// 	f7.dialog.confirm(`Are you sure that your name is ${name}?`, () => {
-				// 		f7.dialog.alert(`Ok, your name is ${name}`)
-				// 	})
-				// })
-				// return
-				const reslut = await cretaeIdentity(user_id, fromData.email, true)
-				await CommonStore.add(CommonStore.tables.users, {
-					...reslut,
-					// TODO: 验证设备后填充密钥
-					keyPair: null,
-					user_info: data?.user_info
-				})
-			} else {
-				await CommonStore.update(CommonStore.tables.users, 'user_id', user_id, {
-					...user,
-					user_info: data?.user_info
-				})
-			}
+			// const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
+			// if (!user) {
+			// 	// TODO: 进一步验证
+			// 	// f7.dialog.prompt($t('请输入你在旧设备导出的密钥对'), $t('验证新设备'), (name) => {
+			// 	// 	f7.dialog.confirm(`Are you sure that your name is ${name}?`, () => {
+			// 	// 		f7.dialog.alert(`Ok, your name is ${name}`)
+			// 	// 	})
+			// 	// })
+			// 	// return
+			// 	const reslut = await cretaeIdentity(user_id, fromData.email, true)
+			// 	await CommonStore.add(CommonStore.tables.users, {
+			// 		...reslut,
+			// 		// TODO: 验证设备后填充密钥
+			// 		keyPair: null,
+			// 		user_info: data?.user_info
+			// 	})
+			// } else {
+			// 	await CommonStore.update(CommonStore.tables.users, 'user_id', user_id, {
+			// 		...user,
+			// 		user_info: data?.user_info
+			// 	})
+			// }
 			setCookie(USER_ID, data?.user_info?.user_id)
 			setCookie(ACCOUNT, data?.user_info?.email)
 			setCookie(TOKEN, data?.token)
@@ -125,7 +124,7 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 				userId: data?.user_info?.user_id,
 				token: data?.token,
 				userInfo: data?.user_info,
-				deviceId: driver_id,
+				deviceId: driver_id
 			})
 
 			location.reload()
