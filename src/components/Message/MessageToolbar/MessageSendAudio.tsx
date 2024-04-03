@@ -145,7 +145,7 @@ const MessageSendAudio = () => {
 				ref={audioRef}
 				onTouchStart={handlerTouchStart}
 				onTouchEnd={handlerTouchEnd}
-				className={clsx('flex items-center bg-primary rounded-full w-8 h-8 justify-center relative')}
+				className={clsx('flex items-center bg-primary rounded-full w-8 h-8 justify-center relative ')}
 			>
 				{/* isRecording && 'absolute !w-16 !h-16 right-1' */}
 				<div
