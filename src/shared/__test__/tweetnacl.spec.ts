@@ -15,18 +15,17 @@ describe('tweetnacl', () => {
 		expect(sharedSecret2).toBeInstanceOf(Uint8Array)
 
 		const nonce = cretateNonce()
-
 		const message = 'Hello, Bob!'
 
 		const encryptedMessage = encryptMessage(message, nonce, sharedSecret1)
 
-		console.log('encryptedMessage', encryptedMessage)
+		console.log('encryptedMessage 加密消息', encryptedMessage)
 
-		const msg = { msg: encryptedMessage, nonce: nonce }
+		// const msg = { msg: encryptedMessage, nonce: nonce }
 
-		console.log('encryptedMessage', msg, encryptedMessage)
+		// console.log('encryptedMessage', msg, encryptedMessage)
 
-		const decryptedMessage = decryptMessage(msg.msg, msg.nonce, sharedSecret2)
-		console.log('decryptedMessage', decryptedMessage)
+		// const decryptedMessage = decryptMessage(msg.msg, msg.nonce, sharedSecret2)
+		// console.log('decryptedMessage', decryptedMessage)
 	})
 })
