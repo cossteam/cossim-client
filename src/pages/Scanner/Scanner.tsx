@@ -12,10 +12,10 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 	useEffect(() => {
 		getCameras()
 		return () => {
-			console.log(QrCode)
 			if (QrCode) handleStop()
 		}
 	}, [])
+
 	/**
 	 * 检测摄像头检查打开
 	 * @returns
@@ -34,6 +34,7 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 				return false
 			})
 	}
+
 	const getCameras = async () => {
 		try {
 			await hasCamera()
@@ -54,27 +55,28 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 		}
 	}
 
-	const addPersional = async (userId: string) => {
+	const addPersional = async (userId: string | undefined) => {
 		try {
-			const { code } = await UserService.getUserInfoApi({ user_id: userId })
+			const { code } = await UserService.getUserInfoApi({ user_id: userId as string })
 			if (code == 200) {
 				console.log('获取用户状态', code)
-				f7router?.navigate(`/personal_detail/${userId}/`)
+				f7router?.navigate(`/personal_detail/${userId}/`, {reloadCurrent: true})
 			}
 		} catch (error) {
 			f7.dialog.alert($t('该二维码已过期'))
 		}
 	}
 
-	const addGroup = (groupId: string) => {
+	const addGroup = (groupId: string | undefined) => {
 		console.log('群id', groupId, typeof groupId)
 		console.log('群id', Number(groupId), typeof Number(groupId))
-		f7router?.navigate(`/add_group/?group_id=${groupId}`)
+		f7router?.navigate(`/add_group/?group_id=${groupId}`, {reloadCurrent: true})
 	}
 
 	const handleScanner = (text: string) => {
-		const type: any = text.match(/.*(?=:)/)?.[0]
-		const content: any = text.match(/(?<=.*:).*/)?.[0]
+		console.log('处理扫码', text)
+		const type: string | undefined = text.match(/.*(?=:)/)?.[0]
+		const content: string | undefined = text.match(/(?<=.*:).*/)?.[0]
 		console.log('获取', type, content) // Output: 一段文本，
 
 		switch (type) {
@@ -93,7 +95,7 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 			{ facingMode: 'environment' },
 			{
 				fps: 10, // 设置每秒多少帧
-				qrbox: 300 // 设置取景范围
+				qrbox: 400 // 设置取景范围
 			},
 			(decodedText: any) => {
 				console.log('扫描结果', decodedText)
