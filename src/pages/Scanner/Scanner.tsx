@@ -95,7 +95,7 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 			{ facingMode: 'environment' },
 			{
 				fps: 10, // 设置每秒多少帧
-				qrbox: 400 // 设置取景范围
+				// qrbox: 400 // 设置取景范围
 			},
 			(decodedText: any) => {
 				console.log('扫描结果', decodedText)
