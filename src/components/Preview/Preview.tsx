@@ -4,7 +4,21 @@ import { Button, Popup } from 'framework7-react'
 const Preview: React.FC = () => {
 	const previewStore = usePreviewStore()
 
+	// const photos = useMemo(() => {
+	// 	return previewStore.list.map((item) => {
+	// 		return {
+	// 			url: item.url,
+	// 			caption: item.type === 'video' ? '视频' : '图片'
+	// 		}
+	// 	})
+	// }, [])
+	// const standaloneDarkRef = useRef<any>(null)
+	// useEffect(() => {
+	// 	console.log(previewStore.opened)
+	// 	previewStore.opened && standaloneDarkRef.current?.open()
+	// }, [previewStore.opened])
 	return (
+		// <PhotoBrowser photos={photos} theme="dark" ref={standaloneDarkRef} />
 		<Popup opened={previewStore.opened} tabletFullscreen closeByBackdropClick={false}>
 			<div className="h-full bg-black relative flex flex-col justify-center items-center">
 				<div className="w-full h-14 px-4 z-10 flex justify-between items-center  absolute top-0 left-0">

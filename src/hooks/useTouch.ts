@@ -33,9 +33,9 @@ const useTouch = () => {
 		el.current.removeEventListener('touchmove', moved)
 		el.current.removeEventListener('touchend', ended)
 		endCall.current && endCall.current()
-		setTimeout(() => {
-			setIsCancel(false)
-		}, 200)
+		// setTimeout(() => {
+		// 	setIsCancel(false)
+		// }, 200)
 	}
 
 	const start = (element: HTMLElement, call?: () => void) => {
