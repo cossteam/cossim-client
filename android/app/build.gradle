@@ -4,12 +4,12 @@ android {
     signingConfigs {
         debug {
             // mo mac
-            storeFile file('/Users/mac-os12/Documents/project/im/coss/COSS_KEYS')
+//            storeFile file('/Users/mac-os12/Documents/project/im/coss/COSS_KEYS')
             // mo win
 //            storeFile file('G:/im/coss/COSS_KEYS')
             // YuHong mac
-//            storeFile file("/Users/macos-13/Desktop/IM/key/COSS_KEYS")
-            // YuHong win
+            storeFile file("/Users/macos-13/Desktop/IM/key/COSS_KEYS")
+            // YuHong win 
 //            storeFile file("D:/workspace/IM/COSS_KEYS")
             storePassword 'hitosea.coss'
             keyPassword 'hitosea.coss'

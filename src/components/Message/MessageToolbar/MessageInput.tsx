@@ -22,30 +22,6 @@ const MessageInput = () => {
 		messageStore.update({ content, sendType })
 	}
 
-	// useEffect(() => {
-	// 	if (!toolEditorRef.current || !toolEditorRef.current.quill) return
-
-	// 	const quill = toolEditorRef.current.quill
-	// 	const handlerFocus = () => {
-	// 		// setIndex(quill.getSelection()?.index ?? 0)
-	// 		// setIsFocus(true)
-	// 		// 如果是插入表情触发的聚焦，不做处理
-	// 		// if (isEmojiFocus.current) {
-	// 		// 	quill?.blur()
-	// 		// }
-	// 	}
-
-	// 	// const handlerBlur = () => Keyboard?.hide()
-
-	// 	quill.root.addEventListener('focus', handlerFocus)
-	// 	// quill.root.addEventListener('blur', handlerBlur)
-
-	// 	return () => {
-	// 		quill.root.removeEventListener('focus', handlerFocus)
-	// 		// quill.root.removeEventListener('blur', handlerBlur)
-	// 	}
-	// }, [toolEditorRef.current])
-
 	// 插入表情
 	useEffect(() => {
 		if (!messageStore.selectedEmojis) return
@@ -74,6 +50,11 @@ const MessageInput = () => {
 		if (messageStore.toolbarType !== emojiOrMore.KEYBOARD) return
 		const quill = toolEditorRef.current?.quill
 		quill?.focus()
+	}, [messageStore.toolbarType])
+
+	// 解决在 ios 上滚动消息但键盘不隐藏的问题
+	useEffect(() => {
+		if (messageStore.toolbarType == emojiOrMore.NONE) toolEditorRef.current?.quill?.blur()
 	}, [messageStore.toolbarType])
 
 	return (
