@@ -35,9 +35,11 @@ export const performKeyExchange = (myPrivateKey: Uint8Array, theirPublicKey: Uin
 export const encryptMessage = (message: string, nonce: string, sharedKey: Uint8Array): string => {
 	const result = { msg: message, nonce }
 	try {
-		result.msg = fromUint8Array(nacl.box.after(new TextEncoder().encode(message), toUint8Array(nonce), sharedKey))
-	} catch (error) {
-		console.log('加密失败', error)
+		const encryptedMessage = nacl.box.before(new TextEncoder().encode(message), toUint8Array(nonce), sharedKey)
+
+		console.log('encryptedMessage', encryptedMessage)
+	} catch (error: any) {
+		console.error('加密失败', error?.message)
 		return JSON.stringify(result)
 	}
 	return JSON.stringify(result)
@@ -53,7 +55,7 @@ export const encryptMessage = (message: string, nonce: string, sharedKey: Uint8A
 export const decryptMessage = (encryptedMessage: string, nonce: string, sharedKey: Uint8Array): string => {
 	const messageUint8Array = toUint8Array(encryptedMessage)
 	const decryptedMessage = nacl.box.open.after(messageUint8Array, toUint8Array(nonce), sharedKey)
-	return new TextDecoder().decode(decryptedMessage as Uint8Array)
+	return new TextDecoder()?.decode(decryptedMessage as Uint8Array)
 }
 
 /**

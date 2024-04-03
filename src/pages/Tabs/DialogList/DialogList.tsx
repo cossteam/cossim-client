@@ -28,7 +28,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const messageStore = useMessageStore()
 	const cacheStore = useCacheStore()
 	const { router, setRouter } = useRouterStore()
-	const { doubleClick,setDoubleClick } = useToolbarStore()
+	const { doubleClick, setDoubleClick } = useToolbarStore()
 
 	useEffect(() => {
 		if (doubleClick) {
@@ -36,7 +36,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 			unread && scrollTo(unread.dialog_id)
 		}
 		setDoubleClick(false)
-	},[doubleClick])
+	}, [doubleClick])
 
 	useEffect(() => {
 		setRouter(f7router)
@@ -117,15 +117,15 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		}
 	}
 
-	function heightToTop(ele: any){
+	function heightToTop(ele: any) {
 		//ele为指定跳转到该位置的DOM节点
-		const root: HTMLElement = document.body;
-		let height = 0;
-		do{
-			height += ele.offsetTop;
-			ele = ele.offsetParent;
-		}while( ele !== root )
-		return height;
+		const root: HTMLElement = document.body
+		let height = 0
+		do {
+			height += ele.offsetTop
+			ele = ele.offsetParent
+		} while (ele !== root)
+		return height
 	}
 
 	function scrollTo(id: string) {
@@ -136,8 +136,8 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		element.scrollTo({
 			top: heightToTop(el) - 50,
 			left: 0,
-			behavior: "smooth",
-		});
+			behavior: 'smooth'
+		})
 		// el.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" });
 	}
 
@@ -179,7 +179,11 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 				</List>
 			</Popover>
 			<PageContent className="p-0 max-h-full h-full">
-				<div id='dialog-box' className="h-full bg-bgPrimary pb-12 overflow-y-auto" onScroll={onDialogListScroll}>
+				<div
+					id="dialog-box"
+					className="h-full bg-bgPrimary pb-12 overflow-y-auto"
+					onScroll={onDialogListScroll}
+				>
 					<List contactsList noChevron mediaList dividers className="">
 						{cacheStore.cacheDialogs.sort(customSort).map((item, index) => {
 							// @ts-ignore
@@ -199,7 +203,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 									)}
 									link
 									onClick={async () => {
-										await messageStore.init({
+										messageStore.init({
 											dialogId: item?.dialog_id ?? 0,
 											receiverId: item?.user_id ?? item?.group_id ?? 0,
 											isGroup: !!item?.group_id,

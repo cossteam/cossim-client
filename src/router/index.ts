@@ -8,7 +8,7 @@ import AuthScreen from '@/pages/Auth/AuthScreen'
 import Message from '@/pages/Message/Message'
 
 import NotFound from '@/pages/NotFound'
-import { theme } from 'framework7-react'
+// import { theme } from 'framework7-react'
 
 const routes: Router.RouteParameters[] = [
 	// {
@@ -51,10 +51,9 @@ const routes: Router.RouteParameters[] = [
 	},
 	{
 		path: '/message/:id/:dialog_id/',
-		// asyncComponent: () => import('@/pages/Message/Message'),
 		component: Message,
 		options: {
-			animate: theme.md ? true : false
+			animate: false
 			// transition: 'f7-push'
 			// transition: 'f7-custom'
 		}
