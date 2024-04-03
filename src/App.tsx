@@ -17,7 +17,6 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
 import run, { handlerSocketEdit, handlerSocketMessage, handlerSocketRequest } from './run'
 import { isWeb } from './utils'
-import { Toaster } from 'react-hot-toast'
 
 function App() {
 	const router = useRef<Router.Router | null>(null)
@@ -190,7 +189,6 @@ function App() {
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />
 			)}
-			<Toaster />
 		</AppComponent>
 	)
 }

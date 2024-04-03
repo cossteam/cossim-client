@@ -1,10 +1,9 @@
-import ToolEditor, { ToolEditorMethods } from '@/Editor'
+import ToolEditor, { ToolEditorMethods } from '@/components/ToolEditor/ToolEditor'
 import { $t, emojiOrMore, msgSendType } from '@/shared'
 import { useEffect, useRef } from 'react'
 import useMessageStore from '@/stores/new_message'
 import Quill from 'quill'
 import MessageBlockquote from './MessageBlockquote'
-// import { Keyboard } from 'capacitor-keyboard'
 
 const MessageInput = () => {
 	const toolEditorRef = useRef<ToolEditorMethods | null>(null)
@@ -21,30 +20,6 @@ const MessageInput = () => {
 		const sendType = isEmpty ? msgSendType.AUDIO : msgSendType.TEXT
 		messageStore.update({ content, sendType })
 	}
-
-	// useEffect(() => {
-	// 	if (!toolEditorRef.current || !toolEditorRef.current.quill) return
-
-	// 	const quill = toolEditorRef.current.quill
-	// 	const handlerFocus = () => {
-	// 		// setIndex(quill.getSelection()?.index ?? 0)
-	// 		// setIsFocus(true)
-	// 		// 如果是插入表情触发的聚焦，不做处理
-	// 		// if (isEmojiFocus.current) {
-	// 		// 	quill?.blur()
-	// 		// }
-	// 	}
-
-	// 	// const handlerBlur = () => Keyboard?.hide()
-
-	// 	quill.root.addEventListener('focus', handlerFocus)
-	// 	// quill.root.addEventListener('blur', handlerBlur)
-
-	// 	return () => {
-	// 		quill.root.removeEventListener('focus', handlerFocus)
-	// 		// quill.root.removeEventListener('blur', handlerBlur)
-	// 	}
-	// }, [toolEditorRef.current])
 
 	// 插入表情
 	useEffect(() => {
@@ -76,10 +51,15 @@ const MessageInput = () => {
 		quill?.focus()
 	}, [messageStore.toolbarType])
 
+	// 解决在 ios 上滚动消息但键盘不隐藏的问题
+	useEffect(() => {
+		if (messageStore.toolbarType == emojiOrMore.NONE) toolEditorRef.current?.quill?.blur()
+	}, [messageStore.toolbarType])
+
 	return (
 		<div className="flex-1 max-w-[calc(100%-108px)]">
 			<div
-				className="flex py-2 flex-col justify-center bg-bgTertiary min-h-10 rounded max-h-[150px] overflow-y-auto overflow-x-hidden"
+				className="flex py-2 flex-col justify-center bg-bgTertiary min-h-10 rounded max-h-[150px] overflow-y-auto"
 				ref={inputRef}
 			>
 				<MessageBlockquote />
@@ -89,6 +69,7 @@ const MessageInput = () => {
 					ref={toolEditorRef}
 					defaultValue={messageStore.draft}
 					onChange={handlerChange}
+					is_group={messageStore.isGroup}
 				/>
 			</div>
 		</div>

@@ -24,9 +24,9 @@
 		"paths": {
 			"@/*": ["./src/*"],
 			"dom7": ["node_modules/dom7/dom7.d.ts"],
-			"framework7/lite-bundle":["node_modules/framework7/framework7.d.ts"]
+			"framework7/lite-bundle": ["node_modules/framework7/framework7.d.ts"]
 		}
 	},
-	"include": ["src", "src/**/*.d.ts", "src/types", "src/**/*"],
+	"include": ["src", "src/**/*.d.ts", "src/types", "src/**/*", "bak/bak", "bak/ChatMessage"],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }

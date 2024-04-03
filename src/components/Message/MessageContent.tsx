@@ -15,8 +15,7 @@ const MessageContent = () => {
 		<div
 			className="flex-1 overflow-y-auto py-4"
 			ref={container}
-			onTouchStart={() => messageStore.container?.click()}
-			onTouchMove={() => messageStore.container?.click()}
+			// onTouchStart={() => messageStore.container?.focus()}
 		>
 			<MessageList />
 		</div>
