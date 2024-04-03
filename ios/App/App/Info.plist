@@ -23,7 +23,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>是否允许此App使用你的相机？</string>
+	<string>是否允许COSS使用你的相机？</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>是否允许 COSS录音?</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
