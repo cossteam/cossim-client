@@ -123,7 +123,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const search = async (userId: string) => {
 		if (messageStore.manualTipType === tooltipType.SELECT) return
 		watchAsyncFn(async () => {
-			if (userId === userStore.userId) return;
+			if (userId === userStore.userId) return
 			const friend = cacheStore.cacheContacts?.find((item) => item.user_id === userId)
 			friend ? router?.navigate(`/profile/${friend?.user_id}/`) : router?.navigate(`/personal_detail/${userId}/`)
 		}, '搜索中...')
@@ -140,7 +140,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 					stop()
 					return
 				}
-				// console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
+				console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
 				// console.table(_.pick(item, ['msg_id', 'is_read', 'content']))
 				// messageStore.updateUnreadList(item.msg_id)
 				await MsgService.readMessagesApi(
