@@ -1,5 +1,6 @@
+import { $t } from '@/shared'
 import { usePreviewStore } from '@/stores/preview'
-import { Button, Popup } from 'framework7-react'
+import { Link, NavRight, Navbar, Page, PageContent, Popup } from 'framework7-react'
 
 const Preview: React.FC = () => {
 	const previewStore = usePreviewStore()
@@ -20,18 +21,26 @@ const Preview: React.FC = () => {
 	return (
 		// <PhotoBrowser photos={photos} theme="dark" ref={standaloneDarkRef} />
 		<Popup opened={previewStore.opened} tabletFullscreen closeByBackdropClick={false}>
-			<div className="h-full bg-black relative flex flex-col justify-center items-center">
-				<div className="w-full h-14 px-4 z-10 flex justify-between items-center  absolute top-0 left-0">
-					<Button onClick={() => previewStore.close()}>关闭</Button>
-				</div>
-				{previewStore.list.map((item, index) =>
-					item.type === 'video' ? (
-						<video className="h-full" key={index} src={item.url} autoPlay loop muted controls />
-					) : (
-						<img key={index} src={item.url} alt="" />
-					)
-				)}
-			</div>
+			<Page>
+				<Navbar>
+					<NavRight>
+						<Link className="px-2" onClick={() => previewStore.close()}>
+							{$t('关闭')}
+						</Link>
+					</NavRight>
+				</Navbar>
+				<PageContent className="p-0 bg-white">
+					<div className="h-full overflow-auto relative flex flex-col justify-center items-center">
+						{previewStore.list.map((item, index) =>
+							item.type === 'video' ? (
+								<video className="h-full" key={index} src={item.url} autoPlay loop muted controls />
+							) : (
+								<img className="" key={index} src={item.url} alt="" />
+							)
+						)}
+					</div>
+				</PageContent>
+			</Page>
 		</Popup>
 	)
 }

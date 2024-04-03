@@ -23,7 +23,7 @@ export const CACHE_CONTACTS = 'CacheContacts'
 export const CACHE_GROUP = 'CacheGroup'
 /** 缓存共享密钥表 */
 export const CACHE_SHARE_KEYS = 'CacheShareKeys'
-/** 缓存搜索消息表 */                      
+/** 缓存搜索消息表 */
 export const CACHE_SEARCH_MESSAGE = 'CacheSearchMessage'
 /** 缓存未读消息数 */
 export const CACHE_UNREAD_COUNT = 'CacheUnreadCount'
@@ -33,3 +33,5 @@ export const CACHE_APPLY_COUNT = 'CacheApplyCount'
 export const CACHE_KEYBOARD_HEIGHT = 'keyboardHeight'
 /** 缓存消息 */
 export const CACHE_MESSAGE = 'CacheMessage'
+/** 缓存密钥对 */
+export const CACHE_KEY_PAIR = 'CacheKeyPair'

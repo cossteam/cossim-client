@@ -7,6 +7,7 @@ import {
 	CACHE_DIALOGS,
 	CACHE_GROUP,
 	CACHE_KEYBOARD_HEIGHT,
+	CACHE_KEY_PAIR,
 	CACHE_SEARCH_MESSAGE,
 	CACHE_SHARE_KEYS,
 	CACHE_UNREAD_COUNT,
@@ -27,7 +28,9 @@ const defaultOptions: CacheStoreOptions = {
 	keyboardHeight: 317,
 	friendApply: [],
 	groupApply: [],
-	keyboardShow: false
+	keyboardShow: false,
+	cacheKeyPair: null,
+	lastLoginTime: 1
 }
 
 const useCacheStore = create<CacheStore>((set, get) => ({
@@ -42,6 +45,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const unreadCount = (await cacheStore.get(CACHE_UNREAD_COUNT)) ?? 0
 		const applyCount = (await cacheStore.get(CACHE_APPLY_COUNT)) ?? 0
 		const keyboardHeight = (await cacheStore.get(CACHE_KEYBOARD_HEIGHT)) ?? 300
+		const cacheKeyPair = (await cacheStore.get(CACHE_KEY_PAIR)) ?? null
 
 		set({
 			cacheDialogs,
@@ -52,7 +56,8 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 			applyCount,
 			keyboardHeight,
 			cacheSearchMessage,
-			cacheContactsObj: cacheContacts
+			cacheContactsObj: cacheContacts,
+			cacheKeyPair
 		})
 	},
 	updateFirstOpened: (firstOpened) => set({ firstOpened }),
@@ -108,8 +113,14 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		await cacheStore.set(CACHE_CONTACTS, cacheContactsObj)
 		set({ cacheContacts, cacheContactsObj })
 	},
-	update: async (options) => {
-		return set((state: CacheStoreOptions) => ({ ...state, ...options }))
+	update: async (options, isUpdateDB = false) => {
+		set((state: CacheStoreOptions) => ({ ...state, ...options }))
+
+		// 更新本地数据库
+		if (isUpdateDB) {
+			const { set } = get()
+			Object.entries(options).map(([key, value]) => set(key, value))
+		}
 	},
 	get: async (key) => (await cacheStore.get(key)) ?? [],
 	getDialogMessages: async (dialogId: number, ...ids: number[]) => {

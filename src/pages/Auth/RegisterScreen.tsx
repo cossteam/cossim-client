@@ -3,11 +3,13 @@ import { At, ChevronLeft, Lock } from 'framework7-icons/react'
 import { useState } from 'react'
 import clsx from 'clsx'
 
-import { $t, cretaeIdentity } from '@/shared'
+import { $t } from '@/shared'
 import type { RegisterData } from '@/types/api/user'
 import './Auth.scss'
 import { validEmail, validPassword } from '@/utils/validate'
 import UserService from '@/api/user'
+// import useCacheStore from '@/stores/cache'
+import useUserStore from '@/stores/user'
 
 const RegisterScreen: React.FC<RouterProps> = ({ f7router }) => {
 	const [fromData, setFromData] = useState<RegisterData>({
@@ -24,6 +26,9 @@ const RegisterScreen: React.FC<RouterProps> = ({ f7router }) => {
 
 	// 登录loading
 	const [loading, setLoading] = useState<boolean>(false)
+
+	const userStore = useUserStore()
+	// const cacheStore = useCacheStore()
 
 	const valid = (): boolean => {
 		let pass = false
@@ -70,8 +75,8 @@ const RegisterScreen: React.FC<RouterProps> = ({ f7router }) => {
 				f7.dialog.alert(msg)
 				return
 			}
-
-			await cretaeIdentity(data.user_id, fromData.email)
+			userStore.update({ userId: data?.user_id })
+			// await cretaeIdentity(data.user_id, fromData.email)
 			f7router.navigate('/login/', { props: { defaultData: fromData } })
 		} catch {
 			f7.dialog.alert($t('注册失败,请稍后重试'))

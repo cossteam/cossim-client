@@ -8,7 +8,7 @@ import Contact from '@/components/Contact/Contact'
 import { CreateGroupData } from '@/types/api/group'
 import GroupService from '@/api/group'
 import UserStore from '@/db/user'
-import { useAsyncEffect } from '@reactuses/core'
+// import { useAsyncEffect } from '@reactuses/core'
 import { pick } from 'lodash-es'
 
 const CreateGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
@@ -25,24 +25,24 @@ const CreateGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		member: []
 	})
 	// 获取群信息
-	useAsyncEffect(
-		async () => {
-			try {
-				const { code, data, msg } = await GroupService.groupInfoApi({ group_id })
-				if (code !== 200) {
-					f7.dialog.alert($t(msg || '获取群信息失败'))
-					return
-				}
-				setGroup(pick(data, ['name', 'avatar', 'type', 'max_members_limit', 'member']))
-			} catch (error: any) {
-				f7.dialog.alert($t(error?.message || '获取群信息失败'))
-			} finally {
-				f7.dialog.close()
-			}
-		},
-		() => {},
-		[]
-	)
+	// useAsyncEffect(
+	// 	async () => {
+	// 		try {
+	// 			const { code, data, msg } = await GroupService.groupInfoApi({ group_id })
+	// 			if (code !== 200) {
+	// 				f7.dialog.alert($t(msg || '获取群信息失败'))
+	// 				return
+	// 			}
+	// 			setGroup(pick(data, ['name', 'avatar', 'type', 'max_members_limit', 'member']))
+	// 		} catch (error: any) {
+	// 			f7.dialog.alert($t(error?.message || '获取群信息失败'))
+	// 		} finally {
+	// 			f7.dialog.close()
+	// 		}
+	// 	},
+	// 	() => {},
+	// 	[]
+	// )
 
 	const [friends, setFriends] = useState<any[]>([])
 	// const [maxMembers] = useState<number[]>([100, 500, 1000])

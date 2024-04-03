@@ -57,6 +57,10 @@ export interface CacheStoreOptions {
 	groupApply: any[]
 	/** 键盘是否显示 */
 	keyboardShow: boolean
+	/** 密钥对 */
+	cacheKeyPair: null | { privateKey: string; publicKey: string }
+	/** 上一次登录时间 */
+	lastLoginTime: number
 }
 
 /**
@@ -121,8 +125,9 @@ export type CacheStore = CacheStoreOptions & {
 	/**
 	 * 更新所有缓存信息, 可以只更新部分信息
 	 * @param { Partial<CacheStoreOptions>} options
+	 * @param {boolean} isUpdateDB 是否需要更新本地数据库，默认不需要
 	 */
-	update: (options: Partial<CacheStoreOptions>) => Promise<void>
+	update: (options: Partial<CacheStoreOptions>, isUpdateDB?: boolean) => Promise<void>
 	/**
 	 * 获取缓存的内容
 	 * @param {string} key 键
