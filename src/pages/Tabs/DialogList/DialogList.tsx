@@ -197,8 +197,8 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 									badgeColor="red"
 									swipeout
 									after={formatDialogListTime(
-										item?.last_message?.send_time
-											? item?.last_message?.send_time
+										item?.last_message?.send_at
+											? item?.last_message?.send_at
 											: item?.dialog_create_at
 									)}
 									link
