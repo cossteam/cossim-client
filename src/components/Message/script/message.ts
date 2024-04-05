@@ -16,10 +16,16 @@ export const send = async (message: Message, options?: Options): Promise<Message
 	// 消息仓库
 	const messageStore = useMessageStore.getState()
 
-	// 加密
-	const encryptMessage = messageStore.isGroup
-		? message.content
-		: await encrypt(messageStore.receiverId as string, message.content)
+	// 加密消息
+	let encryptMessage = ''
+	try {
+		encryptMessage =
+			messageStore.isGroup || messageStore.receiverId === '10001'
+				? message.content
+				: await encrypt(messageStore.receiverId as string, message.content)
+	} catch {
+		encryptMessage = message.content
+	}
 
 	// 基本参数
 	const params: any = {
