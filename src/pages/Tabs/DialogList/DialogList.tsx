@@ -203,7 +203,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 									)}
 									link
 									onClick={async () => {
-										messageStore.init({
+										await messageStore.init({
 											dialogId: item?.dialog_id ?? 0,
 											receiverId: item?.user_id ?? item?.group_id ?? 0,
 											isGroup: !!item?.group_id,

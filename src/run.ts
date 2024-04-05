@@ -350,6 +350,7 @@ export function handlerSocketRequest(data: any) {
  */
 export function handlerSocketResult(data: any) {
 	console.log('好友同意或拒绝', data)
+	getRemoteSession()
 }
 
 /**

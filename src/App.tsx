@@ -85,7 +85,6 @@ function App() {
 					break
 				case SocketEvent.ApplyAcceptEvent:
 					handlerSocketResult(data)
-
 					break
 				// 通话事件
 				case SocketEvent.UserCallReqEvent:

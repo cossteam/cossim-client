@@ -5,9 +5,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BellFill, ChevronRight, Ellipsis } from 'framework7-icons/react'
 import useUserStore from '@/stores/user'
 import GroupService from '@/api/group'
-import { App } from '@capacitor/app'
-import { useAsyncEffect } from '@reactuses/core'
-import { PluginListenerHandle } from '@capacitor/core'
+// import { App } from '@capacitor/app'
+// import { useAsyncEffect } from '@reactuses/core'
+// import { PluginListenerHandle } from '@capacitor/core'
 
 const MessageHeader = () => {
 	const messageStore = useMessageStore()
@@ -55,15 +55,15 @@ const MessageHeader = () => {
 		messageStore.update(defaultOptions)
 	}
 
-	// 在安卓端返回操作时需要把消息设置会默认值
-	let AppListener: PluginListenerHandle
-	useAsyncEffect(
-		async () => {
-			AppListener = await App.addListener('backButton', handlerBack)
-		},
-		() => AppListener.remove(),
-		[]
-	)
+	// // 在安卓端返回操作时需要把消息设置会默认值
+	// let AppListener: PluginListenerHandle
+	// useAsyncEffect(
+	// 	async () => {
+	// 		AppListener = await App.addListener('backButton', handlerBack)
+	// 	},
+	// 	() => AppListener.remove(),
+	// 	[]
+	// )
 
 	return (
 		<div className="min-h-12 bg-bgPrimary sticky top-0 z-50">

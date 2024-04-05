@@ -8,7 +8,8 @@ import {
 	Segmented,
 	SwipeoutActions,
 	SwipeoutButton,
-	f7, NavRight
+	f7,
+	NavRight
 } from 'framework7-react'
 import { useMemo, useState } from 'react'
 
@@ -19,7 +20,7 @@ import GroupService from '@/api/group'
 import UserStore from '@/db/user'
 import Empty from '@/components/Empty'
 import useCacheStore from '@/stores/cache'
-import { getApplyList } from '@/run'
+import { getApplyList, getRemoteSession } from '@/run'
 import { useAsyncEffect } from '@reactuses/core'
 import { Plus } from 'framework7-icons/react'
 import Avatar from '@/components/Avatar/Avatar.tsx'
@@ -37,8 +38,7 @@ const ApplyList = () => {
 		async () => {
 			await getApplyList()
 		},
-		() => {
-		},
+		() => {},
 		[type]
 	)
 
@@ -67,15 +67,15 @@ const ApplyList = () => {
 					? await RelationService.manageFriendApplyApi({ request_id: item.id, action, e2e_public_key })
 					: item?.status === ApplyStatus.INVITE_RECEIVER // 是否是被邀请者
 						? await GroupService.manageGroupRequestApi({
-							group_id: item.group_id,
-							action,
-							id: item.id // parseInt(item.id.split('_')[1])
-						})
+								group_id: item.group_id,
+								action,
+								id: item.id // parseInt(item.id.split('_')[1])
+							})
 						: await GroupService.manageGroupRequestAdminApi({
-							group_id: item.group_id,
-							action,
-							id: item.id // parseInt(item.id.split('_')[1])
-						})
+								group_id: item.group_id,
+								action,
+								id: item.id // parseInt(item.id.split('_')[1])
+							})
 
 			if (code !== 200) {
 				f7.dialog.alert($t(msg))
@@ -151,6 +151,11 @@ const ApplyList = () => {
 		}
 	}
 
+	const handlerClick = async (item:any) => {
+		manageFriendApply(item, MangageApplyStatus.ACCEPT)
+		getRemoteSession()
+	}
+
 	return (
 		<Page noToolbar className="bg-bgTertiary">
 			<Navbar backLink className="coss_applylist_navbar bg-bgPrimary hidden-navbar-bg">
@@ -165,7 +170,8 @@ const ApplyList = () => {
 					</Segmented>
 				</NavTitle>
 				<NavRight>
-					<ListItem link="/add_friend/" popoverClose className="coss_dialog_list"><Plus className="w-7 h-7" />
+					<ListItem link="/add_friend/" popoverClose className="coss_dialog_list">
+						<Plus className="w-7 h-7" />
 					</ListItem>
 				</NavRight>
 			</Navbar>
@@ -187,8 +193,7 @@ const ApplyList = () => {
 								</div>
 								<div slot="content" className="pr-2 flex">
 									{!isOperate(item) ? (
-										<Button className="text-sm text-gray-500" onClick={() => {
-										}}>
+										<Button className="text-sm text-gray-500" onClick={() => {}}>
 											{getStatusText(item.status)}
 										</Button>
 									) : (
@@ -199,10 +204,7 @@ const ApplyList = () => {
 											>
 												拒绝
 											</Button>
-											<Button
-												className="text-sm text-primary"
-												onClick={() => manageFriendApply(item, MangageApplyStatus.ACCEPT)}
-											>
+											<Button className="text-sm text-primary" onClick={() => handlerClick(item)}>
 												同意
 											</Button>
 										</>
@@ -231,8 +233,7 @@ const ApplyList = () => {
 								</div>
 								<div slot="content" className="pr-2 flex">
 									{!isOperate(item) ? (
-										<Button className="text-sm text-gray-500" onClick={() => {
-										}}>
+										<Button className="text-sm text-gray-500" onClick={() => {}}>
 											{getStatusText(item.status)}
 										</Button>
 									) : (

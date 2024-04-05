@@ -13,6 +13,7 @@
 		"build:ios": "npm run build && npx cap sync ios",
 		"test": "vitest",
 		"ionic:build": "npm run build",
+		
 		"ionic:serve": "npm run dev"
 	},
 	"dependencies": {
