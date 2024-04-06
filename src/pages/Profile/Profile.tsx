@@ -90,7 +90,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}
 
 	// 阅后即焚
-	const burnAfterRead = async () => {
+	const burnAfterRead = async (time_out = 10) => {
 		const action =
 			userInfo?.preferences?.open_burn_after_reading === MessageBurnAfterRead.YES
 				? MessageBurnAfterRead.NO
@@ -100,13 +100,12 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 		watchAsyncFn(async () => {
 			try {
-				const { code } = await RelationService.setBurnApi({ action, user_id })
+				const { code } = await RelationService.setBurnApi({ action, user_id, time_out })
 				if (code !== 200) {
 					toastMessage(tips_error)
 					return
 				}
-				await RelationService.setBurnTimeApi({ friend_id: user_id, open_burn_after_reading_time_out: 10 })
-				updateCache({ open_burn_after_reading_time_out: 10, open_burn_after_reading: action })
+				updateCache({ open_burn_after_reading_time_out: time_out, open_burn_after_reading: action })
 			} catch (error) {
 				toastMessage('设置阅后即焚失败')
 			}
@@ -249,7 +248,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					after={userInfo?.preferences?.remark}
 				></ListItem>
 				<ListItem title={$t('阅后即焚')}>
-					<Toggle slot="after" checked={is_burn_after_reading} onChange={burnAfterRead} />
+					<Toggle slot="after" checked={is_burn_after_reading} onChange={() => burnAfterRead()} />
 				</ListItem>
 				{is_burn_after_reading && (
 					<li>
