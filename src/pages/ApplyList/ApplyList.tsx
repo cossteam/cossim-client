@@ -152,7 +152,7 @@ const ApplyList = () => {
 	}
 
 	const handlerClick = async (item:any) => {
-		manageFriendApply(item, MangageApplyStatus.ACCEPT)
+		await manageFriendApply(item, MangageApplyStatus.ACCEPT)
 		getRemoteSession()
 	}
 
