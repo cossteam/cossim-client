@@ -1,5 +1,5 @@
 import { Link, List, ListGroup, ListItem, NavRight, Navbar, Page } from 'framework7-react'
-import { Person2Alt, PersonBadgePlusFill, Search } from 'framework7-icons/react'
+import { Person2Alt, PersonBadgeMinusFill, PersonBadgePlusFill, Search } from 'framework7-icons/react'
 
 import { $t } from '@/shared'
 // import RelationService from '@/api/relation'
@@ -123,12 +123,12 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 						{$t('群聊')}
 					</span>
 				</ListItem>
-				{/* <ListItem>
+				<ListItem link='/black_list/'>
 					<PersonBadgeMinusFill slot="media" className="text-red-400 text-2xl" />
 					<span slot="title" className="text-red-400">
 						{$t('黑名单')}
 					</span>
-				</ListItem> */}
+				</ListItem>
 
 				{Object.keys(cacheStore.cacheContactsObj).map((groupKey: any) => (
 					<ListGroup key={groupKey}>

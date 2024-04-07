@@ -16,7 +16,10 @@ const MessageLabel: React.FC<MessageLabelProps> = ({ item }) => {
 			<div className="message-tip__text">
 				{item?.sender_info?.name}
 				&nbsp;{$t(text)}&nbsp; &quot;
-				<ReadEditor content={item?.content} className="text-[0.7rem] px-0" />
+				<ReadEditor
+					content={item?.content}
+					className="text-[0.7rem] px-0 whitespace-nowrap overflow-hidden text-ellipsis"
+				/>
 				&quot;
 			</div>
 		</div>

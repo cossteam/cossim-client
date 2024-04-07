@@ -4,16 +4,7 @@ import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
 import Layout from './components/Layout'
-import {
-	$t,
-	TOKEN,
-	SocketClient,
-	SocketEvent,
-	DEVICE_ID,
-	// burnAfterReading,
-	toastMessage,
-	uploadPublicKey
-} from '@/shared'
+import { $t, TOKEN, SocketClient, SocketEvent, DEVICE_ID, toastMessage, uploadPublicKey } from '@/shared'
 import { hasCookie, setCookie } from '@/utils/cookie'
 import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
