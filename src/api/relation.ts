@@ -155,6 +155,16 @@ class RelationServiceImpl {
 	}
 
 	/**
+	 * 获取黑名单列表
+	 */
+	getBlackList(): Promise<DataResponse> {
+		return request({
+			url: `${this.baseUrl}/blacklist`,
+			method: 'get',
+		})
+	}
+
+	/**
 	 * 设置用户消息静默通知
 	 *
 	 * @param {Object} data
