@@ -409,7 +409,18 @@ export const handlerDestroyMessage = _.debounce(() => {
 					Date.now(),
 					preferences.open_burn_after_reading_time_out
 				)
-				readAndTimeout && messageStore.deleteMessage(i)
+				if (readAndTimeout) {
+					// 删除已读且且超时的消息
+					messageStore.deleteMessage(i)
+					// 删除会回最后一条消息数据
+					// const dialogs = cacheStore.cacheDialogs.map((j) => {
+					// 	if (j.dialog_id === item.dialog_id) {
+					// 		j.last_message.content = ''
+					// 	}
+					// })
+					// console.log(dialogs)
+					// cacheStore.updateCacheDialogs(dialogs)
+				}
 				return i.is_read === MESSAGE_READ.NOT_READ || !readAndTimeout
 			})
 		)

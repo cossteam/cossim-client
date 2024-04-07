@@ -12,7 +12,7 @@ export async function getCacheShareKey(userId: string) {
 
 	let shareKey: any = cacheStore.cacheShareKeys.find((v) => v.user_id === userId)?.shareKey
 
-	console.log('加密', shareKey)
+	// console.log('加密', shareKey)
 
 	if (!shareKey) {
 		const publicKey = await getServerPublicKey(userId)
