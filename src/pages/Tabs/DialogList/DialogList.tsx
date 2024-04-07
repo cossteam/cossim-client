@@ -28,14 +28,11 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const messageStore = useMessageStore()
 	const cacheStore = useCacheStore()
 	const { router, setRouter } = useRouterStore()
-	const { doubleClick, setDoubleClick } = useToolbarStore()
+	const { doubleClick } = useToolbarStore()
 
 	useEffect(() => {
-		if (doubleClick) {
-			const unread = cacheStore.cacheDialogs.find((item) => item?.dialog_unread_count > 0)
-			unread && scrollTo(unread.dialog_id)
-		}
-		setDoubleClick(false)
+		const unread = cacheStore.cacheDialogs.find((item) => item?.dialog_unread_count > 0)
+		unread && scrollTo(unread.dialog_id)
 	}, [doubleClick])
 
 	useEffect(() => {
