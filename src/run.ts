@@ -217,7 +217,8 @@ export async function handlerSocketMessage(data: any) {
 	try {
 		// msg 的发送者不是自己并且当前不在会话中
 		const dialogId = Number(messageStore.dialogId)
-		if (dialogId !== 0 && Number(message.dialog_id) !== dialogId) {
+		console.log('本地通知：', dialogId, Number(message.dialog_id))
+		if (Number(message.dialog_id) !== dialogId) {
 			// 本地通知
 			const dom = document.createElement('p')
 			dom.innerHTML = DOMPurify.sanitize(message.content || '')

@@ -27,6 +27,8 @@ import useCacheStore from '@/stores/cache'
 import run, { handlerSocketEdit, handlerSocketMessage, handlerSocketRequest, handlerSocketResult } from './run'
 import { isWeb } from './utils'
 import useUserStore from '@/stores/user'
+import useMessageStore, { defaultOptions } from './stores/message'
+import { usePreviewStore } from './stores/preview'
 
 function App() {
 	const router = useRef<Router.Router | null>(null)
@@ -122,6 +124,8 @@ function App() {
 	let backListener: PluginListenerHandle
 	let appStateListener: PluginListenerHandle
 
+	const messageStore = useMessageStore()
+	const previewStore = usePreviewStore()
 	useAsyncEffect(
 		async () => {
 			let backNumber = 0
@@ -137,6 +141,16 @@ function App() {
 					backNumber = 0
 				}, 1000)
 
+				// 监听消息页返回
+				if (
+					router.current?.currentRoute.url !== undefined &&
+					router.current?.currentRoute.url.indexOf('/message/') !== -1
+				) {
+					// 清空当前消息页数据
+					messageStore.update(defaultOptions)
+					// 关闭预览
+					previewStore.close()
+				}
 				const flag = historyRoutes.includes(router.current?.currentRoute.url ?? '')
 				if (flag) toastMessage('再按一次退出程序')
 				if (backNumber > 1) {
