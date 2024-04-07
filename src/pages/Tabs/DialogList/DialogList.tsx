@@ -32,7 +32,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 
 	useEffect(() => {
 		if (doubleClick) {
-			const unread = cacheStore.cacheDialogs.find((item) => item.dialog_unread_count > 0)
+			const unread = cacheStore.cacheDialogs.find((item) => item?.dialog_unread_count > 0)
 			unread && scrollTo(unread.dialog_id)
 		}
 		setDoubleClick(false)
@@ -46,14 +46,14 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	// console.log(router)
 	// 置顶对话
 	const topDialog = async (item: any) => {
-		await RelationService.topDialogApi({ dialog_id: item.dialog_id, action: item?.top_at ? 0 : 1 })
+		await RelationService.topDialogApi({ dialog_id: item?.dialog_id, action: item?.top_at ? 0 : 1 })
 		await getRemoteSession()
 	}
 
 	// 删除对话
 	const deleteDialog = async (e: any, item: any) => {
 		console.log('delete', e, item)
-		await RelationService.showDialogApi({ dialog_id: item.dialog_id, action: 0 })
+		await RelationService.showDialogApi({ dialog_id: item?.dialog_id, action: 0 })
 		await getRemoteSession()
 	}
 
@@ -186,11 +186,12 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 				>
 					<List contactsList noChevron mediaList dividers className="">
 						{cacheStore.cacheDialogs.sort(customSort).map((item, index) => {
+							// console.log('1111', item)
 							// @ts-ignore
 							return (
 								<ListItem
-									id={item.dialog_id}
-									className={clsx(item.top_at !== 0 && 'bg-bgSecondary')}
+									id={item?.dialog_id}
+									className={clsx(item?.top_at !== 0 && 'bg-bgSecondary')}
 									key={item?.dialog_id + `${index}`}
 									title={item?.dialog_name}
 									badge={item?.dialog_unread_count}
@@ -224,7 +225,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 									</div>
 									<SwipeoutActions right>
 										<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
-											{$t(item.top_at === 0 ? '置顶' : '取消置顶')}
+											{$t(item?.top_at === 0 ? '置顶' : '取消置顶')}
 										</SwipeoutButton>
 										<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
 											{$t('删除')}
