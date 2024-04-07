@@ -211,6 +211,8 @@ export interface MessageStoreOptions {
 	isGroupAnnouncement: boolean
 	/** 是否在插入表情 */
 	isEmojiFocus: boolean
+	/** 是否需要滚动到底部 */
+	isScrollBottom: boolean
 }
 
 interface initOptions {

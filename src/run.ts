@@ -242,6 +242,13 @@ export async function handlerSocketMessage(data: any) {
 
 	msg.content = await decrypt(message?.sender_id, message.content)
 
+	// TODO: 解密标注消息
+	if (isLableMessage(type)) {
+		const replyMessage = msg.reply_msg
+		if (!replyMessage) return
+		msg.reply_msg.content = await decrypt(replyMessage?.sender_id, replyMessage.content)
+	}
+
 	// 如果是当前会话，需要实时更新到页面
 	if (message?.dialog_id === messageStore.dialogId) {
 		await messageStore.createMessage(msg)
@@ -265,6 +272,9 @@ export async function handlerSocketMessage(data: any) {
 			const message = messageStore.allMessages.find((v) => v?.msg_id === msg?.reply_id)
 			message && messageStore.deleteMessage(message)
 		}
+
+		// 手动触发滚动到底部操作
+		// messageStore.update({ isScrollBottom: true })
 	} else {
 		cacheStore.addCacheMessage(msg)
 	}

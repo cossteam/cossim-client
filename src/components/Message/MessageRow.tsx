@@ -195,6 +195,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			className="list-none"
 			checkbox={isSelect}
 			onChange={(e) => handlerSelectChange(e.target.checked, item)}
+			id={`row-${item.msg_id}`}
 		>
 			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')} ref={itemRef}>
 				<div className={clsx('max-w-[80%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>

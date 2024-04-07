@@ -59,7 +59,7 @@ const MessageInput = () => {
 	return (
 		<div className="flex-1 max-w-[calc(100%-108px)]">
 			<div
-				className="flex py-2 flex-col justify-center bg-bgTertiary min-h-10 rounded max-h-[150px] overflow-y-auto"
+				className="flex py-2 flex-col justify-center bg-bgTertiary min-h-10 rounded max-h-[150px]"
 				ref={inputRef}
 			>
 				<MessageBlockquote />
@@ -70,6 +70,7 @@ const MessageInput = () => {
 					defaultValue={messageStore.draft}
 					onChange={handlerChange}
 					is_group={messageStore.isGroup}
+					id={messageStore.receiverId}
 				/>
 			</div>
 		</div>

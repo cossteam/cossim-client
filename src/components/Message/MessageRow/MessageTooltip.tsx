@@ -123,7 +123,7 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) =>
 						onClick={() => handlerClick(item)}
 						aria-expanded="true"
 						key={item.name}
-						className={clsx('flex min-w-[50px] p-3 px-4 text-[1rem]')}
+						className={clsx('flex min-w-[56px] max-w-[56px] p-3 px-4 text-[1rem]')}
 					>
 						<div className="flex flex-col items-center justify-center">
 							<div className="mb-[6px]">{item?.icon}</div>
