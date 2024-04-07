@@ -100,9 +100,11 @@ export async function getApplyList() {
 		friend.data && friendApply.push(...friend.data)
 		group.data && groupApply.push(...group.data)
 		// 统计未读数
-		const len = [...friendApply, ...groupApply].filter(
+		const len: number = [...friendApply, ...groupApply].filter(
 			(v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId
 		).length
+		friendApply.sort((a: any, b: any) => b.create_at - a.create_at)
+		groupApply.sort((a: any, b: any) => b.create_at - a.create_at)
 		// 缓存申请列表
 		cacheStore.update({
 			friendApply,
@@ -217,7 +219,8 @@ export async function handlerSocketMessage(data: any) {
 	try {
 		// msg 的发送者不是自己并且当前不在会话中
 		const dialogId = Number(messageStore.dialogId)
-		if (dialogId !== 0 && Number(message.dialog_id) !== dialogId) {
+		console.log('本地通知：', dialogId, Number(message.dialog_id))
+		if (Number(message.dialog_id) !== dialogId) {
 			// 本地通知
 			const dom = document.createElement('p')
 			dom.innerHTML = DOMPurify.sanitize(message.content || '')
@@ -349,6 +352,14 @@ export function handlerSocketRequest(data: any) {
 	if (data?.data?.user_id) {
 		savePublicKey(data?.data?.user_id, data?.data?.e2e_public_key)
 	}
+	// 本地通知
+	try {
+		console.log('新请求', data)
+		localNotification(LocalNotificationType.MESSAGE, '新请求', data.msg ?? '有新的请求待处理')
+	} catch {
+		console.log('发送本地通知失败')
+	}
+	// 修改未处理请求数
 	const cacheStore = useCacheStore.getState()
 	cacheStore.updateCacheApplyCount(cacheStore.applyCount + 1)
 }

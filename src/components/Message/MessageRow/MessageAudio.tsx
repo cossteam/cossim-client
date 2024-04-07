@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { Icon } from 'framework7-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import lottie from 'lottie-web'
 
 interface MessageAudioProps {
 	className?: string
@@ -67,6 +68,7 @@ const MessageAudio: React.FC<MessageAudioProps> = ({ className, item, isSelf }) 
 
 	useEffect(() => {
 		const audio = audioRef.current
+		console.log('lottie', lottie)
 		if (!audio) return
 		audio.addEventListener('play', playListener)
 		audio.addEventListener('pause', pauseListener)

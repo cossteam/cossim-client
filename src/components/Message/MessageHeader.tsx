@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BellFill, ChevronRight, Ellipsis } from 'framework7-icons/react'
 import useUserStore from '@/stores/user'
 import GroupService from '@/api/group'
-// import { App } from '@capacitor/app'
 // import { useAsyncEffect } from '@reactuses/core'
 // import { PluginListenerHandle } from '@capacitor/core'
 
@@ -37,6 +36,10 @@ const MessageHeader = () => {
 		[groupAnnouncement]
 	)
 
+	const handlerBack = () => {
+		messageStore.update(defaultOptions)
+	}
+
 	// 获取群聊人员
 	useEffect(() => {
 		if (messageStore.isGroup) {
@@ -51,20 +54,6 @@ const MessageHeader = () => {
 		if (messageStore.isGroup) messageStore.update({ isGroupAnnouncement: isShowGroupAnnouncement })
 	}, [isShowGroupAnnouncement])
 
-	const handlerBack = () => {
-		messageStore.update(defaultOptions)
-	}
-
-	// // 在安卓端返回操作时需要把消息设置会默认值
-	// let AppListener: PluginListenerHandle
-	// useAsyncEffect(
-	// 	async () => {
-	// 		AppListener = await App.addListener('backButton', handlerBack)
-	// 	},
-	// 	() => AppListener.remove(),
-	// 	[]
-	// )
-
 	return (
 		<div className="min-h-12 bg-bgPrimary sticky top-0 z-50">
 			<Navbar
@@ -73,10 +62,13 @@ const MessageHeader = () => {
 				backLink
 				outline={false}
 				className="coss_message_navbar"
+				onClickBack={() => handlerBack()}
 			>
 				<NavRight>
 					{messageStore.manualTipType === tooltipType.SELECT ? (
-						<Link onClick={handlerBack}>{$t('取消')}</Link>
+						<Link onClick={() => messageStore.update({ manualTipType: tooltipType.NONE })}>
+							{$t('取消')}
+						</Link>
 					) : (
 						!is_system && (
 							<Link
