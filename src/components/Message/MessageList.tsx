@@ -8,26 +8,14 @@ import { useIntersectionObserver } from '@reactuses/core'
 const MessageList = () => {
 	const messageStore = useMessageStore()
 
-	// 滚动到底部
-	// useEffect(() => {
-	// 	if (isLoading.current) return
-	// 	messageStore.container?.scrollTo({
-	// 		top: messageStore.container?.scrollHeight
-	// 	})
-	// }, [messageStore.container])
-	// messageStore.messages
-
 	useEffect(() => {
 		if (messageStore.toolbarType === emojiOrMore.NONE) return
-		messageStore.container?.scrollTo({
-			top: messageStore.container?.scrollHeight
-		})
+		if (messageStore.isAtBottom) bottomRef.current?.scrollIntoView({ block: 'end' })
 	}, [messageStore.toolbarType])
 
-	const placeholderRef = useRef<HTMLDivElement | null>(null)
-	// const isLoading = useRef<boolean>(false)
-
 	const [isFirstIn, setIsFirstIn] = useState<boolean>(true)
+
+	const placeholderRef = useRef<HTMLDivElement | null>(null)
 	const bottomRef = useRef<HTMLDivElement | null>(null)
 
 	// const isEOF = useMemo(
@@ -63,26 +51,48 @@ const MessageList = () => {
 
 	const row = useCallback((item: Message, index: number) => <MessageRow item={item} key={index} />, [])
 
-	const [isEntry, setIsEntry] = useState<boolean>(true)
-	useIntersectionObserver(bottomRef, (entry) => setIsEntry(entry[0].isIntersecting))
+	useIntersectionObserver(bottomRef, (entry) => messageStore.update({ isAtBottom: entry[0].isIntersecting }))
 
+	// 自动滚动到底部
 	useEffect(() => {
+		console.log('messageStore.isAtBotto', messageStore.isAtBottom)
+
 		if (!bottomRef.current) return
-		if (!isEntry) return
-		bottomRef.current.scrollIntoView({ block: 'end', behavior: isFirstIn ? 'instant' : 'smooth' })
+		if (!messageStore.isAtBottom && !isFirstIn) return
+		bottomRef.current.scrollIntoView({ block: 'end' })
 		if (isFirstIn) setIsFirstIn(false)
 	}, [messageStore.messages])
 
-	// useEffect(() => {
-	// 	console.log('进去', isEntry)
-	// }, [isEntry])
+	// 手动滚动到底部
+	useEffect(() => {
+		if (!bottomRef.current) return
+		if (!messageStore.isScrollBottom) return
+		try {
+			if (!messageStore.isAtBottom) bottomRef.current.scrollIntoView({ block: 'end' })
+		} finally {
+			messageStore.update({ isScrollBottom: false })
+		}
+	}, [messageStore.isScrollBottom])
 
+	// useEffect(() => {
+	// 	if (!messageStore.isLoading) return
+	// 	setTimeout(() => {
+	// 		messageStore.unshiftMessage()
+	// 		messageStore.update({ isLoading: false })
+	// 	}, 1000)
+	// }, [messageStore.isLoading])
 	return (
 		<div className="w-full h-auto relative">
-			<div className="w-full h-10 absolute top -z-1" ref={placeholderRef} />
+			{messageStore.isLoading && (
+				<div className="w-full h-10 top -z-1 text-center text-gray-500" ref={placeholderRef}>
+					loading...
+				</div>
+			)}
 			{messageStore.isGroupAnnouncement && <div className="h-10" />}
 			<List className="m-0">{messageStore.messages.map((item, index) => row(item, index))}</List>
-			<div className="w-full h-1" ref={bottomRef} />
+			<div className="min-h-4">
+				<div className="w-full h-32 absolute bottom-0" ref={bottomRef} />
+			</div>
 		</div>
 	)
 }

@@ -113,6 +113,9 @@ dependencies:
   lodash-es:
     specifier: ^4.17.21
     version: 4.17.21
+  lottie-web:
+    specifier: ^5.12.2
+    version: 5.12.2
   openpgp:
     specifier: ^5.11.0
     version: 5.11.0
@@ -3450,6 +3453,10 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
+    dev: false
+
+  /lottie-web@5.12.2:
+    resolution: {integrity: sha512-uvhvYPC8kGPjXT3MyKMrL3JitEAmDMp30lVkuq/590Mw9ok6pWcFCwXJveo0t5uqYw1UREQHofD+jVpdjBv8wg==}
     dev: false
 
   /loupe@2.3.7:
