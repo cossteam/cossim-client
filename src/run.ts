@@ -342,6 +342,14 @@ export function handlerSocketRequest(data: any) {
 	if (data?.data?.user_id) {
 		savePublicKey(data?.data?.user_id, data?.data?.e2e_public_key)
 	}
+	// 本地通知
+	try {
+		console.log('新请求', data)
+		localNotification(LocalNotificationType.MESSAGE, '新请求', data.msg ?? '有新的请求待处理')
+	} catch {
+		console.log('发送本地通知失败')
+	}
+	// 修改未处理请求数
 	const cacheStore = useCacheStore.getState()
 	cacheStore.updateCacheApplyCount(cacheStore.applyCount + 1)
 }
