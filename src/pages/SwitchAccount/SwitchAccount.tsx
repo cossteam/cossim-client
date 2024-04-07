@@ -3,8 +3,7 @@ import Avatar from '@/components/Avatar/Avatar.tsx'
 import React, { useEffect, useState } from 'react'
 import { Device } from '@capacitor/device'
 import UserService from '@/api/user.ts'
-import CommonStore from '@/db/common.ts'
-import { ACCOUNT, cretaeIdentity, TOKEN, USER_ID } from '@/shared'
+import { ACCOUNT, TOKEN, USER_ID } from '@/shared'
 import { setCookie } from '@/utils/cookie.ts'
 import useUserStore from '@/stores/user.ts'
 import useLoading from '@/hooks/useLoading.ts'
@@ -30,6 +29,7 @@ const SwitchAccount: React.FC<RouterProps> = ({ f7router }) => {
 	const userStore = useUserStore()
 	const submit = async (index: number) => {
 		console.log('切换账号', userList)
+		if (userId == userList[index].user_id) return;
 
 		const { identifier: driver_id } = await Device.getId()
 		console.log(userList.password)
@@ -44,27 +44,12 @@ const SwitchAccount: React.FC<RouterProps> = ({ f7router }) => {
 			})
 		)
 
+		console.log('登录', data)
 		if (code !== 200) {
 			f7.dialog.alert(msg)
 			return
 		}
 
-		const user_id = data?.user_info?.user_id
-
-		const user = await CommonStore.findOneById(CommonStore.tables.users, 'user_id', user_id)
-		if (!user) {
-			const reslut = await cretaeIdentity(user_id, userList?.email, true)
-			await CommonStore.add(CommonStore.tables.users, {
-				...reslut,
-				keyPair: null,
-				user_info: data?.user_info
-			})
-		} else {
-			await CommonStore.update(CommonStore.tables.users, 'user_id', user_id, {
-				...user,
-				user_info: data?.user_info
-			})
-		}
 		setCookie(USER_ID, data?.user_info?.user_id)
 		setCookie(ACCOUNT, data?.user_info?.email)
 		setCookie(TOKEN, data?.token)
