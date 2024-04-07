@@ -90,22 +90,28 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}
 
 	// 阅后即焚
-	const burnAfterRead = async (time_out = 10) => {
-		const action =
-			userInfo?.preferences?.open_burn_after_reading === MessageBurnAfterRead.YES
-				? MessageBurnAfterRead.NO
-				: MessageBurnAfterRead.YES
+	const burnAfterRead = async (timeout?: number) => {
+		let action: MessageBurnAfterRead
+		if (!timeout) {
+			action =
+				userInfo?.preferences?.open_burn_after_reading === MessageBurnAfterRead.YES
+					? MessageBurnAfterRead.NO
+					: MessageBurnAfterRead.YES
+			timeout = 10
+		} else {
+			action = MessageBurnAfterRead.YES
+		}
 
 		const tips_error = action === MessageBurnAfterRead.YES ? $t('阅后即焚失败') : $t('取消阅后即焚失败')
 
 		watchAsyncFn(async () => {
 			try {
-				const { code } = await RelationService.setBurnApi({ action, user_id, time_out })
+				const { code } = await RelationService.setBurnApi({ action, user_id, timeout: timeout ?? 10 })
 				if (code !== 200) {
 					toastMessage(tips_error)
 					return
 				}
-				updateCache({ open_burn_after_reading_time_out: time_out, open_burn_after_reading: action })
+				updateCache({ open_burn_after_reading_time_out: timeout, open_burn_after_reading: action })
 			} catch (error) {
 				toastMessage('设置阅后即焚失败')
 			}
@@ -156,18 +162,19 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	// 设置阅后即焚时间
 	const changeTime = async (index: number) => {
-		watchAsyncFn(async () => {
-			try {
-				const { code } = await RelationService.setBurnTimeApi({
-					friend_id: user_id,
-					open_burn_after_reading_time_out: times[index].value
-				})
-				if (code !== 200) return toastMessage('设置失败')
-				updateCache({ open_burn_after_reading_time_out: times[index].value })
-			} catch (error) {
-				toastMessage('设置失败')
-			}
-		}, '设置中...')
+		burnAfterRead(times[index].value)
+		// watchAsyncFn(async () => {
+		// 	try {
+		// 		const { code } = await RelationService.setBurnTimeApi({
+		// 			friend_id: user_id,
+		// 			open_burn_after_reading_time_out: times[index].value
+		//         })
+		// 		if (code !== 200) return toastMessage('设置失败')
+		// 		updateCache({ open_burn_after_reading_time_out: times[index].value })
+		// 	} catch (error) {
+		// 		toastMessage('设置失败')
+		// 	}
+		// }, '设置中...')
 	}
 
 	const is_burn_after_reading = useMemo(

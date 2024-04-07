@@ -27,5 +27,5 @@ export interface SilenceData {
 export interface BurnData {
 	action: number
 	user_id: string
-	time_out: number
+	timeout: number
 }

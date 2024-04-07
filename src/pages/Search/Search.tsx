@@ -30,7 +30,14 @@ const Search: React.FC<RouterProps> = ({ f7router }) => {
 					if (dialogAllMsg.length <= 0) return
 					const dialogMsg = dialogAllMsg.filter((i: any) => i.msg_type === MESSAGE_TYPE.TEXT)
 					if (dialogMsg.length <= 0) return
-					const msgs = dialogMsg.filter((i: any) => handlerContent(i.content).indexOf(keyword) !== -1)
+					const msgs = dialogMsg.filter((i: any) => {
+						// console.log('比配')
+						// console.log(keyword)
+						// console.log(console.log(handlerContent(i.content)))
+						// console.log()
+
+						return handlerContent(i.content).indexOf(keyword) !== -1
+					})
 					if (dialog.dialog_name.indexOf(keyword) !== -1 || msgs.length > 0) {
 						// console.log(dialog?.dialog_name, msgs)
 						newDialog.msgs = msgs
