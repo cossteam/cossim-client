@@ -20,7 +20,7 @@ import GroupService from '@/api/group'
 import UserStore from '@/db/user'
 import Empty from '@/components/Empty'
 import useCacheStore from '@/stores/cache'
-import { getApplyList, getRemoteSession } from '@/run'
+import { getApplyList, getFriendList, getRemoteSession } from '@/run'
 import { useAsyncEffect } from '@reactuses/core'
 import { Plus } from 'framework7-icons/react'
 import Avatar from '@/components/Avatar/Avatar.tsx'
@@ -153,6 +153,7 @@ const ApplyList = () => {
 
 	const handlerClick = async (item:any) => {
 		await manageFriendApply(item, MangageApplyStatus.ACCEPT)
+		getFriendList()
 		getRemoteSession()
 	}
 
