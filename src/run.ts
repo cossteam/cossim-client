@@ -100,9 +100,11 @@ export async function getApplyList() {
 		friend.data && friendApply.push(...friend.data)
 		group.data && groupApply.push(...group.data)
 		// 统计未读数
-		const len = [...friendApply, ...groupApply].filter(
+		const len: number = [...friendApply, ...groupApply].filter(
 			(v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId
 		).length
+		friendApply.sort((a: any, b: any) => b.create_at - a.create_at)
+		groupApply.sort((a: any, b: any) => b.create_at - a.create_at)
 		// 缓存申请列表
 		cacheStore.update({
 			friendApply,

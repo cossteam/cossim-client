@@ -19,7 +19,7 @@ const BlackList = () => {
 
 	return (
 		<Page noToolbar>
-			<Navbar backLink />
+			<Navbar backLink title='黑名单' />
 			<List contactsList noChevron dividers outline className="h-full bg-bgPrimary">
 				{blackList?.map((contact: any, index: number) => (
 					<ListItem
