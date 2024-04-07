@@ -124,7 +124,7 @@ export async function getBehindMessage() {
 		const cacheStore = useCacheStore.getState()
 		const params = cacheStore.cacheDialogs.map((v) => ({
 			dialog_id: v?.dialog_id,
-			msg_id: v?.last_message?.msg_id
+			msg_id: v?.last_message?.msg_id ?? 0
 		}))
 		const { code, data } = await MsgService.getBehindMessageApi(params)
 		if (code !== 200) return
@@ -241,8 +241,6 @@ export async function handlerSocketMessage(data: any) {
 	})
 
 	msg.content = await decrypt(message?.sender_id, message.content)
-
-	// console.log('msg', msg)
 
 	// 如果是当前会话，需要实时更新到页面
 	if (message?.dialog_id === messageStore.dialogId) {
@@ -431,9 +429,9 @@ function run() {
 			getRemoteSession()
 			getApplyList()
 			getFriendList()
-			setInterval(() => {
-				handlerDestroyMessage() // 阅后即焚
-			}, 2000)
+			// setInterval(() => {
+			// 	handlerDestroyMessage() // 阅后即焚
+			// }, 2000)
 			cacheStore.updateFirstOpened(false)
 		}
 	})

@@ -55,7 +55,6 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const cacheStore = useCacheStore()
 
 	const [showTippy, setShowTippy] = useState<boolean>(false)
-
 	const longPressEvent = useLongPress(
 		() => {
 			// 当前状态为多选
@@ -140,7 +139,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 					stop()
 					return
 				}
-				console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
+				// console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
 				// console.table(_.pick(item, ['msg_id', 'is_read', 'content']))
 				// messageStore.updateUnreadList(item.msg_id)
 				await MsgService.readMessagesApi(
