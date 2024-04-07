@@ -55,7 +55,6 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	const cacheStore = useCacheStore()
 
 	const [showTippy, setShowTippy] = useState<boolean>(false)
-
 	const longPressEvent = useLongPress(
 		() => {
 			// 当前状态为多选

@@ -93,7 +93,7 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		)
 		set({
 			allMessages: newAllMessages,
-			messages: newAllMessages.slice(-(messages.length + 1))
+			messages: newAllMessages.slice(-messages.length)
 		})
 
 		if (isupdateCacheMessage) {
