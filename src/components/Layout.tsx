@@ -11,7 +11,7 @@ const Layout: React.FC = () => {
 	const [tabActive, setTabActive] = useState<string>('dialog')
 	const previousTab = useRef<string>('dialog')
 	const { router, contactRouter } = useRouterStore()
-	const { setDoubleClick } = useToolbarStore()
+	const { onDoubleClick } = useToolbarStore()
 	const onTabLinkClick = (tabName: string) => {
 		if (previousTab.current !== tabActive) {
 			previousTab.current = tabActive
@@ -19,10 +19,9 @@ const Layout: React.FC = () => {
 		}
 		if (tabActive === tabName) {
 			console.log(router)
-			console.log('双击')
 			switch (tabName) {
 				case 'dialog':
-					setDoubleClick(true)
+					onDoubleClick()
 					break
 				case 'contacts':
 					if (cacheStore.applyCount)
