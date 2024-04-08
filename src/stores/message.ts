@@ -49,7 +49,7 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		if (!cache.cacheSearchMessage.includes(tableName)) {
 			cache.updateCacheSearchMessage(tableName)
 		}
-		const messages = allMessages.slice(-15)
+		const messages = allMessages.slice(-100)
 
 		set({ allMessages, messages, isNeedPull: !allMessages.length, tableName, ...options })
 
@@ -115,7 +115,7 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 	unshiftMessage: async () => {
 		const { allMessages, messages } = get()
 		const newMessages = allMessages.slice(-messages.length - 15)
-		set({ messages: newMessages })
+		set({ messages: newMessages, isLoading: false })
 	},
 	updateUnreadList: async (msgId) => {
 		const { unreadList } = get()

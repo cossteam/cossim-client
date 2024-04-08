@@ -163,6 +163,8 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 					cacheStore.cacheDialogs.map((i) => {
 						if (i.dialog_id === newMsg.dialog_id) {
 							const unreadCount = --i.dialog_unread_count
+
+							console.log('unreadCount1', unreadCount)
 							return {
 								...i,
 								last_message: newMsg,
@@ -172,8 +174,11 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 						return i
 					})
 				)
+
 				// 更新Tabber未读消息数
 				const unreadCount = cacheStore.unreadCount - 1
+
+				console.log('unreadCount', unreadCount)
 				cacheStore.updateCacheUnreadCount(unreadCount < 0 ? 0 : unreadCount)
 			}
 		}, 1000)
