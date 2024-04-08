@@ -276,13 +276,13 @@ const ApplyList = () => {
 										</>
 									)}
 								</div>
-								{!isOperate(item) && (
-									<SwipeoutActions right>
-										<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
-											{$t('删除')}
-										</SwipeoutButton>
-									</SwipeoutActions>
-								)}
+								{/* {!isOperate(item) && (
+								)} */}
+								<SwipeoutActions right>
+									<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
+										{$t('删除')}
+									</SwipeoutButton>
+								</SwipeoutActions>
 							</ListItem>
 						)
 					)}
