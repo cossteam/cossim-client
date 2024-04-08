@@ -227,7 +227,7 @@ const ApplyList = () => {
 							</ListItem>
 						) : (
 							// 群聊
-							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout={!isOperate(item)}>
+							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
 								<div slot="media" className="w-12 h-12">
 									<Avatar size={50} src={item?.receiver_info?.user_avatar} />
 								</div>
@@ -276,8 +276,6 @@ const ApplyList = () => {
 										</>
 									)}
 								</div>
-								{/* {!isOperate(item) && (
-								)} */}
 								<SwipeoutActions right>
 									<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
 										{$t('删除')}
