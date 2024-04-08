@@ -4,20 +4,19 @@ import MessageSendButton from './MessageToolbar/MessageSendButton'
 import MessageSendAudio from './MessageToolbar/MessageSendAudio'
 import MessageToolbarContent from './MessageToolbar/MessageToolbarContent'
 import './styles/MessageToolbar.scss'
-import { emojiOrMore, msgSendType, tooltipType } from '@/shared'
+import { MESSAGE_READ, emojiOrMore, msgSendType, tooltipType } from '@/shared'
 import { KeyboardIcon } from '@/components/Icon/Icon'
-import { FaceSmiling, PlusCircle } from 'framework7-icons/react'
+import { ChevronDown, FaceSmiling, PlusCircle } from 'framework7-icons/react'
 import { useMemo, useRef } from 'react'
 import { useClickOutside } from '@reactuses/core'
 import clsx from 'clsx'
 import MessageSelect from './MessageToolbar/MessageSelect'
-// import MessagePlaceholder from './MessageToolbar/MessagePlaceholder'
-// import useCacheStore from '@/stores/cache'
+import useCacheStore from '@/stores/cache'
 
 const MessageToolbar = () => {
 	const toolbarRef = useRef<HTMLDivElement | null>(null)
 	const messageStore = useMessageStore()
-	// const cacheStore = useCacheStore()
+	const cacheStore = useCacheStore()
 
 	const handlerSelect = (toolbarType: emojiOrMore) => {
 		messageStore.update({ toolbarType })
@@ -26,6 +25,25 @@ const MessageToolbar = () => {
 	useClickOutside(toolbarRef, () => messageStore.update({ toolbarType: emojiOrMore.NONE }))
 
 	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
+
+	const unreadCount = useMemo(
+		() => cacheStore.cacheDialogs.find((v) => v?.dialog_id === messageStore.dialogId)?.dialog_unread_count ?? 0,
+		[cacheStore.cacheDialogs]
+	)
+
+	const handlerToBottom = () => {
+		if (unreadCount === 0) return messageStore.update({ isScrollBottom: true })
+		// 找到未读消息的第一条，然后滚动到这条消息
+		const index = messageStore.messages.findIndex((v) => v?.is_read === MESSAGE_READ.NOT_READ)
+		if (index === -1) return messageStore.update({ isScrollBottom: true })
+
+		const el = document.getElementById(`row-${messageStore.messages[index]?.msg_id}`)
+
+		// console.log('el', el)
+
+		if (el) el?.scrollIntoView({ block: 'start' })
+		else messageStore.update({ isScrollBottom: true })
+	}
 
 	return (
 		<>
@@ -72,8 +90,16 @@ const MessageToolbar = () => {
 				{/* 表情或者更多内容切换 */}
 				<MessageToolbarContent />
 
-				{/* 占位 */}
-				{/* <MessagePlaceholder /> */}
+				{/* 滚动到底部按钮 */}
+				<div
+					className={clsx(
+						'absolute bottom-[calc(100%+10px)] z-[9999] right-2 bg-bgPrimary  justify-center items-center rounded-full w-8 h-8 shadow select-none cursor-pointer',
+						messageStore.isAtBottom ? 'hidden' : 'flex'
+					)}
+					onClick={handlerToBottom}
+				>
+					{unreadCount === 0 ? <ChevronDown /> : <span className="text-xs text-gray-500">{unreadCount}</span>}
+				</div>
 			</div>
 		</>
 	)

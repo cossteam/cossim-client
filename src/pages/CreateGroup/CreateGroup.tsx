@@ -10,6 +10,7 @@ import GroupService from '@/api/group'
 import UserStore from '@/db/user'
 // import { useAsyncEffect } from '@reactuses/core'
 import { pick } from 'lodash-es'
+import { getRemoteSession } from '@/run.ts'
 
 const CreateGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	// 群ID
@@ -76,6 +77,7 @@ const CreateGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				top_at: 0
 			}
 
+			getRemoteSession()
 			await UserStore.add(UserStore.tables.dialogs, chat)
 			f7router.back()
 		} catch (error: any) {
@@ -98,6 +100,7 @@ const CreateGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				return
 			}
 			code === 200 && f7router.back()
+			getRemoteSession()
 		} catch (error: any) {
 			f7.dialog.alert($t(error?.message || '编辑群聊失败'))
 		} finally {

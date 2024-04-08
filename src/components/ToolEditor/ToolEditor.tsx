@@ -14,7 +14,7 @@ interface ToolEditorProps {
 	content?: string
 	children?: React.ReactNode
 	placeholder?: string
-	id?: string
+	id?: string | number
 	is_group?: boolean
 	onChange?: (content: string) => void
 	defaultValue?: string

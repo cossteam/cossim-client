@@ -22,7 +22,8 @@ const MessageSendButton = () => {
 			isClearContent: true,
 			manualTipType: tooltipType.NONE,
 			tipType: tooltipType.NONE,
-			isEmojiFocus: false
+			isEmojiFocus: false,
+			isScrollBottom: true
 		})
 	}
 

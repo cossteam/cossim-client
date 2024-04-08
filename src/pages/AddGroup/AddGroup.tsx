@@ -14,21 +14,23 @@ const AddGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		watchAsyncFn(() =>
 			GroupService.groupInfoApi({
 				group_id: Number(groupId)
-			}).then((res) => {
-				console.log('群信息', res)
-				if (res.code == 200) {
-					setGroupInfo(res.data)
-					// 已经在群聊
-					if (res.data.preferences) {
-						console.log()
-						f7router.navigate(`/group_info/${groupId}/`, {reloadCurrent: true})
-					}
-				} else {
-					toastMessage($t('二维码无效'))
-				}
-			}).catch((err) => {
-				console.log('获取群聊失败', err)
 			})
+				.then((res) => {
+					if (res.code == 200) {
+						setGroupInfo(res.data)
+						// 已经在群聊
+						if (res.data.preferences) {
+							console.log()
+							f7router.navigate(`/group_info/${groupId}/`, { reloadCurrent: true })
+						}
+					} else {
+						toastMessage($t('获取群信息失败'))
+						console.log('获取群信息失败', res)
+					}
+				})
+				.catch((err) => {
+					console.log('获取群聊失败', err)
+				})
 		)
 	}, [])
 
