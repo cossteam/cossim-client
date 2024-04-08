@@ -35,7 +35,6 @@ const Search: React.FC<RouterProps> = ({ f7router }) => {
 						// console.log(keyword)
 						// console.log(console.log(handlerContent(i.content)))
 						// console.log()
-
 						return handlerContent(i.content).indexOf(keyword) !== -1
 					})
 					if (dialog.dialog_name.indexOf(keyword) !== -1 || msgs.length > 0) {
