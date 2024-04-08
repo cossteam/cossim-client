@@ -123,7 +123,7 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 						{$t('群聊')}
 					</span>
 				</ListItem>
-				<ListItem link='/black_list/'>
+				<ListItem link="/black_list/">
 					<PersonBadgeMinusFill slot="media" className="text-red-400 text-2xl" />
 					<span slot="title" className="text-red-400">
 						{$t('黑名单')}
@@ -148,7 +148,11 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 								// f7router.navigate(`/profile/${contact.user_id}/`)
 								// }}
 							>
-								<span slot="title">{contact?.nickname}</span>
+								<span slot="title">
+									{contact?.preferences?.remark?.trim() === ''
+										? contact?.nickname
+										: contact?.preferences?.remark}
+								</span>
 								<div slot="media" className="w-10 h-10 ">
 									<img
 										className="w-full h-full object-cover rounded-full bg-black bg-opacity-10"
