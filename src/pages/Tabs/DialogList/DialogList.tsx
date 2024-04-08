@@ -10,7 +10,7 @@ import {
 	SwipeoutButton,
 	PageContent
 } from 'framework7-react'
-import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill, Search } from 'framework7-icons/react'
+import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill, Search, Qrcode } from 'framework7-icons/react'
 import { useCallback, useEffect, useState } from 'react'
 import { $t, customSort, formatDialogListTime, MESSAGE_TYPE } from '@/shared'
 import RelationService from '@/api/relation'
@@ -172,6 +172,11 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 					<ListItem link="/scanner/" noChevron popoverClose className="coss_dialog_list">
 						<ViewfinderCircleFill className="coss_dialog_list__icon" />
 						<span className="coss_dialog_list__text">{$t('扫一扫')}</span>
+					</ListItem>
+
+					<ListItem link="/my_qrcode/" noChevron popoverClose className="coss_dialog_list">
+						<Qrcode className="coss_dialog_list__icon" />
+						<span className="coss_dialog_list__text">{$t('我的二维码')}</span>
 					</ListItem>
 				</List>
 			</Popover>
