@@ -126,11 +126,11 @@ export async function getBehindMessage() {
 		const cacheStore = useCacheStore.getState()
 		const params = cacheStore.cacheDialogs.map((v) => ({
 			dialog_id: v?.dialog_id,
-			msg_id: v?.last_message?.msg_id ?? 0
+			msg_id: 0
 		}))
 		const { code, data } = await MsgService.getBehindMessageApi(params)
 		if (code !== 200) return
-		console.log('落后消息', data)
+		// console.log('落后消息', data)
 		// 更新本地缓存消息
 		cacheStore.updateBehindMessage(data)
 	} catch (error) {

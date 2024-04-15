@@ -1,6 +1,6 @@
 import { MESSAGE_READ, isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/message'
 import ReadEditor from '@/components/ReadEditor/ReadEditor'
 import MessageImage from './MessageRow/MessageImage'
@@ -38,7 +38,7 @@ const className = (is_self: boolean) => {
 	)
 }
 
-const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
+const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 	const longPressRef = useRef<HTMLDivElement>(null)
 
 	const { router } = useRouterStore()
@@ -140,7 +140,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 					stop()
 					return
 				}
-				console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
+				// console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
 				// messageStore.updateUnreadList(item.msg_id)
 				await MsgService.readMessagesApi(
 					{
@@ -200,7 +200,7 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			className="list-none"
 			checkbox={isSelect}
 			onChange={(e) => handlerSelectChange(e.target.checked, item)}
-			id={`row-${item.msg_id}`}
+			id={`row-${item?.msg_id}`}
 		>
 			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')} ref={itemRef}>
 				<div className={clsx('max-w-[80%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>
@@ -248,6 +248,6 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			</div>
 		</ListItem>
 	)
-}
+})
 
 export default MessageRow

@@ -49,7 +49,7 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		if (!cache.cacheSearchMessage.includes(tableName)) {
 			cache.updateCacheSearchMessage(tableName)
 		}
-		const messages = allMessages.slice(-100)
+		const messages = allMessages.slice(-15)
 
 		set({ allMessages, messages, isNeedPull: !allMessages.length, tableName, ...options })
 
