@@ -71,7 +71,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 			const isSilence = data?.preferences?.silent_notification
 			setSilence(isSilence === 1)
 		})()
-	}, [props])
+	}, [])
 
 	// 群成员
 	const [members, setMembers] = useState([])
@@ -84,7 +84,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 			identity && setIdentity(identity)
 			setMembers(data)
 		})()
-	}, [props])
+	}, [])
 
 	// 退出群聊
 	const quitGroup = async () => {
@@ -156,11 +156,14 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 										<Avatar size={50} square src={item.avatar} />
 									</div>
 
-									<div style={{
-										whiteSpace: 'nowrap',
-										overflow: 'hidden',
-										textOverflow: 'ellipsis'
-									}} className="w-12 min-w-12 min-h-6 flex-1 text-sm text-gray-400 max-w-12 overflow-hidden text-ellipsis">
+									<div
+										style={{
+											whiteSpace: 'nowrap',
+											overflow: 'hidden',
+											textOverflow: 'ellipsis'
+										}}
+										className="w-12 min-w-12 min-h-6 flex-1 text-sm text-gray-400 max-w-12 overflow-hidden text-ellipsis"
+									>
 										{item.nickname}
 									</div>
 								</div>
@@ -207,7 +210,11 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 				</ListItem>
 				<ListItem link={`/group_notice/${GroupId}/?identity=${identity}`} title="群公告"></ListItem>
 				<ListItem link={`/group_qrcode/?group_id=${GroupId}`} title="群二维码"></ListItem>
-				<ListItem link={`/group_user_display_name/?group_id=${GroupId}&remark=${groupInfo?.preferences.remark}`} title="我在群组的昵称" after={groupInfo?.preferences.remark} />
+				<ListItem
+					link={`/group_user_display_name/?group_id=${GroupId}&remark=${groupInfo?.preferences.remark}`}
+					title="我在群组的昵称"
+					after={groupInfo?.preferences.remark}
+				/>
 			</List>
 			<List className="m-0 mb-3 bg-white" strong dividers outline noChevron>
 				<ListItem title="消息免打扰">

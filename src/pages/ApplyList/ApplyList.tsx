@@ -127,8 +127,14 @@ const ApplyList = () => {
 	}
 
 	// 是否邀请者
-	const isRreceiver = ({ status, sender_info }: any) => {
-		return type === ApplyType.FRIEND ? sender_info.user_id === user_id : status === ApplyStatus.INVITE_SENDER
+	const isRreceiver = ({ status, sender_info = {} }: any) => {
+		if (type === ApplyType.FRIEND) {
+			return sender_info.user_id === user_id
+		}
+		if (!(status === ApplyStatus.ACCEPT)) {
+			return status === ApplyStatus.INVITE_SENDER
+		}
+		return sender_info?.user_id === user_id
 	}
 
 	/**
@@ -151,7 +157,7 @@ const ApplyList = () => {
 		}
 	}
 
-	const handlerClick = async (item:any) => {
+	const handlerClick = async (item: any) => {
 		await manageFriendApply(item, MangageApplyStatus.ACCEPT)
 		getFriendList()
 		getRemoteSession()
@@ -185,7 +191,7 @@ const ApplyList = () => {
 						// 区分好友申请和群申请
 						type === ApplyType.FRIEND ? (
 							// 好友
-							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout={!isOperate(item)}>
+							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
 								<div slot="media" className="w-12 h-12">
 									<Avatar size={50} src={item?.receiver_info?.user_avatar} />
 								</div>
@@ -211,25 +217,39 @@ const ApplyList = () => {
 										</>
 									)}
 								</div>
-								{!isOperate(item) && (
-									<SwipeoutActions right>
-										<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
-											{$t('删除')}
-										</SwipeoutButton>
-									</SwipeoutActions>
-								)}
+								<SwipeoutActions right>
+									<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
+										{$t('删除')}
+									</SwipeoutButton>
+								</SwipeoutActions>
 							</ListItem>
 						) : (
 							// 群聊
-							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout={!isOperate(item)}>
+							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
 								<div slot="media" className="w-12 h-12">
 									<Avatar size={50} src={item?.receiver_info?.user_avatar} />
 								</div>
 								<div slot="title">
-									<span>{$t(isRreceiver(item) ? '你' : item?.sender_info?.user_name)}</span>
-									<span>{$t('邀请')}</span>
-									<span>{$t(isRreceiver(item) ? item?.receiver_info?.user_name : '你')}</span>
-									<span>{$t('加入')}</span>
+									{item?.sender_info && item?.receiver_info ? (
+										<>
+											<span>{$t(isRreceiver(item) ? '你' : item?.sender_info?.user_name)}</span>
+											<span>{$t('邀请')}</span>
+											<span>{$t(isRreceiver(item) ? item?.receiver_info?.user_name : '你')}</span>
+											<span>{$t('加入')}</span>
+										</>
+									) : !item?.sender_info ? (
+										<>
+											<span>{$t(item?.receiver_info?.user_name)}</span>
+											<span>{$t('申请加入')}</span>
+										</>
+									) : (
+										<>
+											<span>{$t(item?.sender_info?.user_name)}</span>
+											<span>{$t('邀请')}</span>
+											<span>{$t(item?.receiver_info?.user_name)}</span>
+											<span>{$t('加入')}</span>
+										</>
+									)}
 									<span>{$t(item?.group_name)}</span>
 								</div>
 								<div slot="content" className="pr-2 flex">
@@ -254,13 +274,11 @@ const ApplyList = () => {
 										</>
 									)}
 								</div>
-								{!isOperate(item) && (
-									<SwipeoutActions right>
-										<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
-											{$t('删除')}
-										</SwipeoutButton>
-									</SwipeoutActions>
-								)}
+								<SwipeoutActions right>
+									<SwipeoutButton close color="red" onClick={() => deleteApply(item)}>
+										{$t('删除')}
+									</SwipeoutButton>
+								</SwipeoutActions>
 							</ListItem>
 						)
 					)}

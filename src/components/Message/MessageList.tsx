@@ -55,10 +55,9 @@ const MessageList = () => {
 
 	// 自动滚动到底部
 	useEffect(() => {
-		console.log('messageStore.isAtBotto', messageStore.isAtBottom)
-
 		if (!bottomRef.current) return
 		if (!messageStore.isAtBottom && !isFirstIn) return
+		if (messageStore.isLoading) return
 		bottomRef.current.scrollIntoView({ block: 'end' })
 		if (isFirstIn) setIsFirstIn(false)
 	}, [messageStore.messages])
@@ -90,9 +89,7 @@ const MessageList = () => {
 			)}
 			{messageStore.isGroupAnnouncement && <div className="h-10" />}
 			<List className="m-0">{messageStore.messages.map((item, index) => row(item, index))}</List>
-			<div className="min-h-4">
-				<div className="w-full h-32 absolute bottom-0" ref={bottomRef} />
-			</div>
+			<div className="w-full h-4 bottom-0" ref={bottomRef} />
 		</div>
 	)
 }
