@@ -33,7 +33,7 @@ const MessageAudio: React.FC<MessageAudioProps> = ({ className, item, isSelf }) 
 		if (!content?.msDuration) {
 			return ''
 		}
-		return `${Math.floor(content.msDuration / 1000)}''`
+		return Math.floor(content.msDuration / 1000)
 	}, [content?.msDuration])
 
 	// 图标
@@ -81,17 +81,19 @@ const MessageAudio: React.FC<MessageAudioProps> = ({ className, item, isSelf }) 
 	}, [])
 
 	return (
-		<div className={clsx('', className)} onClick={() => play()}>
-			<div className="min-w-16 flex items-center justify-between">
+		<div style={{ width: duration + 'em', justifyContent: isSelf ? 'end' : 'start' }} className={clsx('min-w-20 max-w-56 flex', className)} onClick={() => play()}>
+			<div  style={{ justifyContent: isSelf ? 'end' : 'start' }} className="w-16 flex items-center">
 				{!isSelf && <Icon className="" f7={icons[iconIndex]} size={22} />}
 				<span className="px-2">{duration}</span>
 				{isSelf && <Icon className="rotate-180" f7={icons[iconIndex]} size={22} />}
 			</div>
-			<audio
-				ref={audioRef}
-				className="hidden"
-				src={content.isBlob ? content.url : `data:${content.mimeType};base64,${content.recordDataBase64}`}
-			/>
+			{content && (
+				<audio
+					ref={audioRef}
+					className="hidden"
+					src={content.isBlob ? content.url : `data:${content.mimeType};base64,${content.recordDataBase64}`}
+				/>
+			)}
 		</div>
 	)
 }
