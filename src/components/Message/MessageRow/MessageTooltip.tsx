@@ -1,10 +1,11 @@
-import { $t, MESSAGE_MARK, MESSAGE_SEND, isOverRecallTime, msgType, tooltipType } from '@/shared'
+import { $t, isOverRecallTime, MESSAGE_MARK, MESSAGE_SEND, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import {
 	ArrowUpRight,
 	ArrowUturnLeft,
 	BubbleLeftBubbleRight,
 	Flag,
+	PlusCircle,
 	SquareOnSquare,
 	SquarePencil,
 	TextAlignleft,
@@ -12,9 +13,12 @@ import {
 } from 'framework7-icons/react'
 import { Link } from 'framework7-react'
 import useMessageStore from '@/stores/message'
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import tooltipStatMachine from '../script/tootip'
 import useUserStore from '@/stores/user'
+import emojiData from '@emoji-mart/data'
+import Tippy from '@tippyjs/react'
+import MessageEmojis from '@/components/Message/MessageToolbar/MessageEmojis.tsx'
 import { useClickOutside } from '@reactuses/core'
 
 interface MessageTooltipProps {
@@ -26,11 +30,18 @@ interface MessageTooltipProps {
 const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) => {
 	const messageStore = useMessageStore()
 	const userStore = useUserStore()
-
+	const emojiRef = useRef<HTMLDivElement>(null)
+	const [showTippy, setShowTippy] = useState<boolean>(false)
 	// 点击其他地方移除提示框
 	useClickOutside(el, () => {
 		setTimeout(() => {
 			setShow(false)
+		}, 100)
+	})
+	useClickOutside(emojiRef, () => {
+		console.log('点击其他')
+		setTimeout(() => {
+			setShowTippy(false)
 		}, 100)
 	})
 
@@ -115,9 +126,22 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) =>
 		tooltipStatMachine(data.name, item)
 	}
 
+	const allEmojis: any = emojiData
+
+	/**
+	 * 获取常用表情 id数组
+	 */
+	const getFrequent = (): [string] => {
+		return allEmojis.categories.find((item: any) => item.id === 'frequent').emojis
+	}
+
+	// const div = document.createElement('div')
+	// document.body.appendChild(div)
+
+	// @ts-ignore
 	return (
-		<div className="h-auto pt-2 w-auto rounded relative z-[100] flex items-center justify-center">
-			<div className={clsx('grid', tooltips.length >= 5 ? 'grid-cols-5' : `grid-cols-${tooltips.length}`)}>
+		<div className="h-auto pt-2 w-auto rounded relative z-[100] flex flex-col items-center justify-center">
+			<div className={clsx('grid', tooltips.length >= 6 ? 'grid-cols-6' : `grid-cols-${tooltips.length}`)}>
 				{tooltips.map((item) => (
 					<Link
 						onClick={() => handlerClick(item)}
@@ -132,6 +156,56 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) =>
 					</Link>
 				))}
 			</div>
+			<div className="w-full flex gap-1">
+				<div style={{ width: '100%', overflowX: 'scroll', display: 'flex', gap: '10px' }}>
+					{getFrequent()
+						.slice(0, 8)
+						.map((item: string) => (
+							<em-emoji key={item} id={item} size="2em"></em-emoji>
+						))}
+				</div>
+				<PlusCircle
+					onClick={() => {
+						setShow(false)
+						setShowTippy(true)
+					}}
+					className="toolbar-icon"
+				/>
+			</div>
+			{showTippy && (
+				<Tippy
+					content={
+						<div ref={emojiRef} className="z-[9999]" style={{ width: '97vw' }}>
+							<MessageEmojis
+								onSelectEmojis={(emoji) => messageStore.update({ selectedEmojis: emoji.native })}
+								className="h-auto pt-2 w-full rounded relative z-[100] flex flex-col items-center justify-center"
+							/>
+						</div>
+					}
+					arrow={false}
+					interactive={true}
+					appendTo={document.body}
+					theme="light"
+					animation="shift-away-subtle"
+					// touch={['hold', 300]}
+					// trigger="manual"·
+					visible={showTippy}
+				></Tippy>
+			)}
+
+			{/*{showTippy && (*/}
+			{/*	<div className="z-[9999]">*/}
+			{/*		{createPortal(*/}
+			{/*		<div id="emoji">*/}
+			{/*			<MessageEmojis*/}
+			{/*				style={{ width: '97vw' }}*/}
+			{/*				onSelectEmojis={(emoji) => messageStore.update({ selectedEmojis: emoji.native })}*/}
+			{/*				className="h-auto pt-2 w-full rounded relative z-[100] flex flex-col items-center justify-center"*/}
+			{/*			/>*/}
+			{/*		</div>*/}
+			{/*		, div)}*/}
+			{/*	</div>*/}
+			{/*)}*/}
 		</div>
 	)
 }
