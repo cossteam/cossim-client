@@ -87,11 +87,13 @@ const MessageAudio: React.FC<MessageAudioProps> = ({ className, item, isSelf }) 
 				<span className="px-2">{duration}</span>
 				{isSelf && <Icon className="rotate-180" f7={icons[iconIndex]} size={22} />}
 			</div>
-			<audio
-				ref={audioRef}
-				className="hidden"
-				src={content.isBlob ? content.url : `data:${content.mimeType};base64,${content.recordDataBase64}`}
-			/>
+			{content && (
+				<audio
+					ref={audioRef}
+					className="hidden"
+					src={content.isBlob ? content.url : `data:${content.mimeType};base64,${content.recordDataBase64}`}
+				/>
+			)}
 		</div>
 	)
 }
