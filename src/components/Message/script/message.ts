@@ -124,9 +124,9 @@ export const sendMessage = async (options: Options) => {
 	} catch (error: any) {
 		message.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		// 生成错误信息并添加至会话
-		const errorMessage = generateMessage({ content: error?.message, msg_type: msgType.ERROR })
-		await messageStore.createMessage(errorMessage)
-		await cacheStore.addCacheMessage(errorMessage)
+		// const errorMessage = generateMessage({ content: error?.message, msg_type: msgType.ERROR })
+		// await messageStore.createMessage(errorMessage)
+		// await cacheStore.addCacheMessage(errorMessage)
 	} finally {
 		await messageStore.updateMessage(message)
 		// 转发时需要更新缓存
@@ -135,7 +135,7 @@ export const sendMessage = async (options: Options) => {
 		updateDialog(message, dialogId)
 	}
 
-	// // 以防万一，在10秒后再次更新消息状态
+	// 以防万一，在10秒后再次更新消息状态
 	// setTimeout(() => {
 	// 	if (message.msg_send_state === MESSAGE_SEND.SEND_SUCCESS) return
 	// 	message.msg_send_state = MESSAGE_SEND.SEND_FAILED
