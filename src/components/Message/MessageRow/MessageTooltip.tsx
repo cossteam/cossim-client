@@ -140,7 +140,7 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) =>
 
 	// @ts-ignore
 	return (
-		<div className="h-auto pt-2 w-auto rounded relative z-[100] flex flex-col items-center justify-center">
+		<div className="h-auto max-w-[300px] pt-2 w-auto rounded relative z-[100] flex flex-col items-center justify-center">
 			<div className={clsx('grid', tooltips.length >= 6 ? 'grid-cols-6' : `grid-cols-${tooltips.length}`)}>
 				{tooltips.map((item) => (
 					<Link

@@ -48,7 +48,7 @@ export interface GetBehindMessage {
 }
 
 export interface GetMessage {
-	user_id?:string
+	user_id?: string
 	type?: string
 	content?: string
 	page_num: number
@@ -59,4 +59,9 @@ export type GetGroupMessage = { group_id?: number } & GetMessage
 
 export interface RevokeMessage {
 	msg_id: number
+}
+
+export interface GetDialog {
+	page_num: number
+	page_size: number
 }

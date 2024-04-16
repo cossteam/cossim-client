@@ -61,6 +61,8 @@ export interface CacheStoreOptions {
 	cacheKeyPair: null | { privateKey: string; publicKey: string }
 	/** 上一次登录时间 */
 	lastLoginTime: number
+	/** 会话消息总数 */
+	totalMessages: Array<{ dialog_id: number; total: number }>
 }
 
 /**
@@ -144,9 +146,10 @@ export type CacheStore = CacheStoreOptions & {
 	 * 设置缓存的内容
 	 * @param key
 	 * @param value
+	 * @param isUpdateDB 是否需要更新本地内存中的数据，默认不需要
 	 * @returns
 	 */
-	set: (key: string, value: any) => Promise<void>
+	set: (key: string, value: any, isUpdateDB?: boolean) => Promise<void>
 }
 
 /**
@@ -269,4 +272,9 @@ export type MessageStore = MessageStoreOptions & {
 	 * @param {number} msgId 消息 id
 	 */
 	updateUnreadList: (msgId: number) => Promise<void>
+
+	/**
+	 * 消息是否加载完毕
+	 */
+	isEOF: () => boolean
 }

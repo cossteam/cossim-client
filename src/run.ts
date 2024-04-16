@@ -8,6 +8,7 @@ import MsgService from '@/api/msg'
 import useUserStore from './stores/user'
 import {
 	CACHE_MESSAGE,
+	CACHE_TOTAL_MESSAGE,
 	MESSAGE_MARK,
 	MESSAGE_READ,
 	MESSAGE_SEND,
@@ -23,7 +24,7 @@ import { generateMessage } from './utils/data'
 import cacheStore from './utils/cache'
 import GroupService from './api/group'
 import RelationService from './api/relation'
-import _ from 'lodash-es'
+import _, { get } from 'lodash-es'
 import DOMPurify from 'dompurify'
 import localNotification, { LocalNotificationType } from './utils/notification'
 import { hasCookie } from './utils/cookie'
@@ -33,31 +34,31 @@ import { hasCookie } from './utils/cookie'
  *
  * @param dialogs 会话列表
  */
-async function updateCacheMessage(dialogs: any[]) {
-	for (let i = 0; i < dialogs.length; i++) {
-		const item = dialogs[i]
-		const tableName = `${item.dialog_id}`
-		const tableData = (await cacheStore.get(tableName)) ?? []
-		if (!tableData.length) {
-			cacheStore.set(tableName, [{ ...item?.last_message, dialog_id: item?.dialog_id }])
-		}
-	}
-}
+// async function updateCacheMessage(dialogs: any[]) {
+// 	for (let i = 0; i < dialogs.length; i++) {
+// 		const item = dialogs[i]
+// 		const tableName = `${item.dialog_id}`
+// 		const tableData = (await cacheStore.get(tableName)) ?? []
+// 		if (!tableData.length) {
+// 			cacheStore.set(tableName, [{ ...item?.last_message, dialog_id: item?.dialog_id }])
+// 		}
+// 	}
+// }
 
 /**
  * 获取远程会话
  */
 export async function getRemoteSession() {
 	try {
-		const { code, data } = await MsgService.getDialogApi()
+		const { code, data } = await MsgService.getDialogApi({ page_num: 1, page_size: 15 })
 		if (code !== 200) return
 
 		const cacheStore = useCacheStore.getState()
 
 		const dialogs = []
 
-		for (let i = 0; i < data.length; i++) {
-			const item = data[i]
+		for (let i = 0; i < data?.list.length; i++) {
+			const item = data?.list[i]
 			let content = ''
 			try {
 				// 解密消息
@@ -74,11 +75,13 @@ export async function getRemoteSession() {
 		// 未读消息数
 		const unreadCount = dialogs.reduce((prev: number, curr: any) => prev + curr?.dialog_unread_count, 0)
 
+		if (!cacheStore.cacheDialogs.length) getBehindMessage(dialogs)
+
 		// 更新缓存
 		cacheStore.updateCacheDialogs(dialogs)
 		cacheStore.updateCacheUnreadCount(unreadCount)
 
-		updateCacheMessage(dialogs)
+		// updateCacheMessage(dialogs)
 	} catch (error) {
 		console.error('获取远程会话失败：', error)
 	}
@@ -97,8 +100,8 @@ export async function getApplyList() {
 
 		const friendApply: any = []
 		const groupApply: any = []
-		friend.data && friendApply.push(...friend.data)
-		group.data && groupApply.push(...group.data)
+		friend.data && friendApply.push(...(get(friend, 'data.list', []) ?? []))
+		group.data && groupApply.push(...(get(group, 'data.list', []) ?? []))
 		// 统计未读数
 		const len: number = [...friendApply, ...groupApply].filter(
 			(v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId
@@ -121,18 +124,21 @@ export async function getApplyList() {
 /**
  * 获取落后消息
  */
-export async function getBehindMessage() {
+export async function getBehindMessage(dialogs?: any[]) {
 	try {
 		const cacheStore = useCacheStore.getState()
-		const params = cacheStore.cacheDialogs.map((v) => ({
+		const dialogsData = dialogs ?? cacheStore.cacheDialogs
+		const params = dialogsData.map((v) => ({
 			dialog_id: v?.dialog_id,
-			msg_id: 0
+			msg_id: dialogs ? 0 : v?.last_message?.msg_id ?? 0
 		}))
 		const { code, data } = await MsgService.getBehindMessageApi(params)
 		if (code !== 200) return
-		// console.log('落后消息', data)
+		console.log('落后消息', data)
 		// 更新本地缓存消息
 		cacheStore.updateBehindMessage(data)
+		const totalMessages = data.map((v: any) => ({ dialog_id: v.dialog_id, total: v.total }))
+		cacheStore.set(CACHE_TOTAL_MESSAGE, totalMessages, true)
 	} catch (error) {
 		console.error('获取落后消息失败：', error)
 	}
@@ -204,8 +210,7 @@ async function updateRecallCacheMessage(message: any) {
  * @param {any} data	推送消息
  */
 export async function handlerSocketMessage(data: any) {
-	console.log('handlerSocketMessage', data)
-
+	// console.log('handlerSocketMessage', data)
 	const userStore = useUserStore.getState()
 	const messageStore = useMessageStore.getState()
 	const cacheStore = useCacheStore.getState()
@@ -457,8 +462,8 @@ function run() {
 	// 订阅 firstOpened 状态
 	useCacheStore.subscribe(async ({ firstOpened }) => {
 		if (firstOpened && hasCookie(TOKEN)) {
-			getBehindMessage() // 获取落后消息
 			getRemoteSession()
+			getBehindMessage() // 获取落后消息
 			getApplyList()
 			getFriendList()
 			// setInterval(() => {

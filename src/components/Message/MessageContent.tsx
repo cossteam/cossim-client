@@ -85,7 +85,7 @@ const MessageContent = () => {
 				style={{ display: 'flex', flexDirection: 'column-reverse', width: '100vw' }}
 				inverse={true}
 				hasMore={true}
-				loader={messageStore.messages.length < messageStore.allMessages.length ? <Loading /> : null}
+				loader={!messageStore.isEOF() ? <Loading /> : null}
 				scrollableTarget="scrollableDiv"
 				ref={infiniteScrollRef}
 				scrollThreshold={0}

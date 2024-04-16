@@ -10,8 +10,10 @@ import {
 	CACHE_KEY_PAIR,
 	CACHE_SEARCH_MESSAGE,
 	CACHE_SHARE_KEYS,
+	CACHE_TOTAL_MESSAGE,
 	CACHE_UNREAD_COUNT,
 	arrayToGroups,
+	// findMessageId,
 	groupsToArray
 } from '@/shared'
 
@@ -30,7 +32,8 @@ const defaultOptions: CacheStoreOptions = {
 	groupApply: [],
 	keyboardShow: false,
 	cacheKeyPair: null,
-	lastLoginTime: 1
+	lastLoginTime: 1,
+	totalMessages: []
 }
 
 const useCacheStore = create<CacheStore>((set, get) => ({
@@ -46,8 +49,9 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const applyCount = (await cacheStore.get(CACHE_APPLY_COUNT)) ?? 0
 		const keyboardHeight = (await cacheStore.get(CACHE_KEYBOARD_HEIGHT)) ?? 300
 		const cacheKeyPair = (await cacheStore.get(CACHE_KEY_PAIR)) ?? null
+		const totalMessages = (await cacheStore.get(CACHE_TOTAL_MESSAGE)) ?? []
 
-		console.log('cacheKeyPair', cacheKeyPair)
+		// console.log('cacheKeyPair', cacheKeyPair)
 
 		set({
 			cacheDialogs,
@@ -59,7 +63,8 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 			keyboardHeight,
 			cacheSearchMessage,
 			cacheContactsObj: cacheContacts,
-			cacheKeyPair
+			cacheKeyPair,
+			totalMessages
 		})
 	},
 	updateFirstOpened: (firstOpened) => set({ firstOpened }),
@@ -89,7 +94,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		behindMessages?.map(async (item) => {
 			const tableName = `${item.dialog_id}`
 			const messages = (await cacheStore.get(tableName)) ?? []
-			cacheStore.set(tableName, [...messages, ...item.msg_list])
+			cacheStore.set(tableName, [...messages, ...item.msg_list.reverse()])
 		})
 	},
 	addCacheMessage: async (message) => {
@@ -103,8 +108,17 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const messages = allMessages.map((item: any) =>
 			item?.msg_id === message?.msg_id || item?.uid === message?.uid ? { ...item, ...message } : item
 		)
-
 		await cacheStore.set(tableName, messages)
+
+		// 更新本地消息总数
+		const { set, totalMessages } = get()
+		set(
+			CACHE_TOTAL_MESSAGE,
+			totalMessages.map((item) =>
+				item?.dialog_id === message?.dialog_id ? { ...item, total: item.total + 1 } : item
+			),
+			true
+		)
 	},
 	updateCacheContacts: async (cacheContacts) => {
 		await cacheStore.set(CACHE_CONTACTS, cacheContacts)
@@ -133,8 +147,9 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		}
 		return allMessages.filter((item: any) => ids.includes(item?.msg_id))
 	},
-	set: async (key: string, value: any) => {
+	set: async (key: string, value: any, isUpdate = false) => {
 		await cacheStore.set(key, value)
+		isUpdate && set({ [key]: value })
 	}
 }))
 
