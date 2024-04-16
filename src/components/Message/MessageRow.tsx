@@ -19,13 +19,14 @@ import MessageLabel from './MessageRow/MessageLabel'
 import useUserStore from '@/stores/user'
 import MessageRecall from './MessageRow/MessageRecall'
 import { ListItem } from 'framework7-react'
-import { useIntersectionObserver, useLongPress } from '@reactuses/core'
+import { useClickOutside, useIntersectionObserver, useLongPress } from '@reactuses/core'
 import Avatar from '@/components/Avatar/Avatar'
 import useRouterStore from '@/stores/router'
 import useLoading from '@/hooks/useLoading'
 import useCacheStore from '@/stores/cache'
 import MsgService from '@/api/msg'
 import _ from 'lodash-es'
+import MessageEmojis from './MessageToolbar/MessageEmojis'
 
 interface MessageRowProps {
 	item: { [key: string]: any }
@@ -68,6 +69,20 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		},
 		{ isPreventDefault: false, delay: 300 }
 	)
+
+	// 表情回复
+	const emojiRef = useRef<HTMLDivElement>(null)
+	const [showEmojis, setShowEmojis] = useState<boolean>(false)
+	useClickOutside(emojiRef, () => {
+		setTimeout(() => {
+			setShowEmojis(false)
+		}, 100)
+	})
+	const emojiReply = (emoji: string) => {
+		console.log(emoji)
+		// TODO: 编辑消息
+		console.log('TODO: 编辑消息')
+	}
 
 	// 选中消息时的处理
 	const handlerSelectChange = (checked: boolean, item: any) => {
@@ -225,7 +240,17 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								<span className="mb-1 text-[0.75rem] text-gray-500">{item?.sender_info?.name}</span>
 							)}
 							<Tippy
-								content={<MessageTooltip item={item} setShow={setShowTippy} el={longPressRef} />}
+								content={
+									<MessageTooltip
+										item={item}
+										setShow={setShowTippy}
+										el={longPressRef}
+										toggleEmojis={({ show, emoji }) => {
+											setShowEmojis(show)
+											!show && emojiReply(emoji)
+										}}
+									/>
+								}
 								arrow={false}
 								interactive={true}
 								appendTo={document.body}
@@ -240,6 +265,18 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 									{render()}
 								</div>
 							</Tippy>
+
+							{showEmojis && (
+								<div ref={emojiRef}>
+									<MessageEmojis
+										className="w-[80vw] min-w-[310px] max-w-[600px] min-h-[250px]  max-h-[320px] pt-2 rounded relative z-[100] flex flex-col items-center justify-center"
+										onSelectEmojis={({ native: emoji }) => {
+											setShowEmojis(false)
+											emojiReply(emoji)
+										}}
+									/>
+								</div>
+							)}
 
 							<MessageTime item={item} is_self={is_self} />
 						</div>

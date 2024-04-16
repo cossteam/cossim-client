@@ -8,7 +8,7 @@ interface MessageEmojisProps {
 	className?: string
 }
 
-const MessageEmojis: React.FC<MessageEmojisProps> = ({...props}) => {
+const MessageEmojis: React.FC<MessageEmojisProps> = ({ ...props }) => {
 	return (
 		<div className={clsx('w-full emojis')} {...props} onClick={(e) => e.stopPropagation()}>
 			<div className="bg-[#f5f5f5] w-full">
