@@ -29,7 +29,7 @@ class GroupServiceImpl {
 	 */
 	createGroupApi(data: CreateGroupData): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/create`,
+			url: `${this.baseUrl}`,
 			method: 'POST',
 			data
 		})
@@ -98,9 +98,9 @@ class GroupServiceImpl {
 	 */
 	groupInfoApi(param: any): Promise<DataResponse> {
 		return request({
-			url: this.baseUrl + '/info',
+			url: `${this.baseUrl}/${param.group_id}`,
 			method: 'GET',
-			params: param
+			// params: param
 		})
 	}
 
@@ -112,8 +112,8 @@ class GroupServiceImpl {
 	 */
 	groupUpdateApi(data: any): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/update`,
-			method: 'POST',
+			url: `${this.baseUrl}/${data.group_id}`,
+			method: 'PUT',
 			data
 		})
 	}
@@ -179,13 +179,13 @@ class GroupServiceImpl {
 	/**
 	 * 解散群聊
 	 * @param {*} data
-	 * @param {*} data.gid
+	 * @param {*} data.group_id
 	 * @returns
 	 */
 	groupDissolve(data: any): Promise<DataResponse> {
 		return request({
-			url: this.baseUrl + '/delete',
-			method: 'POST',
+			url: `${this.baseUrl}/${data.group_id}`,
+			method: 'DELETE',
 			data
 		})
 	}
