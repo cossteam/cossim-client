@@ -9,7 +9,6 @@ import { cretateNonce, decryptMessageWithKey, encryptMessage, generateKeyPair, p
  */
 export async function getCacheShareKey(userId: string) {
 	const cacheStore = useCacheStore.getState()
-
 	let shareKey: any = cacheStore.cacheShareKeys.find((v) => v.user_id === userId)?.shareKey
 
 	if (!shareKey) {
@@ -21,8 +20,6 @@ export async function getCacheShareKey(userId: string) {
 			: cacheStore.cacheShareKeys.map((item) => (item.user_id === userId ? { ...item, shareKey } : item))
 		cacheStore.update({ cacheShareKeys }, true)
 	}
-
-	console.log('查找用户预共享密钥：', shareKey)
 
 	return shareKey
 }

@@ -7,12 +7,15 @@ export const defaultOptions: UserStoreOptions = {
 	userInfo: null,
 	token: '',
 	deviceId: '',
-	lastLoginTime: 1
+	lastLoginTime: 1,
+	loginNumber: 0,
+	isNewLogin: false
 }
 
 const userStore = (set: any): UserStore => ({
 	...defaultOptions,
 	update: (options) => set((state: UserStore) => ({ ...state, ...options }))
+	// updateUserInfo: (userInfo) => set((state: UserStore) => ({ ...state, userInfo }))
 })
 
 const useUserStore = create(

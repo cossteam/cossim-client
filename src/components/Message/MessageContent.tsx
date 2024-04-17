@@ -53,9 +53,10 @@ const MessageContent = () => {
 	const fetchMoreData = () => {
 		// a fake async api call like which sends
 		// 20 more records in 1.5 secs
-		setTimeout(() => {
-			messageStore.unshiftMessage()
-		}, 1500)
+		console.log('加载')
+
+		messageStore.update({ isLoading: true })
+		messageStore.unshiftMessage()
 	}
 
 	// const { height } = useWindowSize()
@@ -85,7 +86,7 @@ const MessageContent = () => {
 				style={{ display: 'flex', flexDirection: 'column-reverse', width: '100vw' }}
 				inverse={true}
 				hasMore={true}
-				loader={!messageStore.isEOF() ? <Loading /> : null}
+				loader={messageStore.isLoading ? <Loading /> : null}
 				scrollableTarget="scrollableDiv"
 				ref={infiniteScrollRef}
 				scrollThreshold={0}

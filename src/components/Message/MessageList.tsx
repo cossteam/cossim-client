@@ -15,7 +15,7 @@ const MessageList = () => {
 
 	const [isFirstIn, setIsFirstIn] = useState<boolean>(true)
 
-	const placeholderRef = useRef<HTMLDivElement | null>(null)
+	// const placeholderRef = useRef<HTMLDivElement | null>(null)
 	const bottomRef = useRef<HTMLDivElement | null>(null)
 
 	// const isEOF = useMemo(
@@ -82,11 +82,11 @@ const MessageList = () => {
 	// }, [messageStore.isLoading])
 	return (
 		<div className="w-full h-auto relative">
-			{messageStore.isLoading && (
+			{/* {messageStore.isLoading && (
 				<div className="w-full h-10 top -z-1 text-center text-gray-500" ref={placeholderRef}>
 					loading...
 				</div>
-			)}
+			)} */}
 			{messageStore.isGroupAnnouncement && <div className="h-10" />}
 			<List className="m-0">{messageStore.messages.map((item, index) => row(item, index))}</List>
 			<div className="w-full h-4 bottom-0" ref={bottomRef} />

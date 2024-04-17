@@ -14,6 +14,10 @@ export interface UserStoreOptions {
 	deviceId: string
 	/** 上一次登录时间 */
 	lastLoginTime: number
+	/** 登录记录，用于记录退出登录前的登录记录 */
+	loginNumber: number
+	/** 是否新设备登录 */
+	isNewLogin: boolean
 }
 
 /**

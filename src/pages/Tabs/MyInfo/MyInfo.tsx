@@ -28,6 +28,7 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 				setInfo(userStore.userInfo)
 				return
 			}
+
 			userStore.update({
 				userInfo: data
 			})

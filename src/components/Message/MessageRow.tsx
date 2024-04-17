@@ -159,7 +159,7 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 				// messageStore.updateUnreadList(item.msg_id)
 				await MsgService.readMessagesApi(
 					{
-						dialog_id: messageStore.isGroup ? Number(messageStore.receiverId) : messageStore.receiverId,
+						dialog_id: messageStore.dialogId,
 						msg_ids: [item.msg_id]
 					},
 					messageStore.isGroup

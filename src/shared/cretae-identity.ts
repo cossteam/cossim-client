@@ -2,6 +2,7 @@ import { Device } from '@capacitor/device'
 import { generateKeyPair } from './tweetnacl'
 // import CommonStore from '@/db/common'
 import useCacheStore from '@/stores/cache'
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 /**
  * 创建一个身份。
@@ -33,4 +34,10 @@ export const cretaeIdentity = async (user_id: string, account: string, is_update
 	// !is_update && (await CommonStore.add(CommonStore.tables.users, result))
 
 	return result
+}
+
+export const getFingerPrintID = async () => {
+	const fpPromise = await FingerprintJS.load()
+	const result = await fpPromise.get()
+	return result.visitorId
 }

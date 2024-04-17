@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { MessageStore, MessageStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
-import { emojiOrMore, getRemoteMessage, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
+import { emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
 import useCacheStore from './cache'
 
 export const defaultOptions: MessageStoreOptions = {
@@ -61,25 +61,6 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 			...options
 		})
 
-		// 获取远程消息
-		// getRemoteMessage(options.isGroup, options.receiverId, 1, 100).then((data) => {
-		// 	const total = data?.total ?? 0
-		// 	const msgs = data?.user_messages ?? data?.group_messages ?? []
-
-		// 	const diffData = msgs
-		// 		.reverse()
-		// 		// @ts-ignore
-		// 		.filter((msg) => !allMessages.some((m) => m?.msg_id === msg?.msg_id))
-
-		// 	if (diffData.length > 0) {
-		// 		// const messages = diffData.concat(allMessages)
-		// 		// set({ allMessages: messages, messages: messages.slice(-15) })
-		// 		cacheStore.set(tableName, diffData)
-		// 	}
-
-		// 	set({ total })
-		// })
-
 		console.log('init message store', get())
 	},
 	update: async (options) => {
@@ -121,28 +102,25 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		cacheStore.set(`${dialogId}`, [])
 	},
 	unshiftMessage: async () => {
-		const { isGroup, dialogId, allMessages, messages, total } = get()
-
-		// console.log('触顶加载', total, messages.length)
-
-		if (allMessages.length < total) {
-			getRemoteMessage({
-				isGroup,
-				id: dialogId,
-				page_num: 1,
-				page_size: 20,
-				msg_id: allMessages[0]?.msg_id ?? 0
-			}).then((data) => {
-				const total = data?.total ?? 0
-				const msgs = data?.user_messages ?? data?.group_messages ?? []
-				const newMessages = [...msgs.reverse(), ...messages]
-				set({ total, messages: newMessages, allMessages: newMessages })
-				cacheStore.set(`${dialogId}`, newMessages)
-			})
-		} else {
-			const newMessages = allMessages.slice(-messages.length - 20)
-			set({ messages: newMessages, total: allMessages.length })
-		}
+		const { allMessages, messages } = get()
+		// if (messages.length < allMessages.length) {
+		// 	getRemoteMessage({
+		// 		isGroup,
+		// 		id: dialogId,
+		// 		page_num: 1,
+		// 		page_size: 20,
+		// 		msg_id: allMessages[0]?.msg_id ?? 0
+		// 	}).then((data) => {
+		// 		const total = data?.total ?? 0
+		// 		const msgs = data?.user_messages ?? data?.group_messages ?? []
+		// 		const newMessages = [...msgs.reverse(), ...messages]
+		// 		set({ total, messages: newMessages, allMessages: newMessages, isLoading: false })
+		// 		cacheStore.set(`${dialogId}`, newMessages)
+		// 	})
+		// } else {
+		const newMessages = allMessages.slice(-messages.length - 20)
+		set({ messages: newMessages, total: allMessages.length, isLoading: false })
+		// }
 	},
 	updateUnreadList: async (msgId) => {
 		const { unreadList } = get()

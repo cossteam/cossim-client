@@ -220,22 +220,6 @@ export async function handlerSocketMessage(data: any) {
 	// 获取消息类型
 	const type = message?.msg_type
 
-	// 本地通知
-	try {
-		// msg 的发送者不是自己并且当前不在会话中
-		const dialogId = Number(messageStore.dialogId)
-		console.log('本地通知：', dialogId, Number(message.dialog_id))
-		if (Number(message.dialog_id) !== dialogId) {
-			// 本地通知
-			const dom = document.createElement('p')
-			dom.innerHTML = DOMPurify.sanitize(message.content || '')
-			localNotification(LocalNotificationType.MESSAGE, message.sender_info.name, dom.innerText)
-			// 本地通知 END
-		}
-	} catch {
-		console.log('发送本地通知失败')
-	}
-
 	// 是否需要继续操作，如果是标注、撤回时需要继续操作,如果都不是且是自己当前设备发的就不处理
 	const isDrivered: boolean = userStore.deviceId === (data?.driver_id ?? data?.driverId)
 	const isContinue = !isLableMessage(type) && !isRecallMessage(type) && isDrivered
@@ -249,6 +233,21 @@ export async function handlerSocketMessage(data: any) {
 	})
 
 	msg.content = await decrypt(message?.sender_id, message.content)
+
+	// 本地通知
+	try {
+		// msg 的发送者不是自己并且当前不在会话中
+		const dialogId = Number(messageStore.dialogId)
+		// console.log('本地通知：', dialogId, Number(message.dialog_id))
+		if (Number(message.dialog_id) !== dialogId) {
+			// 本地通知
+			const dom = document.createElement('p')
+			dom.innerHTML = DOMPurify.sanitize(message.content || '')
+			localNotification(LocalNotificationType.MESSAGE, message.sender_info.name, dom.innerText)
+		}
+	} catch {
+		console.log('发送本地通知失败')
+	}
 
 	// TODO: 解密标注消息
 	if (isLableMessage(type)) {
@@ -359,7 +358,7 @@ export function handlerSocketRequest(data: any) {
 	}
 	// 本地通知
 	try {
-		console.log('新请求', data)
+		// console.log('新请求', data)
 		localNotification(LocalNotificationType.MESSAGE, '新请求', data.msg ?? '有新的请求待处理')
 	} catch {
 		console.log('发送本地通知失败')

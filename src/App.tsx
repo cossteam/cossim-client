@@ -20,9 +20,13 @@ import { isWeb } from './utils'
 import useUserStore from '@/stores/user'
 import useMessageStore, { defaultOptions } from './stores/message'
 import { usePreviewStore } from './stores/preview'
+import DevicePopup from './components/DevicePopup/DevicePopup'
 
 function App() {
 	const router = useRef<Router.Router | null>(null)
+
+	// 是否需要设备验证
+	// const [devicePopupVisible, setDevicePopupVisible] = useState(false)
 
 	const liveRoomStore = useLiveRoomStore()
 	const cacheStore = useCacheStore()
@@ -103,6 +107,13 @@ function App() {
 				uploadPublicKey()
 				userStore.update({ lastLoginTime: Date.now() })
 			}
+			// if (!cacheStore.cacheKeyPair) setDevicePopupVisible(true)
+
+			// 如果是新设备登录
+			// if (userStore.lastLoginTime && userStore.isNewLogin) {
+			// 	toastMessage('检测到新设备登录')
+			// }
+
 			SocketClient.connect()
 			SocketClient.addListener('onWsMessage', handlerInit)
 		}
@@ -207,6 +218,7 @@ function App() {
 					<Layout />
 					<Preview />
 					<LiveRoomNew />
+					<DevicePopup />
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />
