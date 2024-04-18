@@ -28,9 +28,10 @@ const DevicePopup: React.FC<DevicePopupProps> = ({ opened = false }) => {
 		if (!text) return toastMessage('请输入密钥对')
 		try {
 			const keyPair = JSON.parse(decode(text))
+			// const publicKey = getServerPublicKey(userStore.userId)
 			userStore.update({ isNewLogin: false })
 			cacheStore.update({ cacheKeyPair: keyPair }, true)
-			setPopupOpened(false)
+			handlerBeforeClose()
 		} catch (error) {
 			toastMessage('密钥对格式不正确或错误')
 		}
@@ -45,6 +46,19 @@ const DevicePopup: React.FC<DevicePopupProps> = ({ opened = false }) => {
 				setPopupOpened(false)
 			})
 		})
+	}
+
+	const handlerBeforeClose = () => {
+		confirmMessage(
+			'是否同步历史消息？',
+			'同步消息',
+			() => {
+				// 同步历史消息
+				cacheStore.update({ isSyncRemote: true }, true)
+				setPopupOpened(false)
+			},
+			() => setPopupOpened(false)
+		)
 	}
 
 	return (

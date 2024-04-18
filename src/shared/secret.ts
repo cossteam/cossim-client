@@ -3,7 +3,7 @@ import UserService from '@/api/user'
 import { cretateNonce, decryptMessageWithKey, encryptMessage, generateKeyPair, performKeyExchange } from '.'
 
 /**
- * 根据用户 id 获取其共享密钥和共钥
+ * 根据用户 id 获取其共享密钥
  * @param {string} userId 用户 id
  * @returns
  */

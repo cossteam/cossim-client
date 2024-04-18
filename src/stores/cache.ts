@@ -12,6 +12,7 @@ import {
 	CACHE_SHARE_KEYS,
 	CACHE_TOTAL_MESSAGE,
 	CACHE_UNREAD_COUNT,
+	SyncRemote,
 	arrayToGroups,
 	// findMessageId,
 	groupsToArray
@@ -33,7 +34,8 @@ const defaultOptions: CacheStoreOptions = {
 	keyboardShow: false,
 	cacheKeyPair: null,
 	lastLoginTime: 1,
-	totalMessages: []
+	totalMessages: [],
+	isSyncRemote: false
 }
 
 const useCacheStore = create<CacheStore>((set, get) => ({
@@ -50,6 +52,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const keyboardHeight = (await cacheStore.get(CACHE_KEYBOARD_HEIGHT)) ?? 300
 		const cacheKeyPair = (await cacheStore.get(CACHE_KEY_PAIR)) ?? null
 		const totalMessages = (await cacheStore.get(CACHE_TOTAL_MESSAGE)) ?? []
+		const isSyncRemote = (await cacheStore.get(SyncRemote)) ?? false
 
 		// console.log('cacheKeyPair', cacheKeyPair)
 
@@ -64,7 +67,8 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 			cacheSearchMessage,
 			cacheContactsObj: cacheContacts,
 			cacheKeyPair,
-			totalMessages
+			totalMessages,
+			isSyncRemote
 		})
 	},
 	updateFirstOpened: (firstOpened) => set({ firstOpened }),

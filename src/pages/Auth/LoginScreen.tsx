@@ -90,11 +90,11 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 				localStorage.setItem('user_list', JSON.stringify([{ ...data.user_info, ...fromData }]))
 			}
 
+			location.reload()
+
 			setCookie(USER_ID, data?.user_info?.user_id)
 			setCookie(ACCOUNT, data?.user_info?.email)
 			setCookie(TOKEN, data?.token)
-
-			location.reload()
 
 			userStore.update({
 				userId: data?.user_info?.user_id,

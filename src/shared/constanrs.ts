@@ -37,3 +37,5 @@ export const CACHE_MESSAGE = 'CacheMessage'
 export const CACHE_KEY_PAIR = 'cacheKeyPair'
 /** 缓存总数据 */
 export const CACHE_TOTAL_MESSAGE = 'cacheTotalMessage'
+/** 同步历史消息 */
+export const SyncRemote = 'isSyncRemote'

@@ -67,6 +67,8 @@ export interface CacheStoreOptions {
 	lastLoginTime: number
 	/** 会话消息总数 */
 	totalMessages: Array<{ dialog_id: number; total: number }>
+	/** 是否同步远程消息 */
+	isSyncRemote: boolean
 }
 
 /**
