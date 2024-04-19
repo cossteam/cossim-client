@@ -1,8 +1,8 @@
 import { MESSAGE_READ, isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
-import { memo, useCallback, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/message'
-import ReadEditor from '@/components/ReadEditor/ReadEditor'
+// import ReadEditor from '@/components/ReadEditor/ReadEditor'
 import MessageImage from './MessageRow/MessageImage'
 import MessageAudio from './MessageRow/MessageAudio'
 import MessageVideo from './MessageRow/MessageVideo'
@@ -27,9 +27,11 @@ import useCacheStore from '@/stores/cache'
 import MsgService from '@/api/msg'
 import _ from 'lodash-es'
 import MessageEmojis from './MessageToolbar/MessageEmojis'
+import { mergeMessage, sendMessage } from './script/message'
+import MessageText from './MessageRow/MessageText'
 
 interface MessageRowProps {
-	item: { [key: string]: any }
+	item: Message
 }
 
 const className = (is_self: boolean) => {
@@ -78,10 +80,14 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 			setShowEmojis(false)
 		}, 100)
 	})
-	const emojiReply = (emoji: string) => {
-		console.log(emoji)
-		// TODO: 编辑消息
-		console.log('TODO: 编辑消息')
+	const emojiReply = async (emoji: string) => {
+		await sendMessage({
+			content: emoji,
+			msg_type: msgType.EMOJI,
+			reply_id: item.msg_id
+		})
+		// console.log(emoji, item)
+		// console.log('TODO: 编辑消息')
 	}
 
 	// 选中消息时的处理
@@ -100,18 +106,18 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 		[messageStore.manualTipType]
 	)
 
-	const replyMessage = useMemo(() => {
-		const reply = { replyName: '', replyContent: '' }
-		if (!item?.reply_id) return reply
-		const message = messageStore.allMessages.find((msg) => msg?.msg_id === item?.reply_id)
-		if (!message) {
-			reply.replyContent = '消息已删除'
-		} else {
-			reply.replyName = message?.sender_info?.name
-			reply.replyContent = message?.content
-		}
-		return reply
-	}, [item?.reply_id])
+	// const replyMessage = useMemo(() => {
+	// 	const reply = { replyName: '', replyContent: '' }
+	// 	if (!item?.reply_id) return reply
+	// 	const message = messageStore.allMessages.find((msg) => msg?.msg_id === item?.reply_id)
+	// 	if (!message) {
+	// 		reply.replyContent = '消息已删除'
+	// 	} else {
+	// 		reply.replyName = message?.sender_info?.name
+	// 		reply.replyContent = message?.content
+	// 	}
+	// 	return reply
+	// }, [item?.reply_id])
 
 	const render = useCallback(() => {
 		switch (type) {
@@ -124,13 +130,14 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 			case msgType.FILE:
 				return <MessageFile className={clsx(className(is_self), '!px-2 !py-2')} item={item} />
 			default:
-				return (
-					<ReadEditor
-						className={clsx(className(is_self), !is_self ? 'read-editor-no-slef' : '')}
-						content={item?.content}
-						{...replyMessage}
-					/>
-				)
+				return <MessageText item={item} isSelf={is_self} />
+			// return (
+			// 	<ReadEditor
+			// 		className={clsx(className(is_self), !is_self ? 'read-editor-no-slef' : '')}
+			// 		content={item?.content}
+			// 		{...replyMessage}
+			// 	/>
+			// )
 		}
 	}, [messageStore.messages])
 
@@ -164,6 +171,7 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 					},
 					messageStore.isGroup
 				)
+				// @ts-ignore
 				const oldMsg = (await cacheStore.getDialogMessages(item.dialog_id, item.msg_id))[0]
 				// 更新消息状态
 				const newMsg = {
@@ -199,6 +207,14 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 		}, 1000)
 	)
 
+	// console.log('MessageRow', item)
+
+	useEffect(() => {
+		if (type === msgType.EMOJI) {
+			mergeMessage(item)
+		}
+	}, [])
+
 	// 无内容
 	if (type === msgType.NONE) return null
 	// 通知
@@ -209,6 +225,8 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 	if ([msgType.LABEL, msgType.CANCEL_LABEL].includes(type)) return <MessageLabel item={item} />
 	// 撤回消息
 	if (type === msgType.RECALL) return <MessageRecall item={item} />
+	// 表情回复
+	if (type === msgType.EMOJI) return null
 
 	return (
 		<ListItem
@@ -218,7 +236,7 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 			id={`row-${item?.msg_id}`}
 		>
 			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')} ref={itemRef}>
-				<div className={clsx('max-w-[80%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>
+				<div className={clsx('max-w-[85%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>
 					<div className={clsx('flex items-start', is_self ? 'justify-end pr-2' : 'justify-start pl-2')}>
 						<div
 							onClick={() => search(item.sender_info.user_id)}

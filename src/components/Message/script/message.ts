@@ -74,6 +74,8 @@ interface Options {
 	uid?: string
 	/** 是否是转发 */
 	isForward?: boolean
+	/** 回复 id */
+	reply_id?: number
 }
 
 /**
@@ -102,7 +104,7 @@ export const sendMessage = async (options: Options) => {
 		content: content,
 		msg_send_state: MESSAGE_SEND.SENDING,
 		msg_type,
-		reply_id: isReply ? messageStore.selectedMessage?.msg_id : 0,
+		reply_id: options.reply_id || (isReply ? messageStore.selectedMessage?.msg_id : 0),
 		dialog_id: dialogId,
 		is_burn_after_reading: isBurnAfterReading
 	})
@@ -238,4 +240,27 @@ export const forward = async (item: any, msg: Message) => {
 	}
 
 	return message
+}
+
+/**
+ * 合并消息
+ * @param {Message} messages 要合并的消息数组
+ */
+export const mergeMessage = async (message: Message) => {
+	const messageStore = useMessageStore.getState()
+	const index = messageStore.allMessages.findIndex((item) => item.msg_id === message.reply_id)
+	if (index === -1) return
+	console.log('合并消息')
+
+	try {
+		const item = messageStore.allMessages[index]
+		const baseEmojis = item?.reply_emojis ?? []
+		baseEmojis.push(message.content)
+		item.reply_emojis = baseEmojis
+		item.reply_info = message.sender_info
+		await messageStore.updateMessage(item)
+		await messageStore.deleteMessage(message)
+	} catch (error: any) {
+		console.log('合并失败')
+	}
 }

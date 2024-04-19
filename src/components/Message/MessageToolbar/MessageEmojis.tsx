@@ -15,7 +15,7 @@ const MessageEmojis: React.FC<MessageEmojisProps> = ({ ...props }) => {
 				<div className="w-full text-[1rem]" onClick={(e) => e.stopPropagation()}>
 					<Picker
 						data={data}
-						onEmojiSelect={(emojis: any) => props.onSelectEmojis(emojis)}
+						onEmojiSelect={(emojis: any) => props.onSelectEmojis && props.onSelectEmojis(emojis)}
 						dynamicWidth={true}
 						locale="zh"
 						previewPosition="none"
