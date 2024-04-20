@@ -1,6 +1,6 @@
 import useMessageStore from '@/stores/message'
 import MessageRow from './MessageRow'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { emojiOrMore } from '@/shared'
 import { List } from 'framework7-react'
 import { useIntersectionObserver } from '@reactuses/core'
@@ -49,7 +49,7 @@ const MessageList = () => {
 	// 	// setTimeout(() => messageStore.container?.scrollTo({ top: 300 }), 0)
 	// }, [])
 
-	const row = useCallback((item: Message, index: number) => <MessageRow item={item} key={index} />, [])
+	// const row = useCallback((item: Message, index: number) => <MessageRow item={item} key={index} />, [])
 
 	useIntersectionObserver(bottomRef, (entry) => messageStore.update({ isAtBottom: entry[0].isIntersecting }))
 
@@ -88,7 +88,11 @@ const MessageList = () => {
 				</div>
 			)} */}
 			{messageStore.isGroupAnnouncement && <div className="h-10" />}
-			<List className="m-0">{messageStore.messages.map((item, index) => row(item, index))}</List>
+			<List className="m-0">
+				{messageStore.messages.map((item, index) => (
+					<MessageRow item={item} key={index} />
+				))}
+			</List>
 			<div className="w-full h-4 bottom-0" ref={bottomRef} />
 		</div>
 	)

@@ -39,13 +39,16 @@ const MessageText: React.FC<MessageTextProps> = ({ item, isSelf }) => {
 			/>
 			{item?.reply_emojis && !!item.reply_emojis.length && (
 				<div className="px-2 py-[2px] flex flex-wrap gap-1 pb-2 select-none">
-					{item.reply_emojis.map((content: string, index: number) => (
+					{item.reply_emojis.map((item: any, index: number) => (
 						<div
-							className="mr-1 text-1rem p-1 bg-[rgba(255,255,255,0.5)] rounded-full text-[0.75rem] text-[#656464] flex items-center"
+							className={clsx(
+								'mr-1 text-1rem p-1  rounded-full text-[0.75rem] text-[#656464] flex items-center max-w-[100px] overflow-hidden whitespace-nowrap text-ellipsis',
+								isSelf ? 'bg-[rgba(255,255,255,0.5)]' : 'bg-[rgba(0,0,0,0.1)]'
+							)}
 							key={index}
 						>
-							<span className="mr-1">{content}</span>
-							<span className="max-w-[40px] inline-block overflow-x-hidden text-ellipsis whitespace-nowrap">
+							<span className="mr-1">{item?.reply_content}</span>
+							<span className="inline-block overflow-x-hidden text-ellipsis whitespace-nowrap">
 								{item?.reply_info?.name}
 							</span>
 						</div>

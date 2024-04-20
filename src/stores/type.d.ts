@@ -262,11 +262,11 @@ export type MessageStore = MessageStoreOptions & {
 	 *
 	 * @param {any} message
 	 */
-	deleteMessage: (message: any) => void
+	deleteMessage: (message: any) => Promise<void>
 	/**
 	 * 删除本地所有消息
 	 *
-	 * @param {number} dialogId 会话 id
+	 * @param {number} dialogId 会话 idvoid
 	 */
 	deleteAllMessage: (dialogId: number) => Promise<void>
 	/**

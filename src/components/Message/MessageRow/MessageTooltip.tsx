@@ -13,7 +13,7 @@ import {
 } from 'framework7-icons/react'
 import { Link } from 'framework7-react'
 import useMessageStore from '@/stores/message'
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import tooltipStatMachine from '../script/tootip'
 import useUserStore from '@/stores/user'
 import emojiData from '@emoji-mart/data'
@@ -28,8 +28,11 @@ interface MessageTooltipProps {
 const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, toggleEmojis }) => {
 	const messageStore = useMessageStore()
 	const userStore = useUserStore()
+
+	const toolTipRef = useRef<HTMLDivElement | null>(null)
+
 	// 点击其他地方移除提示框
-	useClickOutside(el, () => {
+	useClickOutside(el, async () => {
 		setTimeout(() => {
 			setShow(false)
 		}, 100)
@@ -130,7 +133,10 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 
 	// @ts-ignore
 	return (
-		<div className="h-auto max-w-[300px] pt-2 w-auto rounded relative z-[100] flex flex-col items-center justify-center">
+		<div
+			className="h-auto max-w-[300px] pt-2 w-auto rounded relative z-[100] flex flex-col items-center justify-center"
+			ref={toolTipRef}
+		>
 			<div className={clsx('grid', tooltips.length >= 6 ? 'grid-cols-6' : `grid-cols-${tooltips.length}`)}>
 				{tooltips.map((item) => (
 					<Link

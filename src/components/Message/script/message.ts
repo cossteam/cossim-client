@@ -255,9 +255,9 @@ export const mergeMessage = async (message: Message) => {
 	try {
 		const item = messageStore.allMessages[index]
 		const baseEmojis = item?.reply_emojis ?? []
-		baseEmojis.push(message.content)
+		baseEmojis.push({ reply_content: message.content, reply_info: message.sender_info })
 		item.reply_emojis = baseEmojis
-		item.reply_info = message.sender_info
+		// item.reply_info = message.sender_info
 		await messageStore.updateMessage(item)
 		await messageStore.deleteMessage(message)
 	} catch (error: any) {

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { MessageStore, MessageStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
-import { emojiOrMore, getRemoteMessage, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
+import { emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
 import useCacheStore from './cache'
 
 export const defaultOptions: MessageStoreOptions = {
@@ -102,26 +102,26 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 		cacheStore.set(`${dialogId}`, [])
 	},
 	unshiftMessage: async () => {
-		const { allMessages, messages, dialogId, isGroup } = get()
-		const cacheStore = useCacheStore.getState()
-		if (messages.length < allMessages.length && cacheStore.isSyncRemote) {
-			getRemoteMessage({
-				isGroup,
-				id: dialogId,
-				page_num: 1,
-				page_size: 20,
-				msg_id: allMessages[0]?.msg_id ?? 0
-			}).then((data) => {
-				const total = data?.total ?? 0
-				const msgs = data?.user_messages ?? data?.group_messages ?? []
-				const newMessages = [...msgs.reverse(), ...messages]
-				set({ total, messages: newMessages, allMessages: newMessages, isLoading: false })
-				cacheStore.set(`${dialogId}`, newMessages)
-			})
-		} else {
-			const newMessages = allMessages.slice(-messages.length - 20)
-			set({ messages: newMessages, total: allMessages.length, isLoading: false })
-		}
+		const { allMessages, messages } = get()
+		// const cacheStore = useCacheStore.getState()
+		// if (messages.length < allMessages.length && cacheStore.isSyncRemote) {
+		// 	getRemoteMessage({
+		// 		isGroup,
+		// 		id: dialogId,
+		// 		page_num: 1,
+		// 		page_size: 20,
+		// 		msg_id: allMessages[0]?.msg_id ?? 0
+		// 	}).then((data) => {
+		// 		const total = data?.total ?? 0
+		// 		const msgs = data?.user_messages ?? data?.group_messages ?? []
+		// 		const newMessages = [...msgs.reverse(), ...messages]
+		// 		set({ total, messages: newMessages, allMessages: newMessages, isLoading: false })
+		// 		cacheStore.set(`${dialogId}`, newMessages)
+		// 	})
+		// } else {
+		const newMessages = allMessages.slice(-messages.length - 20)
+		set({ messages: newMessages, total: allMessages.length, isLoading: false })
+		// }
 	},
 	updateUnreadList: async (msgId) => {
 		const { unreadList } = get()

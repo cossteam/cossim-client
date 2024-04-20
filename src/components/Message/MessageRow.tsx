@@ -62,7 +62,6 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 		() => {
 			// 当前状态为多选
 			if (messageStore.manualTipType === tooltipType.SELECT) return
-
 			setShowTippy(true)
 
 			// 全选内容文字内容
