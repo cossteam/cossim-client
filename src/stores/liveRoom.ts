@@ -48,6 +48,8 @@ interface LiveRoomParams {
 	eventDate: any
 	state: LiveRoomStates
 	opened: boolean
+	/** 离开 id 列表 */
+	leaveIds: Array<string>
 }
 
 interface LiveRoomFunc {
@@ -81,7 +83,8 @@ const initialState = (): LiveRoomParams => ({
 	isGroup: false,
 	members: [],
 	state: LiveRoomStates.IDLE,
-	opened: false
+	opened: false,
+	leaveIds: []
 })
 
 export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore => ({
@@ -186,6 +189,12 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 				setTimeout(() => {
 					resetState()
 				}, 2000)
+				break
+			case SocketEvent.UserLeaveGroupCallEvent:
+				const { leaveIds } = get()
+				set({
+					leaveIds: [...leaveIds, eventDate.data.sender_id]
+				})
 				break
 			default:
 				return
@@ -294,7 +303,6 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 	},
 	join: async () => {
 		const { room, recipient, isGroup, hangup } = get()
-		console.log('room => ', room)
 		const joinRoomParams: any = {}
 		!isGroup && (joinRoomParams['user_id'] = recipient)
 		isGroup && (joinRoomParams['group_id'] = Number(recipient))

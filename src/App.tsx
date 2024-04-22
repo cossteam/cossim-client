@@ -96,6 +96,7 @@ function App() {
 				case SocketEvent.GroupCallRejectEvent:
 				case SocketEvent.UserCallHangupEvent:
 				case SocketEvent.GroupCallHangupEvent:
+					case SocketEvent.UserLeaveGroupCallEvent:
 					liveRoomStore.handlerEvent(event, data)
 					break
 				case SocketEvent.MessageEditEvent:
