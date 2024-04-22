@@ -5,12 +5,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BellFill, ChevronRight, Ellipsis } from 'framework7-icons/react'
 import useUserStore from '@/stores/user'
 import GroupService from '@/api/group'
+import useCacheStore from '@/stores/cache'
 // import { useAsyncEffect } from '@reactuses/core'
 // import { PluginListenerHandle } from '@capacitor/core'
 
 const MessageHeader = () => {
 	const messageStore = useMessageStore()
 	const userStore = useUserStore()
+	const cacheStore = useCacheStore()
 
 	// 是否是系统通知
 	const is_system = useMemo(() => messageStore.receiverId === '10001', [messageStore.receiverId])
@@ -55,11 +57,19 @@ const MessageHeader = () => {
 		if (messageStore.isGroup) messageStore.update({ isGroupAnnouncement: isShowGroupAnnouncement })
 	}, [isShowGroupAnnouncement])
 
+	// 在线状态
+	const onlineStatus = useMemo(() => {
+		if (messageStore.isGroup) return ''
+		if (is_system) return ''
+		const user = cacheStore.onlineStatus.find((v) => v.user_id === messageStore.receiverId)
+		return user?.status === 1 ? '在线' : '离线'
+	}, [cacheStore.onlineStatus, messageStore.isGroup, messageStore.receiverId])
+
 	return (
 		<div className="min-h-12 bg-bgPrimary sticky top-0 z-50">
 			<Navbar
 				title={messageStore?.receiverInfo?.dialog_name ?? messageStore?.receiverInfo?.name}
-				subtitle="[在线]"
+				subtitle={onlineStatus}
 				backLink
 				outline={false}
 				className="coss_message_navbar"

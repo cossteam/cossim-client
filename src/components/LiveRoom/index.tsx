@@ -407,6 +407,10 @@ const LiveRoomNew: React.FC = () => {
 									} else {
 										videoStyle['width'] = '100%'
 									}
+
+									// 隐藏视频
+									if (liveRoomStore.state === LiveRoomStates.HANGUP) return null
+
 									return (
 										<VideoBox
 											key={index}

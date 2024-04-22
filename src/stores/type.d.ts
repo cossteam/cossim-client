@@ -69,6 +69,8 @@ export interface CacheStoreOptions {
 	totalMessages: Array<{ dialog_id: number; total: number }>
 	/** 是否同步远程消息 */
 	isSyncRemote: boolean
+	/** 用户在线状态 */
+	onlineStatus: Array<{ user_id: string; status: number }>
 }
 
 /**

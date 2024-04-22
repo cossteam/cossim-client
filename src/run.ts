@@ -461,7 +461,9 @@ export const handlerDestroyMessage = _.debounce(() => {
  */
 export function handlerSocketOnline(data: any) {
 	// const userStore = useUserStore.getState()
-	console.log('用户在线状态d', data)
+	// console.log('用户在线状态d', data)
+	const cacheStore = useCacheStore.getState()
+	cacheStore.update({ onlineStatus: data.data }, true)
 }
 
 /**

@@ -5,14 +5,15 @@ import {
 	CACHE_APPLY_COUNT,
 	CACHE_CONTACTS,
 	CACHE_DIALOGS,
+	CACHE_FRIEND_ONLINE_STATUS,
 	CACHE_GROUP,
 	CACHE_KEYBOARD_HEIGHT,
 	CACHE_KEY_PAIR,
 	CACHE_SEARCH_MESSAGE,
 	CACHE_SHARE_KEYS,
+	CACHE_SYNC_REMOTE,
 	CACHE_TOTAL_MESSAGE,
 	CACHE_UNREAD_COUNT,
-	SyncRemote,
 	arrayToGroups,
 	// findMessageId,
 	groupsToArray
@@ -35,7 +36,8 @@ const defaultOptions: CacheStoreOptions = {
 	cacheKeyPair: null,
 	lastLoginTime: 1,
 	totalMessages: [],
-	isSyncRemote: false
+	isSyncRemote: false,
+	onlineStatus: []
 }
 
 const useCacheStore = create<CacheStore>((set, get) => ({
@@ -52,7 +54,8 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const keyboardHeight = (await cacheStore.get(CACHE_KEYBOARD_HEIGHT)) ?? 300
 		const cacheKeyPair = (await cacheStore.get(CACHE_KEY_PAIR)) ?? null
 		const totalMessages = (await cacheStore.get(CACHE_TOTAL_MESSAGE)) ?? []
-		const isSyncRemote = (await cacheStore.get(SyncRemote)) ?? false
+		const isSyncRemote = (await cacheStore.get(CACHE_SYNC_REMOTE)) ?? false
+		const onlineStatus = (await cacheStore.get(CACHE_FRIEND_ONLINE_STATUS)) ?? []
 
 		// console.log('cacheKeyPair', cacheKeyPair)
 
@@ -68,7 +71,8 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 			cacheContactsObj: cacheContacts,
 			cacheKeyPair,
 			totalMessages,
-			isSyncRemote
+			isSyncRemote,
+			onlineStatus
 		})
 	},
 	updateFirstOpened: (firstOpened) => set({ firstOpened }),
