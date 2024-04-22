@@ -282,7 +282,9 @@ export enum SocketEvent {
 	/** 推送好友在线状态 */
 	FriendOnlineEvent = 27,
 	/** 推送好友离线状态 */
-	FriendOfflineEvent = 28
+	FriendOfflineEvent = 28,
+	/** 用户离开群组通话事件 */
+	UserLeaveGroupCallEvent = 31
 }
 
 /** 消息是否阅后即焚 */
