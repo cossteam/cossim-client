@@ -191,6 +191,7 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 				}, 2000)
 				break
 			case SocketEvent.UserLeaveGroupCallEvent:
+				// eslint-disable-next-line no-case-declarations
 				const { leaveIds } = get()
 				set({
 					leaveIds: [...leaveIds, eventDate.data.sender_id]
