@@ -14,7 +14,7 @@ import {
 	uploadFile
 } from '@/shared'
 import clsx from 'clsx'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import useCacheStore from '@/stores/cache'
 import { sendMessage } from '../script/message'
 import { generateMessage } from '@/utils/data'
@@ -83,6 +83,12 @@ const MessageToolbarContent = () => {
 		}
 	}
 
+	useEffect
+		(() => {
+			// console.log('members', messageStore.members)
+		},[messageStore.members])
+
+
 	return (
 		<div
 			className={clsx('w-full h-[300px] flex overflow-hidden', isNone && 'hidden')}
@@ -93,7 +99,7 @@ const MessageToolbarContent = () => {
 				className={clsx('w-full', !isEmoji && 'hidden')}
 			/>
 			<MessageMore
-				members={[]}
+				members={messageStore.members}
 				className={clsx('w-full', !isMore && 'hidden')}
 				onSelectFiles={handlerSelectFiles}
 			/>

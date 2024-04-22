@@ -38,6 +38,7 @@ export interface CallProps {
 }
 
 interface LiveRoomParams {
+	room: string | null
 	url: string | null
 	token: string | null
 	recipient: number | string | null
@@ -71,6 +72,7 @@ interface LiveRoomFunc {
 type LiveRoomStore = LiveRoomParams & LiveRoomFunc
 
 const initialState = (): LiveRoomParams => ({
+	room: null,
 	url: null,
 	token: null,
 	video: false,
@@ -154,7 +156,10 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 			case SocketEvent.GroupCallReqEvent:
 				{
 					const isGroup = event === SocketEvent.GroupCallReqEvent
+					const room = eventDate.data.room
+					console.log('ws event room => ', room)
 					set({
+						room: room,
 						isGroup,
 						recipient: isGroup ? Number(eventDate.data.group_id) : eventDate.data.sender_id,
 						state: LiveRoomStates.WAITING,
@@ -196,15 +201,20 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 			recipient: callProps.recipient,
 			isGroup: callProps.isGroup
 		}
-		if (callProps.isGroup && callProps.members) {
+		// if (callProps.isGroup && callProps.members) {
+		if (callProps.members) {
 			status['members'] = callProps.members
 		}
 		callProps.video && (status['video'] = callProps.video)
 		// 创建通话参数
 		const createRoomParams: any = {}
-		!callProps.isGroup && (createRoomParams['user_id'] = callProps.recipient)
+		if (!callProps.isGroup) {
+			createRoomParams['user_id'] = callProps.recipient
+			createRoomParams['member'] = [callProps.recipient]
+		}
 		callProps.isGroup && (createRoomParams['group_id'] = Number(callProps.recipient))
 		callProps.isGroup && (createRoomParams['member'] = callProps.members?.map((item) => item.user_id) || [])
+		createRoomParams['type'] = callProps.isGroup ? 'group' : 'user'
 		createRoomParams['option'] = {
 			audio_enabled: true,
 			// codec: 'vp8',
@@ -217,9 +227,7 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 		try {
 			f7.dialog.preloader('正在呼叫...')
 			// 创建通话
-			const { code, data, msg } = !callProps.isGroup
-				? await CallService.createLiveUserApi(createRoomParams)
-				: await CallService.createLiveGroupApi(createRoomParams)
+			const { code, data, msg } = await CallService.createLiveApi(createRoomParams)
 			if (code !== 200) {
 				f7.dialog.alert(msg, () => {
 					hangup()
@@ -231,6 +239,7 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 				...status,
 				state: LiveRoomStates.WAITING,
 				url: data.url,
+				room: data.room,
 				opened: true
 			})
 			// 加入房间
@@ -245,16 +254,15 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 		set({
 			state: LiveRoomStates.HANGUP
 		})
-		const { recipient, isGroup } = get()
+		const { room, recipient, isGroup } = get()
 		console.log('get', get())
 
 		const createRoomParams: any = {}
 		!isGroup && (createRoomParams['user_id'] = recipient)
 		isGroup && (createRoomParams['group_id'] = Number(recipient))
+		createRoomParams['room'] = room
 		try {
-			!isGroup
-				? await CallService.leaveLiveUserApi(createRoomParams)
-				: await CallService.leaveLiveGroupApi(createRoomParams)
+			await CallService.leaveLiveApi(createRoomParams)
 		} finally {
 			setTimeout(() => {
 				f7.dialog.close()
@@ -268,14 +276,13 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 		set({
 			state: LiveRoomStates.REFUSE
 		})
-		const { recipient, isGroup } = get()
+		const { room, recipient, isGroup } = get()
 		const refuseRoomParams: any = {}
 		!isGroup && (refuseRoomParams['user_id'] = recipient)
 		isGroup && (refuseRoomParams['group_id'] = Number(recipient))
+		refuseRoomParams['room'] = room
 		try {
-			!isGroup
-				? await CallService.rejectLiveUserApi(refuseRoomParams)
-				: await CallService.rejectLiveUserApi(refuseRoomParams)
+			await CallService.rejectLiveApi(refuseRoomParams)
 		} finally {
 			setTimeout(() => {
 				f7.dialog.close()
@@ -286,15 +293,15 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 		}
 	},
 	join: async () => {
-		const { recipient, isGroup, hangup } = get()
+		const { room, recipient, isGroup, hangup } = get()
+		console.log('room => ', room)
 		const joinRoomParams: any = {}
 		!isGroup && (joinRoomParams['user_id'] = recipient)
 		isGroup && (joinRoomParams['group_id'] = Number(recipient))
+		joinRoomParams['room'] = room
 		try {
 			f7.dialog.preloader('连接中...')
-			const { code, data, msg } = !isGroup
-				? await CallService.joinLiveUserApi(joinRoomParams)
-				: await CallService.joinLiveGroupApi(joinRoomParams)
+			const { code, data, msg } = await CallService.joinLiveApi(joinRoomParams)
 			if (code !== 200) {
 				f7.dialog.alert(msg, () => {
 					hangup()

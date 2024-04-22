@@ -120,23 +120,23 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 			video_enabled: callProps.video
 		}
 		try {
-			f7.dialog.preloader('正在呼叫...')
-			// 创建通话
-			const { code, msg } = !callProps.isGroup
-				? await CallService.createLiveUserApi(createRoomParams)
-				: await CallService.createLiveGroupApi(createRoomParams)
-			if (code !== 200) {
-				f7.dialog.alert(msg, () => {
-					hangup()
-				})
-				return
-			}
-			set({
-				...initialState(),
-				...status,
-				opened: true,
-				ownEvent: OwnEventEnum.WAITING // 等待创建房间以及加入房间
-			})
+			// f7.dialog.preloader('正在呼叫...')
+			// // 创建通话
+			// const { code, msg } = !callProps.isGroup
+			// 	? await CallService.createLiveApi({ data: createRoomParams })
+			// 	: await CallService.createLiveGroupApi(createRoomParams)
+			// if (code !== 200) {
+			// 	f7.dialog.alert(msg, () => {
+			// 		hangup()
+			// 	})
+			// 	return
+			// }
+			// set({
+			// 	...initialState(),
+			// 	...status,
+			// 	opened: true,
+			// 	ownEvent: OwnEventEnum.WAITING // 等待创建房间以及加入房间
+			// })
 			// 加入房间
 			await accept()
 		} catch (error: any) {
@@ -153,19 +153,19 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 		const refuseRoomParams: any = {}
 		!isGroup && (refuseRoomParams['user_id'] = id)
 		isGroup && (refuseRoomParams['group_id'] = Number(id))
-		try {
-			!isGroup
-				? await CallService.rejectLiveUserApi(refuseRoomParams)
-				: await CallService.rejectLiveUserApi(refuseRoomParams)
-		} finally {
-			setTimeout(() => {
-				f7.dialog.close()
-				set({
-					...initialState(),
-					ownEvent: OwnEventEnum.IDLE
-				})
-			}, 2000)
-		}
+		// try {
+		// 	!isGroup
+		// 		? await CallService.rejectLiveUserApi(refuseRoomParams)
+		// 		: await CallService.rejectLiveUserApi(refuseRoomParams)
+		// } finally {
+		// 	setTimeout(() => {
+		// 		f7.dialog.close()
+		// 		set({
+		// 			...initialState(),
+		// 			ownEvent: OwnEventEnum.IDLE
+		// 		})
+		// 	}, 2000)
+		// }
 	},
 	refused: () => {
 		set({
@@ -185,22 +185,22 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 		isGroup && (joinRoomParams['group_id'] = Number(id))
 		try {
 			f7.dialog.preloader('连接中...')
-			const { code, data, msg } = !isGroup
-				? await CallService.joinLiveUserApi(joinRoomParams)
-				: await CallService.joinLiveGroupApi(joinRoomParams)
-			if (code !== 200) {
-				f7.dialog.alert(msg, () => {
-					hangup()
-				})
-				return
-			}
-			console.log('data', data)
+			// const { code, data, msg } = !isGroup
+			// ? await CallService.joinLiveUserApi(joinRoomParams)
+			// : await CallService.joinLiveGroupApi(joinRoomParams)
+			// if (code !== 200) {
+			// 	f7.dialog.alert(msg, () => {
+			// 		hangup()
+			// 	})
+			// 	return
+			// }
+			// console.log('data', data)
 
-			set({
-				serverUrl: data.url,
-				token: data.token,
-				ownEvent: OwnEventEnum.BUSY
-			})
+			// set({
+			// 	serverUrl: data.url,
+			// 	token: data.token,
+			// 	ownEvent: OwnEventEnum.BUSY
+			// })
 		} catch (error: any) {
 			f7.dialog.alert(error.message)
 		} finally {
@@ -215,20 +215,20 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 		const createRoomParams: any = {}
 		!isGroup && (createRoomParams['user_id'] = id)
 		isGroup && (createRoomParams['group_id'] = Number(id))
-		try {
-			!isGroup
-				? await CallService.leaveLiveUserApi(createRoomParams)
-				: await CallService.leaveLiveGroupApi(createRoomParams)
-		} catch {
-			hanged()
-		} finally {
-			setTimeout(() => {
-				f7.dialog.close()
-				set({
-					...initialState()
-				})
-			}, 2000)
-		}
+		// try {
+		// 	!isGroup
+		// 		? await CallService.leaveLiveApi(createRoomParams)
+		// 		: await CallService.leaveLiveGroupApi(createRoomParams)
+		// } catch {
+		// 	hanged()
+		// } finally {
+		// 	setTimeout(() => {
+		// 		f7.dialog.close()
+		// 		set({
+		// 			...initialState()
+		// 		})
+		// 	}, 2000)
+		// }
 	},
 	hanged: () => {
 		set({
