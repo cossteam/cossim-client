@@ -1,6 +1,6 @@
 import { MESSAGE_READ, isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/message'
 // import ReadEditor from '@/components/ReadEditor/ReadEditor'
 import MessageImage from './MessageRow/MessageImage'
@@ -27,8 +27,9 @@ import useCacheStore from '@/stores/cache'
 import MsgService from '@/api/msg'
 import _ from 'lodash-es'
 import MessageEmojis from './MessageToolbar/MessageEmojis'
-import { mergeMessage, sendMessage } from './script/message'
+import { sendMessage } from './script/message'
 import MessageText from './MessageRow/MessageText'
+import { recall } from './script/tootip'
 
 interface MessageRowProps {
 	item: Message
@@ -80,13 +81,18 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 		}, 100)
 	})
 	const emojiReply = async (emoji: string) => {
+		if (item.reply_emojis) {
+			const replyEmojis = item.reply_emojis.find((item: any) => item.reply_content === emoji)
+			if (replyEmojis) {
+				recall({ ...item, msg_id: replyEmojis?.msg_id })
+				return
+			}
+		}
 		await sendMessage({
 			content: emoji,
 			msg_type: msgType.EMOJI,
 			reply_id: item.msg_id
 		})
-		// console.log(emoji, item)
-		// console.log('TODO: 编辑消息')
 	}
 
 	// 选中消息时的处理
@@ -121,9 +127,9 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 	const render = useCallback(() => {
 		switch (type) {
 			case msgType.IMAGE:
-				return <MessageImage className={clsx(className(is_self), '')} item={item} />
+				return <MessageImage item={item} />
 			case msgType.AUDIO:
-				return <MessageAudio className={className(is_self)} isSelf={is_self} item={item} />
+				return <MessageAudio isSelf={is_self} item={item} />
 			case msgType.VIDEO:
 				return <MessageVideo className={clsx(className(is_self), '!px-2 !py-2')} item={item} />
 			case msgType.FILE:
@@ -208,11 +214,11 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 
 	// console.log('MessageRow', item)
 
-	useEffect(() => {
-		if (type === msgType.EMOJI) {
-			mergeMessage(item)
-		}
-	}, [])
+	// useEffect(() => {
+	// 	if (type === msgType.EMOJI) {
+	// 		mergeMessage(item)
+	// 	}
+	// }, [])
 
 	// 无内容
 	if (type === msgType.NONE) return null

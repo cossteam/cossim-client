@@ -34,7 +34,8 @@ export const defaultOptions: MessageStoreOptions = {
 	unreadList: [],
 	isGroupAnnouncement: false,
 	isEmojiFocus: false,
-	isScrollBottom: true
+	isScrollBottom: true,
+	members: []
 }
 
 const useMessageStore = create<MessageStore>((set, get) => ({

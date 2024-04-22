@@ -75,15 +75,15 @@ async function mark() {
 /**
  * 撤回消息
  */
-async function recall() {
+export async function recall(message?: Message) {
 	const messageStore = useMessageStore.getState()
 	try {
-		const message = messageStore.selectedMessage
-		const params = { msg_id: message.msg_id }
-		const { code, msg } = messageStore.isGroup
+		const msg = message ? message : messageStore.selectedMessage
+		const params = { msg_id: msg.msg_id }
+		const { code, msg: error } = messageStore.isGroup
 			? await MsgService.revokeGroupMessageApi(params)
 			: await MsgService.revokeUserMessageApi(params)
-		if (code !== 200) throw new Error(msg)
+		if (code !== 200) throw new Error(error)
 		messageStore.deleteMessage(message)
 	} catch (error: any) {
 		toastMessage(error?.message ?? '撤回失败')

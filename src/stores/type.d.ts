@@ -222,6 +222,8 @@ export interface MessageStoreOptions {
 	isEmojiFocus: boolean
 	/** 是否需要滚动到底部 */
 	isScrollBottom: boolean
+	/** 群成员 */
+	members: any[]
 }
 
 interface initOptions {

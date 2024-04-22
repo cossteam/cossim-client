@@ -28,6 +28,7 @@ import _, { get } from 'lodash-es'
 import DOMPurify from 'dompurify'
 import localNotification, { LocalNotificationType } from './utils/notification'
 import { hasCookie } from './utils/cookie'
+import { mergeMessage, revokeMessage } from './components/Message/script/message'
 
 /**
  * 更新本地缓存消息，如果一开始没有消息，就添加会话中的最后一条消息
@@ -123,6 +124,7 @@ export async function getApplyList() {
 
 /**
  * 获取落后消息
+ * @param {any[]} dialogs 本地缓存的会话列表
  */
 export async function getBehindMessage(dialogs?: any[]) {
 	try {
@@ -162,7 +164,6 @@ export async function getFriendList() {
 
 /**
  * 是否需要根据消息类型来确定是否需要添加或更新消息，标注、取消标注消息
- *
  * @param type 	消息类型
  */
 function isLableMessage(type: msgType) {
@@ -180,8 +181,7 @@ function isRecallMessage(type: msgType) {
 
 /**
  * 更新本地缓存的标注消息
- *
- * @param {any} message
+ * @param {any} message	消息
  */
 async function updateLabelCacheMessage(message: any) {
 	const tableName = CACHE_MESSAGE + `_${message.dialog_id}`
@@ -194,8 +194,7 @@ async function updateLabelCacheMessage(message: any) {
 
 /**
  * 撤回消息，删除本地的消息
- *
- * @param {message} message
+ * @param {message} message	消息
  */
 async function updateRecallCacheMessage(message: any) {
 	const tableName = CACHE_MESSAGE + `_${message.dialog_id}`
@@ -206,8 +205,7 @@ async function updateRecallCacheMessage(message: any) {
 
 /**
  * 处理消息
- *
- * @param {any} data	推送消息
+ * @param {any} data 推送消息
  */
 export async function handlerSocketMessage(data: any) {
 	// console.log('handlerSocketMessage', data)
@@ -274,29 +272,34 @@ export async function handlerSocketMessage(data: any) {
 
 		// 更新撤回消息
 		if (isRecallMessage(type)) {
-			// 需要拿到最新的消息列表
+			console.log('message', msg)
+			const relpyMsg = msg.reply_msg
 			const messageStore = useMessageStore.getState()
 			const message = messageStore.allMessages.find((v) => v?.msg_id === msg?.reply_id)
-			message && messageStore.deleteMessage(message)
-		}
 
-		// 手动触发滚动到底部操作
-		// messageStore.update({ isScrollBottom: true })
+			if (relpyMsg.msg_type === msgType.EMOJI) {
+				revokeMessage(relpyMsg)
+			} else {
+				// 需要拿到最新的消息列表
+				message && messageStore.deleteMessage(message)
+			}
+		}
 	} else {
 		cacheStore.addCacheMessage(msg)
 	}
 
-	// cacheStore.updateCacheMessage(msg)
 	// 如果是标注消息，需要修改本地消息缓存
 	isLableMessage(type) && updateLabelCacheMessage(msg)
 	// 如果是撤回消息，需要修改本地消息缓存
 	isRecallMessage(type) && updateRecallCacheMessage(msg)
 
 	// 更新消息的总未读数
-	if (msg.is_read !== MESSAGE_READ.READ) {
-		cacheStore.updateCacheUnreadCount(cacheStore.unreadCount + 1)
-	}
+	if (msg.is_read !== MESSAGE_READ.READ) cacheStore.updateCacheUnreadCount(cacheStore.unreadCount + 1)
 
+	// 如果是表情回复，就合并消息
+	if (message.msg_type === msgType.EMOJI) mergeMessage(msg)
+
+	// 更新会话的未读数
 	cacheStore.updateCacheDialogs(
 		cacheStore.cacheDialogs.map((i) => {
 			if (i.dialog_id === message.dialog_id) {
@@ -421,7 +424,7 @@ export const handlerDestroyMessage = _.debounce(() => {
 		// 	allMsg.filter(
 		// 		(i: any) =>
 		// 			i.is_read === MESSAGE_READ.NOT_READ ||
-		// 			!isDifferenceGreaterThanSeconds(i.read_at, Date.now(), preferences.open_burn_after_reading_time_out)
+		// 	!isDifferenceGreaterThanSeconds(i.read_at, Date.now(), preferences.open_burn_after_reading_time_out)
 		// 	)
 		// )
 
@@ -451,6 +454,15 @@ export const handlerDestroyMessage = _.debounce(() => {
 		)
 	})
 }, 1000)
+
+/**
+ * 用户在线状态
+ * @param data 推送消息
+ */
+export function handlerSocketOnline(data: any) {
+	// const userStore = useUserStore.getState()
+	console.log('用户在线状态d', data)
+}
 
 /**
  * 主入口

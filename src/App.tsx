@@ -15,7 +15,13 @@ import LiveRoomNew from '@/components/LiveRoom'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
-import run, { handlerSocketEdit, handlerSocketMessage, handlerSocketRequest, handlerSocketResult } from './run'
+import run, {
+	handlerSocketEdit,
+	handlerSocketMessage,
+	handlerSocketOnline,
+	handlerSocketRequest,
+	handlerSocketResult
+} from './run'
 import { isWeb } from './utils'
 import useUserStore from '@/stores/user'
 import useMessageStore, { defaultOptions } from './stores/message'
@@ -95,6 +101,9 @@ function App() {
 				case SocketEvent.MessageEditEvent:
 					handlerSocketEdit(data)
 					break
+				case SocketEvent.UserOnlineEvent:
+					handlerSocketOnline(data)
+					break
 			}
 		}
 
@@ -173,7 +182,7 @@ function App() {
 					if (hasCookie(TOKEN) && SocketClient.isDisconnect()) {
 						SocketClient.connect()
 					}
-					// cacheStore.updateFirstOpened(true)
+					cacheStore.updateFirstOpened(true)
 				} else {
 					cacheStore.updateFirstOpened(false)
 				}

@@ -10,21 +10,10 @@ import Message from '@/pages/Message/Message'
 import NotFound from '@/pages/NotFound'
 
 const routes: Router.RouteParameters[] = [
-	// {
-	// 	path: '/',
-	// 	redirect: '/chats/',
-	// 	beforeEnter: (ctx: Router.RouteCallbackCtx) => {
-	// 		console.log('beforeEnter', ctx)
-	// 	}
-	// },
 	{
 		path: '/dialog/',
 		component: DialogList,
 		keepAlive: true
-		// options: {
-		// 	animate: false,
-		// 	transition: 'f7-push'
-		// }
 	},
 	{
 		path: '/contacts/',
@@ -52,11 +41,11 @@ const routes: Router.RouteParameters[] = [
 		path: '/message/:id/:dialog_id/',
 		component: Message,
 		options: {
-			// animate: true,
+			animate: true,
 			transition: 'f7-push'
 			// transition: 'f7-custom'
-		}
-		// keepAlive: true
+		},
+		keepAlive: true
 	},
 	{
 		path: '/user_info/:user_id/',

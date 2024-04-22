@@ -1,4 +1,5 @@
-import { $t } from '@/shared'
+import { $t, msgType } from '@/shared'
+import { useMemo } from 'react'
 // import { useMemo } from 'react'
 
 interface MessageRecallProps {
@@ -6,7 +7,10 @@ interface MessageRecallProps {
 }
 
 const MessageRecall: React.FC<MessageRecallProps> = ({ item }) => {
-	// const name = useMemo(() => (isMe(item?.sender_info?.user_id) ? $t('你') : $t('对方')), [item?.sender_info?.user_id])
+	const replyMsg = useMemo(() => item?.reply_msg, [item?.reply_msg])
+
+	// 撤回表情回复不需要显示撤回提示
+	if (replyMsg?.msg_type === msgType.EMOJI) return null
 
 	return (
 		<div className="message-tip">

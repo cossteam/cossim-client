@@ -56,7 +56,7 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 	return (
 		<Page onPageAfterIn={loadUserInfo} className="bg-bgTertiary coss_info">
 			<Navbar className="bg-bgPrimary hidden-navbar-bg coss_navbar" title={info?.nickname} large outline={false}>
-				<span></span>
+				{/* <span></span> */}
 			</Navbar>
 			<List strong mediaList className="coss_list">
 				<ListItem

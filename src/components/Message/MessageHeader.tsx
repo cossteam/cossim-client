@@ -46,6 +46,7 @@ const MessageHeader = () => {
 			getGroupAnnouncement()
 			GroupService.groupMemberApi({ group_id: Number(messageStore.receiverId) }).then((res) => {
 				setMembers(res.data)
+				messageStore.update({ members: res.data })
 			})
 		}
 	}, [])
