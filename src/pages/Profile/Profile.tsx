@@ -182,6 +182,22 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		[userInfo?.preferences?.open_burn_after_reading]
 	)
 
+	const handlerClick = async (isLabel: boolean = false) => {
+		await messageStore.init({
+			dialogId: dialog_id ?? 0,
+			receiverId: user_id ?? 0,
+			isGroup: false,
+			receiverInfo: {
+				dialog_id: userInfo?.dialog_id,
+				dialog_avatar: userInfo?.avatar,
+				dialog_name: userInfo?.nickname
+			},
+			isLabel
+		})
+
+		f7router?.navigate(`/message/${user_id}/${dialog_id}/?is_group=false&dialog_name=${userInfo.nickname}`)
+	}
+
 	return (
 		<Page className="profile-page bg-bgTertiary" noToolbar onPageBeforeIn={onPageBeforeIn}>
 			<Navbar title={$t('用户信息')} backLink className="bg-bgPrimary hidden-navbar-bg" />
@@ -196,27 +212,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					{!is_from_message_page && (
 						<div className="size-10  flex flex-col justify-center items-center">
 							<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-								<Link
-									iconF7="chat_bubble_fill"
-									iconSize={22}
-									onClick={async () => {
-										await messageStore.init({
-											dialogId: dialog_id ?? 0,
-											receiverId: user_id ?? 0,
-											isGroup: false,
-											receiverInfo: {
-												dialog_id: userInfo?.dialog_id,
-												dialog_avatar: userInfo?.avatar,
-												dialog_name: userInfo?.nickname
-											}
-										})
-										console.log(userInfo)
-
-										f7router?.navigate(
-											`/message/${user_id}/${dialog_id}/?is_group=false&dialog_name=${userInfo.nickname}`
-										)
-									}}
-								/>
+								<Link iconF7="chat_bubble_fill" iconSize={22} onClick={async () => handlerClick()} />
 							</div>
 							<span className="text-xs">消息</span>
 						</div>
@@ -241,7 +237,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					</div>
 					<div className="size-10  flex flex-col justify-center items-center" onClick={() => {}}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
-							<Link iconF7="tag_fill" iconSize={22} />
+							<Link iconF7="tag_fill" iconSize={22} onClick={async () => handlerClick(true)} />
 						</div>
 						<span className="text-xs">标注</span>
 					</div>

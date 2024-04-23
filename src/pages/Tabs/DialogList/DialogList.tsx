@@ -12,7 +12,7 @@ import {
 } from 'framework7-react'
 import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill, Search, Qrcode } from 'framework7-icons/react'
 import { useCallback, useEffect, useState } from 'react'
-import { $t, customSort, formatDialogListTime, MESSAGE_TYPE } from '@/shared'
+import { $t, customSort, formatDialogListTime, msgType } from '@/shared'
 import RelationService from '@/api/relation'
 import './DialogList.scss'
 import ReadEditor from '@/components/ReadEditor/ReadEditor'
@@ -91,27 +91,26 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	}
 
 	const Row = (item: any) => {
-		switch (item?.last_message?.msg_type) {
-			case MESSAGE_TYPE.IMAGE:
-				return '[图片]'
-			case MESSAGE_TYPE.VIDEO:
-				return '[视频]'
-			case MESSAGE_TYPE.FILE:
-				return '[文件]'
-			case MESSAGE_TYPE.AUDIO:
-				return '[语音]'
-			default:
-				return (
-					<ReadEditor
-						content={
-							(item?.group_id && item?.last_message?.sender_info?.name
-								? item?.last_message?.sender_info?.name + ':'
-								: '') + handlerContent(item?.last_message?.content ?? '')
-						}
-						className="dialog-read-editor"
-					/>
-				)
-		}
+		let text = item?.last_message?.content ?? ''
+
+		const type = item?.last_message?.msg_type
+
+		if (type === msgType.IMAGE) text = '[图片]'
+		if (type === msgType.VIDEO) text = '[视频]'
+		if (type === msgType.FILE) text = '[文件]'
+		if (type === msgType.AUDIO) text = '[语音]'
+		if (type === msgType.RECALL) text = '[撤回了一条消息]'
+
+		return (
+			<ReadEditor
+				content={
+					(item?.group_id && item?.last_message?.sender_info?.name
+						? item?.last_message?.sender_info?.name + ':'
+						: '') + handlerContent(text)
+				}
+				className="dialog-read-editor"
+			/>
+		)
 	}
 
 	function heightToTop(ele: any) {

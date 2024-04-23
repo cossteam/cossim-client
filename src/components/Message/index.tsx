@@ -76,7 +76,7 @@ const Message: React.FC<RouterProps> = () => {
 			<div className="h-screen overflow-hidden flex flex-col" style={{ height }}>
 				<MessageHeader />
 				<MessageContent />
-				<MessageToolbar />
+				{!messageStore.isLabel && <MessageToolbar />}
 			</div>
 
 			{/* 转发弹出 */}

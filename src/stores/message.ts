@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { MessageStore, MessageStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
-import { emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
+import { MESSAGE_MARK, emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
 import useCacheStore from './cache'
 
 export const defaultOptions: MessageStoreOptions = {
@@ -35,7 +35,8 @@ export const defaultOptions: MessageStoreOptions = {
 	isGroupAnnouncement: false,
 	isEmojiFocus: false,
 	isScrollBottom: true,
-	members: []
+	members: [],
+	isLabel: false
 }
 
 const useMessageStore = create<MessageStore>((set, get) => ({
@@ -43,7 +44,13 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 
 	init: async (options) => {
 		const tableName = `${options.dialogId}`
-		const allMessages = (await cacheStore.get(tableName)) ?? []
+
+		let allMessages = (await cacheStore.get(tableName)) ?? []
+
+		// 如果是查询标记消息的
+		if (options.isLabel) {
+			allMessages = allMessages.filter((item: Message) => item.is_label === MESSAGE_MARK.MARK)
+		}
 
 		// 添加到搜索消息表名中
 		const cache = useCacheStore.getState()

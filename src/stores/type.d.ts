@@ -226,6 +226,8 @@ export interface MessageStoreOptions {
 	isScrollBottom: boolean
 	/** 群成员 */
 	members: any[]
+	/** 是否标注模式 */
+	isLabel: boolean
 }
 
 interface initOptions {
@@ -233,6 +235,7 @@ interface initOptions {
 	receiverId: string | number
 	isGroup: boolean
 	receiverInfo?: any
+	isLabel?: boolean
 }
 
 /**

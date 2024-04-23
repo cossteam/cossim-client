@@ -272,7 +272,6 @@ export async function handlerSocketMessage(data: any) {
 
 		// 更新撤回消息
 		if (isRecallMessage(type)) {
-			console.log('message', msg)
 			const relpyMsg = msg.reply_msg
 			const messageStore = useMessageStore.getState()
 			const message = messageStore.allMessages.find((v) => v?.msg_id === msg?.reply_id)
@@ -376,6 +375,12 @@ export function handlerSocketRequest(data: any) {
  */
 export function handlerSocketResult(data: any) {
 	console.log('好友同意或拒绝', data)
+	try {
+		// console.log('新请求', data)
+		localNotification(LocalNotificationType.MESSAGE, '处理结果', data.msg ?? '有新的请求待处理')
+	} catch {
+		console.log('发送本地通知失败')
+	}
 	getRemoteSession()
 }
 
