@@ -146,4 +146,10 @@ const routes: Router.RouteParameters[] = [
 	}
 ]
 
-export default routes
+export default routes.map((route) => {
+	route.options = {
+		...route.options,
+		transition: 'f7-custom'
+	}
+	return route
+})
