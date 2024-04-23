@@ -4,7 +4,7 @@ import Picker from '@emoji-mart/react'
 import '../styles/MessageEmojis.scss'
 
 interface MessageEmojisProps {
-	onSelectEmojis: (emojis: any) => void
+	onSelectEmojis?: (emojis: any) => void
 	className?: string
 }
 

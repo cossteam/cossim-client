@@ -16,8 +16,11 @@ const Message: React.FC<RouterProps> = () => {
 	const { height } = useWindowSize()
 	const messageStore = useMessageStore()
 
-	// TODO：需优化处理键盘
-	useKeyboard()
+	const { handlerKeyboardEvent } = useKeyboard()
+
+	useEffect(() => {
+		handlerKeyboardEvent()
+	}, [])
 
 	// 转发组件
 	const messageForward = useMemo(() => {

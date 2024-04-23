@@ -1,5 +1,5 @@
 import { Link, Navbar, NavRight, Subnavbar } from 'framework7-react'
-import useMessageStore, { defaultOptions } from '@/stores/message'
+import useMessageStore from '@/stores/message'
 import { $t, getLatestGroupAnnouncement, tooltipType } from '@/shared'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BellFill, ChevronRight, Ellipsis } from 'framework7-icons/react'
@@ -38,9 +38,9 @@ const MessageHeader = () => {
 		[groupAnnouncement]
 	)
 
-	const handlerBack = () => {
-		messageStore.update(defaultOptions)
-	}
+	// const handlerBack = () => {
+	// 	messageStore.update(defaultOptions)
+	// }
 
 	// 获取群聊人员
 	useEffect(() => {
@@ -73,7 +73,7 @@ const MessageHeader = () => {
 				backLink
 				outline={false}
 				className="coss_message_navbar"
-				onClickBack={() => handlerBack()}
+				// onClickBack={() => handlerBack()}
 			>
 				<NavRight>
 					{messageStore.manualTipType === tooltipType.SELECT ? (

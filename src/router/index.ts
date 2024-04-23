@@ -41,15 +41,16 @@ const routes: Router.RouteParameters[] = [
 		path: '/message/:id/:dialog_id/',
 		component: Message,
 		options: {
-			animate: true,
-			transition: 'f7-push'
-			// transition: 'f7-custom'
+			transition: 'f7-custom'
 		},
 		keepAlive: true
 	},
 	{
 		path: '/user_info/:user_id/',
-		asyncComponent: () => import('@/pages/Tabs/MyInfo/UserInfo/UserInfo')
+		asyncComponent: () => import('@/pages/Tabs/MyInfo/UserInfo/UserInfo'),
+		options: {
+			transition: 'f7-custom'
+		}
 	},
 	{
 		path: '/update_user_info/:type/',

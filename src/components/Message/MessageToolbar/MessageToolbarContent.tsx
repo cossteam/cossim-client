@@ -83,11 +83,9 @@ const MessageToolbarContent = () => {
 		}
 	}
 
-	useEffect
-		(() => {
-			// console.log('members', messageStore.members)
-		},[messageStore.members])
-
+	useEffect(() => {
+		// console.log('members', messageStore.members)
+	}, [messageStore.members])
 
 	return (
 		<div
@@ -95,7 +93,7 @@ const MessageToolbarContent = () => {
 			style={{ height: cacheStore.keyboardHeight === 0 ? 318 : cacheStore.keyboardHeight }}
 		>
 			<MessageEmojis
-				onSelectEmojis={(emoji) => messageStore.update({ selectedEmojis: emoji.native })}
+				// onSelectEmojis={(emoji) => messageStore.update({ selectedEmojis: emoji.native })}
 				className={clsx('w-full', !isEmoji && 'hidden')}
 			/>
 			<MessageMore
