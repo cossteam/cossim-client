@@ -4,8 +4,8 @@ import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
 import Layout from './components/Layout'
-import { $t, TOKEN, SocketClient, SocketEvent, DEVICE_ID, toastMessage, uploadPublicKey } from '@/shared'
-import { hasCookie, setCookie } from '@/utils/cookie'
+import { $t, TOKEN, SocketClient, toastMessage, uploadPublicKey } from '@/shared'
+import { hasCookie } from '@/utils/cookie'
 import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import { useAsyncEffect } from '@reactuses/core'
@@ -15,13 +15,7 @@ import LiveRoomNew from '@/components/LiveRoom'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
-import run, {
-	handlerSocketEdit,
-	handlerSocketMessage,
-	handlerSocketOnline,
-	handlerSocketRequest,
-	handlerSocketResult
-} from './run'
+import run from './run'
 import { isWeb } from './utils'
 import useUserStore from '@/stores/user'
 import useMessageStore, { defaultOptions } from './stores/message'

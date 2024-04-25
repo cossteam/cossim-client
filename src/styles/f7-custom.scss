@@ -7,12 +7,12 @@
 
 /** 进入页面前 */
 .router-transition-f7-custom-forward .page-next {
-    animation: f7-custom-next-to-current 400ms forwards;
+    animation: f7-custom-next-to-current 300ms forwards;
 }
 
 
 .router-transition-f7-custom-forward .page-current {
-    animation: f7-custom-current-to-prev 400ms forwards;
+    animation: f7-custom-current-to-prev 300ms forwards;
 }
 
 /** 离开页面前 */
