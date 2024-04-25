@@ -7,6 +7,7 @@ import {
 	handlerSocketRequest,
 	handlerSocketResult
 } from '@/run'
+import { useLiveRoomStore } from '@/stores/liveRoom'
 
 export function createSocket() {
 	const token = getCookie(TOKEN)
@@ -38,6 +39,8 @@ export function closeSocket(socket: any) {
 }
 
 function onReply(socket: any) {
+	const liveRoomStore = useLiveRoomStore.getState()
+
 	socket.on('reply', function (msg: any) {
 		const handlerInit = async (msg: any) => {
 			const data = JSON.parse(msg ?? '{}')
@@ -68,7 +71,7 @@ function onReply(socket: any) {
 				case SocketEvent.UserCallHangupEvent:
 				case SocketEvent.GroupCallHangupEvent:
 				case SocketEvent.UserLeaveGroupCallEvent:
-					// liveRoomStore.handlerEvent(event, data)
+					liveRoomStore.handlerEvent(event, data)
 					break
 				case SocketEvent.MessageEditEvent:
 					handlerSocketEdit(data)
