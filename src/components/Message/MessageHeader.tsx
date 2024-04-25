@@ -8,6 +8,7 @@ import GroupService from '@/api/group'
 import useCacheStore from '@/stores/cache'
 // import { useAsyncEffect } from '@reactuses/core'
 // import { PluginListenerHandle } from '@capacitor/core'
+import './styles/Message.scss'
 
 const MessageHeader = () => {
 	const messageStore = useMessageStore()
@@ -75,26 +76,27 @@ const MessageHeader = () => {
 				className="coss_message_navbar"
 				// onClickBack={() => handlerBack()}
 			>
-				<NavRight>
-					{messageStore.manualTipType === tooltipType.SELECT ? (
-						<Link onClick={() => messageStore.update({ manualTipType: tooltipType.NONE })}>
-							{$t('取消')}
-						</Link>
-					) : (
-						!is_system && (
-							<Link
-								href={
-									messageStore.isGroup
-										? `/group_info/${messageStore.receiverId}/`
-										: `/profile/${messageStore.receiverId}/?from_page=message&dialog_id=${messageStore.dialogId}`
-								}
-							>
-								<Ellipsis className="w-6 h-6 mr-2" />
+				{!messageStore.isLabel && (
+					<NavRight>
+						{messageStore.manualTipType === tooltipType.SELECT ? (
+							<Link onClick={() => messageStore.update({ manualTipType: tooltipType.NONE })}>
+								{$t('取消')}
 							</Link>
-						)
-					)}
-				</NavRight>
-
+						) : (
+							!is_system && (
+								<Link
+									href={
+										messageStore.isGroup
+											? `/group_info/${messageStore.receiverId}/`
+											: `/profile/${messageStore.receiverId}/?from_page=message&dialog_id=${messageStore.dialogId}`
+									}
+								>
+									<Ellipsis className="w-6 h-6 mr-2" />
+								</Link>
+							)
+						)}
+					</NavRight>
+				)}
 				{messageStore.isGroupAnnouncement && (
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster">
 						<Link

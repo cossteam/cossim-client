@@ -1,7 +1,7 @@
 import { SocketEvent } from '@/shared'
 import { create } from 'zustand'
 import { persist, createJSONStorage, devtools } from 'zustand/middleware'
-import CallService from '@/api/call'
+// import CallService from '@/api/call'
 import { f7 } from 'framework7-react'
 
 export enum OwnEventEnum {
@@ -97,7 +97,7 @@ const initialState = (): LiveStoreParams => ({
 export const liveStore = (set: any, get: any): LiveStore => ({
 	...initialState(),
 	call: async (callProps: CallProps) => {
-		const { accept, hangup } = get()
+		const { accept } = get()
 		const status: CallProps = {
 			id: callProps.id,
 			isGroup: callProps.isGroup
@@ -179,7 +179,7 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 		}, 2000)
 	},
 	accept: async () => {
-		const { id, isGroup, hangup } = get()
+		const { id, isGroup } = get()
 		const joinRoomParams: any = {}
 		!isGroup && (joinRoomParams['user_id'] = id)
 		isGroup && (joinRoomParams['group_id'] = Number(id))
@@ -211,7 +211,7 @@ export const liveStore = (set: any, get: any): LiveStore => ({
 		set({
 			ownEvent: OwnEventEnum.HANGUP
 		})
-		const { id, isGroup, hanged } = get()
+		const { id, isGroup } = get()
 		const createRoomParams: any = {}
 		!isGroup && (createRoomParams['user_id'] = id)
 		isGroup && (createRoomParams['group_id'] = Number(id))

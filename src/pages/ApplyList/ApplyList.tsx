@@ -17,7 +17,7 @@ import RelationService from '@/api/relation'
 import { $t, ApplyStatus, ApplyType, USER_ID, MangageApplyStatus, GroupApplyStatus, toastMessage } from '@/shared'
 import { getCookie } from '@/utils/cookie'
 import GroupService from '@/api/group'
-import UserStore from '@/db/user'
+// import UserStore from '@/db/user'
 import Empty from '@/components/Empty'
 import useCacheStore from '@/stores/cache'
 import { getApplyList, getFriendList, getRemoteSession } from '@/run'
@@ -59,7 +59,7 @@ const ApplyList = () => {
 
 			// TODO: 传输 e2e_public_key
 			if (isAgree) {
-				e2e_public_key = 'test'
+				e2e_public_key = ''
 			}
 
 			const { code, msg } =
@@ -83,10 +83,10 @@ const ApplyList = () => {
 			}
 
 			// 更新本地数据
-			await UserStore.update(UserStore.tables.apply_list, 'id', item.id, {
-				...item,
-				status: isAgree ? ApplyStatus.ACCEPT : ApplyStatus.REFUSE
-			})
+			// await UserStore.update(UserStore.tables.apply_list, 'id', item.id, {
+			// 	...item,
+			// 	status: isAgree ? ApplyStatus.ACCEPT : ApplyStatus.REFUSE
+			// })
 
 			// 更新数据
 			await getApplyList()

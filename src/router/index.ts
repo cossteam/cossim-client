@@ -3,10 +3,8 @@ import type { Router } from 'framework7/types'
 import DialogList from '@/pages/Tabs/DialogList/DialogList'
 import ContactList from '@/pages/Tabs/ContactList/ContactList'
 import MyInfo from '@/pages/Tabs/MyInfo/MyInfo'
-
 import AuthScreen from '@/pages/Auth/AuthScreen'
 import Message from '@/pages/Message/Message'
-
 import NotFound from '@/pages/NotFound'
 
 const routes: Router.RouteParameters[] = [
@@ -50,7 +48,8 @@ const routes: Router.RouteParameters[] = [
 		asyncComponent: () => import('@/pages/Tabs/MyInfo/UserInfo/UserInfo'),
 		options: {
 			transition: 'f7-custom'
-		}
+		},
+		keepAlive: true
 	},
 	{
 		path: '/update_user_info/:type/',
@@ -148,8 +147,8 @@ const routes: Router.RouteParameters[] = [
 
 export default routes.map((route) => {
 	route.options = {
-		...route.options,
-		transition: 'f7-custom'
+		transition: 'f7-custom',
+		...route.options
 	}
 	return route
 })

@@ -1,6 +1,6 @@
 import ReadEditor from '@/components/ReadEditor/ReadEditor'
 import Avatar from '@/components/Avatar/Avatar'
-import { $t, MESSAGE_TYPE } from '@/shared'
+import { $t, msgType } from '@/shared'
 import useCacheStore from '@/stores/cache'
 import useMessageStore from '@/stores/message'
 import { useAsyncEffect } from '@reactuses/core'
@@ -28,7 +28,7 @@ const Search: React.FC<RouterProps> = ({ f7router }) => {
 					const newDialog = { ...dialog, msgs: [] }
 					const dialogAllMsg = await cacheStore.get(`${dialog.dialog_id}`)
 					if (dialogAllMsg.length <= 0) return
-					const dialogMsg = dialogAllMsg.filter((i: any) => i.msg_type === MESSAGE_TYPE.TEXT)
+					const dialogMsg = dialogAllMsg.filter((i: any) => i.msg_type === msgType.TEXT)
 					if (dialogMsg.length <= 0) return
 					const msgs = dialogMsg.filter((i: any) => {
 						// console.log('比配')
