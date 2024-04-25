@@ -11,6 +11,8 @@ import useMessageStore from '@/stores/message'
 import { useEffect, useMemo } from 'react'
 import { tooltipType } from '@/shared'
 import { forwardMessage } from './script/message'
+// import { PluginListenerHandle } from '@capacitor/core'
+// import { App } from '@capacitor/app'
 
 const Message: React.FC<RouterProps> = () => {
 	const { height } = useWindowSize()
@@ -45,6 +47,25 @@ const Message: React.FC<RouterProps> = () => {
 		if (!messageStore.selectedForwardUsers.length) return
 		forwardMessage()
 	}, [messageStore.selectedForwardUsers])
+
+	// let backListener: PluginListenerHandle | null = null
+	// useAsyncEffect(
+	// 	async () => {
+	// 		console.log("f7.views.main.router.navigate('/add_friend/')", f7route)
+	// 		//
+	// 		const backButtonHandler = () => {
+	// 			// 获取当前路由 url
+	// 		}
+
+	// 		// 添加返回按钮事件监听器
+	// 		backListener = await App.addListener('backButton', backButtonHandler)
+	// 	},
+	// 	() => {
+	// 		// 组件卸载时移除返回按钮事件监听器
+	// 		backListener?.remove()
+	// 	},
+	// 	[]
+	// )
 
 	// // 已读消息
 	// const read = async () => {

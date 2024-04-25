@@ -6,8 +6,6 @@ import { BellFill, ChevronRight, Ellipsis } from 'framework7-icons/react'
 import useUserStore from '@/stores/user'
 import GroupService from '@/api/group'
 import useCacheStore from '@/stores/cache'
-// import { useAsyncEffect } from '@reactuses/core'
-// import { PluginListenerHandle } from '@capacitor/core'
 import './styles/Message.scss'
 
 const MessageHeader = () => {
@@ -39,8 +37,8 @@ const MessageHeader = () => {
 		[groupAnnouncement]
 	)
 
-	// const handlerBack = () => {
-	// 	messageStore.update(defaultOptions)
+	// const handlerBack = async () => {
+	// 	await messageStore.update(defaultOptions)
 	// }
 
 	// 获取群聊人员
@@ -97,6 +95,8 @@ const MessageHeader = () => {
 						)}
 					</NavRight>
 				)}
+
+				{/* 群公告 */}
 				{messageStore.isGroupAnnouncement && (
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster">
 						<Link

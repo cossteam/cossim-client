@@ -43,6 +43,8 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 	...defaultOptions,
 
 	init: async (options) => {
+		set(defaultOptions)
+
 		const tableName = `${options.dialogId}`
 
 		let allMessages = (await cacheStore.get(tableName)) ?? []
