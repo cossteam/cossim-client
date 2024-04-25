@@ -4,23 +4,24 @@
     // transition: all 0;
 }
 
+
 /** 进入页面前 */
 .router-transition-f7-custom-forward .page-next {
-    animation: f7-custom-next-to-current 300ms forwards;
+    animation: f7-custom-next-to-current 400ms forwards;
 }
 
 
 .router-transition-f7-custom-forward .page-current {
-    animation: f7-custom-current-to-prev 300ms forwards;
+    animation: f7-custom-current-to-prev 400ms forwards;
 }
 
 /** 离开页面前 */
 .router-transition-f7-custom-backward .page-current {
-    animation: f7-custom-current-to-next 300ms forwards;
+    animation: f7-custom-current-to-next 400ms forwards;
 }
 
 .router-transition-f7-custom-backward .page-previous {
-    animation: f7-custom-prev-to-current 300ms forwards;
+    animation: f7-custom-prev-to-current 400ms forwards;
 }
 
 @keyframes f7-custom-next-to-current {
