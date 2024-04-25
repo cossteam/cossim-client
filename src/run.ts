@@ -208,7 +208,7 @@ async function updateRecallCacheMessage(message: any) {
  * @param {any} data 推送消息
  */
 export async function handlerSocketMessage(data: any) {
-	// console.log('handlerSocketMessage', data)
+	console.log('handlerSocketMessage', data)
 	const userStore = useUserStore.getState()
 	const messageStore = useMessageStore.getState()
 	const cacheStore = useCacheStore.getState()
@@ -221,8 +221,10 @@ export async function handlerSocketMessage(data: any) {
 	// 是否需要继续操作，如果是标注、撤回时需要继续操作,如果都不是且是自己当前设备发的就不处理
 	const isDrivered: boolean = userStore.deviceId === (data?.driver_id ?? data?.driverId)
 	const isContinue = !isLableMessage(type) && !isRecallMessage(type) && isDrivered
-	if (isContinue) return
-
+	//如果是自己发的消息，则不处理
+	const isMe: boolean = userStore.userId === message?.sender_id
+	if (isContinue&&isMe) return
+	
 	const msg = generateMessage({
 		...message,
 		is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK,
@@ -255,7 +257,7 @@ export async function handlerSocketMessage(data: any) {
 	}
 
 	// 如果是当前会话，需要实时更新到页面
-	if (message?.dialog_id === messageStore.dialogId) {
+	if (message?.dialog_id === messageStore.dialogId) {		
 		await messageStore.createMessage(msg)
 
 		// 更新标注消息

@@ -68,45 +68,45 @@ function App() {
 		}
 
 		// 事件处理
-		const handlerInit = async (e: any) => {
-			const data = JSON.parse(e.data)
-			const event = data.event
+		// const handlerInit = async (e: any) => {
+		// 	const data = JSON.parse(e.data)
+		// 	const event = data.event
 
-			console.log('接收到所有 sokect 通知：', data)
-			switch (event) {
-				case SocketEvent.OnlineEvent:
-					setCookie(DEVICE_ID, data.driverId)
-					break
-				case SocketEvent.PrivateChatsEvent:
-				case SocketEvent.GroupChatsEvent:
-				case SocketEvent.SelfChatsEvent:
-					handlerSocketMessage(data)
-					break
-				case SocketEvent.ApplyListEvent:
-				case SocketEvent.GroupApplyListEvent:
-					handlerSocketRequest(data)
-					break
-				case SocketEvent.ApplyAcceptEvent:
-					handlerSocketResult(data)
-					break
-				// 通话事件
-				case SocketEvent.UserCallReqEvent:
-				case SocketEvent.GroupCallReqEvent:
-				case SocketEvent.UserCallRejectEvent:
-				case SocketEvent.GroupCallRejectEvent:
-				case SocketEvent.UserCallHangupEvent:
-				case SocketEvent.GroupCallHangupEvent:
-				case SocketEvent.UserLeaveGroupCallEvent:
-					liveRoomStore.handlerEvent(event, data)
-					break
-				case SocketEvent.MessageEditEvent:
-					handlerSocketEdit(data)
-					break
-				case SocketEvent.UserOnlineEvent:
-					handlerSocketOnline(data)
-					break
-			}
-		}
+		// 	console.log('接收到所有 sokect 通知：', data)
+		// 	switch (event) {
+		// 		case SocketEvent.OnlineEvent:
+		// 			setCookie(DEVICE_ID, data.driverId)
+		// 			break
+		// 		case SocketEvent.PrivateChatsEvent:
+		// 		case SocketEvent.GroupChatsEvent:
+		// 		case SocketEvent.SelfChatsEvent:
+		// 			handlerSocketMessage(data)
+		// 			break
+		// 		case SocketEvent.ApplyListEvent:
+		// 		case SocketEvent.GroupApplyListEvent:
+		// 			handlerSocketRequest(data)
+		// 			break
+		// 		case SocketEvent.ApplyAcceptEvent:
+		// 			handlerSocketResult(data)
+		// 			break
+		// 		// 通话事件
+		// 		case SocketEvent.UserCallReqEvent:
+		// 		case SocketEvent.GroupCallReqEvent:
+		// 		case SocketEvent.UserCallRejectEvent:
+		// 		case SocketEvent.GroupCallRejectEvent:
+		// 		case SocketEvent.UserCallHangupEvent:
+		// 		case SocketEvent.GroupCallHangupEvent:
+		// 		case SocketEvent.UserLeaveGroupCallEvent:
+		// 			liveRoomStore.handlerEvent(event, data)
+		// 			break
+		// 		case SocketEvent.MessageEditEvent:
+		// 			handlerSocketEdit(data)
+		// 			break
+		// 		case SocketEvent.UserOnlineEvent:
+		// 			handlerSocketOnline(data)
+		// 			break
+		// 	}
+		// }
 
 		// 连接 socket
 		if (hasCookie(TOKEN)) {
@@ -124,12 +124,12 @@ function App() {
 			// 	toastMessage('检测到新设备登录')
 			// }
 
-			SocketClient.connect()
-			SocketClient.addListener('onWsMessage', handlerInit)
+			// SocketClient.connect()
+			// SocketClient.addListener('onWsMessage', handlerInit)
 		}
 
 		return () => {
-			SocketClient.removeListener('onWsMessage', handlerInit)
+			// SocketClient.removeListener('onWsMessage', handlerInit)
 		}
 	}, [])
 
