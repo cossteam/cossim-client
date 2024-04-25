@@ -9,7 +9,12 @@ export function createSocket() {
     const url = import.meta.env.VITE_WS_URL
     const urlObject = new URL(url)
     const path = urlObject.pathname
-    const host = urlObject.host
+    let host = urlObject.origin
+    const port = urlObject.port || (urlObject.protocol === 'wss:' ? 443 : 80)
+    if (!urlObject.port) {
+        // 如果端口号为空，则手动添加默认端口号到主机中
+        host += ':' + port
+    }
     const socket = io(host, {
         query: {
             token
