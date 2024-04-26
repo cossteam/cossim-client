@@ -4,7 +4,7 @@ import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
 import Layout from './components/Layout'
-import { $t, TOKEN, SocketClient, toastMessage, uploadPublicKey } from '@/shared'
+import { $t, TOKEN, SocketClient,createSocket, toastMessage, uploadPublicKey } from '@/shared'
 import { hasCookie } from '@/utils/cookie'
 import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
@@ -111,6 +111,7 @@ function App() {
 				uploadPublicKey()
 				userStore.update({ lastLoginTime: Date.now() })
 			}
+			createSocket()
 			// if (!cacheStore.cacheKeyPair) setDevicePopupVisible(true)
 
 			// 如果是新设备登录
