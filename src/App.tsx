@@ -173,7 +173,7 @@ function App() {
 					if (hasCookie(TOKEN) && SocketClient.isDisconnect()) {
 						SocketClient.connect()
 					}
-					// cacheStore.updateFirstOpened(true)
+					cacheStore.updateFirstOpened(true)
 				} else {
 					cacheStore.updateFirstOpened(false)
 				}

@@ -19,8 +19,8 @@ interface LoginScreenProps {
 
 const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7route, defaultData }) => {
 	const [fromData, setFromData] = useState<LoginData>({
-		email: '1@qq.com',
-		password: '123456qqq'
+		email: '',
+		password: ''
 	})
 
 	const switchAccount = f7route.query?.switch_account
