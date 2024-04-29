@@ -8,19 +8,25 @@ import {
 	GearAlt,
 	Qrcode
 } from 'framework7-icons/react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import UserService from '@/api/user'
 import { $t } from '@/shared'
 import './MyInfo.scss'
 import useUserStore from '@/stores/user'
 import Avatar from '@/components/Avatar/Avatar'
+import useRouterStore from '@/stores/router.ts'
 
 const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 	const [info, setInfo] = useState<any>({})
 	const userStore = useUserStore()
 	const userId = useMemo(() => userStore.userId, [])
 
+	const { setMyRouter } = useRouterStore()
+
+	useEffect(() => {
+		setMyRouter(f7router)
+	}, [])
 	const loadUserInfo = async () => {
 		try {
 			const { data } = await UserService.getUserInfoApi({ user_id: userId })
