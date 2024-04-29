@@ -29,10 +29,16 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const cacheStore = useCacheStore()
 	const { router, setRouter } = useRouterStore()
 	const { doubleClick } = useToolbarStore()
+	const [ firstUnread, setFirstUnread ] = useState<string>()
 
 	useEffect(() => {
 		const unread = cacheStore.cacheDialogs.find((item) => item?.dialog_unread_count > 0)
 		unread && scrollTo(unread.dialog_id)
+		setFirstUnread(unread?.dialog_id)
+		setTimeout(() => {
+			setFirstUnread('0')
+		}, 1000)
+
 	}, [doubleClick])
 
 	useEffect(() => {
@@ -192,7 +198,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 							return (
 								<ListItem
 									id={item?.dialog_id}
-									className={clsx(item?.top_at !== 0 && 'bg-bgSecondary')}
+									className={clsx(item?.top_at !== 0 && 'bg-bgSecondary', item?.dialog_id == firstUnread && 'animate__animated animate__shakeX')}
 									key={item?.dialog_id + `${index}`}
 									title={item?.dialog_name}
 									badge={item?.dialog_unread_count}

@@ -8,6 +8,7 @@ import Avatar from '@/components/Avatar/Avatar.tsx'
 import useMessageStore from '@/stores/message'
 import useCacheStore from '@/stores/cache'
 import useLoading from '@/hooks/useLoading'
+import { getFriendList, getRemoteSession } from '@/run.ts'
 
 const times = [
 	{ label: $t('10秒'), value: 10 },
@@ -67,6 +68,10 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 					}
 					const friendList = cacheStore.cacheContacts?.filter((item) => item?.user_id !== user_id)
 					cacheStore.updateCacheContactsObj(friendList)
+					// 刷新消息列表
+					getRemoteSession()
+					// 刷新好友列表
+					getFriendList()
 				} catch (error) {
 					toastMessage('删除好友失败')
 				} finally {
@@ -143,7 +148,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const blackList = async () => {
 		const is_add = userInfo?.relation_status === RelationStatus.BLACK
 		const tips_error = is_add ? $t('移除黑名单失败') : $t('添加黑名单失败')
-		watchAsyncFn(
+		await watchAsyncFn(
 			async () => {
 				try {
 					const params = { user_id }
@@ -152,6 +157,10 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						: await RelationService.addBlackListApi(params)
 					if (code !== 200) return toastMessage(tips_error)
 					updateCache({}, { relation_status: is_add ? RelationStatus.YES : RelationStatus.BLACK })
+					// 刷新消息列表
+					getRemoteSession()
+					// 刷新好友列表
+					getFriendList()
 				} catch (error) {
 					toastMessage(tips_error)
 				}

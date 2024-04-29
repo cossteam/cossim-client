@@ -1,4 +1,4 @@
-import { Link, Toolbar, View, Views } from 'framework7-react'
+import { f7, Link, Toolbar, View, Views } from 'framework7-react'
 import { useRef, useState } from 'react'
 import $ from 'dom7'
 import useCacheStore from '@/stores/cache'
@@ -10,15 +10,16 @@ import MsgService from '@/api/msg.ts'
 const Layout: React.FC = () => {
 	const [tabActive, setTabActive] = useState<string>('dialog')
 	const previousTab = useRef<string>('dialog')
-	const { router, contactRouter } = useRouterStore()
+	const { contactRouter, myRouter } = useRouterStore()
 	const { onDoubleClick } = useToolbarStore()
 	const onTabLinkClick = (tabName: string) => {
 		if (previousTab.current !== tabActive) {
 			previousTab.current = tabActive
 			return
 		}
+		// 双击
 		if (tabActive === tabName) {
-			console.log(router)
+			console.log('双击', tabName)
 			switch (tabName) {
 				case 'dialog':
 					onDoubleClick()
@@ -27,6 +28,8 @@ const Layout: React.FC = () => {
 					if (cacheStore.applyCount) contactRouter?.navigate('/apply_list/')
 					break
 				case 'my':
+					myRouter?.navigate('/my_qrcode/')
+					// f7.views.main.router.navigate('/my_qrcode/')
 					break
 			}
 

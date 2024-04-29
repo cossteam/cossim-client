@@ -90,6 +90,10 @@ const ApplyList = () => {
 
 			// 更新数据
 			await getApplyList()
+			// 刷新好友列表
+			getFriendList()
+			// 更新消息列表
+			getRemoteSession()
 		} catch (error) {
 			console.error('处理好友请求失败', error)
 			f7.dialog.alert($t('处理好友请求失败'))
@@ -159,6 +163,7 @@ const ApplyList = () => {
 
 	const handlerClick = async (item: any) => {
 		await manageFriendApply(item, MangageApplyStatus.ACCEPT)
+		// 刷新好友列表
 		getFriendList()
 		getRemoteSession()
 	}
