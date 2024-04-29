@@ -15,6 +15,7 @@ import { $t } from '@/shared'
 import './MyInfo.scss'
 import useUserStore from '@/stores/user'
 import Avatar from '@/components/Avatar/Avatar'
+import { AppLauncher } from '@capacitor/app-launcher'
 
 const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 	const [info, setInfo] = useState<any>({})
@@ -39,10 +40,20 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 		}
 	}
 
+	const toSysSettings = async () => {
+		await AppLauncher.openUrl({ url: 'com.android.settings' })
+		// await AppLauncher.openUrl({ packageName: 'com.hitosea.coss' })
+	}
+
 	const settings = useMemo(
 		() => [
 			[
-				{ title: $t('通知中心'), icon: <Bell className="coss_item__icon" />, link: '#' },
+				{
+					title: $t('通知中心'),
+					icon: <Bell className="coss_item__icon" />,
+					link: '#',
+					onClick: () => toSysSettings()
+				},
 				{ title: $t('显示'), icon: <DeviceDesktop className="coss_item__icon" />, link: '#' },
 				{ title: $t('隐私与安全'), icon: <ExclamationmarkShield className="coss_item__icon" />, link: '#' },
 				{ title: $t('设备'), icon: <DeviceTabletPortrait className="coss_item__icon" />, link: '#' },
@@ -83,7 +94,13 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 			{settings.map((item, index) => (
 				<List strong className="coss_list" key={index} dividers>
 					{item.map((child, current) => (
-						<ListItem title={child.title} className="coss_item__button" link key={current}>
+						<ListItem
+							title={child.title}
+							className="coss_item__button"
+							link
+							key={current}
+							onClick={child.onClick ?? (() => {})}
+						>
 							<div slot="media">{child.icon}</div>
 						</ListItem>
 					))}
