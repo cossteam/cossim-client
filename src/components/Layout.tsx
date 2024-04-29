@@ -25,8 +25,7 @@ const Layout: React.FC = () => {
 					onDoubleClick()
 					break
 				case 'contacts':
-					if (cacheStore.applyCount)
-					contactRouter?.navigate('/apply_list/')
+					if (cacheStore.applyCount) contactRouter?.navigate('/apply_list/')
 					break
 				case 'my':
 					myRouter?.navigate('/my_qrcode/')
@@ -53,18 +52,26 @@ const Layout: React.FC = () => {
 			const list = store.cacheDialogs.map((item: any) => {
 				// 有未读的对话
 				if (item.dialog_unread_count > 0) {
-					promiseList.push(MsgService.readMessagesApi({dialog_id: item.dialog_id, msg_ids: [], read_all: true}, item.dialog_type == 1))
+					promiseList.push(
+						MsgService.readMessagesApi(
+							{ dialog_id: item.dialog_id, msg_ids: [], read_all: true },
+							item.dialog_type == 1
+						)
+					)
 				}
 				return { ...item, dialog_unread_count: 0 }
 			})
 			Promise.all(promiseList)
 			store.updateCacheDialogs(list)
 			store.updateCacheUnreadCount(0)
-
 		}
 	})
 
 	const dialogRef = useRef<any>()
+
+	// const test = () => {
+	// 	f7.views.main.router.navigate('/add_friend/')
+	// }
 
 	return (
 		<Views tabs className="safe-area app">

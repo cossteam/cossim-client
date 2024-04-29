@@ -4,32 +4,6 @@ export enum RESPONSE_CODE {
 	Unauthorized = 401
 }
 
-/** 消息类型
- * TODO: 后续删除
- */
-export enum MESSAGE_TYPE {
-	/** 文本 */
-	TEXT = 1,
-	/** 音频 */
-	AUDIO = 2,
-	/** 图片 */
-	IMAGE = 3,
-	/** 标注消息 */
-	LABEL = 4,
-	/** 群公告 */
-	NOTICE = 5,
-	/** 文件 */
-	FILE = 6,
-	/** 待办 */
-	TODO = 7,
-	/** 错误信息 */
-	ERROR = 8,
-	/** 视频 */
-	VIDEO = 9,
-	/** 通话消息  */
-	CALL = 10
-}
-
 /** 消息类型 */
 export enum msgType {
 	/** 错误消息 */
@@ -90,32 +64,6 @@ export enum MESSAGE_MARK {
 	MARK = 1
 }
 
-/** 提示类型
- * TODO: 后续删除
- */
-export enum TOOLTIP_TYPE {
-	/** 复制 */
-	COPY = 'copy',
-	/** 转发 */
-	FORWARD = 'forward',
-	/** 编辑 */
-	EDIT = 'edit',
-	/** 删除 */
-	DELETE = 'delete',
-	/** 多选 */
-	SELECT = 'select',
-	/** 回复 */
-	REPLY = 'reply',
-	/** 标记 */
-	MARK = 'mark',
-	/** 无操作 */
-	NONE = 'none',
-	/** 通知 */
-	NOTICE = 'notice',
-	/** 设置撤回 */
-	RECALL = 'recall'
-}
-
 /** 提示类型 */
 export enum tooltipType {
 	/** 复制 */
@@ -138,16 +86,6 @@ export enum tooltipType {
 	NOTICE = 'notice',
 	/** 设置撤回 */
 	RECALL = 'recall'
-}
-
-/** 平台 */
-export enum PLATFORM {
-	/** web */
-	WEB = 'web',
-	/** ios */
-	IOS = 'ios',
-	/** android */
-	ANDROID = 'android'
 }
 
 /** 申请列表类型 */
@@ -180,20 +118,6 @@ export enum MangageApplyStatus {
 	ACCEPT = 1
 }
 
-/** 群聊管理列表状态管理 */
-// export enum ApplyGroupStatus {
-// 	/** 申请中 */
-// 	PENDING = 0,
-// 	/** 已同意 */
-// 	ACCEPT = 1,
-// 	/** 已拒绝 */
-// 	REFUSE = 2,
-// 	/** 邀请发送者 */
-// 	INVITE_SENDER = 3,
-// 	/** 被邀请者 */
-// 	INVITE_RECEIVER = 4
-// }
-
 /** 群聊成员列表类型 */
 export enum MemberListType {
 	/** 非本群成员 */
@@ -204,6 +128,7 @@ export enum MemberListType {
 	MEMBERSHOW = 'member_show'
 }
 
+/** 通话状态 */
 export enum CallStatus {
 	/** 空闲 */
 	IDLE = 0,
@@ -217,30 +142,6 @@ export enum CallStatus {
 	CALLING = 4,
 	/** 挂断 */
 	HANGUP = 5
-}
-
-export function getStatusDescription(status: CallStatus) {
-	switch (status) {
-		case CallStatus.IDLE:
-			return '空闲中'
-		case CallStatus.BUSY:
-			return '占线中'
-		case CallStatus.WAITING:
-			return '等待中'
-		case CallStatus.REFUSE:
-			return '已拒绝'
-		case CallStatus.CALLING:
-			return '通话中'
-		case CallStatus.HANGUP:
-			return '已挂断'
-	}
-}
-
-export enum CallType {
-	/** 视频通话 */
-	VIDEO = 1,
-	/** 音频通话 */
-	AUDIO = 2
 }
 
 /** Socket 事件 */
@@ -271,6 +172,8 @@ export enum SocketEvent {
 	UserCallHangupEvent = 18,
 	/** 群聊通话挂断事件 */
 	GroupCallHangupEvent = 19,
+	/** 用户在线状态 */
+	UserOnlineEvent = 22,
 	/** 接收到消息标注信息 */
 	MessageLabelEvent = 23,
 	/** 编辑消息事件 */
@@ -280,7 +183,9 @@ export enum SocketEvent {
 	/** 推送好友在线状态 */
 	FriendOnlineEvent = 27,
 	/** 推送好友离线状态 */
-	FriendOfflineEvent = 28
+	FriendOfflineEvent = 28,
+	/** 用户离开群组通话事件 */
+	UserLeaveGroupCallEvent = 31
 }
 
 /** 消息是否阅后即焚 */
@@ -321,18 +226,6 @@ export enum GroupApplyStatus {
 	INVITE_SENDER = 3,
 	/** 邀请接收者 */
 	INVITE_RECEIVER = 4
-}
-
-/** 消息页表情和更多切换 */
-export enum MessageMore {
-	/** 文本 */
-	TEXT = 0,
-	/** 表情 */
-	EMOJI = 1,
-	/** 更多 */
-	OTHER = 2,
-	/** 语音 */
-	AUDIO = 3
 }
 
 /** 消息页表情和更多切换 */

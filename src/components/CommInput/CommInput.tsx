@@ -1,6 +1,7 @@
 import { InputHTMLAttributes, useState } from 'react'
 import './CommInput.scss'
 import { Icon } from 'framework7-react'
+import clsx from 'clsx'
 
 interface CommInputProps {
 	title?: string
@@ -10,7 +11,7 @@ interface CommInputProps {
 
 const CommInput: React.FC<CommInputProps & InputHTMLAttributes<HTMLInputElement>> = ({
 	clearButton = true,
-	defaultValue,
+	defaultValue = '',
 	onChange,
 	...resetProps
 }) => {
@@ -21,7 +22,7 @@ const CommInput: React.FC<CommInputProps & InputHTMLAttributes<HTMLInputElement>
 	}
 
 	return (
-		<div className="custom-input-container flex flex-col px-5 gap-y-1 mt-3">
+		<div className={clsx('custom-input-container flex flex-col px-5 gap-y-1 mt-3', resetProps?.className)}>
 			<span className="ml-3 text-gray-700">{resetProps?.title}</span>
 			<div className="w-full input">
 				<input

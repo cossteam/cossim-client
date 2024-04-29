@@ -14,6 +14,10 @@ export interface UserStoreOptions {
 	deviceId: string
 	/** 上一次登录时间 */
 	lastLoginTime: number
+	/** 登录记录，用于记录退出登录前的登录记录 */
+	loginNumber: number
+	/** 是否新设备登录 */
+	isNewLogin: boolean
 }
 
 /**
@@ -61,6 +65,12 @@ export interface CacheStoreOptions {
 	cacheKeyPair: null | { privateKey: string; publicKey: string }
 	/** 上一次登录时间 */
 	lastLoginTime: number
+	/** 会话消息总数 */
+	totalMessages: Array<{ dialog_id: number; total: number }>
+	/** 是否同步远程消息 */
+	isSyncRemote: boolean
+	/** 用户在线状态 */
+	onlineStatus: Array<{ user_id: string; status: number }>
 }
 
 /**
@@ -144,9 +154,10 @@ export type CacheStore = CacheStoreOptions & {
 	 * 设置缓存的内容
 	 * @param key
 	 * @param value
+	 * @param isUpdateDB 是否需要更新本地内存中的数据，默认不需要
 	 * @returns
 	 */
-	set: (key: string, value: any) => Promise<void>
+	set: (key: string, value: any, isUpdateDB?: boolean) => Promise<void>
 }
 
 /**
@@ -213,6 +224,10 @@ export interface MessageStoreOptions {
 	isEmojiFocus: boolean
 	/** 是否需要滚动到底部 */
 	isScrollBottom: boolean
+	/** 群成员 */
+	members: any[]
+	/** 是否标注模式 */
+	isLabel: boolean
 }
 
 interface initOptions {
@@ -220,6 +235,7 @@ interface initOptions {
 	receiverId: string | number
 	isGroup: boolean
 	receiverInfo?: any
+	isLabel?: boolean
 }
 
 /**
@@ -253,11 +269,11 @@ export type MessageStore = MessageStoreOptions & {
 	 *
 	 * @param {any} message
 	 */
-	deleteMessage: (message: any) => void
+	deleteMessage: (message: any) => Promise<void>
 	/**
 	 * 删除本地所有消息
 	 *
-	 * @param {number} dialogId 会话 id
+	 * @param {number} dialogId 会话 idvoid
 	 */
 	deleteAllMessage: (dialogId: number) => Promise<void>
 	/**
@@ -269,4 +285,9 @@ export type MessageStore = MessageStoreOptions & {
 	 * @param {number} msgId 消息 id
 	 */
 	updateUnreadList: (msgId: number) => Promise<void>
+
+	/**
+	 * 消息是否加载完毕
+	 */
+	isEOF: () => boolean
 }

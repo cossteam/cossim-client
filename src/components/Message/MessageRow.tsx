@@ -1,8 +1,8 @@
 import { MESSAGE_READ, isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/message'
-import ReadEditor from '@/components/ReadEditor/ReadEditor'
+// import ReadEditor from '@/components/ReadEditor/ReadEditor'
 import MessageImage from './MessageRow/MessageImage'
 import MessageAudio from './MessageRow/MessageAudio'
 import MessageVideo from './MessageRow/MessageVideo'
@@ -19,16 +19,20 @@ import MessageLabel from './MessageRow/MessageLabel'
 import useUserStore from '@/stores/user'
 import MessageRecall from './MessageRow/MessageRecall'
 import { ListItem } from 'framework7-react'
-import { useIntersectionObserver, useLongPress } from '@reactuses/core'
+import { useClickOutside, useIntersectionObserver, useLongPress } from '@reactuses/core'
 import Avatar from '@/components/Avatar/Avatar'
 import useRouterStore from '@/stores/router'
 import useLoading from '@/hooks/useLoading'
 import useCacheStore from '@/stores/cache'
 import MsgService from '@/api/msg'
 import _ from 'lodash-es'
+import MessageEmojis from './MessageToolbar/MessageEmojis'
+import { sendMessage } from './script/message'
+import MessageText from './MessageRow/MessageText'
+import { recall } from './script/tootip'
 
 interface MessageRowProps {
-	item: { [key: string]: any }
+	item: Message
 }
 
 const className = (is_self: boolean) => {
@@ -38,7 +42,7 @@ const className = (is_self: boolean) => {
 	)
 }
 
-const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
+const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 	const longPressRef = useRef<HTMLDivElement>(null)
 
 	const { router } = useRouterStore()
@@ -59,7 +63,6 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		() => {
 			// 当前状态为多选
 			if (messageStore.manualTipType === tooltipType.SELECT) return
-
 			setShowTippy(true)
 
 			// 全选内容文字内容
@@ -68,6 +71,29 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		},
 		{ isPreventDefault: false, delay: 300 }
 	)
+
+	// 表情回复
+	const emojiRef = useRef<HTMLDivElement>(null)
+	const [showEmojis, setShowEmojis] = useState<boolean>(false)
+	useClickOutside(emojiRef, () => {
+		setTimeout(() => {
+			setShowEmojis(false)
+		}, 100)
+	})
+	const emojiReply = async (emoji: string) => {
+		if (item.reply_emojis) {
+			const replyEmojis = item.reply_emojis.find((item: any) => item.reply_content === emoji)
+			if (replyEmojis) {
+				recall({ ...item, msg_id: replyEmojis?.msg_id })
+				return
+			}
+		}
+		await sendMessage({
+			content: emoji,
+			msg_type: msgType.EMOJI,
+			reply_id: item.msg_id
+		})
+	}
 
 	// 选中消息时的处理
 	const handlerSelectChange = (checked: boolean, item: any) => {
@@ -85,37 +111,38 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		[messageStore.manualTipType]
 	)
 
-	const replyMessage = useMemo(() => {
-		const reply = { replyName: '', replyContent: '' }
-		if (!item?.reply_id) return reply
-		const message = messageStore.allMessages.find((msg) => msg?.msg_id === item?.reply_id)
-		if (!message) {
-			reply.replyContent = '消息已删除'
-		} else {
-			reply.replyName = message?.sender_info?.name
-			reply.replyContent = message?.content
-		}
-		return reply
-	}, [item?.reply_id])
+	// const replyMessage = useMemo(() => {
+	// 	const reply = { replyName: '', replyContent: '' }
+	// 	if (!item?.reply_id) return reply
+	// 	const message = messageStore.allMessages.find((msg) => msg?.msg_id === item?.reply_id)
+	// 	if (!message) {
+	// 		reply.replyContent = '消息已删除'
+	// 	} else {
+	// 		reply.replyName = message?.sender_info?.name
+	// 		reply.replyContent = message?.content
+	// 	}
+	// 	return reply
+	// }, [item?.reply_id])
 
 	const render = useCallback(() => {
 		switch (type) {
 			case msgType.IMAGE:
-				return <MessageImage className={clsx(className(is_self), '')} item={item} />
+				return <MessageImage item={item} />
 			case msgType.AUDIO:
-				return <MessageAudio className={className(is_self)} isSelf={is_self} item={item} />
+				return <MessageAudio isSelf={is_self} item={item} />
 			case msgType.VIDEO:
 				return <MessageVideo className={clsx(className(is_self), '!px-2 !py-2')} item={item} />
 			case msgType.FILE:
 				return <MessageFile className={clsx(className(is_self), '!px-2 !py-2')} item={item} />
 			default:
-				return (
-					<ReadEditor
-						className={clsx(className(is_self), !is_self ? 'read-editor-no-slef' : '')}
-						content={item?.content}
-						{...replyMessage}
-					/>
-				)
+				return <MessageText item={item} isSelf={is_self} />
+			// return (
+			// 	<ReadEditor
+			// 		className={clsx(className(is_self), !is_self ? 'read-editor-no-slef' : '')}
+			// 		content={item?.content}
+			// 		{...replyMessage}
+			// 	/>
+			// )
 		}
 	}, [messageStore.messages])
 
@@ -144,11 +171,12 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 				// messageStore.updateUnreadList(item.msg_id)
 				await MsgService.readMessagesApi(
 					{
-						dialog_id: item.dialog_id,
+						dialog_id: messageStore.dialogId,
 						msg_ids: [item.msg_id]
 					},
 					messageStore.isGroup
 				)
+				// @ts-ignore
 				const oldMsg = (await cacheStore.getDialogMessages(item.dialog_id, item.msg_id))[0]
 				// 更新消息状态
 				const newMsg = {
@@ -184,6 +212,14 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 		}, 1000)
 	)
 
+	// console.log('MessageRow', item)
+
+	// useEffect(() => {
+	// 	if (type === msgType.EMOJI) {
+	// 		mergeMessage(item)
+	// 	}
+	// }, [])
+
 	// 无内容
 	if (type === msgType.NONE) return null
 	// 通知
@@ -194,16 +230,18 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 	if ([msgType.LABEL, msgType.CANCEL_LABEL].includes(type)) return <MessageLabel item={item} />
 	// 撤回消息
 	if (type === msgType.RECALL) return <MessageRecall item={item} />
+	// 表情回复
+	if (type === msgType.EMOJI) return null
 
 	return (
 		<ListItem
 			className="list-none"
 			checkbox={isSelect}
 			onChange={(e) => handlerSelectChange(e.target.checked, item)}
-			id={`row-${item.msg_id}`}
+			id={`row-${item?.msg_id}`}
 		>
 			<div className={clsx('w-full flex items-start', is_self ? 'justify-end' : 'justify-start')} ref={itemRef}>
-				<div className={clsx('max-w-[80%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>
+				<div className={clsx('max-w-[85%] flex-1 flex', is_self ? 'justify-end' : 'justify-start')}>
 					<div className={clsx('flex items-start', is_self ? 'justify-end pr-2' : 'justify-start pl-2')}>
 						<div
 							onClick={() => search(item.sender_info.user_id)}
@@ -225,7 +263,17 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								<span className="mb-1 text-[0.75rem] text-gray-500">{item?.sender_info?.name}</span>
 							)}
 							<Tippy
-								content={<MessageTooltip item={item} setShow={setShowTippy} el={longPressRef} />}
+								content={
+									<MessageTooltip
+										item={item}
+										setShow={setShowTippy}
+										el={longPressRef}
+										toggleEmojis={({ show, emoji }) => {
+											setShowEmojis(show)
+											!show && emojiReply(emoji)
+										}}
+									/>
+								}
 								arrow={false}
 								interactive={true}
 								appendTo={document.body}
@@ -241,6 +289,18 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 								</div>
 							</Tippy>
 
+							{showEmojis && (
+								<div ref={emojiRef}>
+									<MessageEmojis
+										className="w-[80vw] min-w-[310px] max-w-[600px] min-h-[250px]  max-h-[320px] pt-2 rounded relative z-[100] flex flex-col items-center justify-center"
+										onSelectEmojis={({ native: emoji }) => {
+											setShowEmojis(false)
+											emojiReply(emoji)
+										}}
+									/>
+								</div>
+							)}
+
 							<MessageTime item={item} is_self={is_self} />
 						</div>
 					</div>
@@ -248,6 +308,6 @@ const MessageRow: React.FC<MessageRowProps> = ({ item }) => {
 			</div>
 		</ListItem>
 	)
-}
+})
 
 export default MessageRow

@@ -1,6 +1,7 @@
 import type {
 	EditMessage,
 	GetBehindMessage,
+	GetDialog,
 	GetGroupMessage,
 	GetMessage,
 	LabelMessage,
@@ -21,9 +22,10 @@ class MsgServiceImpl {
 	 *
 	 * @returns
 	 */
-	getDialogApi(): Promise<DataResponse> {
+	getDialogApi(params: GetDialog): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/dialog/list`
+			url: `${this.baseUrl}/dialog/list`,
+			params
 		})
 	}
 

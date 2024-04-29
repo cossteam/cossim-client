@@ -51,18 +51,3 @@ export function generateMessage(message?: Partial<Message>): Message {
 
 	return { ...msg, ...message }
 }
-
-/**
- * 生成会话
- * @param dialog 会话内容
- */
-export function generateDialog(dialog: any) {
-	return {
-		/** 消息唯一标识 */
-		// id: uuidv4(),
-		/** 消息共享密钥 */
-		sharedKey: '',
-		/** 其他 */
-		...dialog
-	}
-}

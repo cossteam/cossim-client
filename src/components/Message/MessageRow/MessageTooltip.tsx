@@ -13,35 +13,28 @@ import {
 } from 'framework7-icons/react'
 import { Link } from 'framework7-react'
 import useMessageStore from '@/stores/message'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef } from 'react'
 import tooltipStatMachine from '../script/tootip'
 import useUserStore from '@/stores/user'
 import emojiData from '@emoji-mart/data'
-import Tippy from '@tippyjs/react'
-import MessageEmojis from '@/components/Message/MessageToolbar/MessageEmojis.tsx'
 import { useClickOutside } from '@reactuses/core'
-
 interface MessageTooltipProps {
 	item: any
 	setShow: (show: boolean) => void
 	el: React.RefObject<Element>
+	toggleEmojis?: (data: { show: boolean; emoji: any }) => void
 }
 
-const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) => {
+const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, toggleEmojis }) => {
 	const messageStore = useMessageStore()
 	const userStore = useUserStore()
-	const emojiRef = useRef<HTMLDivElement>(null)
-	const [showTippy, setShowTippy] = useState<boolean>(false)
+
+	const toolTipRef = useRef<HTMLDivElement | null>(null)
+
 	// 点击其他地方移除提示框
-	useClickOutside(el, () => {
+	useClickOutside(el, async () => {
 		setTimeout(() => {
 			setShow(false)
-		}, 100)
-	})
-	useClickOutside(emojiRef, () => {
-		console.log('点击其他')
-		setTimeout(() => {
-			setShowTippy(false)
 		}, 100)
 	})
 
@@ -132,7 +125,8 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) =>
 	 * 获取常用表情 id数组
 	 */
 	const getFrequent = (): [string] => {
-		return allEmojis.categories.find((item: any) => item.id === 'frequent').emojis
+		// return allEmojis.categories.find((item: any) => item.id === 'frequent').emojis
+		return ['']
 	}
 
 	// const div = document.createElement('div')
@@ -140,7 +134,10 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) =>
 
 	// @ts-ignore
 	return (
-		<div className="h-auto pt-2 w-auto rounded relative z-[100] flex flex-col items-center justify-center">
+		<div
+			className="h-auto max-w-[300px] pt-2 w-auto rounded relative z-[100] flex flex-col items-center justify-center"
+			ref={toolTipRef}
+		>
 			<div className={clsx('grid', tooltips.length >= 6 ? 'grid-cols-6' : `grid-cols-${tooltips.length}`)}>
 				{tooltips.map((item) => (
 					<Link
@@ -161,51 +158,30 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el }) =>
 					{getFrequent()
 						.slice(0, 8)
 						.map((item: string) => (
-							<em-emoji key={item} id={item} size="2em"></em-emoji>
+							// @ts-ignore
+							<em-emoji
+								key={item}
+								id={item}
+								size="2em"
+								onClick={() => {
+									toggleEmojis &&
+										toggleEmojis({
+											show: false,
+											emoji: allEmojis?.emojis[item]?.skins[0]?.native ?? item
+										})
+								}}
+							/>
 						))}
 				</div>
 				<PlusCircle
 					onClick={() => {
 						setShow(false)
-						setShowTippy(true)
+						// setShowTippy(true)
+						toggleEmojis && toggleEmojis({ show: true, emoji: null })
 					}}
 					className="toolbar-icon"
 				/>
 			</div>
-			{showTippy && (
-				<Tippy
-					content={
-						<div ref={emojiRef} className="z-[9999]" style={{ width: '97vw' }}>
-							<MessageEmojis
-								onSelectEmojis={(emoji) => messageStore.update({ selectedEmojis: emoji.native })}
-								className="h-auto pt-2 w-full rounded relative z-[100] flex flex-col items-center justify-center"
-							/>
-						</div>
-					}
-					arrow={false}
-					interactive={true}
-					appendTo={document.body}
-					theme="light"
-					animation="shift-away-subtle"
-					// touch={['hold', 300]}
-					// trigger="manual"·
-					visible={showTippy}
-				></Tippy>
-			)}
-
-			{/*{showTippy && (*/}
-			{/*	<div className="z-[9999]">*/}
-			{/*		{createPortal(*/}
-			{/*		<div id="emoji">*/}
-			{/*			<MessageEmojis*/}
-			{/*				style={{ width: '97vw' }}*/}
-			{/*				onSelectEmojis={(emoji) => messageStore.update({ selectedEmojis: emoji.native })}*/}
-			{/*				className="h-auto pt-2 w-full rounded relative z-[100] flex flex-col items-center justify-center"*/}
-			{/*			/>*/}
-			{/*		</div>*/}
-			{/*		, div)}*/}
-			{/*	</div>*/}
-			{/*)}*/}
 		</div>
 	)
 }

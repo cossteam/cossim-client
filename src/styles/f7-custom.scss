@@ -1,23 +1,27 @@
 .router-transition-f7-custom-forward,
 .router-transition-f7-custom-backward {
-    // background: #000;
-    // perspective: 0px;
+    perspective: 0px;
+    // transition: all 0;
 }
 
+
+/** 进入页面前 */
 .router-transition-f7-custom-forward .page-next {
-    animation: f7-custom-next-to-current 200ms forwards;
+    animation: f7-custom-next-to-current 300ms forwards;
 }
+
 
 .router-transition-f7-custom-forward .page-current {
-    animation: f7-custom-current-to-prev 200ms forwards;
+    animation: f7-custom-current-to-prev 300ms forwards;
 }
 
+/** 离开页面前 */
 .router-transition-f7-custom-backward .page-current {
-    animation: f7-custom-current-to-next 200ms forwards;
+    animation: f7-custom-current-to-next 400ms forwards;
 }
 
 .router-transition-f7-custom-backward .page-previous {
-    animation: f7-custom-prev-to-current 200ms forwards;
+    animation: f7-custom-prev-to-current 400ms forwards;
 }
 
 @keyframes f7-custom-next-to-current {
@@ -42,24 +46,20 @@
 
 @keyframes f7-custom-current-to-prev {
     from {
-        transform: translateZ(0);
         opacity: 1;
     }
 
     to {
-        transform: translateZ(-300px);
         opacity: 0.5;
     }
 }
 
 @keyframes f7-custom-prev-to-current {
     from {
-        transform: translateZ(-300px);
         opacity: 0.5;
     }
 
     to {
-        transform: translateZ(0);
         opacity: 1;
     }
 }

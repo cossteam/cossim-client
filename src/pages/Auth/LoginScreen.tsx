@@ -3,14 +3,15 @@ import { At, Lock, ChevronLeft } from 'framework7-icons/react'
 import { useEffect, useState } from 'react'
 import clsx from 'clsx'
 
-import { $t, USER_ID, TOKEN, ACCOUNT } from '@/shared'
+import { $t, USER_ID, TOKEN, ACCOUNT, getFingerPrintID } from '@/shared'
 import UserService from '@/api/user'
 import type { LoginData, RegisterData } from '@/types/api/user'
 import { validEmail } from '@/utils/validate'
 import './Auth.scss'
 import { setCookie } from '@/utils/cookie'
-import { Device } from '@capacitor/device'
+// import { Device } from '@capacitor/device'
 import useUserStore from '@/stores/user'
+// import { cloneDeep } from 'lodash-es'
 
 interface LoginScreenProps {
 	defaultData?: RegisterData
@@ -18,8 +19,8 @@ interface LoginScreenProps {
 
 const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7route, defaultData }) => {
 	const [fromData, setFromData] = useState<LoginData>({
-		email: '',
-		password: ''
+		email: '1@qq.com',
+		password: '123456qqq'
 	})
 
 	const switchAccount = f7route.query?.switch_account
@@ -63,7 +64,10 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 		try {
 			if (!valid()) return
 
-			const { identifier: deviceId } = await Device.getId()
+			// const { identifier: deviceId } = await Device.getId()
+			// console.log('deviceId', await Device.getInfo(), deviceId)
+
+			const deviceId = await getFingerPrintID()
 
 			const { code, data, msg } = await UserService.loginApi({
 				...fromData,
@@ -86,17 +90,20 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 				localStorage.setItem('user_list', JSON.stringify([{ ...data.user_info, ...fromData }]))
 			}
 
+			location.reload()
+
 			setCookie(USER_ID, data?.user_info?.user_id)
 			setCookie(ACCOUNT, data?.user_info?.email)
 			setCookie(TOKEN, data?.token)
 
-			location.reload()
 			userStore.update({
 				userId: data?.user_info?.user_id,
 				token: data?.token,
 				userInfo: data?.user_info,
 				deviceId,
-				lastLoginTime: data?.user_info?.last_login_time ?? 1
+				lastLoginTime: data?.user_info?.last_login_time ?? 1,
+				loginNumber: data?.user_info?.login_number ?? 0,
+				isNewLogin: data?.user_info?.new_device_login ?? false
 			})
 		} catch (error) {
 			console.error('登录失败', error)

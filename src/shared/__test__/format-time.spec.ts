@@ -1,4 +1,4 @@
-import { formatTime } from '../format-time'
+import { formatTime } from '../format_time'
 import { describe, it, expect } from 'vitest'
 
 describe('format', () => {

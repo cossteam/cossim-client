@@ -4,8 +4,8 @@ import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
 import Layout from './components/Layout'
-import { $t, TOKEN, SocketClient, SocketEvent, DEVICE_ID, toastMessage, uploadPublicKey } from '@/shared'
-import { hasCookie, setCookie } from '@/utils/cookie'
+import { $t, TOKEN, SocketClient,createSocket, toastMessage, uploadPublicKey } from '@/shared'
+import { hasCookie } from '@/utils/cookie'
 import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import { useAsyncEffect } from '@reactuses/core'
@@ -15,14 +15,18 @@ import LiveRoomNew from '@/components/LiveRoom'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
-import run, { handlerSocketEdit, handlerSocketMessage, handlerSocketRequest, handlerSocketResult } from './run'
+import run from './run'
 import { isWeb } from './utils'
 import useUserStore from '@/stores/user'
 import useMessageStore, { defaultOptions } from './stores/message'
 import { usePreviewStore } from './stores/preview'
+import DevicePopup from './components/DevicePopup/DevicePopup'
 
 function App() {
 	const router = useRef<Router.Router | null>(null)
+
+	// 是否需要设备验证
+	// const [devicePopupVisible, setDevicePopupVisible] = useState(false)
 
 	const liveRoomStore = useLiveRoomStore()
 	const cacheStore = useCacheStore()
@@ -58,41 +62,45 @@ function App() {
 		}
 
 		// 事件处理
-		const handlerInit = async (e: any) => {
-			const data = JSON.parse(e.data)
-			const event = data.event
+		// const handlerInit = async (e: any) => {
+		// 	const data = JSON.parse(e.data)
+		// 	const event = data.event
 
-			console.log('接收到所有 sokect 通知：', data)
-			switch (event) {
-				case SocketEvent.OnlineEvent:
-					setCookie(DEVICE_ID, data.driverId)
-					break
-				case SocketEvent.PrivateChatsEvent:
-				case SocketEvent.GroupChatsEvent:
-				case SocketEvent.SelfChatsEvent:
-					handlerSocketMessage(data)
-					break
-				case SocketEvent.ApplyListEvent:
-				case SocketEvent.GroupApplyListEvent:
-					handlerSocketRequest(data)
-					break
-				case SocketEvent.ApplyAcceptEvent:
-					handlerSocketResult(data)
-					break
-				// 通话事件
-				case SocketEvent.UserCallReqEvent:
-				case SocketEvent.GroupCallReqEvent:
-				case SocketEvent.UserCallRejectEvent:
-				case SocketEvent.GroupCallRejectEvent:
-				case SocketEvent.UserCallHangupEvent:
-				case SocketEvent.GroupCallHangupEvent:
-					liveRoomStore.handlerEvent(event, data)
-					break
-				case SocketEvent.MessageEditEvent:
-					handlerSocketEdit(data)
-					break
-			}
-		}
+		// 	console.log('接收到所有 sokect 通知：', data)
+		// 	switch (event) {
+		// 		case SocketEvent.OnlineEvent:
+		// 			setCookie(DEVICE_ID, data.driverId)
+		// 			break
+		// 		case SocketEvent.PrivateChatsEvent:
+		// 		case SocketEvent.GroupChatsEvent:
+		// 		case SocketEvent.SelfChatsEvent:
+		// 			handlerSocketMessage(data)
+		// 			break
+		// 		case SocketEvent.ApplyListEvent:
+		// 		case SocketEvent.GroupApplyListEvent:
+		// 			handlerSocketRequest(data)
+		// 			break
+		// 		case SocketEvent.ApplyAcceptEvent:
+		// 			handlerSocketResult(data)
+		// 			break
+		// 		// 通话事件
+		// 		case SocketEvent.UserCallReqEvent:
+		// 		case SocketEvent.GroupCallReqEvent:
+		// 		case SocketEvent.UserCallRejectEvent:
+		// 		case SocketEvent.GroupCallRejectEvent:
+		// 		case SocketEvent.UserCallHangupEvent:
+		// 		case SocketEvent.GroupCallHangupEvent:
+		// 		case SocketEvent.UserLeaveGroupCallEvent:
+		// 			liveRoomStore.handlerEvent(event, data)
+		// 			break
+		// 		case SocketEvent.MessageEditEvent:
+		// 			handlerSocketEdit(data)
+		// 			break
+		// 		case SocketEvent.UserOnlineEvent:
+		// 			handlerSocketOnline(data)
+		// 			break
+		// 	}
+		// }
 
 		// 连接 socket
 		if (hasCookie(TOKEN)) {
@@ -103,12 +111,20 @@ function App() {
 				uploadPublicKey()
 				userStore.update({ lastLoginTime: Date.now() })
 			}
-			SocketClient.connect()
-			SocketClient.addListener('onWsMessage', handlerInit)
+			createSocket()
+			// if (!cacheStore.cacheKeyPair) setDevicePopupVisible(true)
+
+			// 如果是新设备登录
+			// if (userStore.lastLoginTime && userStore.isNewLogin) {
+			// 	toastMessage('检测到新设备登录')
+			// }
+
+			// SocketClient.connect()
+			// SocketClient.addListener('onWsMessage', handlerInit)
 		}
 
 		return () => {
-			SocketClient.removeListener('onWsMessage', handlerInit)
+			// SocketClient.removeListener('onWsMessage', handlerInit)
 		}
 	}, [])
 
@@ -207,6 +223,7 @@ function App() {
 					<Layout />
 					<Preview />
 					<LiveRoomNew />
+					<DevicePopup />
 				</>
 			) : (
 				<View url="/auth/" id="view-auth" name="auth" />

@@ -232,7 +232,7 @@ const LiveRoomNew: React.FC = () => {
 	useAsyncEffect(
 		async () => {
 			console.log('当前状态', liveRoomStore.getliveRoomStatesText(liveRoomStore.state))
-			console.log('当前房间', client.current)
+			console.log('当前房间', client.current, videoTracks)
 			switch (liveRoomStore.state) {
 				case LiveRoomStates.IDLE:
 					liveRoomStore.resetState()
@@ -301,6 +301,18 @@ const LiveRoomNew: React.FC = () => {
 	const onVideosScroll = (e: any) => {
 		setVideosTop(e.target.scrollTop)
 	}
+
+	// 用户退出通话后删除对应的VideoBox
+	useEffect(() => {
+		if (!liveRoomStore.leaveIds.length) return
+		liveRoomStore.leaveIds.forEach((id) => {
+			const index = videoTracks.findIndex((item) => item.id === id)
+			if (index > -1) {
+				videoTracks.splice(index, 1)
+			}
+			setVideoTracks([...videoTracks])
+		})
+	}, [liveRoomStore.leaveIds])
 
 	return (
 		<>
@@ -407,6 +419,10 @@ const LiveRoomNew: React.FC = () => {
 									} else {
 										videoStyle['width'] = '100%'
 									}
+
+									// 隐藏视频
+									if (liveRoomStore.state === LiveRoomStates.HANGUP) return null
+
 									return (
 										<VideoBox
 											key={index}

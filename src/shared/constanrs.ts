@@ -35,3 +35,9 @@ export const CACHE_KEYBOARD_HEIGHT = 'keyboardHeight'
 export const CACHE_MESSAGE = 'CacheMessage'
 /** 缓存密钥对 */
 export const CACHE_KEY_PAIR = 'cacheKeyPair'
+/** 缓存总数据 */
+export const CACHE_TOTAL_MESSAGE = 'cacheTotalMessage'
+/** 同步历史消息 */
+export const CACHE_SYNC_REMOTE = 'cacheSyncRemote'
+/** 缓存好友在线状态 */
+export const CACHE_FRIEND_ONLINE_STATUS = 'cacheOnlineStatus'

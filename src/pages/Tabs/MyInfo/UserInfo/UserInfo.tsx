@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { f7, Page, Navbar, List, ListItem, Button, Block, Popup } from 'framework7-react'
-// import { useClipboard } from '@reactuses/core'
+import { useClipboard } from '@reactuses/core'
+import { encode } from 'js-base64'
 
 import { $t, toastMessage } from '@/shared'
 import UserService from '@/api/user'
@@ -10,19 +11,23 @@ import '../MyInfo.scss'
 import { Qrcode } from 'framework7-icons/react'
 import Cropper from '@/components/Cropper/Cropper'
 import Avatar from '@/components/Avatar/Avatar.tsx'
+import useCacheStore from '@/stores/cache'
 
 const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 	const [userInfo, setUserInfo] = useState<any>({})
 	const userStore = useUserStore()
+	const cacheStore = useCacheStore()
 	const [isOpened, setOpened] = useState(false)
 	const [files, setFiles] = useState<any>()
 
 	const logout = () => {
 		f7.dialog.confirm($t('退出登录'), $t('确定要退出登录吗？'), async () => {
 			try {
+				console.log(userStore?.userInfo)
+
 				f7.dialog.preloader($t('正在退出...'))
 				await UserService.logoutApi({
-					login_number: userInfo?.login_number
+					login_number: userStore?.loginNumber
 				})
 			} catch (error) {
 				toastMessage($t('退出登录失败'))
@@ -35,10 +40,23 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 		})
 	}
 
-	// const [, copy] = useClipboard()
+	const [, copy] = useClipboard()
 	const exportPreKey = async () => {
 		try {
-			toastMessage($t('暂时不支持导出密钥'))
+			if (cacheStore.cacheKeyPair) {
+				const text = JSON.stringify(cacheStore.cacheKeyPair)
+
+				copy(encode(text))
+					.then(() => {
+						toastMessage('已经成功导出到剪切板')
+					})
+					.catch(() => {
+						toastMessage('导出失败')
+					})
+			} else {
+				toastMessage('暂时不支持导出密钥')
+			}
+			// toastMessage($t('暂时不支持导出密钥'))
 			// const keyPair: any = userStore.keyPair
 			// if (keyPair) {
 			// 	const text = exportKeyPair(keyPair)
@@ -109,7 +127,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 
 	return (
 		<Page className="bg-bgTertiary" noToolbar onPageBeforeIn={loadUserInfo}>
-			<Navbar className="hidden-navbar-bg" backLink outline={false} title={$t('个人信息')} />
+			<Navbar className="hidden-navbar-bg bg-white" backLink outline={false} title={$t('个人信息')} />
 			<List className="coss_list" strong>
 				<ListItem className="coss_item__bottom" title="头像" onClick={handleAvatarClick}>
 					<div slot="after">

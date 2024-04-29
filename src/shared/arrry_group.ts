@@ -23,10 +23,10 @@ export const arrayToGroups = (array: any[]) => {
  * @param {Object} groups -对象的输入数组
  * @return {any[]} 一个对象数组
  */
-export const groupsToArray = (groups: any) => {
+export const groupsToArray = (groups: any): any[] => {
 	return Object.entries(groups).reduce((result, [key, value]) => {
 		// @ts-ignore
-		const list = value.map(v=>({ ...v, group: key }))
+		const list = value.map((v) => ({ ...v, group: key }))
 		// @ts-ignore
 		return result.concat(list)
 	}, [])

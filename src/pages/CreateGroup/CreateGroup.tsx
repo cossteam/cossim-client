@@ -7,7 +7,7 @@ import './CreateGroup.scss'
 import Contact from '@/components/Contact/Contact'
 import { CreateGroupData } from '@/types/api/group'
 import GroupService from '@/api/group'
-import UserStore from '@/db/user'
+// import UserStore from '@/db/user'
 // import { useAsyncEffect } from '@reactuses/core'
 import { pick } from 'lodash-es'
 import { getRemoteSession } from '@/run.ts'
@@ -52,33 +52,33 @@ const CreateGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const createGroup = async () => {
 		try {
 			f7.dialog.preloader('创建中...')
-			const { code, data, msg } = await GroupService.createGroupApi(group)
+			const { code, msg } = await GroupService.createGroupApi(group)
 			if (code !== 200) {
 				f7.dialog.alert(msg, $t('新建群聊失败'))
 				return
 			}
 
 			// 添加会话
-			const chat = {
-				dialog_id: data?.dialog_id,
-				group_id: data?.id,
-				dialog_type: data?.type,
-				dialog_name: data?.name,
-				dialog_avatar: data?.avatar,
-				dialog_unread_count: 0,
-				last_message: {
-					msg_type: 0,
-					content: '',
-					sender_id: '',
-					send_time: 0,
-					msg_id: 0
-				},
-				dialog_create_at: Date.now(),
-				top_at: 0
-			}
+			// const chat = {
+			// 	dialog_id: data?.dialog_id,
+			// 	group_id: data?.id,
+			// 	dialog_type: data?.type,
+			// 	dialog_name: data?.name,
+			// 	dialog_avatar: data?.avatar,
+			// 	dialog_unread_count: 0,
+			// 	last_message: {
+			// 		msg_type: 0,
+			// 		content: '',
+			// 		sender_id: '',
+			// 		send_time: 0,
+			// 		msg_id: 0
+			// 	},
+			// 	dialog_create_at: Date.now(),
+			// 	top_at: 0
+			// }
 
 			getRemoteSession()
-			await UserStore.add(UserStore.tables.dialogs, chat)
+			// await UserStore.add(UserStore.tables.dialogs, chat)
 			f7router.back()
 		} catch (error: any) {
 			f7.dialog.alert($t(error?.message || '群聊创建失败'))

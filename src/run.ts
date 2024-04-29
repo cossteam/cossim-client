@@ -8,6 +8,7 @@ import MsgService from '@/api/msg'
 import useUserStore from './stores/user'
 import {
 	CACHE_MESSAGE,
+	CACHE_TOTAL_MESSAGE,
 	MESSAGE_MARK,
 	MESSAGE_READ,
 	MESSAGE_SEND,
@@ -23,41 +24,42 @@ import { generateMessage } from './utils/data'
 import cacheStore from './utils/cache'
 import GroupService from './api/group'
 import RelationService from './api/relation'
-import _ from 'lodash-es'
+import _, { get } from 'lodash-es'
 import DOMPurify from 'dompurify'
 import localNotification, { LocalNotificationType } from './utils/notification'
 import { hasCookie } from './utils/cookie'
+import { mergeMessage, revokeMessage } from './components/Message/script/message'
 
 /**
  * 更新本地缓存消息，如果一开始没有消息，就添加会话中的最后一条消息
  *
  * @param dialogs 会话列表
  */
-async function updateCacheMessage(dialogs: any[]) {
-	for (let i = 0; i < dialogs.length; i++) {
-		const item = dialogs[i]
-		const tableName = `${item.dialog_id}`
-		const tableData = (await cacheStore.get(tableName)) ?? []
-		if (!tableData.length) {
-			cacheStore.set(tableName, [{ ...item?.last_message, dialog_id: item?.dialog_id }])
-		}
-	}
-}
+// async function updateCacheMessage(dialogs: any[]) {
+// 	for (let i = 0; i < dialogs.length; i++) {
+// 		const item = dialogs[i]
+// 		const tableName = `${item.dialog_id}`
+// 		const tableData = (await cacheStore.get(tableName)) ?? []
+// 		if (!tableData.length) {
+// 			cacheStore.set(tableName, [{ ...item?.last_message, dialog_id: item?.dialog_id }])
+// 		}
+// 	}
+// }
 
 /**
  * 获取远程会话
  */
 export async function getRemoteSession() {
 	try {
-		const { code, data } = await MsgService.getDialogApi()
+		const { code, data } = await MsgService.getDialogApi({ page_num: 1, page_size: 15 })
 		if (code !== 200) return
 
 		const cacheStore = useCacheStore.getState()
 
 		const dialogs = []
 
-		for (let i = 0; i < data.length; i++) {
-			const item = data[i]
+		for (let i = 0; i < data?.list.length; i++) {
+			const item = data?.list[i]
 			let content = ''
 			try {
 				// 解密消息
@@ -74,11 +76,13 @@ export async function getRemoteSession() {
 		// 未读消息数
 		const unreadCount = dialogs.reduce((prev: number, curr: any) => prev + curr?.dialog_unread_count, 0)
 
+		if (!cacheStore.cacheDialogs.length) getBehindMessage(dialogs)
+
 		// 更新缓存
 		cacheStore.updateCacheDialogs(dialogs)
 		cacheStore.updateCacheUnreadCount(unreadCount)
 
-		updateCacheMessage(dialogs)
+		// updateCacheMessage(dialogs)
 	} catch (error) {
 		console.error('获取远程会话失败：', error)
 	}
@@ -97,8 +101,8 @@ export async function getApplyList() {
 
 		const friendApply: any = []
 		const groupApply: any = []
-		friend.data && friendApply.push(...friend.data)
-		group.data && groupApply.push(...group.data)
+		friend.data && friendApply.push(...(get(friend, 'data.list', []) ?? []))
+		group.data && groupApply.push(...(get(group, 'data.list', []) ?? []))
 		// 统计未读数
 		const len: number = [...friendApply, ...groupApply].filter(
 			(v) => [0, 4].includes(v?.status) && v?.sender_id !== userStore.userId
@@ -120,19 +124,23 @@ export async function getApplyList() {
 
 /**
  * 获取落后消息
+ * @param {any[]} dialogs 本地缓存的会话列表
  */
-export async function getBehindMessage() {
+export async function getBehindMessage(dialogs?: any[]) {
 	try {
 		const cacheStore = useCacheStore.getState()
-		const params = cacheStore.cacheDialogs.map((v) => ({
+		const dialogsData = dialogs ?? cacheStore.cacheDialogs
+		const params = dialogsData.map((v) => ({
 			dialog_id: v?.dialog_id,
-			msg_id: v?.last_message?.msg_id ?? 0
+			msg_id: dialogs ? 0 : v?.last_message?.msg_id ?? 0
 		}))
 		const { code, data } = await MsgService.getBehindMessageApi(params)
 		if (code !== 200) return
 		console.log('落后消息', data)
 		// 更新本地缓存消息
 		cacheStore.updateBehindMessage(data)
+		const totalMessages = data.map((v: any) => ({ dialog_id: v.dialog_id, total: v.total }))
+		cacheStore.set(CACHE_TOTAL_MESSAGE, totalMessages, true)
 	} catch (error) {
 		console.error('获取落后消息失败：', error)
 	}
@@ -156,7 +164,6 @@ export async function getFriendList() {
 
 /**
  * 是否需要根据消息类型来确定是否需要添加或更新消息，标注、取消标注消息
- *
  * @param type 	消息类型
  */
 function isLableMessage(type: msgType) {
@@ -174,8 +181,7 @@ function isRecallMessage(type: msgType) {
 
 /**
  * 更新本地缓存的标注消息
- *
- * @param {any} message
+ * @param {any} message	消息
  */
 async function updateLabelCacheMessage(message: any) {
 	const tableName = CACHE_MESSAGE + `_${message.dialog_id}`
@@ -188,8 +194,7 @@ async function updateLabelCacheMessage(message: any) {
 
 /**
  * 撤回消息，删除本地的消息
- *
- * @param {message} message
+ * @param {message} message	消息
  */
 async function updateRecallCacheMessage(message: any) {
 	const tableName = CACHE_MESSAGE + `_${message.dialog_id}`
@@ -200,12 +205,10 @@ async function updateRecallCacheMessage(message: any) {
 
 /**
  * 处理消息
- *
- * @param {any} data	推送消息
+ * @param {any} data 推送消息
  */
 export async function handlerSocketMessage(data: any) {
 	console.log('handlerSocketMessage', data)
-
 	const userStore = useUserStore.getState()
 	const messageStore = useMessageStore.getState()
 	const cacheStore = useCacheStore.getState()
@@ -215,27 +218,13 @@ export async function handlerSocketMessage(data: any) {
 	// 获取消息类型
 	const type = message?.msg_type
 
-	// 本地通知
-	try {
-		// msg 的发送者不是自己并且当前不在会话中
-		const dialogId = Number(messageStore.dialogId)
-		console.log('本地通知：', dialogId, Number(message.dialog_id))
-		if (Number(message.dialog_id) !== dialogId) {
-			// 本地通知
-			const dom = document.createElement('p')
-			dom.innerHTML = DOMPurify.sanitize(message.content || '')
-			localNotification(LocalNotificationType.MESSAGE, message.sender_info.name, dom.innerText)
-			// 本地通知 END
-		}
-	} catch {
-		console.log('发送本地通知失败')
-	}
-
 	// 是否需要继续操作，如果是标注、撤回时需要继续操作,如果都不是且是自己当前设备发的就不处理
 	const isDrivered: boolean = userStore.deviceId === (data?.driver_id ?? data?.driverId)
 	const isContinue = !isLableMessage(type) && !isRecallMessage(type) && isDrivered
-	if (isContinue) return
-
+	//如果是自己发的消息，则不处理
+	const isMe: boolean = userStore.userId === message?.sender_id
+	if (isContinue&&isMe) return
+	
 	const msg = generateMessage({
 		...message,
 		is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK,
@@ -245,6 +234,21 @@ export async function handlerSocketMessage(data: any) {
 
 	msg.content = await decrypt(message?.sender_id, message.content)
 
+	// 本地通知
+	try {
+		// msg 的发送者不是自己并且当前不在会话中
+		const dialogId = Number(messageStore.dialogId)
+		// console.log('本地通知：', dialogId, Number(message.dialog_id))
+		if (Number(message.dialog_id) !== dialogId) {
+			// 本地通知
+			const dom = document.createElement('p')
+			dom.innerHTML = DOMPurify.sanitize(message.content || '')
+			localNotification(LocalNotificationType.MESSAGE, message.sender_info.name, dom.innerText)
+		}
+	} catch {
+		console.log('发送本地通知失败')
+	}
+
 	// TODO: 解密标注消息
 	if (isLableMessage(type)) {
 		const replyMessage = msg.reply_msg
@@ -253,7 +257,7 @@ export async function handlerSocketMessage(data: any) {
 	}
 
 	// 如果是当前会话，需要实时更新到页面
-	if (message?.dialog_id === messageStore.dialogId) {
+	if (message?.dialog_id === messageStore.dialogId) {		
 		await messageStore.createMessage(msg)
 
 		// 更新标注消息
@@ -270,29 +274,33 @@ export async function handlerSocketMessage(data: any) {
 
 		// 更新撤回消息
 		if (isRecallMessage(type)) {
-			// 需要拿到最新的消息列表
+			const relpyMsg = msg.reply_msg
 			const messageStore = useMessageStore.getState()
 			const message = messageStore.allMessages.find((v) => v?.msg_id === msg?.reply_id)
-			message && messageStore.deleteMessage(message)
-		}
 
-		// 手动触发滚动到底部操作
-		// messageStore.update({ isScrollBottom: true })
+			if (relpyMsg.msg_type === msgType.EMOJI) {
+				revokeMessage(relpyMsg)
+			} else {
+				// 需要拿到最新的消息列表
+				message && messageStore.deleteMessage(message)
+			}
+		}
 	} else {
 		cacheStore.addCacheMessage(msg)
 	}
 
-	// cacheStore.updateCacheMessage(msg)
 	// 如果是标注消息，需要修改本地消息缓存
 	isLableMessage(type) && updateLabelCacheMessage(msg)
 	// 如果是撤回消息，需要修改本地消息缓存
 	isRecallMessage(type) && updateRecallCacheMessage(msg)
 
 	// 更新消息的总未读数
-	if (msg.is_read !== MESSAGE_READ.READ) {
-		cacheStore.updateCacheUnreadCount(cacheStore.unreadCount + 1)
-	}
+	if (msg.is_read !== MESSAGE_READ.READ) cacheStore.updateCacheUnreadCount(cacheStore.unreadCount + 1)
 
+	// 如果是表情回复，就合并消息
+	if (message.msg_type === msgType.EMOJI) mergeMessage(msg)
+
+	// 更新会话的未读数
 	cacheStore.updateCacheDialogs(
 		cacheStore.cacheDialogs.map((i) => {
 			if (i.dialog_id === message.dialog_id) {
@@ -354,7 +362,7 @@ export function handlerSocketRequest(data: any) {
 	}
 	// 本地通知
 	try {
-		console.log('新请求', data)
+		// console.log('新请求', data)
 		localNotification(LocalNotificationType.MESSAGE, '新请求', data.msg ?? '有新的请求待处理')
 	} catch {
 		console.log('发送本地通知失败')
@@ -369,6 +377,12 @@ export function handlerSocketRequest(data: any) {
  */
 export function handlerSocketResult(data: any) {
 	console.log('好友同意或拒绝', data)
+	try {
+		// console.log('新请求', data)
+		localNotification(LocalNotificationType.MESSAGE, '处理结果', data.msg ?? '有新的请求待处理')
+	} catch {
+		console.log('发送本地通知失败')
+	}
 	getRemoteSession()
 }
 
@@ -417,7 +431,7 @@ export const handlerDestroyMessage = _.debounce(() => {
 		// 	allMsg.filter(
 		// 		(i: any) =>
 		// 			i.is_read === MESSAGE_READ.NOT_READ ||
-		// 			!isDifferenceGreaterThanSeconds(i.read_at, Date.now(), preferences.open_burn_after_reading_time_out)
+		// 	!isDifferenceGreaterThanSeconds(i.read_at, Date.now(), preferences.open_burn_after_reading_time_out)
 		// 	)
 		// )
 
@@ -449,6 +463,17 @@ export const handlerDestroyMessage = _.debounce(() => {
 }, 1000)
 
 /**
+ * 用户在线状态
+ * @param data 推送消息
+ */
+export function handlerSocketOnline(data: any) {
+	// const userStore = useUserStore.getState()
+	// console.log('用户在线状态d', data)
+	const cacheStore = useCacheStore.getState()
+	cacheStore.update({ onlineStatus: data.data }, true)
+}
+
+/**
  * 主入口
  */
 function run() {
@@ -457,8 +482,8 @@ function run() {
 	// 订阅 firstOpened 状态
 	useCacheStore.subscribe(async ({ firstOpened }) => {
 		if (firstOpened && hasCookie(TOKEN)) {
-			getBehindMessage() // 获取落后消息
 			getRemoteSession()
+			getBehindMessage() // 获取落后消息
 			getApplyList()
 			getFriendList()
 			// setInterval(() => {

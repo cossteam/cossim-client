@@ -16,7 +16,7 @@ export declare global {
 	 * @description 消息类型
 	 */
 	interface Message {
-		msg_id: string
+		msg_id: number
 		[key: string]: any
 	}
 }

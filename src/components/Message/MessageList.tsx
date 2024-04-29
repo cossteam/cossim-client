@@ -1,6 +1,6 @@
 import useMessageStore from '@/stores/message'
 import MessageRow from './MessageRow'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { emojiOrMore } from '@/shared'
 import { List } from 'framework7-react'
 import { useIntersectionObserver } from '@reactuses/core'
@@ -15,7 +15,7 @@ const MessageList = () => {
 
 	const [isFirstIn, setIsFirstIn] = useState<boolean>(true)
 
-	const placeholderRef = useRef<HTMLDivElement | null>(null)
+	// const placeholderRef = useRef<HTMLDivElement | null>(null)
 	const bottomRef = useRef<HTMLDivElement | null>(null)
 
 	// const isEOF = useMemo(
@@ -49,7 +49,7 @@ const MessageList = () => {
 	// 	// setTimeout(() => messageStore.container?.scrollTo({ top: 300 }), 0)
 	// }, [])
 
-	const row = useCallback((item: Message, index: number) => <MessageRow item={item} key={index} />, [])
+	// const row = useCallback((item: Message, index: number) => <MessageRow item={item} key={index} />, [])
 
 	useIntersectionObserver(bottomRef, (entry) => messageStore.update({ isAtBottom: entry[0].isIntersecting }))
 
@@ -82,13 +82,17 @@ const MessageList = () => {
 	// }, [messageStore.isLoading])
 	return (
 		<div className="w-full h-auto relative">
-			{messageStore.isLoading && (
+			{/* {messageStore.isLoading && (
 				<div className="w-full h-10 top -z-1 text-center text-gray-500" ref={placeholderRef}>
 					loading...
 				</div>
-			)}
+			)} */}
 			{messageStore.isGroupAnnouncement && <div className="h-10" />}
-			<List className="m-0">{messageStore.messages.map((item, index) => row(item, index))}</List>
+			<List className="m-0">
+				{messageStore.messages.map((item, index) => (
+					<MessageRow item={item} key={index} />
+				))}
+			</List>
 			<div className="w-full h-4 bottom-0" ref={bottomRef} />
 		</div>
 	)

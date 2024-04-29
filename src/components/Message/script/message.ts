@@ -4,7 +4,16 @@
  * @date 2024/03/20 16:13:00
  */
 import MsgService from '@/api/msg'
-import { MESSAGE_SEND, MessageBurnAfterRead, encrypt, msgType, toastMessage, tooltipType, updateDialog } from '@/shared'
+import {
+	MESSAGE_SEND,
+	MessageBurnAfterRead,
+	decrypt,
+	encrypt,
+	msgType,
+	toastMessage,
+	tooltipType,
+	updateDialog
+} from '@/shared'
 import useCacheStore from '@/stores/cache'
 import useMessageStore from '@/stores/message'
 import { generateMessage } from '@/utils/data'
@@ -74,6 +83,8 @@ interface Options {
 	uid?: string
 	/** 是否是转发 */
 	isForward?: boolean
+	/** 回复 id */
+	reply_id?: number
 }
 
 /**
@@ -102,7 +113,7 @@ export const sendMessage = async (options: Options) => {
 		content: content,
 		msg_send_state: MESSAGE_SEND.SENDING,
 		msg_type,
-		reply_id: isReply ? messageStore.selectedMessage?.msg_id : 0,
+		reply_id: options.reply_id || (isReply ? messageStore.selectedMessage?.msg_id : 0),
 		dialog_id: dialogId,
 		is_burn_after_reading: isBurnAfterReading
 	})
@@ -124,18 +135,23 @@ export const sendMessage = async (options: Options) => {
 	} catch (error: any) {
 		message.msg_send_state = MESSAGE_SEND.SEND_FAILED
 		// 生成错误信息并添加至会话
-		const errorMessage = generateMessage({ content: error?.message, msg_type: msgType.ERROR })
-		await messageStore.createMessage(errorMessage)
-		await cacheStore.addCacheMessage(errorMessage)
+		// const errorMessage = generateMessage({ content: error?.message, msg_type: msgType.ERROR })
+		// await messageStore.createMessage(errorMessage)
+		// await cacheStore.addCacheMessage(errorMessage)
 	} finally {
 		await messageStore.updateMessage(message)
 		// 转发时需要更新缓存
 		if (isForward) await cacheStore.addCacheMessage(message)
 		// 更新本地会话
 		updateDialog(message, dialogId)
+
+		// 如果是表情回复
+		if (message.msg_type === msgType.EMOJI) {
+			mergeMessage(message)
+		}
 	}
 
-	// // 以防万一，在10秒后再次更新消息状态
+	// 以防万一，在10秒后再次更新消息状态
 	// setTimeout(() => {
 	// 	if (message.msg_send_state === MESSAGE_SEND.SEND_SUCCESS) return
 	// 	message.msg_send_state = MESSAGE_SEND.SEND_FAILED
@@ -238,4 +254,51 @@ export const forward = async (item: any, msg: Message) => {
 	}
 
 	return message
+}
+
+/**
+ * 合并消息
+ * @param {Message} messages 要合并的消息数组
+ */
+export const mergeMessage = async (message: Message) => {
+	const messageStore = useMessageStore.getState()
+	const index = messageStore.allMessages.findIndex((item) => item.msg_id === message.reply_id)
+	if (index === -1) return
+	console.log('合并消息', message)
+	try {
+		try {
+			message.content = await decrypt(message.sender_id as string, message.content)
+		} catch (error) {
+			console.log('解密失败', error)
+		}
+		const item = messageStore.allMessages[index]
+		const baseEmojis = item?.reply_emojis ?? []
+		baseEmojis.push({ reply_content: message.content, reply_info: message.sender_info, msg_id: message.msg_id })
+		item.reply_emojis = baseEmojis
+		await messageStore.updateMessage(item)
+		await messageStore.deleteMessage(message)
+	} catch (error: any) {
+		console.log('合并失败')
+	}
+}
+
+/**
+ * 撤销回复消息
+ * @param {Message} message 要撤回的消息
+ */
+export const revokeMessage = async (message: Message) => {
+	const messageStore = useMessageStore.getState()
+	const index = messageStore.allMessages.findIndex((item) => item.msg_id === message.reply_id)
+	if (index === -1) return
+	const item = messageStore.allMessages[index]
+	try {
+		const reply_emojis = item.reply_emojis
+		if (!reply_emojis) return
+		const newEmojis = reply_emojis.filter((item: any) => item.msg_id !== message.msg_id)
+		item.reply_emojis = newEmojis
+		await messageStore.updateMessage(item)
+		// await messageStore.deleteMessage(message)
+	} catch (error: any) {
+		console.log('撤回失败')
+	}
 }

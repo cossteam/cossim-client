@@ -3,28 +3,15 @@ import type { Router } from 'framework7/types'
 import DialogList from '@/pages/Tabs/DialogList/DialogList'
 import ContactList from '@/pages/Tabs/ContactList/ContactList'
 import MyInfo from '@/pages/Tabs/MyInfo/MyInfo'
-
 import AuthScreen from '@/pages/Auth/AuthScreen'
 import Message from '@/pages/Message/Message'
-
 import NotFound from '@/pages/NotFound'
 
 const routes: Router.RouteParameters[] = [
-	// {
-	// 	path: '/',
-	// 	redirect: '/chats/',
-	// 	beforeEnter: (ctx: Router.RouteCallbackCtx) => {
-	// 		console.log('beforeEnter', ctx)
-	// 	}
-	// },
 	{
 		path: '/dialog/',
 		component: DialogList,
 		keepAlive: true
-		// options: {
-		// 	animate: false,
-		// 	transition: 'f7-push'
-		// }
 	},
 	{
 		path: '/contacts/',
@@ -52,15 +39,17 @@ const routes: Router.RouteParameters[] = [
 		path: '/message/:id/:dialog_id/',
 		component: Message,
 		options: {
-			// animate: true,
-			transition: 'f7-push'
-			// transition: 'f7-custom'
-		}
-		// keepAlive: true
+			transition: 'f7-custom'
+		},
+		keepAlive: true
 	},
 	{
 		path: '/user_info/:user_id/',
-		asyncComponent: () => import('@/pages/Tabs/MyInfo/UserInfo/UserInfo')
+		asyncComponent: () => import('@/pages/Tabs/MyInfo/UserInfo/UserInfo'),
+		options: {
+			transition: 'f7-custom'
+		},
+		keepAlive: true
 	},
 	{
 		path: '/update_user_info/:type/',
@@ -156,4 +145,10 @@ const routes: Router.RouteParameters[] = [
 	}
 ]
 
-export default routes
+export default routes.map((route) => {
+	route.options = {
+		transition: 'f7-custom',
+		...route.options
+	}
+	return route
+})

@@ -3,13 +3,12 @@ import UserService from '@/api/user'
 import { cretateNonce, decryptMessageWithKey, encryptMessage, generateKeyPair, performKeyExchange } from '.'
 
 /**
- * 根据用户 id 获取其共享密钥和共钥
+ * 根据用户 id 获取其共享密钥
  * @param {string} userId 用户 id
  * @returns
  */
 export async function getCacheShareKey(userId: string) {
 	const cacheStore = useCacheStore.getState()
-
 	let shareKey: any = cacheStore.cacheShareKeys.find((v) => v.user_id === userId)?.shareKey
 
 	if (!shareKey) {
@@ -21,8 +20,6 @@ export async function getCacheShareKey(userId: string) {
 			: cacheStore.cacheShareKeys.map((item) => (item.user_id === userId ? { ...item, shareKey } : item))
 		cacheStore.update({ cacheShareKeys }, true)
 	}
-
-	console.log('查找用户预共享密钥：', shareKey)
 
 	return shareKey
 }

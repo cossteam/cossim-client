@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { MessageStore, MessageStoreOptions } from './type'
 import cacheStore from '@/utils/cache'
-import { emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
+import { MESSAGE_MARK, emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
 import useCacheStore from './cache'
 
 export const defaultOptions: MessageStoreOptions = {
@@ -34,45 +34,44 @@ export const defaultOptions: MessageStoreOptions = {
 	unreadList: [],
 	isGroupAnnouncement: false,
 	isEmojiFocus: false,
-	isScrollBottom: true
+	isScrollBottom: true,
+	members: [],
+	isLabel: false
 }
 
 const useMessageStore = create<MessageStore>((set, get) => ({
 	...defaultOptions,
 
 	init: async (options) => {
+		set(defaultOptions)
+
 		const tableName = `${options.dialogId}`
-		const allMessages = (await cacheStore.get(tableName)) ?? []
+
+		let allMessages = (await cacheStore.get(tableName)) ?? []
+
+		// 如果是查询标记消息的
+		if (options.isLabel) {
+			allMessages = allMessages.filter((item: Message) => item.is_label === MESSAGE_MARK.MARK)
+		}
 
 		// 添加到搜索消息表名中
 		const cache = useCacheStore.getState()
 		if (!cache.cacheSearchMessage.includes(tableName)) {
 			cache.updateCacheSearchMessage(tableName)
 		}
-		const messages = allMessages.slice(-100)
+		const messages = allMessages.slice(-20)
+		const total = cache.totalMessages.find((item) => item.dialog_id === options.dialogId)?.total ?? 0
 
-		set({ allMessages, messages, isNeedPull: !allMessages.length, tableName, ...options })
+		set({
+			allMessages,
+			messages,
+			isNeedPull: !allMessages.length,
+			tableName,
+			total,
+			...options
+		})
 
-		// 获取远程消息
-		// getRemoteMessage(options.isGroup, options.receiverId, 1, 100).then((data) => {
-		// 	const total = data?.total ?? 0
-		// 	const msgs = data?.user_messages ?? data?.group_messages ?? []
-
-		// 	const diffData = msgs
-		// 		.reverse()
-		// 		// @ts-ignore
-		// 		.filter((msg) => !allMessages.some((m) => m?.msg_id === msg?.msg_id))
-
-		// 	if (diffData.length > 0) {
-		// 		// const messages = diffData.concat(allMessages)
-		// 		// set({ allMessages: messages, messages: messages.slice(-15) })
-		// 		cacheStore.set(tableName, diffData)
-		// 	}
-
-		// 	set({ total })
-		// })
-
-		console.log('init message store', options)
+		console.log('init message store', get())
 	},
 	update: async (options) => {
 		set((state) => ({ ...state, ...options }))
@@ -114,12 +113,34 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 	},
 	unshiftMessage: async () => {
 		const { allMessages, messages } = get()
-		const newMessages = allMessages.slice(-messages.length - 15)
-		set({ messages: newMessages, isLoading: false })
+		// const cacheStore = useCacheStore.getState()
+		// if (messages.length < allMessages.length && cacheStore.isSyncRemote) {
+		// 	getRemoteMessage({
+		// 		isGroup,
+		// 		id: dialogId,
+		// 		page_num: 1,
+		// 		page_size: 20,
+		// 		msg_id: allMessages[0]?.msg_id ?? 0
+		// 	}).then((data) => {
+		// 		const total = data?.total ?? 0
+		// 		const msgs = data?.user_messages ?? data?.group_messages ?? []
+		// 		const newMessages = [...msgs.reverse(), ...messages]
+		// 		set({ total, messages: newMessages, allMessages: newMessages, isLoading: false })
+		// 		cacheStore.set(`${dialogId}`, newMessages)
+		// 	})
+		// } else {
+		const newMessages = allMessages.slice(-messages.length - 20)
+		set({ messages: newMessages, total: allMessages.length, isLoading: false })
+		// }
 	},
 	updateUnreadList: async (msgId) => {
 		const { unreadList } = get()
 		if (!unreadList.includes(msgId)) unreadList.push(msgId)
+	},
+
+	isEOF: () => {
+		const { total, messages } = get()
+		return messages.length >= total
 	}
 }))
 
