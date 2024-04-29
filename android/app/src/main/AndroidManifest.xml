@@ -107,7 +107,4 @@
         </provider>
     </application>
 
-<!--    <queries>-->
-<!--        <package android:name="com.hitosea.coss" />-->
-<!--    </queries>-->
 </manifest>
