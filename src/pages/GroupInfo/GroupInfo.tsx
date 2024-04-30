@@ -122,16 +122,13 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 		const isSilence = !silence
 		setSilence(isSilence)
 		try {
-			f7.dialog.preloader('请稍候...')
 			const { code } = await GroupService.setGroupSilenceApi({
 				group_id: Number(GroupId),
 				is_silent: isSilence ? 1 : 0
 			})
 			if (code !== 200) return
 		} catch (error: any) {
-			f7.dialog.alert(error.message)
-		} finally {
-			f7.dialog.close()
+
 		}
 	}
 

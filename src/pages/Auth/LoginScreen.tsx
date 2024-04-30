@@ -1,4 +1,16 @@
-import { Button, Link, List, ListInput, LoginScreenTitle, theme, Preloader, Page, Block, f7 } from 'framework7-react'
+import {
+	Button,
+	Link,
+	List,
+	ListInput,
+	LoginScreenTitle,
+	theme,
+	Preloader,
+	Page,
+	Block,
+	f7,
+	Popup, BlockTitle, Navbar, NavRight
+} from 'framework7-react'
 import { At, Lock, ChevronLeft } from 'framework7-icons/react'
 import { useEffect, useState } from 'react'
 import clsx from 'clsx'
@@ -11,6 +23,7 @@ import './Auth.scss'
 import { setCookie } from '@/utils/cookie'
 // import { Device } from '@capacitor/device'
 import useUserStore from '@/stores/user'
+import SetRequestUrl from '@/pages/SetRequestUrl/SetRequestUrl.tsx'
 // import { cloneDeep } from 'lodash-es'
 
 interface LoginScreenProps {
@@ -172,6 +185,21 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 						{loading && <Preloader size="18" color="white" />}
 					</Button>
 				</List>
+				<Button round small popupOpen=".demo-popup-swipe">
+					切换服务地址
+				</Button>
+				<Popup className="demo-popup-swipe" swipeToClose>
+					<Page>
+						<Navbar title="环境切换">
+							<NavRight>
+								<Link popupClose>Close</Link>
+							</NavRight>
+						</Navbar>
+						<div>
+							<SetRequestUrl />
+						</div>
+					</Page>
+				</Popup>
 			</Block>
 		</Page>
 	)
