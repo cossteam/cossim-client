@@ -1,4 +1,5 @@
-import { ListChannelsResult, LocalNotifications, ScheduleOptions, ScheduleResult } from '@capacitor/local-notifications'
+import useNotificationStore from '@/stores/notification'
+import { LocalNotifications, ScheduleOptions, ScheduleResult } from '@capacitor/local-notifications'
 import { Device } from '@capacitor/device'
 
 export enum LocalNotificationType {
@@ -19,7 +20,30 @@ export enum Platform {
 	WEB = 'web'
 }
 
+export async function checkPermissions() {
+	// 获取权限状态
+	let permissionStatus = await LocalNotifications.checkPermissions()
+	window.localStorage.setItem('permissionStatus', JSON.stringify(permissionStatus))
+	if (permissionStatus.display !== 'granted') {
+		console.error('本地通知权限未开启，请求权限')
+		// 请求权限
+		permissionStatus = await LocalNotifications.requestPermissions()
+		if (permissionStatus.display !== 'granted') {
+			console.error('本地通知权限未开启，请求权限失败')
+			return
+		}
+	}
+}
+
 export default async function localNotification(type: LocalNotificationType, title: string, body: string) {
+	const useNotification = useNotificationStore.getState()
+
+	// 是否启用
+	if (!useNotification.enableNotification) {
+		console.log('本地通知未启用')
+		return
+	}
+
 	// 获取平台
 	const platform = (await Device.getInfo()).platform
 	if (platform === Platform.WEB) {
@@ -27,27 +51,17 @@ export default async function localNotification(type: LocalNotificationType, tit
 		return
 	}
 	try {
-		// 获取通知通道（类别）
-		const listChannels: ListChannelsResult = await LocalNotifications.listChannels()
-		console.log(listChannels)
+		// // 获取通知通道（类别）
+		// const listChannels: ListChannelsResult = await LocalNotifications.listChannels()
+		// console.log(listChannels)
 		// 获取权限状态
-		let permissionStatus = await LocalNotifications.checkPermissions()
-		window.localStorage.setItem('permissionStatus', JSON.stringify(permissionStatus))
-		if (permissionStatus.display !== 'granted') {
-			console.error('本地通知权限未开启，请求权限')
-			// 请求权限
-			permissionStatus = await LocalNotifications.requestPermissions()
-			if (permissionStatus.display !== 'granted') {
-				console.error('本地通知权限未开启，请求权限失败')
-				return
-			}
-		}
+		await checkPermissions()
 		// 创建通知
 		const notification: ScheduleOptions = {
 			notifications: [
 				{
 					title,
-					body,
+					body: useNotification.showDetail ? body : '',
 					id: type
 					// schedule: { at: new Date(Date.now() + 1000 * 5) } // 5 秒后触发
 				}
