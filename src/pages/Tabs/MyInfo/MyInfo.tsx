@@ -94,10 +94,10 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 				<List strong className="coss_list" key={index} dividers>
 					{item.map((child, current) => (
 						<ListItem
-							title={child.title}
-							className="coss_item__button"
-							link={'/notification_setting/'}
 							key={current}
+							className="coss_item__button"
+							title={child.title}
+							link={child.link ? child.link : ''}
 						>
 							<div slot="media">{child.icon}</div>
 						</ListItem>
