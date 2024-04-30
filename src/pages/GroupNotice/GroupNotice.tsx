@@ -52,8 +52,8 @@ const GroupNotice: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}
 
 	return (
-		<Page noToolbar className="bg-bgTertiary" onPageBeforeIn={loadNotification}>
-			<Navbar title={$t('群公告')} backLink className="bg-bgPrimary">
+		<Page noToolbar onPageBeforeIn={loadNotification}>
+			<Navbar title={$t('群公告')} backLink>
 				<NavRight>
 					{isGroupLeader && (
 						<Link href={`/create_group_notice/${group_id}/?admin=${isGroupLeader}`} className="text-2xl">

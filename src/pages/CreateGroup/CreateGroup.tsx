@@ -115,11 +115,11 @@ const CreateGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}, [friends])
 
 	return (
-		<Page noToolbar className="bg-bgTertiary relative">
+		<Page noToolbar className="relative">
 			<Navbar
 				backLink
 				title={$t(group_id ? '修改群聊信息' : '新建群聊')}
-				className="bg-bgPrimary hidden-navbar-bg"
+				className="hidden-navbar-bg"
 			>
 				<NavRight>
 					<Button large disabled={!group.name} onClick={group_id ? editGroup : createGroup}>

@@ -1,6 +1,6 @@
 import { List, ListItem, Navbar, Page } from 'framework7-react'
 import {
-	Bell,
+	Bell, CircleLefthalfFill,
 	DeviceDesktop,
 	DeviceTabletPortrait,
 	EllipsesBubble,
@@ -58,14 +58,17 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 				{ title: $t('设备'), icon: <DeviceTabletPortrait className="coss_item__icon" />, link: '#' },
 				{ title: $t('语言'), icon: <EllipsesBubble className="coss_item__icon" />, link: '#' }
 			],
-			[{ title: $t('设置'), icon: <GearAlt className="coss_item__icon" />, link: '#' }]
+			[
+				{ title: $t('设置'), icon: <GearAlt className="coss_item__icon" />, link: '#' },
+				{ title: $t('主题'), icon: <CircleLefthalfFill className="coss_item__icon" />, link: '/color_themes/' }
+			]
 		],
 		[]
 	)
 
 	return (
-		<Page onPageAfterIn={loadUserInfo} className="bg-bgTertiary coss_info">
-			<Navbar className="bg-bgPrimary hidden-navbar-bg coss_navbar" title={info?.nickname} large outline={false}>
+		<Page onPageAfterIn={loadUserInfo} className="coss_info">
+			<Navbar title={info?.nickname} large outline={false}>
 				{/* <span></span> */}
 			</Navbar>
 			<List strong mediaList className="coss_list">
@@ -96,7 +99,7 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 						<ListItem
 							title={child.title}
 							className="coss_item__button"
-							link={'/notification_setting/'}
+							link={child.link}
 							key={current}
 						>
 							<div slot="media">{child.icon}</div>

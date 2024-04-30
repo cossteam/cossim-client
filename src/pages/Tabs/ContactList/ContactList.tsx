@@ -87,12 +87,12 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 	return (
 		<Page
 			ptr
-			className="coss_contacts bg-gray-200"
+			className="coss_contacts"
 			// onPageTabShow={onPageTabShow}
 			onPtrRefresh={onRefresh}
 			// onPageInit={onPageTabShow}
 		>
-			<Navbar title={$t('联系人')} className="hidden-navbar-bg bg-bgPrimary">
+			<Navbar title={$t('联系人')} className="hidden-navbar-bg">
 				<NavRight>
 					<Link href={'/search/'}>
 						<Search className="w-6 h-6" />
@@ -109,7 +109,7 @@ const ContactList: React.FC<RouterProps> = ({ f7router }) => {
 				</Subnavbar> */}
 			</Navbar>
 
-			<List contactsList noChevron dividers outline className="h-full bg-bgPrimary">
+			<List contactsList noChevron dividers outline className="h-full">
 				<ListItem link="/apply_list/" badge={cacheStore.applyCount} badgeColor="red">
 					<PersonBadgePlusFill slot="media" className="text-primary text-2xl" />
 					<span slot="title" className="text-color-primary">

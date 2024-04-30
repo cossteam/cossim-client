@@ -202,10 +202,10 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}
 
 	return (
-		<Page className="profile-page bg-bgTertiary" noToolbar onPageBeforeIn={onPageBeforeIn}>
-			<Navbar title={$t('用户信息')} backLink className="bg-bgPrimary hidden-navbar-bg" />
+		<Page className="profile-page" noToolbar onPageBeforeIn={onPageBeforeIn}>
+			<Navbar title={$t('用户信息')} backLink className="hidden-navbar-bg" />
 
-			<div className="mb-3 p-4 bg-white flex flex-col justify-center items-center">
+			<div className="mb-3 p-4 flex flex-col justify-center items-center">
 				<Avatar size={70} src={userInfo?.avatar} />
 				<div className="mb-2 flex flex-col items-center">
 					<span className="">{`@${userInfo?.nickname || ''}`}</span>

@@ -153,11 +153,11 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	return (
 		<Page
 			ptr={ptrRefresh}
-			className={clsx('coss_dialog bg-gray-200', !ptrRefresh && 'hide-page-content')}
 			onPtrRefresh={onRefresh}
+			className={clsx('coss_dialog', !ptrRefresh && 'hide-page-content')}
 			noSwipeback={false}
 		>
-			<Navbar title="COSS" className="hidden-navbar-bg bg-bgPrimary">
+			<Navbar title="COSS" className="hidden-navbar-bg">
 				<NavRight>
 					<Link href={'/search/'}>
 						<Search className="w-6 h-6" />
@@ -195,7 +195,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 			<PageContent className="p-0 max-h-full h-full">
 				<div
 					id="dialog-box"
-					className="h-full bg-bgPrimary pb-12 overflow-y-auto"
+					className="h-full pb-12 overflow-y-auto"
 					onScroll={onDialogListScroll}
 				>
 					<List contactsList noChevron mediaList dividers className="">

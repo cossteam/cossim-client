@@ -126,8 +126,8 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 	}
 
 	return (
-		<Page className="bg-bgTertiary" noToolbar onPageBeforeIn={loadUserInfo}>
-			<Navbar className="hidden-navbar-bg bg-white" backLink outline={false} title={$t('个人信息')} />
+		<Page noToolbar onPageBeforeIn={loadUserInfo}>
+			<Navbar backLink outline={false} title={$t('个人信息')} />
 			<List className="coss_list" strong>
 				<ListItem className="coss_item__bottom" title="头像" onClick={handleAvatarClick}>
 					<div slot="after">

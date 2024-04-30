@@ -132,7 +132,7 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 	}
 
     return <Page noToolbar>
-			<Navbar title={ PageType === MemberListType.MEMBERSHOW ? getTitle() : ''} backLink className="bg-bgPrimary hidden-navbar-bg" >
+			<Navbar title={ PageType === MemberListType.MEMBERSHOW ? getTitle() : ''} backLink className="hidden-navbar-bg" >
 				{/* <NavTitle>
 					<div className={PageType === MemberListType.MEMBERSHOW && 'mr-14'}>{getTitle()}</div>
 				</NavTitle> */}
