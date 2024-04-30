@@ -140,6 +140,10 @@ const routes: Router.RouteParameters[] = [
 		asyncComponent: () => import('@/pages/BlackList/BlackList')
 	},
 	{
+		path: '/notification_setting/',
+		asyncComponent: () => import('@/pages/NotificationSetting/NotificationSetting')
+	},
+	{
 		path: '(.*)',
 		component: NotFound
 	}

@@ -223,8 +223,8 @@ export async function handlerSocketMessage(data: any) {
 	const isContinue = !isLableMessage(type) && !isRecallMessage(type) && isDrivered
 	//如果是自己发的消息，则不处理
 	const isMe: boolean = userStore.userId === message?.sender_id
-	if (isContinue&&isMe) return
-	
+	if (isContinue && isMe) return
+
 	const msg = generateMessage({
 		...message,
 		is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK,
@@ -234,21 +234,6 @@ export async function handlerSocketMessage(data: any) {
 
 	msg.content = await decrypt(message?.sender_id, message.content)
 
-	// 本地通知
-	try {
-		// msg 的发送者不是自己并且当前不在会话中
-		const dialogId = Number(messageStore.dialogId)
-		// console.log('本地通知：', dialogId, Number(message.dialog_id))
-		if (Number(message.dialog_id) !== dialogId) {
-			// 本地通知
-			const dom = document.createElement('p')
-			dom.innerHTML = DOMPurify.sanitize(message.content || '')
-			localNotification(LocalNotificationType.MESSAGE, message.sender_info.name, dom.innerText)
-		}
-	} catch {
-		console.log('发送本地通知失败')
-	}
-
 	// TODO: 解密标注消息
 	if (isLableMessage(type)) {
 		const replyMessage = msg.reply_msg
@@ -256,8 +241,22 @@ export async function handlerSocketMessage(data: any) {
 		msg.reply_msg.content = await decrypt(replyMessage?.sender_id, replyMessage.content)
 	}
 
+	// 本地通知
+	try {
+		// msg 的发送者不是自己并且当前不在会话中
+		const dialogId = Number(messageStore.dialogId)
+		if (Number(message.dialog_id) !== dialogId) {
+			// 本地通知
+			const dom = document.createElement('p')
+			dom.innerHTML = DOMPurify.sanitize(msg.content || '')
+			localNotification(LocalNotificationType.MESSAGE, msg.sender_info.name, dom.innerText)
+		}
+	} catch {
+		console.log('发送本地通知失败')
+	}
+
 	// 如果是当前会话，需要实时更新到页面
-	if (message?.dialog_id === messageStore.dialogId) {		
+	if (message?.dialog_id === messageStore.dialogId) {
 		await messageStore.createMessage(msg)
 
 		// 更新标注消息
@@ -357,12 +356,13 @@ export async function handlerSocketEdit(data: any) {
  * @param data
  */
 export function handlerSocketRequest(data: any) {
+	console.log('好友/群聊请求', data)
+
 	if (data?.data?.user_id) {
 		savePublicKey(data?.data?.user_id, data?.data?.e2e_public_key)
 	}
 	// 本地通知
 	try {
-		// console.log('新请求', data)
 		localNotification(LocalNotificationType.MESSAGE, '新请求', data.msg ?? '有新的请求待处理')
 	} catch {
 		console.log('发送本地通知失败')
@@ -378,8 +378,11 @@ export function handlerSocketRequest(data: any) {
 export function handlerSocketResult(data: any) {
 	console.log('好友同意或拒绝', data)
 	try {
-		// console.log('新请求', data)
-		localNotification(LocalNotificationType.MESSAGE, '处理结果', data.msg ?? '有新的请求待处理')
+		localNotification(
+			LocalNotificationType.MESSAGE,
+			'处理结果',
+			`${data.target_info.nickname}${data.status ? '同意' : '拒绝'}了你的申请`
+		)
 	} catch {
 		console.log('发送本地通知失败')
 	}
