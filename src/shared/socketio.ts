@@ -8,11 +8,13 @@ import {
 	handlerSocketResult
 } from '@/run'
 import { useLiveRoomStore } from '@/stores/liveRoom'
+import {getWsUrl} from '@/stores/requestUrl.ts'
 
 export function createSocket() {
 	const token = getCookie(TOKEN)
 	if (!token) throw new Error('User not logged in')
-	const url = import.meta.env.VITE_WS_URL
+	// const url = import.meta.env.VITE_WS_URL
+	const url = getWsUrl()
 	const urlObject = new URL(url)
 	const path = urlObject.pathname
 	let host = urlObject.origin

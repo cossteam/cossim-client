@@ -77,7 +77,7 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 					</div>
 					<Qrcode
 						slot="after"
-						className="text-3xl"
+						className="text-3xl mr-5"
 						onClick={(e) => {
 							e.stopPropagation()
 							f7router.navigate('/my_qrcode/')

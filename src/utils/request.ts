@@ -4,9 +4,11 @@ import { getCookie, removeAllCookie } from './cookie'
 import { TOKEN, RESPONSE_CODE } from '@/shared'
 import PGPUtils from '@/utils/pgp'
 import { f7 } from 'framework7-react'
+import { getBaseUrl } from '@/stores/requestUrl.ts'
 
 const axiosConfig = {
-	baseURL: import.meta.env.VITE_BASE_URL,
+	// baseURL:  import.meta.env.VITE_BASE_URL,
+	// baseURL:  getBaseUrl(),
 	timeout: 50000,
 	headers: {
 		'Content-Type': 'application/json;charset=UTF-8'
@@ -30,7 +32,7 @@ const pgpEnv = {
  * 使用 PGP 加密（AES256加密内容，RSA加密AES256密钥）
  * @param {*} serverPublicKey
  * @param {*} msg
- * @returns
+ * @returns 影响了公司项目的进度感到十分抱歉
  */
 const encryptPGP = async (serverPublicKey: any, msg: any) => {
 	// 通知服务端修改客户端公钥
@@ -79,6 +81,7 @@ const getClientKeys = async () => {
 // 请求拦截器
 service.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
+		config.baseURL = getBaseUrl();
 		const token = getCookie(TOKEN)
 		if (token) config.headers['Authorization'] = 'Bearer ' + token
 		/////////////////////////////////////////////////////////////////////////////////////////////
