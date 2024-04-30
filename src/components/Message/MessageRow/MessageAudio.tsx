@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { Icon } from 'framework7-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import lottie from 'lottie-web'
+// import lottie from 'lottie-web'
 
 interface MessageAudioProps {
 	className?: string
@@ -68,7 +68,7 @@ const MessageAudio: React.FC<MessageAudioProps> = ({ className, item, isSelf }) 
 
 	useEffect(() => {
 		const audio = audioRef.current
-		console.log('lottie', lottie)
+		// console.log('lottie', lottie)
 		if (!audio) return
 		audio.addEventListener('play', playListener)
 		audio.addEventListener('pause', pauseListener)
@@ -81,8 +81,12 @@ const MessageAudio: React.FC<MessageAudioProps> = ({ className, item, isSelf }) 
 	}, [])
 
 	return (
-		<div style={{ width: duration + 'em', justifyContent: isSelf ? 'end' : 'start' }} className={clsx('min-w-20 max-w-56 flex', className)} onClick={() => play()}>
-			<div  style={{ justifyContent: isSelf ? 'end' : 'start' }} className="w-16 flex items-center">
+		<div
+			style={{ width: duration + 'em', justifyContent: isSelf ? 'end' : 'start' }}
+			className={clsx('min-w-20 max-w-56 flex', className)}
+			onClick={() => play()}
+		>
+			<div style={{ justifyContent: isSelf ? 'end' : 'start' }} className="w-16 flex items-center">
 				{!isSelf && <Icon className="" f7={icons[iconIndex]} size={22} />}
 				<span className="px-2">{duration}</span>
 				{isSelf && <Icon className="rotate-180" f7={icons[iconIndex]} size={22} />}

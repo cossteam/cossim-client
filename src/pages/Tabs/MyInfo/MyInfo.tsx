@@ -1,7 +1,6 @@
 import { List, ListItem, Navbar, Page } from 'framework7-react'
 import {
 	Bell,
-	DeviceDesktop,
 	DeviceTabletPortrait,
 	EllipsesBubble,
 	ExclamationmarkShield,
@@ -53,7 +52,6 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 					icon: <Bell className="coss_item__icon" />,
 					link: '/notification_setting/'
 				},
-				{ title: $t('显示'), icon: <DeviceDesktop className="coss_item__icon" />, link: '#' },
 				{ title: $t('隐私与安全'), icon: <ExclamationmarkShield className="coss_item__icon" />, link: '#' },
 				{ title: $t('设备'), icon: <DeviceTabletPortrait className="coss_item__icon" />, link: '#' },
 				{ title: $t('语言'), icon: <EllipsesBubble className="coss_item__icon" />, link: '#' }

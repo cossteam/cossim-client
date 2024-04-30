@@ -30,13 +30,13 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const cacheStore = useCacheStore()
 	const { router, setRouter } = useRouterStore()
 	const { doubleClick } = useToolbarStore()
-	const [ firstUnread, setFirstUnread ] = useState<string>()
+	const [firstUnread, setFirstUnread] = useState<string>()
 
 	useEffect(() => {
 		const unread = cacheStore.cacheDialogs.find((item) => item?.dialog_unread_count > 0)
 		unread && scrollTo(unread.dialog_id)
-		const unreadElement = document.getElementById(unread?.dialog_id);
-		elementIsVisible(unreadElement).then(isVisible => {
+		const unreadElement = document.getElementById(unread?.dialog_id)
+		elementIsVisible(unreadElement).then((isVisible) => {
 			if (isVisible) {
 				setTimeout(() => {
 					setFirstUnread(unread?.dialog_id)
@@ -205,7 +205,10 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 							return (
 								<ListItem
 									id={item?.dialog_id}
-									className={clsx(item?.top_at !== 0 && 'bg-bgSecondary', item?.dialog_id == firstUnread && 'animate__animated animate__fadeIn')}
+									className={clsx(
+										item?.top_at !== 0 && 'bg-bgSecondary',
+										item?.dialog_id == firstUnread && 'animate__animated animate__fadeIn'
+									)}
 									key={item?.dialog_id + `${index}`}
 									title={item?.dialog_name}
 									badge={item?.dialog_unread_count}
