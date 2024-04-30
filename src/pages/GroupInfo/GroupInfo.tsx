@@ -142,7 +142,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 
 	return (
 		<Page noToolbar onPageBeforeIn={() => handlerToolbar(false)} onPageBeforeOut={() => handlerToolbar(true)}>
-			<Navbar title={$t('群聊信息')} backLink className="bg-bgPrimary hidden-navbar-bg" />
+			<Navbar title={$t('群聊信息')} backLink className="hidden-navbar-bg" />
 			<List className="m-0 mb-3 bg-white" strong dividers outline>
 				<ListItem noChevron>
 					<div className="w-full flex flex-col justify-center items-center">

@@ -140,6 +140,10 @@ const routes: Router.RouteParameters[] = [
 		asyncComponent: () => import('@/pages/BlackList/BlackList')
 	},
 	{
+		path: '/color_themes/',
+		asyncComponent: () => import('@/pages/ColorThemes/ColorThemes')
+	},
+	{
 		path: '/notification_setting/',
 		asyncComponent: () => import('@/pages/NotificationSetting/NotificationSetting')
 	},

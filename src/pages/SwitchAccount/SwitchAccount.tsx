@@ -64,10 +64,10 @@ const SwitchAccount: React.FC<RouterProps> = ({ f7router }) => {
 	}
 
 	return (
-		<Page className="bg-bgTertiary" noToolbar>
-			<Navbar className="bg-white" backLink />
+		<Page className='bg-bgTertiary' noToolbar>
+			<Navbar backLink />
 			<h1 className="text-center mt-20 text-2xl">点击头像切换账号</h1>
-			<div className="mt-20">
+			<div className="mt-20 ">
 				{userList &&
 					userList.map((item: any, index: number) => {
 						return (

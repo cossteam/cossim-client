@@ -31,10 +31,12 @@ function App() {
 	const liveRoomStore = useLiveRoomStore()
 	const cacheStore = useCacheStore()
 	const userStore = useUserStore()
+	const [theme] = useState(localStorage.getItem('theme') || 'light')
 
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
 		theme: 'ios',
+		darkMode: theme == 'dark',
 		routes,
 		colors: {
 			primary: '#33a854'
