@@ -108,19 +108,17 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		}
 
 		const tips_error = action === MessageBurnAfterRead.YES ? $t('阅后即焚失败') : $t('取消阅后即焚失败')
-
-		watchAsyncFn(async () => {
-			try {
-				const { code } = await RelationService.setBurnApi({ action, user_id, timeout: timeout ?? 10 })
-				if (code !== 200) {
-					toastMessage(tips_error)
-					return
-				}
-				updateCache({ open_burn_after_reading_time_out: timeout, open_burn_after_reading: action })
-			} catch (error) {
-				toastMessage('设置阅后即焚失败')
+		updateCache({ open_burn_after_reading_time_out: timeout, open_burn_after_reading: action })
+		try {
+			const { code } = await RelationService.setBurnApi({ action, user_id, timeout: timeout ?? 10 })
+			if (code !== 200) {
+				toastMessage(tips_error)
+				return
 			}
-		}, '设置中...')
+
+		} catch (error) {
+			toastMessage('设置阅后即焚失败')
+		}
 	}
 
 	// 消息免打扰
@@ -130,43 +128,39 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				? MessageNoDisturb.NO
 				: MessageNoDisturb.YES
 		const tips_error = is_silent === MessageNoDisturb.YES ? $t('消息免打扰失败') : $t('取消消息免打扰失败')
-		watchAsyncFn(async () => {
-			try {
-				const { code } = await RelationService.setSilenceApi({ is_silent, user_id })
-				if (code !== 200) {
-					toastMessage(tips_error)
-					return
-				}
-				updateCache({ silent_notification: is_silent })
-			} catch (error) {
-				toastMessage('设置消息免打扰失败')
+		updateCache({ silent_notification: is_silent })
+		try {
+			const { code } = await RelationService.setSilenceApi({ is_silent, user_id })
+			if (code !== 200) {
+				toastMessage(tips_error)
+				return
 			}
-		}, '设置消息免打扰中...')
+
+		} catch (error) {
+			toastMessage('设置消息免打扰失败')
+		}
+
 	}
 
 	// 黑名单
 	const blackList = async () => {
 		const is_add = userInfo?.relation_status === RelationStatus.BLACK
 		const tips_error = is_add ? $t('移除黑名单失败') : $t('添加黑名单失败')
-		await watchAsyncFn(
-			async () => {
-				try {
-					const params = { user_id }
-					const { code } = is_add
-						? await RelationService.deleteBlackListApi(params)
-						: await RelationService.addBlackListApi(params)
-					if (code !== 200) return toastMessage(tips_error)
-					updateCache({}, { relation_status: is_add ? RelationStatus.YES : RelationStatus.BLACK })
-					// 刷新消息列表
-					getRemoteSession()
-					// 刷新好友列表
-					getFriendList()
-				} catch (error) {
-					toastMessage(tips_error)
-				}
-			},
-			is_add ? '移除黑名单中...' : '加入黑名单中...'
-		)
+		updateCache({}, { relation_status: is_add ? RelationStatus.YES : RelationStatus.BLACK })
+		try {
+			const params = { user_id }
+			const { code } = is_add
+				? await RelationService.deleteBlackListApi(params)
+				: await RelationService.addBlackListApi(params)
+			if (code !== 200) return toastMessage(tips_error)
+			// 刷新消息列表
+			getRemoteSession()
+			// 刷新好友列表
+			getFriendList()
+		} catch (error) {
+			toastMessage(tips_error)
+		}
+
 	}
 
 	// 设置阅后即焚时间
