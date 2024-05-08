@@ -129,7 +129,7 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 			case msgType.IMAGE:
 				return <MessageImage item={item} />
 			case msgType.AUDIO:
-				return <MessageAudio isSelf={is_self} item={item} />
+				return <MessageAudio className={clsx(className(is_self))} isSelf={is_self} item={item} />
 			case msgType.VIDEO:
 				return <MessageVideo className={clsx(className(is_self), '!px-2 !py-2')} item={item} />
 			case msgType.FILE:
