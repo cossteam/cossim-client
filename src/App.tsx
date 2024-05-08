@@ -4,7 +4,7 @@ import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
 import Layout from './components/Layout'
-import { $t, TOKEN, SocketClient,createSocket, toastMessage, uploadPublicKey } from '@/shared'
+import { $t, TOKEN, SocketClient, createSocket, toastMessage, uploadPublicKey } from '@/shared'
 import { hasCookie } from '@/utils/cookie'
 import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
@@ -62,47 +62,6 @@ function App() {
 			const viewEl = document.querySelector('meta[name="viewport"]') as HTMLMetaElement
 			viewEl.setAttribute('content', `${viewEl.getAttribute('content')}, maximum-scale=1, user-scalable=no`)
 		}
-
-		// 事件处理
-		// const handlerInit = async (e: any) => {
-		// 	const data = JSON.parse(e.data)
-		// 	const event = data.event
-
-		// 	console.log('接收到所有 sokect 通知：', data)
-		// 	switch (event) {
-		// 		case SocketEvent.OnlineEvent:
-		// 			setCookie(DEVICE_ID, data.driverId)
-		// 			break
-		// 		case SocketEvent.PrivateChatsEvent:
-		// 		case SocketEvent.GroupChatsEvent:
-		// 		case SocketEvent.SelfChatsEvent:
-		// 			handlerSocketMessage(data)
-		// 			break
-		// 		case SocketEvent.ApplyListEvent:
-		// 		case SocketEvent.GroupApplyListEvent:
-		// 			handlerSocketRequest(data)
-		// 			break
-		// 		case SocketEvent.ApplyAcceptEvent:
-		// 			handlerSocketResult(data)
-		// 			break
-		// 		// 通话事件
-		// 		case SocketEvent.UserCallReqEvent:
-		// 		case SocketEvent.GroupCallReqEvent:
-		// 		case SocketEvent.UserCallRejectEvent:
-		// 		case SocketEvent.GroupCallRejectEvent:
-		// 		case SocketEvent.UserCallHangupEvent:
-		// 		case SocketEvent.GroupCallHangupEvent:
-		// 		case SocketEvent.UserLeaveGroupCallEvent:
-		// 			liveRoomStore.handlerEvent(event, data)
-		// 			break
-		// 		case SocketEvent.MessageEditEvent:
-		// 			handlerSocketEdit(data)
-		// 			break
-		// 		case SocketEvent.UserOnlineEvent:
-		// 			handlerSocketOnline(data)
-		// 			break
-		// 	}
-		// }
 
 		// 连接 socket
 		if (hasCookie(TOKEN)) {

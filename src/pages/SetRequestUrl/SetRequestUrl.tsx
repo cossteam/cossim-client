@@ -31,7 +31,7 @@ const SetRequestUrl = () => {
 							outline
 							className="el-input"
 							type="text"
-							placeholder="Enter custom Base URL"
+							placeholder="请输入自定义http地址"
 							value={baseCustomUrl}
 							onChange={(e) => setBaseCustomUrl(e.target.value)}
 						/>
@@ -40,7 +40,7 @@ const SetRequestUrl = () => {
 							outline
 							className="el-input"
 							type="text"
-							placeholder="Enter custom WS URL"
+							placeholder="请输入自定义ws地址"
 							value={wsCustomUrl}
 							onChange={(e) => setWsCustomUrl(e.target.value)}
 						/>
