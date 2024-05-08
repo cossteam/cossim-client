@@ -8,7 +8,7 @@ export default class PGPUtils {
 	 * @param {*} passphrase
 	 * @returns
 	 */
-	static async generateKeyPair(name: string, email: string, passphrase: string):Promise<any> {
+	static async generateKeyPair(name: string, email: string, passphrase: string): Promise<any> {
 		if (!name || !email || !passphrase) {
 			console.error('请输入姓名、电子邮件和密码')
 			return null

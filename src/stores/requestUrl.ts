@@ -1,6 +1,4 @@
-
-
-let baseUrl: string =  'https://coss.gezi.vip/api/v1'
+let baseUrl: string = 'https://coss.gezi.vip/api/v1'
 let wsUrl: string = 'wss://coss.gezi.vip/api/v1/push/ws'
 
 export const getBaseUrl = () => {
@@ -21,5 +19,3 @@ export const setWsUrl = (url: string) => {
 		localStorage.setItem('ws_url', url)
 	}
 }
-
-

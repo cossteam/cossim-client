@@ -1,77 +1,74 @@
 .custom-editor {
-    padding: 0 0.5rem;
-    font-size: 1rem;
+	padding: 0 0.5rem;
+	font-size: 1rem;
 
-    &[data-placeholder]:empty:before {
-        content: attr(data-placeholder);
-        color: gray;
-        font-size: 14px;
-    }
+	&[data-placeholder]:empty:before {
+		content: attr(data-placeholder);
+		color: gray;
+		font-size: 14px;
+	}
 
-    &[data-placeholder]:focus {
-        content: none;
-    }
+	&[data-placeholder]:focus {
+		content: none;
+	}
 
-    &:focus-visible {
-        outline: none;
-    }
+	&:focus-visible {
+		outline: none;
+	}
 
-    img {
-        display: inline-block;
-        object-fit: cover;
-        border-radius: 4px;
-    }
+	img {
+		display: inline-block;
+		object-fit: cover;
+		border-radius: 4px;
+	}
 }
 
 #tooltips {
-    position: fixed;
-    z-index: 99999;
-    background: var(--coss-primary-background);
-    color: var(--coss-text-primary);
-    // top: 50%;
-    width: 300px;
-    height: auto;
+	position: fixed;
+	z-index: 99999;
+	background: var(--coss-primary-background);
+	color: var(--coss-text-primary);
+	// top: 50%;
+	width: 300px;
+	height: auto;
 }
 
 .read-editor-1 {
-    width: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    word-break: break-all;
+	width: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	word-break: break-all;
 }
 
 .ql-editor {
-    padding: 0 12px;
-    max-height: 150px;
-    overflow-y: auto;
-    word-break: break-all;
+	padding: 0 12px;
+	max-height: 150px;
+	overflow-y: auto;
+	word-break: break-all;
 
-    &:focus-visible {
-        outline: none;
-    }
+	&:focus-visible {
+		outline: none;
+	}
 
-    &.ql-blank::before {
-        content: attr(data-placeholder);
-        font-size: 0.9rem;
-        left: 10px !important;
-        right: auto !important;
-        font-style: normal !important;
-        top: 1px;
-    }
+	&.ql-blank::before {
+		content: attr(data-placeholder);
+		font-size: 0.9rem;
+		left: 10px !important;
+		right: auto !important;
+		font-style: normal !important;
+		top: 1px;
+	}
 
-    &.ql-blank:focus:before {
-        content: '';
-    }
+	&.ql-blank:focus:before {
+		content: '';
+	}
 
-
-
-    code {
-        color: var(--coss-text-primary);
-        background: #ccc;
-        padding: 4px;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-
+	code {
+		color: var(--coss-text-primary);
+		background: #ccc;
+		padding: 4px;
+		border-radius: 4px;
+		box-sizing: border-box;
+	}
 }

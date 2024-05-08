@@ -2,85 +2,85 @@ $dotSize: 8px;
 $dotSpacing: 16px;
 
 .loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .dots {
-    position: relative;
-    width: $dotSize;
-    height: $dotSize;
-    border-radius: 50%;
-    background-color: rgb(var(--coss-primary));
-    opacity: 1;
-    animation: dot-middle 1s infinite linear;
+	position: relative;
+	width: $dotSize;
+	height: $dotSize;
+	border-radius: 50%;
+	background-color: rgb(var(--coss-primary));
+	opacity: 1;
+	animation: dot-middle 1s infinite linear;
 
-    &:before,
-    &:after {
-        content: '';
-        position: absolute;
-        width: $dotSize;
-        height: $dotSize;
-        border-radius: 50%;
-        background-color: rgb(var(--coss-primary));
-    }
+	&:before,
+	&:after {
+		content: '';
+		position: absolute;
+		width: $dotSize;
+		height: $dotSize;
+		border-radius: 50%;
+		background-color: rgb(var(--coss-primary));
+	}
 
-    &:before {
-        left: -$dotSpacing;
-        opacity: 0.25;
-        animation: dot-left 1s infinite linear;
-    }
+	&:before {
+		left: -$dotSpacing;
+		opacity: 0.25;
+		animation: dot-left 1s infinite linear;
+	}
 
-    &:after {
-        left: $dotSpacing;
-        opacity: 1;
-        animation: dot-right 1s infinite linear;
-    }
+	&:after {
+		left: $dotSpacing;
+		opacity: 1;
+		animation: dot-right 1s infinite linear;
+	}
 }
 
 @keyframes dot-middle {
-    0% {
-        opacity: 1;
-    }
+	0% {
+		opacity: 1;
+	}
 
-    33% {
-        opacity: 0.25;
-    }
+	33% {
+		opacity: 0.25;
+	}
 
-    66% {
-        opacity: 0.25;
-    }
+	66% {
+		opacity: 0.25;
+	}
 
-    100% {
-        opacity: 1;
-    }
+	100% {
+		opacity: 1;
+	}
 }
 
 @keyframes dot-left {
-    0% {
-        opacity: 0.25;
-    }
+	0% {
+		opacity: 0.25;
+	}
 
-    33% {
-        opacity: 1;
-    }
+	33% {
+		opacity: 1;
+	}
 
-    66% {
-        opacity: 0.25;
-    }
+	66% {
+		opacity: 0.25;
+	}
 }
 
 @keyframes dot-right {
-    33% {
-        opacity: 0.25;
-    }
+	33% {
+		opacity: 0.25;
+	}
 
-    66% {
-        opacity: 1;
-    }
+	66% {
+		opacity: 1;
+	}
 
-    100% {
-        opacity: 0.25;
-    }
+	100% {
+		opacity: 0.25;
+	}
 }

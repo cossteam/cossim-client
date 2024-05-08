@@ -193,11 +193,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 				</List>
 			</Popover>
 			<PageContent className="p-0 max-h-full h-full">
-				<div
-					id="dialog-box"
-					className="h-full pb-12 overflow-y-auto"
-					onScroll={onDialogListScroll}
-				>
+				<div id="dialog-box" className="h-full pb-12 overflow-y-auto" onScroll={onDialogListScroll}>
 					<List contactsList noChevron mediaList dividers className="">
 						{cacheStore.cacheDialogs.sort(customSort).map((item, index) => {
 							// console.log('1111', item)

@@ -1,21 +1,20 @@
-import { MemberListType, USER_ID } from "@/shared";
-import { getCookie } from "@/utils/cookie";
-import { Link, List, ListItem, NavRight, Navbar, Page, Searchbar, Subnavbar, f7 } from "framework7-react"
-import { useEffect, useMemo, useState } from "react";
+import { MemberListType, USER_ID } from '@/shared'
+import { getCookie } from '@/utils/cookie'
+import { Link, List, ListItem, NavRight, Navbar, Page, Searchbar, Subnavbar, f7 } from 'framework7-react'
+import { useEffect, useMemo, useState } from 'react'
 import GroupService from '@/api/group'
 import RelationService from '@/api/relation'
-import "./MemberList.scss"
+import './MemberList.scss'
 
 interface MemberListProps {
-    group_id: string
-    list_type: MemberListType  | string
+	group_id: string
+	list_type: MemberListType | string
 }
 
 const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
-    
-    console.log(props);
-    
-    const PageType = props.list_type
+	console.log(props)
+
+	const PageType = props.list_type
 
 	// 标题
 	const getTitle = () => {
@@ -26,7 +25,7 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 		}[PageType]
 	}
 
-    const user_id = getCookie(USER_ID) || ''
+	const user_id = getCookie(USER_ID) || ''
 	const [identity, setIdentity] = useState(null)
 
 	// 成员列表
@@ -131,8 +130,13 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 		})
 	}
 
-    return <Page noToolbar>
-			<Navbar title={ PageType === MemberListType.MEMBERSHOW ? getTitle() : ''} backLink className="hidden-navbar-bg" >
+	return (
+		<Page noToolbar>
+			<Navbar
+				title={PageType === MemberListType.MEMBERSHOW ? getTitle() : ''}
+				backLink
+				className="hidden-navbar-bg"
+			>
 				{/* <NavTitle>
 					<div className={PageType === MemberListType.MEMBERSHOW && 'mr-14'}>{getTitle()}</div>
 				</NavTitle> */}
@@ -154,7 +158,7 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 						<ListItem
 							key={index}
 							checkbox
-                            // @ts-ignore
+							// @ts-ignore
 							checkboxIcon="end"
 							media={member.avatar}
 							title={member.nickname}
@@ -170,7 +174,7 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 						<ListItem
 							key={index}
 							checkbox
-                              // @ts-ignore
+							// @ts-ignore
 							checkboxIcon="end"
 							media={member.avatar}
 							title={member.nickname}
@@ -193,7 +197,8 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 					))}
 				</List>
 			)}
-    </Page>
+		</Page>
+	)
 }
 
 export default MemberList

@@ -5,7 +5,7 @@ import { useRef } from 'react'
  *
  * @param max   最大渲染数
  * @returns
- * @example 
+ * @example
  * {
  *      Array.from({ length: 100 }).map((_,index)=> startDefer(index) ? <div>自定义内容<div> : null)
  * }
@@ -26,9 +26,9 @@ const useDefer = (max: number = 20) => {
 
 	updateFrameCount()
 
-    // 开始渲染
+	// 开始渲染
 	const startDefer = (n: number) => frameCount.current >= n
-    // 取消渲染
+	// 取消渲染
 	const cancelDefer = () => cancelAnimationFrame(refId)
 
 	return {

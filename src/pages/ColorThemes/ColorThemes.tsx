@@ -1,15 +1,7 @@
+import { useState } from 'react'
+import { Navbar, Page, BlockTitle, Block, Checkbox, f7 } from 'framework7-react'
 
-import { useState } from 'react';
-import {
-	Navbar,
-	Page,
-	BlockTitle,
-	Block,
-Checkbox,
-	f7
-} from 'framework7-react'
-
-let globalTheme = localStorage.getItem('theme') || 'light';
+let globalTheme = localStorage.getItem('theme') || 'light'
 // let globalThemeColor = $('html').css('--f7-color-primary').trim();
 
 export default () => {
@@ -17,21 +9,20 @@ export default () => {
 	// 	(c) => c !== 'primary' && c !== 'white' && c !== 'black',
 	// );
 
-	const [theme, setTheme] = useState(globalTheme);
+	const [theme, setTheme] = useState(globalTheme)
 	// const [themeColor, setThemeColor] = useState(globalThemeColor);
 
 	const setScheme = (newTheme: string) => {
-		f7.setDarkMode(newTheme === 'dark');
-		globalTheme = newTheme;
-		setTheme(newTheme);
+		f7.setDarkMode(newTheme === 'dark')
+		globalTheme = newTheme
+		setTheme(newTheme)
 		localStorage.setItem('theme', newTheme)
 		if (newTheme == 'dark') {
-			document.documentElement.setAttribute('theme', 'dark');
-
+			document.documentElement.setAttribute('theme', 'dark')
 		} else {
-			document.documentElement.removeAttribute('theme');
+			document.documentElement.removeAttribute('theme')
 		}
-	};
+	}
 
 	// const setColorTheme = (newColor: string) => {
 	// 	globalThemeColor = f7.colors[newColor];
@@ -48,8 +39,7 @@ export default () => {
 
 	return (
 		<Page noToolbar>
-			<Navbar backLink>
-			</Navbar>
+			<Navbar backLink></Navbar>
 			<BlockTitle medium>主题</BlockTitle>
 			<Block strong>
 				<p>布局主题:浅色(默认)和深色:</p>
@@ -60,10 +50,7 @@ export default () => {
 					>
 						{theme === 'light' && <Checkbox checked disabled />}
 					</div>
-					<div
-						className="bg-color-black rounded-md demo-theme-picker"
-						onClick={() => setScheme('dark')}
-					>
+					<div className="bg-color-black rounded-md demo-theme-picker" onClick={() => setScheme('dark')}>
 						{theme === 'dark' && <Checkbox checked disabled />}
 					</div>
 				</div>
@@ -114,5 +101,5 @@ export default () => {
 			{/*	</ListInput>*/}
 			{/*</List>*/}
 		</Page>
-	);
-};
+	)
+}

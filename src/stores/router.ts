@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { Router } from 'framework7/types';
+import { Router } from 'framework7/types'
 
 interface MyRouter {
 	router: null | Router.Router
@@ -10,7 +10,6 @@ interface MyRouter {
 	setMyRouter: (newRouter: Router.Router) => void
 }
 
-
 // 创建 store
 export const useRouterStore = create<MyRouter>((set) => ({
 	router: null,
@@ -18,7 +17,7 @@ export const useRouterStore = create<MyRouter>((set) => ({
 	myRouter: null,
 	setRouter: (newRouter) => set({ router: newRouter }),
 	setContactRouter: (newRouter) => set({ contactRouter: newRouter }),
-	setMyRouter: (newRouter) => set({ myRouter: newRouter }),
+	setMyRouter: (newRouter) => set({ myRouter: newRouter })
 }))
 
 export default useRouterStore

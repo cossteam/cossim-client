@@ -160,7 +160,7 @@ class RelationServiceImpl {
 	getBlackList(): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/blacklist`,
-			method: 'get',
+			method: 'get'
 		})
 	}
 

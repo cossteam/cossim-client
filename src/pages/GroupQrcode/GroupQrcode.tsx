@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react'
 import GroupService from '@/api/group'
 import { $t } from '@/shared'
 
-const GroupQrcode: React.FC<RouterProps> = ({f7route}) => {
-	const [groupInfo, setGroupInfo] = useState<any>();
-	console.log(f7route.query);
-	
+const GroupQrcode: React.FC<RouterProps> = ({ f7route }) => {
+	const [groupInfo, setGroupInfo] = useState<any>()
+	console.log(f7route.query)
+
 	const groupId = f7route.query.group_id
 	useEffect(() => {
 		;(async () => {
@@ -17,7 +17,6 @@ const GroupQrcode: React.FC<RouterProps> = ({f7route}) => {
 			code === 200 && setGroupInfo(data)
 		})()
 	}, [groupId])
-
 
 	return (
 		<Page noToolbar>
@@ -29,7 +28,8 @@ const GroupQrcode: React.FC<RouterProps> = ({f7route}) => {
 					</div>
 					<div className="flex flex-col">
 						<span className="font-bold text-lg" style={{ color: 'black', textAlign: 'center' }}>
-							{$t('群组 : ')}{groupInfo?.name}
+							{$t('群组 : ')}
+							{groupInfo?.name}
 						</span>
 					</div>
 				</div>

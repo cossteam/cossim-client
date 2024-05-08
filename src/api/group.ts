@@ -99,7 +99,7 @@ class GroupServiceImpl {
 	groupInfoApi(param: any): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/${param.group_id}`,
-			method: 'GET',
+			method: 'GET'
 			// params: param
 		})
 	}
