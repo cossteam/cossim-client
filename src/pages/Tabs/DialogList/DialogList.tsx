@@ -7,8 +7,7 @@ import {
 	List,
 	ListItem,
 	SwipeoutActions,
-	SwipeoutButton,
-	PageContent
+	SwipeoutButton
 } from 'framework7-react'
 import { Plus, Person2Alt, PersonBadgePlusFill, ViewfinderCircleFill, Search, Qrcode } from 'framework7-icons/react'
 import { useCallback, useEffect, useState } from 'react'
@@ -21,14 +20,12 @@ import useCacheStore from '@/stores/cache'
 import { getRemoteSession } from '@/run'
 import useMessageStore from '@/stores/message'
 import Avatar from '@/components/Avatar/Avatar.tsx'
-import useRouterStore from '@/stores/router.ts'
 import useToolbarStore from '@/stores/toolbar.ts'
 import { elementIsVisible } from '@/utils/utils.ts'
 
 const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const messageStore = useMessageStore()
 	const cacheStore = useCacheStore()
-	const { router, setRouter } = useRouterStore()
 	const { doubleClick } = useToolbarStore()
 	const [firstUnread, setFirstUnread] = useState<string>()
 
@@ -36,24 +33,19 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		const unread = cacheStore.cacheDialogs.find((item) => item?.dialog_unread_count > 0)
 		unread && scrollTo(unread.dialog_id)
 		const unreadElement = document.getElementById(unread?.dialog_id)
-		elementIsVisible(unreadElement).then((isVisible) => {
-			if (isVisible) {
-				setTimeout(() => {
-					setFirstUnread(unread?.dialog_id)
-				}, 100)
-				setTimeout(() => {
-					setFirstUnread('0')
-				}, 2000)
-			}
-		})
+		unreadElement &&
+			elementIsVisible(unreadElement).then((isVisible) => {
+				if (isVisible) {
+					setTimeout(() => {
+						setFirstUnread(unread?.dialog_id)
+					}, 100)
+					setTimeout(() => {
+						setFirstUnread('0')
+					}, 2000)
+				}
+			})
 	}, [doubleClick])
 
-	useEffect(() => {
-		setRouter(f7router)
-		console.log('1路由', router)
-	}, [])
-
-	// console.log(router)
 	// 置顶对话
 	const topDialog = async (item: any) => {
 		await RelationService.topDialogApi({ dialog_id: item?.dialog_id, action: item?.top_at ? 0 : 1 })
@@ -86,21 +78,8 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 
 	// 刷新
 	const onRefresh = async (done: any) => {
-		// await getDialogList()
 		await getRemoteSession()
 		done()
-		// setPtrRefresh(true)
-	}
-
-	const [ptrRefresh, setPtrRefresh] = useState(true)
-	const onDialogListScroll = (e: any) => {
-		if (e.target?.scrollTop === 0) {
-			setPtrRefresh(true)
-			return
-		}
-		if (ptrRefresh) {
-			setPtrRefresh(false)
-		}
 	}
 
 	const Row = (item: any) => {
@@ -152,12 +131,13 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 
 	return (
 		<Page
-			ptr={ptrRefresh}
+			className={clsx('coss_dialog')}
+			ptr={true}
+			ptrMousewheel={false}
 			onPtrRefresh={onRefresh}
-			className={clsx('coss_dialog', !ptrRefresh && 'hide-page-content')}
 			noSwipeback={false}
 		>
-			<Navbar title="COSS" className="hidden-navbar-bg">
+			<Navbar title="COSS" className="hidden-navbar-bg bg-bgPrimary">
 				<NavRight>
 					<Link href={'/search/'}>
 						<Search className="w-6 h-6" />
@@ -192,68 +172,66 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 					</ListItem>
 				</List>
 			</Popover>
-			<PageContent className="p-0 max-h-full h-full">
-				<div
-					id="dialog-box"
-					className="h-full pb-12 overflow-y-auto"
-					onScroll={onDialogListScroll}
-				>
-					<List contactsList noChevron mediaList dividers className="">
-						{cacheStore.cacheDialogs.sort(customSort).map((item, index) => {
-							// console.log('1111', item)
-							// @ts-ignore
-							return (
-								<ListItem
-									id={item?.dialog_id}
-									className={clsx(
-										item?.top_at !== 0 && 'bg-bgSecondary',
-										item?.dialog_id == firstUnread && 'animate__animated animate__fadeIn'
-									)}
-									key={item?.dialog_id + `${index}`}
-									title={item?.dialog_name}
-									badge={item?.dialog_unread_count}
-									badgeColor="red"
-									swipeout
-									after={formatDialogListTime(
-										item?.last_message?.send_at
-											? item?.last_message?.send_at
-											: item?.dialog_create_at
-									)}
-									link
-									onClick={async () => {
-										await messageStore.init({
-											dialogId: item?.dialog_id ?? 0,
-											receiverId: item?.user_id ?? item?.group_id ?? 0,
-											isGroup: !!item?.group_id,
-											receiverInfo: item
-										})
-										f7router?.navigate(
-											`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
-										)
-									}}
+
+			<List contactsList noChevron mediaList dividers className="pb-[50px]">
+				{[
+					...cacheStore.cacheDialogs,
+					...cacheStore.cacheDialogs,
+					...cacheStore.cacheDialogs,
+					...cacheStore.cacheDialogs
+				]
+					.sort(customSort)
+					.map((item, index) => {
+						// console.log('1111', item)
+						// @ts-ignore
+						return (
+							<ListItem
+								id={item?.dialog_id}
+								className={clsx(
+									item?.top_at !== 0 && 'bg-bgSecondary',
+									item?.dialog_id == firstUnread && 'animate__animated animate__fadeIn'
+								)}
+								key={item?.dialog_id + `${index}`}
+								title={item?.dialog_name}
+								badge={item?.dialog_unread_count}
+								badgeColor="red"
+								swipeout
+								after={formatDialogListTime(
+									item?.last_message?.send_at ? item?.last_message?.send_at : item?.dialog_create_at
+								)}
+								link
+								onClick={async () => {
+									await messageStore.init({
+										dialogId: item?.dialog_id ?? 0,
+										receiverId: item?.user_id ?? item?.group_id ?? 0,
+										isGroup: !!item?.group_id,
+										receiverInfo: item
+									})
+									f7router?.navigate(
+										`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
+									)
+								}}
+							>
+								{/*@ts-ignore*/}
+								<Avatar slot="media" src={`${item?.dialog_avatar}`} />
+								<div
+									slot="text"
+									className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap"
 								>
-									{/*@ts-ignore*/}
-									<Avatar slot="media" src={`${item?.dialog_avatar}`} />
-									<div
-										slot="text"
-										className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap"
-									>
-										{Row(item)}
-									</div>
-									<SwipeoutActions right>
-										<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
-											{$t(item?.top_at === 0 ? '置顶' : '取消置顶')}
-										</SwipeoutButton>
-										<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
-											{$t('删除')}
-										</SwipeoutButton>
-									</SwipeoutActions>
-								</ListItem>
-							)
-						})}
-					</List>
-				</div>
-			</PageContent>
+									{Row(item)}
+								</div>
+								<SwipeoutActions right>
+									<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
+										{$t(item?.top_at === 0 ? '置顶' : '取消置顶')}
+									</SwipeoutButton>
+									<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
+										{$t('删除')}
+									</SwipeoutButton>
+								</SwipeoutActions>
+							</ListItem>
+						)
+					})}
+			</List>
 		</Page>
 	)
 }
