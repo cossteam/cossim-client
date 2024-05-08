@@ -20,14 +20,14 @@
 	--coss-border-radius-primary: 4px;
 }
 
-[theme='dark']:root {
-	--coss-background-primary: #666;
+.dark:root {
+	--coss-background-primary: #000;
 	--coss-background-secondary: #555;
 	--coss-background-tertiary: #444;
 
 	--coss-border-primary: #d5d5d5;
 	--coss-border-secondary: #eee;
-	--coss-border-tertiary: #f5f5f5;
+	--coss-border-tertiary: #b7b5b5;
 
 	--coss-text-primary: #eee;
 	--coss-text-secondary: #ddd;
