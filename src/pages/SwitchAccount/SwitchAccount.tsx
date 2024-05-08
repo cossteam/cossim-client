@@ -29,7 +29,7 @@ const SwitchAccount: React.FC<RouterProps> = ({ f7router }) => {
 	const userStore = useUserStore()
 	const submit = async (index: number) => {
 		console.log('切换账号', userList)
-		if (userId == userList[index].user_id) return;
+		if (userId == userList[index].user_id) return
 
 		const { identifier: driver_id } = await Device.getId()
 		console.log(userList.password)
@@ -64,7 +64,7 @@ const SwitchAccount: React.FC<RouterProps> = ({ f7router }) => {
 	}
 
 	return (
-		<Page className='bg-bgTertiary' noToolbar>
+		<Page className="bg-bgTertiary" noToolbar>
 			<Navbar backLink />
 			<h1 className="text-center mt-20 text-2xl">点击头像切换账号</h1>
 			<div className="mt-20 ">

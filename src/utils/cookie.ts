@@ -1,5 +1,7 @@
 // import Cookies from 'js-cookie'
 
+import { BASE_URL, WS_URL } from '@/shared'
+
 /**
  * 获取cookie
  *
@@ -46,10 +48,19 @@ export const hasCookie = (name: string) => !!localStorage.getItem(name)
 /**
  * 移除所有 cookie
  */
-export const removeAllCookie = () => {
+export const removeAllCookie = (filters: string[] = [BASE_URL, WS_URL]) => {
 	// const keys = Object.keys(Cookies.get())
 	// keys.forEach((key: string) => {
 	// 	Cookies.remove(key)
 	// })
-	localStorage.clear()
+	// localStorage.clear()
+
+	// 获取所有的localStorage key
+	const keys = Object.keys(localStorage)
+	// 循环删除localStorage key
+	for (let i = 0; i < keys.length; i++) {
+		const key = keys[i]
+		if (filters.includes(key)) continue
+		localStorage.removeItem(key)
+	}
 }

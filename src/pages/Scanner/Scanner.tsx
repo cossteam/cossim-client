@@ -60,7 +60,7 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 			const { code } = await UserService.getUserInfoApi({ user_id: userId as string })
 			if (code == 200) {
 				console.log('获取用户状态', code)
-				f7router?.navigate(`/personal_detail/${userId}/`, {reloadCurrent: true})
+				f7router?.navigate(`/personal_detail/${userId}/`, { reloadCurrent: true })
 			}
 		} catch (error) {
 			f7.dialog.alert($t('该二维码已过期'))
@@ -70,7 +70,7 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 	const addGroup = (groupId: string | undefined) => {
 		console.log('群id', groupId, typeof groupId)
 		console.log('群id', Number(groupId), typeof Number(groupId))
-		f7router?.navigate(`/add_group/?group_id=${groupId}`, {reloadCurrent: true})
+		f7router?.navigate(`/add_group/?group_id=${groupId}`, { reloadCurrent: true })
 	}
 
 	const handleScanner = (text: string) => {
@@ -94,7 +94,7 @@ const QrScanner: React.FC<RouterProps> = ({ f7router }) => {
 		QrCode?.start(
 			{ facingMode: 'environment' },
 			{
-				fps: 10, // 设置每秒多少帧
+				fps: 10 // 设置每秒多少帧
 				// qrbox: 400 // 设置取景范围
 			},
 			(decodedText: any) => {

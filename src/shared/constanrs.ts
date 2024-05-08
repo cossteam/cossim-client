@@ -41,3 +41,8 @@ export const CACHE_TOTAL_MESSAGE = 'cacheTotalMessage'
 export const CACHE_SYNC_REMOTE = 'cacheSyncRemote'
 /** 缓存好友在线状态 */
 export const CACHE_FRIEND_ONLINE_STATUS = 'cacheOnlineStatus'
+
+/** 基本地址 */
+export const BASE_URL = 'BASE_URL'
+/** 基本 ws 地址 */
+export const WS_URL = 'WS_URL'

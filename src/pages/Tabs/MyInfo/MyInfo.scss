@@ -1,19 +1,17 @@
 .coss_list {
-    @apply m-0 bg-bgPrimary mb-4;
+	@apply m-0 bg-bgPrimary mb-4;
 
-    .coss_item__bottom {
+	.coss_item__bottom {
+		&:not(:last-child) {
+			//border-bottom: #eee solid 1px;
+		}
+	}
 
-        &:not(:last-child) {
-            //border-bottom: #eee solid 1px;
-        }
-
-    }
-
-    .coss_item__icon {
-        @apply text-[20px];
-    }
+	.coss_item__icon {
+		@apply text-[20px];
+	}
 }
 
 .coss_navbar .title-large {
-    @apply bg-bgPrimary pb-2;
+	@apply bg-bgPrimary pb-2;
 }

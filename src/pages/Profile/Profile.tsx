@@ -115,7 +115,6 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				toastMessage(tips_error)
 				return
 			}
-
 		} catch (error) {
 			toastMessage('设置阅后即焚失败')
 		}
@@ -135,11 +134,9 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				toastMessage(tips_error)
 				return
 			}
-
 		} catch (error) {
 			toastMessage('设置消息免打扰失败')
 		}
-
 	}
 
 	// 黑名单
@@ -160,7 +157,6 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		} catch (error) {
 			toastMessage(tips_error)
 		}
-
 	}
 
 	// 设置阅后即焚时间

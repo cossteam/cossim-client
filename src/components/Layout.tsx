@@ -1,4 +1,4 @@
-import { f7, Link, Toolbar, View, Views } from 'framework7-react'
+import { Link, Toolbar, View, Views } from 'framework7-react'
 import { useRef, useState } from 'react'
 import $ from 'dom7'
 import useCacheStore from '@/stores/cache'

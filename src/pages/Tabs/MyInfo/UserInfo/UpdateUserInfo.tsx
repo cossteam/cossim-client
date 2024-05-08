@@ -86,12 +86,26 @@ const UpdateUserInfo: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				<div>
 					<CommInput defaultValue={defaultValue} onChange={(value: any) => setText(value)} />
 				</div>
-				
 			) : (
 				<div>
-					<CommInput title={$t('旧密码')} placeholder={$t('请输入旧密码')} type='password'  onChange={(value: any) => setOldPassword(value)} />
-					<CommInput title={$t('新密码')} placeholder={$t('请输入新密码')} type='password' onChange={(value: any) => setNewPassword(value)} />
-					<CommInput title={$t('确认密码')} placeholder={$t('请再次输入新密码')} type='password' onChange={(value: any) => setConfirmPassword(value)} />
+					<CommInput
+						title={$t('旧密码')}
+						placeholder={$t('请输入旧密码')}
+						type="password"
+						onChange={(value: any) => setOldPassword(value)}
+					/>
+					<CommInput
+						title={$t('新密码')}
+						placeholder={$t('请输入新密码')}
+						type="password"
+						onChange={(value: any) => setNewPassword(value)}
+					/>
+					<CommInput
+						title={$t('确认密码')}
+						placeholder={$t('请再次输入新密码')}
+						type="password"
+						onChange={(value: any) => setConfirmPassword(value)}
+					/>
 				</div>
 			)}
 		</Page>

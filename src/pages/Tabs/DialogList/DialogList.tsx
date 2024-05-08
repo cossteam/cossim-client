@@ -174,63 +174,52 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 			</Popover>
 
 			<List contactsList noChevron mediaList dividers className="pb-[50px]">
-				{[
-					...cacheStore.cacheDialogs,
-					...cacheStore.cacheDialogs,
-					...cacheStore.cacheDialogs,
-					...cacheStore.cacheDialogs
-				]
-					.sort(customSort)
-					.map((item, index) => {
-						// console.log('1111', item)
-						// @ts-ignore
-						return (
-							<ListItem
-								id={item?.dialog_id}
-								className={clsx(
-									item?.top_at !== 0 && 'bg-bgSecondary',
-									item?.dialog_id == firstUnread && 'animate__animated animate__fadeIn'
-								)}
-								key={item?.dialog_id + `${index}`}
-								title={item?.dialog_name}
-								badge={item?.dialog_unread_count}
-								badgeColor="red"
-								swipeout
-								after={formatDialogListTime(
-									item?.last_message?.send_at ? item?.last_message?.send_at : item?.dialog_create_at
-								)}
-								link
-								onClick={async () => {
-									await messageStore.init({
-										dialogId: item?.dialog_id ?? 0,
-										receiverId: item?.user_id ?? item?.group_id ?? 0,
-										isGroup: !!item?.group_id,
-										receiverInfo: item
-									})
-									f7router?.navigate(
-										`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
-									)
-								}}
-							>
-								{/*@ts-ignore*/}
-								<Avatar slot="media" src={`${item?.dialog_avatar}`} />
-								<div
-									slot="text"
-									className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap"
-								>
-									{Row(item)}
-								</div>
-								<SwipeoutActions right>
-									<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
-										{$t(item?.top_at === 0 ? '置顶' : '取消置顶')}
-									</SwipeoutButton>
-									<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
-										{$t('删除')}
-									</SwipeoutButton>
-								</SwipeoutActions>
-							</ListItem>
-						)
-					})}
+				{cacheStore.cacheDialogs.sort(customSort).map((item, index) => {
+					// @ts-ignore
+					return (
+						<ListItem
+							id={item?.dialog_id}
+							className={clsx(
+								item?.top_at !== 0 && 'bg-bgSecondary',
+								item?.dialog_id == firstUnread && 'animate__animated animate__fadeIn'
+							)}
+							key={item?.dialog_id + `${index}`}
+							title={item?.dialog_name}
+							badge={item?.dialog_unread_count}
+							badgeColor="red"
+							swipeout
+							after={formatDialogListTime(
+								item?.last_message?.send_at ? item?.last_message?.send_at : item?.dialog_create_at
+							)}
+							link
+							onClick={async () => {
+								await messageStore.init({
+									dialogId: item?.dialog_id ?? 0,
+									receiverId: item?.user_id ?? item?.group_id ?? 0,
+									isGroup: !!item?.group_id,
+									receiverInfo: item
+								})
+								f7router?.navigate(
+									`/message/${item?.user_id ?? item?.group_id}/${item?.dialog_id}/?is_group=${item?.user_id ? 'false' : 'true'}&dialog_name=${item?.dialog_name}`
+								)
+							}}
+						>
+							{/*@ts-ignore*/}
+							<Avatar slot="media" src={`${item?.dialog_avatar}`} />
+							<div slot="text" className="max-w-[100%] overflow-hidden text-ellipsis whitespace-nowrap">
+								{Row(item)}
+							</div>
+							<SwipeoutActions right>
+								<SwipeoutButton close overswipe color="blue" onClick={() => topDialog(item)}>
+									{$t(item?.top_at === 0 ? '置顶' : '取消置顶')}
+								</SwipeoutButton>
+								<SwipeoutButton close color="red" onClick={(e) => deleteDialog(e, item)}>
+									{$t('删除')}
+								</SwipeoutButton>
+							</SwipeoutActions>
+						</ListItem>
+					)
+				})}
 			</List>
 		</Page>
 	)

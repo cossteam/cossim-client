@@ -1,13 +1,13 @@
 import axios from 'axios'
 import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 import { getCookie, removeAllCookie } from './cookie'
-import { TOKEN, RESPONSE_CODE } from '@/shared'
+import { TOKEN, RESPONSE_CODE, BASE_URL } from '@/shared'
 import PGPUtils from '@/utils/pgp'
 import { f7 } from 'framework7-react'
-import { getBaseUrl } from '@/stores/requestUrl.ts'
+// import { getBaseUrl } from '@/stores/requestUrl.ts'
 
 const axiosConfig = {
-	// baseURL:  import.meta.env.VITE_BASE_URL,
+	// baseURL: getCookie(BASE_URL),
 	// baseURL:  getBaseUrl(),
 	timeout: 50000,
 	headers: {
@@ -81,7 +81,7 @@ const getClientKeys = async () => {
 // 请求拦截器
 service.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
-		config.baseURL = getBaseUrl();
+		config.baseURL = getCookie(BASE_URL)
 		const token = getCookie(TOKEN)
 		if (token) config.headers['Authorization'] = 'Bearer ' + token
 		/////////////////////////////////////////////////////////////////////////////////////////////

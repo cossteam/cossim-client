@@ -127,9 +127,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 				is_silent: isSilence ? 1 : 0
 			})
 			if (code !== 200) return
-		} catch (error: any) {
-
-		}
+		} catch (error: any) {}
 	}
 
 	//! 解决傻逼底部导航栏莫名其妙的显示问题

@@ -1,16 +1,4 @@
-import {
-	Button,
-	Link,
-	List,
-	ListInput,
-	LoginScreenTitle,
-	theme,
-	Preloader,
-	Page,
-	Block,
-	f7,
-	Popup, BlockTitle, Navbar, NavRight
-} from 'framework7-react'
+import { Button, Link, List, ListInput, LoginScreenTitle, theme, Preloader, Page, Block, f7 } from 'framework7-react'
 import { At, Lock, ChevronLeft } from 'framework7-icons/react'
 import { useEffect, useState } from 'react'
 import clsx from 'clsx'
@@ -21,10 +9,7 @@ import type { LoginData, RegisterData } from '@/types/api/user'
 import { validEmail } from '@/utils/validate'
 import './Auth.scss'
 import { setCookie } from '@/utils/cookie'
-// import { Device } from '@capacitor/device'
 import useUserStore from '@/stores/user'
-import SetRequestUrl from '@/pages/SetRequestUrl/SetRequestUrl.tsx'
-// import { cloneDeep } from 'lodash-es'
 
 interface LoginScreenProps {
 	defaultData?: RegisterData
@@ -181,31 +166,13 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 					</p>
 				</List>
 				<List inset>
-					<Button onClick={submit} large className="mx-[16px] mb-5" fill round text={$t('登录')}>
+					<Button onClick={submit} large className="mx-[16px]" fill round text={$t('登录')}>
 						{loading && <Preloader size="18" color="white" />}
 					</Button>
 				</List>
-				<Button round small popupOpen=".demo-popup-swipe">
-					切换服务地址
-				</Button>
-				<Popup className="demo-popup-swipe" swipeToClose>
-					<Page>
-						<Navbar title="环境切换">
-							<NavRight>
-								<Link popupClose>Close</Link>
-							</NavRight>
-						</Navbar>
-						<div>
-							<SetRequestUrl />
-						</div>
-					</Page>
-				</Popup>
 			</Block>
 		</Page>
 	)
 }
 
 export default LoginScreen
-
-// 0bc73fd0-5014-4967-a65b-ee1959aab39a
-// 0bc73fd0-5014-4967-a65b-ee1959aab39a

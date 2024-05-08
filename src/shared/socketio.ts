@@ -8,7 +8,7 @@ import {
 	handlerSocketResult
 } from '@/run'
 import { useLiveRoomStore } from '@/stores/liveRoom'
-import {getWsUrl} from '@/stores/requestUrl.ts'
+import { getWsUrl } from '@/stores/requestUrl.ts'
 
 export function createSocket() {
 	const token = getCookie(TOKEN)
