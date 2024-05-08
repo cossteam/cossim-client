@@ -1,13 +1,5 @@
 import { List, ListItem, Navbar, Page } from 'framework7-react'
-import {
-	Bell,
-	CircleLefthalfFill,
-	DeviceTabletPortrait,
-	EllipsesBubble,
-	ExclamationmarkShield,
-	GearAlt,
-	Qrcode
-} from 'framework7-icons/react'
+import { Bell, CircleLefthalfFill, Qrcode } from 'framework7-icons/react'
 import { useEffect, useMemo, useState } from 'react'
 
 import UserService from '@/api/user'

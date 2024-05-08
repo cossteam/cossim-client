@@ -18,10 +18,16 @@ const Message: React.FC<RouterProps> = () => {
 	const { height } = useWindowSize()
 	const messageStore = useMessageStore()
 
-	const { handlerKeyboardEvent } = useKeyboard()
+	const { handlerKeyboardEvent, handlerClear } = useKeyboard()
 
 	useEffect(() => {
+		console.log('handlerKeyboardEvent')
+
 		handlerKeyboardEvent()
+
+		return () => {
+			handlerClear()
+		}
 	}, [])
 
 	// 转发组件
