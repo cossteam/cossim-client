@@ -52,13 +52,13 @@ const MyInfo: React.FC<RouterProps> = ({ f7router }) => {
 					title: $t('通知中心'),
 					icon: <Bell className="coss_item__icon" />,
 					link: '/notification_setting/'
-				},
-				{ title: $t('隐私与安全'), icon: <ExclamationmarkShield className="coss_item__icon" />, link: '#' },
-				{ title: $t('设备'), icon: <DeviceTabletPortrait className="coss_item__icon" />, link: '#' },
-				{ title: $t('语言'), icon: <EllipsesBubble className="coss_item__icon" />, link: '#' }
+				}
+				// { title: $t('隐私与安全'), icon: <ExclamationmarkShield className="coss_item__icon" />, link: '#' },
+				// { title: $t('设备'), icon: <DeviceTabletPortrait className="coss_item__icon" />, link: '#' },
+				// { title: $t('语言'), icon: <EllipsesBubble className="coss_item__icon" />, link: '#' }
 			],
 			[
-				{ title: $t('设置'), icon: <GearAlt className="coss_item__icon" />, link: '#' },
+				// { title: $t('设置'), icon: <GearAlt className="coss_item__icon" />, link: '#' },
 				{ title: $t('主题'), icon: <CircleLefthalfFill className="coss_item__icon" />, link: '/color_themes/' }
 			]
 		],
