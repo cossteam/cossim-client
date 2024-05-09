@@ -340,7 +340,7 @@ const LiveRoomNew: React.FC = () => {
 							<div>
 								{(isWaiting || isJoining) && (
 									<Timer
-										timeout={5}
+										timeout={60}
 										onTimeout={() => {
 											liveRoomStore.updateState(LiveRoomStates.TIMEOUT)
 										}}

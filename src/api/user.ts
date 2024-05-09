@@ -5,7 +5,8 @@ import type {
 	SearchUserParams,
 	UpdateUserInfData,
 	UserInfoParams,
-	updatePassWorData
+	updatePassWorData,
+	LogoutData
 } from '@/types/api/user'
 import request from '@/utils/request'
 
@@ -136,7 +137,7 @@ class UserServiceImpl {
 	 * 退出登录
 	 * @returns
 	 */
-	logoutApi(data: any) {
+	logoutApi(data: LogoutData) {
 		return request({
 			url: `${this.baseUrl}/logout`,
 			method: 'POST',
