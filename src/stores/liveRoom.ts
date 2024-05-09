@@ -178,7 +178,7 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 				})
 				setTimeout(() => {
 					resetState()
-				}, 2000)
+				}, 1000)
 				break
 			// 被挂断
 			case SocketEvent.UserCallHangupEvent:
@@ -188,7 +188,7 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 				})
 				setTimeout(() => {
 					resetState()
-				}, 2000)
+				}, 1000)
 				break
 			case SocketEvent.UserLeaveGroupCallEvent:
 				// eslint-disable-next-line no-case-declarations
@@ -279,7 +279,7 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 				set({
 					...initialState()
 				})
-			}, 2000)
+			}, 1000)
 		}
 	},
 	refuse: async () => {
@@ -299,7 +299,7 @@ export const liveRoomStore = (set: any, get: () => LiveRoomStore): LiveRoomStore
 				set({
 					...initialState()
 				})
-			}, 2000)
+			}, 1000)
 		}
 	},
 	join: async () => {
