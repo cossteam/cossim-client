@@ -29,7 +29,7 @@ const Preview: React.FC = () => {
 						</Link>
 					</NavRight>
 				</Navbar>
-				<PageContent className="p-0 bg-white">
+				<PageContent className="p-0 bg-bgPrimary">
 					<div className="h-full overflow-auto relative flex flex-col justify-center items-center">
 						{previewStore.list.map((item, index) =>
 							item.type === 'video' ? (

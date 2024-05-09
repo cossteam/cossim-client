@@ -26,11 +26,15 @@ const MessageVideo: React.FC<MessageVideoProps> = ({ className, item }) => {
 	return (
 		<>
 			<div
-				className={clsx('size-48 overflow-hidden flex justify-center items-center relative', className)}
+				className={clsx(
+					'h-48 overflow-hidden flex justify-center items-center relative ',
+					className,
+					'bg-transparent'
+				)}
 				onClick={() => previewStore.preview({ url, type: 'video' })}
 			>
-				<img className="h-full object-cover" src={cover} />
-				<div className="w-full h-full bg-[rgba(0,0,0,.3)]  flex justify-center items-center absolute top-0 left-0">
+				<img className="h-full object-cover rounded" src={cover} />
+				<div className="w-full h-full  flex justify-center items-center absolute top-0 left-0">
 					<Link className="rotate-90 text-white" iconF7="arrowtriangle_up_circle" />
 				</div>
 			</div>

@@ -1,8 +1,7 @@
-import { MESSAGE_READ, isMe, msgType, tooltipType } from '@/shared'
+import { MESSAGE_READ, THEME, isMe, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import { memo, useCallback, useMemo, useRef, useState } from 'react'
 import useMessageStore from '@/stores/message'
-// import ReadEditor from '@/components/ReadEditor/ReadEditor'
 import MessageImage from './MessageRow/MessageImage'
 import MessageAudio from './MessageRow/MessageAudio'
 import MessageVideo from './MessageRow/MessageVideo'
@@ -30,6 +29,7 @@ import MessageEmojis from './MessageToolbar/MessageEmojis'
 import { sendMessage } from './script/message'
 import MessageText from './MessageRow/MessageText'
 import { recall } from './script/tootip'
+import { getCookie } from '@/utils/cookie'
 
 interface MessageRowProps {
 	item: Message
@@ -136,13 +136,6 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 				return <MessageFile className={clsx(className(is_self), '!px-2 !py-2')} item={item} />
 			default:
 				return <MessageText item={item} isSelf={is_self} />
-			// return (
-			// 	<ReadEditor
-			// 		className={clsx(className(is_self), !is_self ? 'read-editor-no-slef' : '')}
-			// 		content={item?.content}
-			// 		{...replyMessage}
-			// 	/>
-			// )
 		}
 	}, [messageStore.messages])
 
@@ -151,7 +144,7 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 		if (userId == '10001' || userId === userStore.userId) return
 		if (messageStore.manualTipType === tooltipType.SELECT) return
 		watchAsyncFn(async () => {
-			const friend = cacheStore.cacheContacts?.find((item) => item.user_id === userId)
+			const friend = cacheStore.cacheContacts?.find((item: { user_id: string }) => item.user_id === userId)
 			friend ? router?.navigate(`/profile/${friend?.user_id}/`) : router?.navigate(`/personal_detail/${userId}/`)
 		})
 	}
@@ -188,7 +181,7 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 				await messageStore.updateMessage(newMsg)
 				// 更新对话列表
 				cacheStore.updateCacheDialogs(
-					cacheStore.cacheDialogs.map((i) => {
+					cacheStore.cacheDialogs.map((i: { dialog_id: any; dialog_unread_count: number }) => {
 						if (i.dialog_id === newMsg.dialog_id) {
 							const unreadCount = --i.dialog_unread_count
 
@@ -211,14 +204,6 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 			}
 		}, 1000)
 	)
-
-	// console.log('MessageRow', item)
-
-	// useEffect(() => {
-	// 	if (type === msgType.EMOJI) {
-	// 		mergeMessage(item)
-	// 	}
-	// }, [])
 
 	// 无内容
 	if (type === msgType.NONE) return null
@@ -277,7 +262,7 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 								arrow={false}
 								interactive={true}
 								appendTo={document.body}
-								theme="light"
+								theme={getCookie(THEME ?? 'light')}
 								animation="shift-away-subtle"
 								// touch={['hold', 300]}
 								// trigger="manual"

@@ -1,21 +1,12 @@
 import clsx from 'clsx'
 import { Icon } from 'framework7-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-// import lottie from 'lottie-web'
 
 interface MessageAudioProps {
 	className?: string
 	item: { [key: string]: any }
 	isSelf?: boolean
 }
-
-// {
-//     "mimeType": "audio/webm;codecs=opus",
-//     "msDuration": 5280,
-//     "recordDataBase64": "",
-//     "url": "https://coss.gezi.vip/api/v1/storage/files/download/audio/23795966-8e52-4243-a38a-2b66ea3be340.webm",
-//     "isBlob": true
-// }
 
 const MessageAudio: React.FC<MessageAudioProps> = ({ className, item, isSelf }) => {
 	const audioRef = useRef<HTMLAudioElement>(null)

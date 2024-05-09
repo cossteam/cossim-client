@@ -3,7 +3,6 @@ import useUserStore from '@/stores/user'
 import { Block, Link, NavRight, Navbar, Page, Popup, f7 } from 'framework7-react'
 import { useEffect, useState } from 'react'
 import CommInput from '../CommInput/CommInput'
-// import { decode } from 'js-base64'
 import useCacheStore from '@/stores/cache'
 import MsgService from '@/api/msg'
 import dayjs from 'dayjs'
@@ -29,7 +28,6 @@ const DevicePopup: React.FC<DevicePopupProps> = ({ opened = false }) => {
 	const handlerClick = () => {
 		if (!text) return toastMessage('请输入密钥对')
 		try {
-			// const keyPair = JSON.parse(decode(text))
 			const keyPair = { publicKey: text, privateKey: text }
 			userStore.update({ isNewLogin: false })
 			cacheStore.update({ cacheKeyPair: keyPair }, true)
@@ -71,13 +69,13 @@ const DevicePopup: React.FC<DevicePopupProps> = ({ opened = false }) => {
 	}
 
 	const loadUserMessages = async () => {
-		const userDialogs = cacheStore.cacheContacts.map((item) => item.dialog_id)
+		const userDialogs = cacheStore.cacheContacts.map((item: any) => item.dialog_id)
 		const size = 2
 		const next = async () => {
 			const dialogIds = userDialogs.splice(0, size)
 			try {
 				const data: any[] = await Promise.allSettled(
-					dialogIds.map((dialog_id) => {
+					dialogIds.map((dialog_id: number) => {
 						return MsgService.getUserMessageApi({
 							dialog_id,
 							start_at: dayjs().subtract(7, 'day').valueOf(),

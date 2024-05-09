@@ -3,6 +3,8 @@ import clsx from 'clsx'
 import data from '@/shared/emoji_data'
 import Picker from '@emoji-mart/react'
 import '../styles/MessageEmojis.scss'
+import { getCookie } from '@/utils/cookie'
+import { THEME } from '@/shared'
 
 console.log('emoji data', data)
 
@@ -14,7 +16,7 @@ interface MessageEmojisProps {
 const MessageEmojis: React.FC<MessageEmojisProps> = ({ ...props }) => {
 	return (
 		<div className={clsx('w-full emojis')} {...props} onClick={(e) => e.stopPropagation()}>
-			<div className="bg-[#f5f5f5] w-full">
+			<div className="bg-bgPrimary w-full">
 				<div className="w-full text-[1rem]" onClick={(e) => e.stopPropagation()}>
 					<Picker
 						data={data}
@@ -25,7 +27,7 @@ const MessageEmojis: React.FC<MessageEmojisProps> = ({ ...props }) => {
 						searchPosition="none"
 						emojiSize="30"
 						emojiButtonSize="48"
-						theme="light"
+						theme={getCookie(THEME) ?? 'light'}
 					/>
 				</div>
 			</div>

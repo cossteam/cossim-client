@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Navbar, Page, BlockTitle, Block, Checkbox, f7 } from 'framework7-react'
+import { getCookie, setCookie } from '@/utils/cookie'
+import { THEME } from '@/shared'
 
-let globalTheme = localStorage.getItem('theme') || 'light'
+let globalTheme = getCookie(THEME) || 'light'
 // let globalThemeColor = $('html').css('--f7-color-primary').trim();
 
-export default () => {
+const ColorThemes = () => {
 	// const colors = Object.keys(f7.colors).filter(
 	// 	(c) => c !== 'primary' && c !== 'white' && c !== 'black',
 	// );
@@ -19,8 +21,10 @@ export default () => {
 		localStorage.setItem('theme', newTheme)
 		if (newTheme == 'dark') {
 			document.documentElement.setAttribute('theme', 'dark')
+			setCookie(THEME, 'dark')
 		} else {
 			document.documentElement.removeAttribute('theme')
+			setCookie(THEME, 'light')
 		}
 	}
 
@@ -103,3 +107,5 @@ export default () => {
 		</Page>
 	)
 }
+
+export default ColorThemes

@@ -6,6 +6,7 @@ import GroupService from '@/api/group'
 import 'quill-mention-react'
 import Quill from 'quill'
 import useMessageStore from '@/stores/message'
+import { emojiOrMore } from '@/shared'
 
 interface ToolEditorProps {
 	className?: string
@@ -101,7 +102,13 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 		quill: quill!
 	}))
 
-	return <div className={clsx('w-full text-[1rem]', props.className)} ref={EditorRef} />
+	return (
+		<div
+			className={clsx('w-full text-[1rem]', props.className)}
+			ref={EditorRef}
+			onFocus={() => messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })}
+		/>
+	)
 }
 
 export const EditorComponent = forwardRef(ToolEditor)

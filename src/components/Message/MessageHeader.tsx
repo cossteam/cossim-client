@@ -60,7 +60,7 @@ const MessageHeader = () => {
 	const onlineStatus = useMemo(() => {
 		if (messageStore.isGroup) return ''
 		if (is_system) return ''
-		const user = cacheStore.onlineStatus.find((v) => v.user_id === messageStore.receiverId)
+		const user = cacheStore.onlineStatus.find((v: { user_id: any }) => v.user_id === messageStore.receiverId)
 		return user?.status === 1 ? '在线' : '离线'
 	}, [cacheStore.onlineStatus, messageStore.isGroup, messageStore.receiverId])
 

@@ -305,7 +305,7 @@ const LiveRoomNew: React.FC = () => {
 	// 用户退出通话后删除对应的VideoBox
 	useEffect(() => {
 		if (!liveRoomStore.leaveIds.length) return
-		liveRoomStore.leaveIds.forEach((id) => {
+		liveRoomStore.leaveIds.forEach((id: string) => {
 			const index = videoTracks.findIndex((item) => item.id === id)
 			if (index > -1) {
 				videoTracks.splice(index, 1)

@@ -105,7 +105,7 @@ export const sendMessage = async (options: Options) => {
 
 	// 获取是否阅后即焚
 	const isBurnAfterReading =
-		cacheStore.cacheContacts.find((item) => item.dialog_id === dialogId)?.preferences?.open_burn_after_reading ??
+		cacheStore.cacheContacts.find((item: { dialog_id: number }) => item.dialog_id === dialogId)?.preferences?.open_burn_after_reading ??
 		MessageBurnAfterRead.NO
 
 	// 生成消息对象
@@ -262,7 +262,7 @@ export const forward = async (item: any, msg: Message) => {
  */
 export const mergeMessage = async (message: Message) => {
 	const messageStore = useMessageStore.getState()
-	const index = messageStore.allMessages.findIndex((item) => item.msg_id === message.reply_id)
+	const index = messageStore.allMessages.findIndex((item: { msg_id: number }) => item.msg_id === message.reply_id)
 	if (index === -1) return
 	console.log('合并消息', message)
 	try {
@@ -288,7 +288,7 @@ export const mergeMessage = async (message: Message) => {
  */
 export const revokeMessage = async (message: Message) => {
 	const messageStore = useMessageStore.getState()
-	const index = messageStore.allMessages.findIndex((item) => item.msg_id === message.reply_id)
+	const index = messageStore.allMessages.findIndex((item: { msg_id: number }) => item.msg_id === message.reply_id)
 	if (index === -1) return
 	const item = messageStore.allMessages[index]
 	try {

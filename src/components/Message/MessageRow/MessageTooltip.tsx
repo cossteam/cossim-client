@@ -16,9 +16,9 @@ import useMessageStore from '@/stores/message'
 import React, { useMemo, useRef } from 'react'
 import tooltipStatMachine from '../script/tootip'
 import useUserStore from '@/stores/user'
-// import emojiData from '@emoji-mart/data'
 import emojiData from '@/shared/emoji_data'
 import { useClickOutside } from '@reactuses/core'
+
 interface MessageTooltipProps {
 	item: any
 	setShow: (show: boolean) => void
@@ -126,8 +126,8 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 	 * 获取常用表情 id数组
 	 */
 	const getFrequent = (): [string] => {
-		// return allEmojis.categories.find((item: any) => item.id === 'frequent').emojis
-		return ['']
+		return allEmojis.categories.find((item: any) => item.id === 'frequent').emojis
+		// return ['']
 	}
 
 	// const div = document.createElement('div')

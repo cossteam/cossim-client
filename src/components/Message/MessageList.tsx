@@ -1,6 +1,6 @@
 import useMessageStore from '@/stores/message'
 import MessageRow from './MessageRow'
-import { useEffect, useRef, useState } from 'react'
+import { Key, useEffect, useRef, useState } from 'react'
 import { emojiOrMore } from '@/shared'
 import { List } from 'framework7-react'
 import { useIntersectionObserver } from '@reactuses/core'
@@ -89,7 +89,7 @@ const MessageList = () => {
 			)} */}
 			{messageStore.isGroupAnnouncement && <div className="h-10" />}
 			<List className="m-0">
-				{messageStore.messages.map((item, index) => (
+				{messageStore.messages.map((item: Message, index: Key | null | undefined) => (
 					<MessageRow item={item} key={index} />
 				))}
 			</List>

@@ -46,3 +46,5 @@ export const CACHE_FRIEND_ONLINE_STATUS = 'cacheOnlineStatus'
 export const BASE_URL = 'BASE_URL'
 /** 基本 ws 地址 */
 export const WS_URL = 'WS_URL'
+/** 主题 */
+export const THEME = 'theme'

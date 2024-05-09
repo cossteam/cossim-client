@@ -47,8 +47,9 @@ const MessageInput = () => {
 	// 点击键盘时聚焦输入框
 	useEffect(() => {
 		if (messageStore.toolbarType !== emojiOrMore.KEYBOARD) return
+		console.error('handlerSelect: 更改为键盘', messageStore.toolbarType)
 		const quill = toolEditorRef.current?.quill
-		quill?.focus()
+		setTimeout(() => quill?.focus(), 0)
 	}, [messageStore.toolbarType])
 
 	// 解决在 ios 上滚动消息但键盘不隐藏的问题

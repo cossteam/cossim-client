@@ -20,6 +20,7 @@ const MessageToolbar = () => {
 
 	const handlerSelect = (toolbarType: emojiOrMore) => {
 		messageStore.update({ toolbarType })
+		console.log('handlerSelect: 触发了handlerSelect')
 	}
 
 	useClickOutside(toolbarRef, () => messageStore.update({ toolbarType: emojiOrMore.NONE }))
@@ -27,14 +28,18 @@ const MessageToolbar = () => {
 	const isSelect = useMemo(() => messageStore.manualTipType === tooltipType.SELECT, [messageStore.manualTipType])
 
 	const unreadCount = useMemo(
-		() => cacheStore.cacheDialogs.find((v) => v?.dialog_id === messageStore.dialogId)?.dialog_unread_count ?? 0,
+		() =>
+			cacheStore.cacheDialogs.find((v: { dialog_id: number }) => v?.dialog_id === messageStore.dialogId)
+				?.dialog_unread_count ?? 0,
 		[cacheStore.cacheDialogs]
 	)
 
 	const handlerToBottom = () => {
 		if (unreadCount === 0) return messageStore.update({ isScrollBottom: true })
 		// 找到未读消息的第一条，然后滚动到这条消息
-		const index = messageStore.messages.findIndex((v) => v?.is_read === MESSAGE_READ.NOT_READ)
+		const index = messageStore.messages.findIndex(
+			(v: { is_read: MESSAGE_READ }) => v?.is_read === MESSAGE_READ.NOT_READ
+		)
 		if (index === -1) return messageStore.update({ isScrollBottom: true })
 
 		const el = document.getElementById(`row-${messageStore.messages[index]?.msg_id}`)

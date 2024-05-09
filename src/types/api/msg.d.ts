@@ -48,7 +48,7 @@ export interface GetBehindMessage {
 }
 
 export interface GetMessage {
-	dialog_id: string
+	dialog_id: number
 	user_id?: string
 	type?: string
 	content?: string

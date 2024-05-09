@@ -29,9 +29,9 @@ const useKeyboard = () => {
 			// Keyboard?.show()
 
 			Keyboard?.addListener('keyboardWillShow', (info) => {
-				const messageStore = useMessageStore.getState()
+				// const messageStore = useMessageStore.getState()
 				cacheStore.updateKeyboardHeight(info.keyboardHeight)
-				if (!messageStore.isEmojiFocus) messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
+				// if (!messageStore.isEmojiFocus) messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })
 			})
 
 			Keyboard?.addListener('keyboardWillHide', () => {
