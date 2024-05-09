@@ -26,7 +26,7 @@ const useKeyboard = () => {
 		if (isWeb.current) {
 			// 以编程方式启用或禁用WebView滚动。在 ios 端
 			// platform.platform === 'ios' && Keyboard?.setScroll({ isDisabled: true })
-			Keyboard?.show()
+			// Keyboard?.show()
 
 			Keyboard?.addListener('keyboardWillShow', (info) => {
 				const messageStore = useMessageStore.getState()
@@ -44,8 +44,9 @@ const useKeyboard = () => {
 	}
 
 	const handlerClear = () => {
-		Keyboard?.removeAllListeners()
-		Keyboard?.hide()
+		console.log('clear')
+		isWeb.current && Keyboard?.removeAllListeners()
+		// Keyboard?.hide()
 	}
 
 	return {
