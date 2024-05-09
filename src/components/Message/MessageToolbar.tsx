@@ -29,7 +29,7 @@ const MessageToolbar = () => {
 
 	const unreadCount = useMemo(
 		() =>
-			cacheStore.cacheDialogs.find((v: { dialog_id: number }) => v?.dialog_id === messageStore.dialogId)
+			cacheStore.cacheDialogs?.find((v: { dialog_id: number }) => v?.dialog_id === messageStore.dialogId)
 				?.dialog_unread_count ?? 0,
 		[cacheStore.cacheDialogs]
 	)

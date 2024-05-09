@@ -30,7 +30,8 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	const [firstUnread, setFirstUnread] = useState<string>()
 
 	useEffect(() => {
-		const unread = cacheStore.cacheDialogs.find((item) => item?.dialog_unread_count > 0)
+		const unread = cacheStore.cacheDialogs?.find((item) => item?.dialog_unread_count > 0)
+		if (!unread) return
 		unread && scrollTo(unread.dialog_id)
 		const unreadElement = document.getElementById(unread?.dialog_id)
 		unreadElement &&

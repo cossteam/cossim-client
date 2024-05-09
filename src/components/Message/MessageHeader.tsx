@@ -60,7 +60,7 @@ const MessageHeader = () => {
 	const onlineStatus = useMemo(() => {
 		if (messageStore.isGroup) return ''
 		if (is_system) return ''
-		const user = cacheStore.onlineStatus.find((v: { user_id: any }) => v.user_id === messageStore.receiverId)
+		const user = cacheStore.onlineStatus?.find((v: { user_id: any }) => v.user_id === messageStore.receiverId)
 		return user?.status === 1 ? '在线' : '离线'
 	}, [cacheStore.onlineStatus, messageStore.isGroup, messageStore.receiverId])
 
@@ -101,7 +101,7 @@ const MessageHeader = () => {
 					<Subnavbar className="coss_message_subnavbar animate__animated  animate__faster">
 						<Link
 							className="w-full h-full flex justify-center items-center rounded bg-bgPrimary"
-							href={`/create_group_notice/${messageStore.receiverId}/?id=${groupAnnouncement?.id}&admin=${members.find((v) => v?.identity === userStore.userId)?.identity === 2}}`}
+							href={`/create_group_notice/${messageStore.receiverId}/?id=${groupAnnouncement?.id}&admin=${members?.find((v) => v?.identity === userStore.userId)?.identity === 2}}`}
 							onClick={() => messageStore.update({ isGroupAnnouncement: false })}
 						>
 							<div className="w-full py-3 px-4 relative flex items-center">

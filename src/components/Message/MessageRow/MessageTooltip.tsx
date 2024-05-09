@@ -126,7 +126,7 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 	 * 获取常用表情 id数组
 	 */
 	const getFrequent = (): [string] => {
-		return allEmojis.categories.find((item: any) => item.id === 'frequent').emojis
+		return allEmojis.categories?.find((item: any) => item.id === 'frequent').emojis
 		// return ['']
 	}
 

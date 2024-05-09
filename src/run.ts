@@ -263,7 +263,7 @@ export async function handlerSocketMessage(data: any) {
 		if (isLableMessage(type)) {
 			// 需要拿到最新的消息列表
 			const messageStore = useMessageStore.getState()
-			const messages = messageStore.allMessages.find((v) => v?.msg_id === msg?.reply_id)
+			const messages = messageStore.allMessages?.find((v) => v?.msg_id === msg?.reply_id)
 			messages &&
 				messageStore.updateMessage({
 					...messages,
@@ -275,7 +275,7 @@ export async function handlerSocketMessage(data: any) {
 		if (isRecallMessage(type)) {
 			const relpyMsg = msg.reply_msg
 			const messageStore = useMessageStore.getState()
-			const message = messageStore.allMessages.find((v) => v?.msg_id === msg?.reply_id)
+			const message = messageStore.allMessages?.find((v) => v?.msg_id === msg?.reply_id)
 
 			if (relpyMsg.msg_type === msgType.EMOJI) {
 				revokeMessage(relpyMsg)

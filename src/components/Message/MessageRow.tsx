@@ -82,7 +82,7 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 	})
 	const emojiReply = async (emoji: string) => {
 		if (item.reply_emojis) {
-			const replyEmojis = item.reply_emojis.find((item: any) => item.reply_content === emoji)
+			const replyEmojis = item.reply_emojis?.find((item: any) => item.reply_content === emoji)
 			if (replyEmojis) {
 				recall({ ...item, msg_id: replyEmojis?.msg_id })
 				return

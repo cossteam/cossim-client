@@ -105,8 +105,8 @@ export const sendMessage = async (options: Options) => {
 
 	// 获取是否阅后即焚
 	const isBurnAfterReading =
-		cacheStore.cacheContacts.find((item: { dialog_id: number }) => item.dialog_id === dialogId)?.preferences?.open_burn_after_reading ??
-		MessageBurnAfterRead.NO
+		cacheStore.cacheContacts?.find((item: { dialog_id: number }) => item.dialog_id === dialogId)?.preferences
+			?.open_burn_after_reading ?? MessageBurnAfterRead.NO
 
 	// 生成消息对象
 	let message = generateMessage({

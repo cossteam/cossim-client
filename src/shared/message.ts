@@ -129,7 +129,7 @@ export const findMessage = (messages: any[], index: number = -1): Message => {
  */
 export const isLastMessage = (message: Message) => {
 	const cacheStore = useCacheStore.getState()
-	const msg = cacheStore.cacheDialogs.find((dialog) => dialog.dialog_id === message.dialog_id)
+	const msg = cacheStore.cacheDialogs?.find((dialog) => dialog.dialog_id === message.dialog_id)
 	if (!msg) return false
 	return msg.last_message.msg_id === message.msg_id
 }

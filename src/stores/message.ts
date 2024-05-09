@@ -60,7 +60,7 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 			cache.updateCacheSearchMessage(tableName)
 		}
 		const messages = allMessages.slice(-20)
-		const total = cache.totalMessages.find((item) => item.dialog_id === options.dialogId)?.total ?? 0
+		const total = cache.totalMessages?.find((item) => item.dialog_id === options.dialogId)?.total ?? 0
 
 		set({
 			allMessages,

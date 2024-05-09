@@ -12,11 +12,13 @@ const Layout: React.FC = () => {
 	const previousTab = useRef<string>('dialog')
 	const { contactRouter, myRouter } = useRouterStore()
 	const { onDoubleClick } = useToolbarStore()
+
 	const onTabLinkClick = (tabName: string) => {
 		if (previousTab.current !== tabActive) {
 			previousTab.current = tabActive
 			return
 		}
+
 		// 双击
 		if (tabActive === tabName) {
 			console.log('双击', tabName)

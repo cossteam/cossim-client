@@ -41,7 +41,7 @@ const routes: Router.RouteParameters[] = [
 		options: {
 			transition: 'f7-custom'
 		},
-		keepAlive: false
+		keepAlive: true
 	},
 	{
 		path: '/user_info/:user_id/',

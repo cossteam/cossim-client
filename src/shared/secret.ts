@@ -9,7 +9,7 @@ import { cretateNonce, decryptMessageWithKey, encryptMessage, generateKeyPair, p
  */
 export async function getCacheShareKey(userId: string) {
 	const cacheStore = useCacheStore.getState()
-	let shareKey: any = cacheStore.cacheShareKeys.find((v) => v.user_id === userId)?.shareKey
+	let shareKey: any = cacheStore.cacheShareKeys?.find((v) => v.user_id === userId)?.shareKey
 
 	if (!shareKey) {
 		const publicKey = await getServerPublicKey(userId)
@@ -91,7 +91,7 @@ export async function decrypt(userId: string, content: string) {
  */
 export function savePublicKey(userId: string, publicKey: string) {
 	const cacheStore = useCacheStore.getState()
-	const user = cacheStore.cacheShareKeys.find((v) => v?.user_id === userId)
+	const user = cacheStore.cacheShareKeys?.find((v) => v?.user_id === userId)
 	if (!cacheStore.cacheKeyPair) return
 
 	const shareKey = performKeyExchange(cacheStore.cacheKeyPair?.privateKey, publicKey)

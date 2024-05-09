@@ -6,8 +6,6 @@ import '../styles/MessageEmojis.scss'
 import { getCookie } from '@/utils/cookie'
 import { THEME } from '@/shared'
 
-console.log('emoji data', data)
-
 interface MessageEmojisProps {
 	onSelectEmojis?: (emojis: any) => void
 	className?: string

@@ -1,5 +1,4 @@
 import { Block, Button, Page } from 'framework7-react'
-
 import { $t } from '@/shared'
 import { APP_NAME } from '@/shared'
 import SetRequestUrl from '@/pages/SetRequestUrl/SetRequestUrl'

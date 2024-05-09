@@ -34,7 +34,7 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 	const loadMembers = async () => {
 		const { code, data } = await GroupService.groupMemberApi({ group_id: props.group_id })
 		if (code === 200) {
-			const identity = data.find((i: any) => i.user_id === user_id).identity
+			const identity = data?.find((i: any) => i.user_id === user_id).identity
 			identity && setIdentity(identity)
 			setMembers(data)
 		}
@@ -63,7 +63,7 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 	}
 	// 排除好友
 	const excludeFriends = useMemo(() => {
-		return friends.filter((friend) => !members.find((member: any) => member.user_id === friend.user_id))
+		return friends.filter((friend) => !members?.find((member: any) => member.user_id === friend.user_id))
 	}, [friends, members])
 	// 排除成员
 	const excludeMembers = useMemo(() => {

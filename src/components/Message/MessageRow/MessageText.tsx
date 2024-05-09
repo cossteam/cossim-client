@@ -15,7 +15,7 @@ const MessageText: React.FC<MessageTextProps> = ({ item, isSelf }) => {
 	const replyMessage = useMemo(() => {
 		const reply = { replyName: '', replyContent: '' }
 		if (!item?.reply_id) return reply
-		const message = messageStore.allMessages.find((msg) => msg?.msg_id === item?.reply_id)
+		const message = messageStore.allMessages?.find((msg) => msg?.msg_id === item?.reply_id)
 		if (!message) {
 			reply.replyContent = '消息已删除'
 		} else {

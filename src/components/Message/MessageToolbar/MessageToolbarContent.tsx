@@ -94,7 +94,6 @@ const MessageToolbarContent = () => {
 		>
 			<MessageEmojis
 				onSelectEmojis={(emoji) => messageStore.update({ selectedEmojis: emoji.native })}
-				// onSelectEmojis={() => null}
 				className={clsx('w-full', !isEmoji && 'hidden')}
 			/>
 			<MessageMore

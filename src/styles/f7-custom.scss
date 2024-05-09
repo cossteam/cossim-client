@@ -1,16 +1,16 @@
 .router-transition-f7-custom-forward,
 .router-transition-f7-custom-backward {
 	perspective: 0px;
-	// transition: all 0;
+	transition: all 0.3s linear;
 }
 
 /** 进入页面前 */
 .router-transition-f7-custom-forward .page-next {
-	animation: f7-custom-next-to-current 300ms forwards;
+	animation: f7-custom-next-to-current 400ms forwards;
 }
 
 .router-transition-f7-custom-forward .page-current {
-	animation: f7-custom-current-to-prev 300ms forwards;
+	animation: f7-custom-current-to-prev 400ms forwards;
 }
 
 /** 离开页面前 */

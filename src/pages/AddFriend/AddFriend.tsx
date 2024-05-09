@@ -17,7 +17,7 @@ const AddFriend: React.FC<RouterProps> = ({ f7router }) => {
 			f7.dialog.preloader($t('搜索中...'))
 
 			// 先查找本地好友列表，查看是否是自己好友
-			const user = cacheStore.cacheContacts.find((v) => v?.email === keyWord)
+			const user = cacheStore.cacheContacts?.find((v) => v?.email === keyWord)
 
 			if (user) {
 				f7router.navigate(`/profile/${user.user_id}/`)

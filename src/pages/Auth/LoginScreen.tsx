@@ -2,7 +2,6 @@ import { Button, Link, List, ListInput, LoginScreenTitle, theme, Preloader, Page
 import { At, Lock, ChevronLeft } from 'framework7-icons/react'
 import { useEffect, useState } from 'react'
 import clsx from 'clsx'
-
 import { $t, USER_ID, TOKEN, ACCOUNT, getFingerPrintID } from '@/shared'
 import UserService from '@/api/user'
 import type { LoginData, RegisterData } from '@/types/api/user'

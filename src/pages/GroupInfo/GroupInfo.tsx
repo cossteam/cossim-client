@@ -80,7 +80,7 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 			// 获取成员信息
 			const { code, data } = await GroupService.groupMemberApi({ group_id: GroupId })
 			if (code !== 200) return
-			const identity = data.find((i: any) => i.user_id === user_id).identity
+			const identity = data?.find((i: any) => i.user_id === user_id).identity
 			identity && setIdentity(identity)
 			setMembers(data)
 		})()
@@ -127,7 +127,10 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 				is_silent: isSilence ? 1 : 0
 			})
 			if (code !== 200) return
-		} catch (error: any) {}
+		} catch (error: any) {
+			f7.dialog.alert(error.message, '设置失败')
+			// setSilence(!isSilence)
+		}
 	}
 
 	//! 解决傻逼底部导航栏莫名其妙的显示问题

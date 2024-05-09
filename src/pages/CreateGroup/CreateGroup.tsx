@@ -1,14 +1,11 @@
 import { Page, Navbar, List, ListItem, Card, CardContent, Button, NavRight, f7 } from 'framework7-react'
 import { Xmark } from 'framework7-icons/react'
 import { useEffect, useMemo, useState } from 'react'
-
 import { $t } from '@/shared'
 import './CreateGroup.scss'
 import Contact from '@/components/Contact/Contact'
 import { CreateGroupData } from '@/types/api/group'
 import GroupService from '@/api/group'
-// import UserStore from '@/db/user'
-// import { useAsyncEffect } from '@reactuses/core'
 import { pick } from 'lodash-es'
 import { getRemoteSession } from '@/run.ts'
 
