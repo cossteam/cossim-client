@@ -1,7 +1,10 @@
 import clsx from 'clsx'
-import data from '@emoji-mart/data'
+// import data from '@emoji-mart/data'
+import data from '@/shared/emoji_data'
 import Picker from '@emoji-mart/react'
 import '../styles/MessageEmojis.scss'
+
+console.log('emoji data', data)
 
 interface MessageEmojisProps {
 	onSelectEmojis?: (emojis: any) => void

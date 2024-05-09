@@ -16,7 +16,8 @@ import useMessageStore from '@/stores/message'
 import React, { useMemo, useRef } from 'react'
 import tooltipStatMachine from '../script/tootip'
 import useUserStore from '@/stores/user'
-import emojiData from '@emoji-mart/data'
+// import emojiData from '@emoji-mart/data'
+import emojiData from '@/shared/emoji_data'
 import { useClickOutside } from '@reactuses/core'
 interface MessageTooltipProps {
 	item: any
