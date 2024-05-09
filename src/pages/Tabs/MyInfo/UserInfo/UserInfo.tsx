@@ -27,7 +27,7 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 
 				f7.dialog.preloader($t('正在退出...'))
 				await UserService.logoutApi({
-					login_number: userStore?.loginNumber
+					driver_id: userStore?.deviceId
 				})
 			} catch (error) {
 				toastMessage($t('退出登录失败'))
