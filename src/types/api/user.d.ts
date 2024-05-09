@@ -40,3 +40,7 @@ export interface updatePassWorData {
 export interface SearchUserParams {
 	email: string
 }
+
+export interface LogoutData {
+	driver_id: string
+}
