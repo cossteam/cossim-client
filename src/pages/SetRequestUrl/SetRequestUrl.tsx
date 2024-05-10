@@ -1,17 +1,19 @@
-import { $t, BASE_URL, WS_URL } from '@/shared'
-import { getCookie, setCookie } from '@/utils/cookie'
+import { $t } from '@/shared'
+// import { setCookie } from '@/utils/cookie'
 import { Block, Button, Link, List, ListInput, NavRight, Navbar, Page, Popup } from 'framework7-react'
 import { useState } from 'react'
 import { toastMessage } from '@/shared'
+import useRequestStore from '@/stores/request'
 
 const SetRequestUrl = () => {
-	const [baseCustomUrl, setBaseCustomUrl] = useState<string>(getCookie(BASE_URL) ?? '')
-	const [wsCustomUrl, setWsCustomUrl] = useState<string>(getCookie(WS_URL) ?? '')
+	const requestStore = useRequestStore()
+
+	const [baseCustomUrl, setBaseCustomUrl] = useState<string>(requestStore.currentBaseUrl)
+	const [wsCustomUrl, setWsCustomUrl] = useState<string>(requestStore.currentWsUrl)
 	const [opened, setOpened] = useState<boolean>(false)
 
 	const handleSubmit = () => {
-		setCookie(BASE_URL, baseCustomUrl)
-		setCookie(WS_URL, wsCustomUrl)
+		requestStore.update({ currentBaseUrl: baseCustomUrl, currentWsUrl: wsCustomUrl })
 		toastMessage('设置成功')
 		setOpened(false)
 	}

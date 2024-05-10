@@ -1,10 +1,11 @@
 import axios from 'axios'
 import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 import { getCookie, removeAllCookie } from './cookie'
-import { TOKEN, RESPONSE_CODE, BASE_URL } from '@/shared'
+import { TOKEN, RESPONSE_CODE } from '@/shared'
 import PGPUtils from '@/utils/pgp'
 import { f7 } from 'framework7-react'
 // import { getBaseUrl } from '@/stores/requestUrl.ts'
+import useRequestStore from '@/stores/request'
 
 const axiosConfig = {
 	// baseURL: getCookie(BASE_URL),
@@ -51,6 +52,7 @@ const encryptPGP = async (serverPublicKey: any, msg: any) => {
  */
 const getServerPublicKey = async () => {
 	const key = 'SERVERPUBLICKEY'
+
 	let serverPublicKey = window.localStorage.getItem(key)
 	if (!serverPublicKey) {
 		const response = await publicKeyInstance.get('/user/system/key/get')
@@ -81,7 +83,8 @@ const getClientKeys = async () => {
 // 请求拦截器
 service.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
-		config.baseURL = getCookie(BASE_URL)
+		const requestStore = useRequestStore.getState()
+		config.baseURL = requestStore.currentBaseUrl
 		const token = getCookie(TOKEN)
 		if (token) config.headers['Authorization'] = 'Bearer ' + token
 		/////////////////////////////////////////////////////////////////////////////////////////////

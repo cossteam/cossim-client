@@ -17,7 +17,6 @@ import {
 } from 'framework7-react'
 import { useState } from 'react'
 import { useAsyncEffect } from '@reactuses/core'
-
 import { $t, arrayToGroups } from '@/shared'
 import './Contact.scss'
 import useCacheStore from '@/stores/cache.ts'

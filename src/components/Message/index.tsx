@@ -1,4 +1,3 @@
-import { Page } from 'framework7-react'
 import './styles/Message.scss'
 import { useWindowSize } from '@reactuses/core'
 import MessageHeader from './MessageHeader'
@@ -11,8 +10,6 @@ import useMessageStore from '@/stores/message'
 import { useEffect, useMemo } from 'react'
 import { tooltipType } from '@/shared'
 import { forwardMessage } from './script/message'
-// import { PluginListenerHandle } from '@capacitor/core'
-// import { App } from '@capacitor/app'
 
 const Message: React.FC<RouterProps> = () => {
 	const { height } = useWindowSize()
@@ -21,8 +18,6 @@ const Message: React.FC<RouterProps> = () => {
 	const { handlerKeyboardEvent, handlerClear } = useKeyboard()
 
 	useEffect(() => {
-		console.log('handlerKeyboardEvent')
-
 		handlerKeyboardEvent()
 
 		return () => {
@@ -102,7 +97,7 @@ const Message: React.FC<RouterProps> = () => {
 	// }, [messageStore.unreadList])
 
 	return (
-		<Page noToolbar className="coss_message transition-all relative">
+		<>
 			<div className="h-screen overflow-hidden flex flex-col" style={{ height }}>
 				<MessageHeader />
 				<MessageContent />
@@ -111,7 +106,7 @@ const Message: React.FC<RouterProps> = () => {
 
 			{/* 转发弹出 */}
 			{messageForward}
-		</Page>
+		</>
 	)
 }
 

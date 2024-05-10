@@ -61,9 +61,6 @@ const LoginScreen: React.FC<LoginScreenProps & RouterProps> = ({ f7router, f7rou
 		try {
 			if (!valid()) return
 
-			// const { identifier: deviceId } = await Device.getId()
-			// console.log('deviceId', await Device.getInfo(), deviceId)
-
 			const deviceId = await getFingerPrintID()
 
 			const { code, data, msg } = await UserService.loginApi({
