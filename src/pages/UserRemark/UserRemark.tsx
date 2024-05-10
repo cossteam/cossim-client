@@ -5,12 +5,14 @@ import RelationService from '@/api/relation'
 import { toastMessage } from '@/shared'
 import CommInput from '@/components/CommInput/CommInput'
 import useLoading from '@/hooks/useLoading'
+import useCacheStore from '@/stores/cache'
 
 const UserRemark: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const oldRemark = f7route.query.remark
 	const [remark, setRemark] = useState()
 	const userId = f7route.query.user_id
 	const { watchAsyncFn } = useLoading()
+	const cacheStore = useCacheStore()
 
 	const handlerSubmit = () => {
 		watchAsyncFn(() =>
@@ -19,6 +21,15 @@ const UserRemark: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				remark: remark!
 			})
 				.then(() => {
+					// 修改
+					cacheStore.updateCacheContactsObj(
+						cacheStore.cacheDialogs.map((item) => {
+							if (item?.user_id === userId) {
+								item.dialog_name = remark
+							}
+							return item
+						})
+					)
 					f7router.back(`/profile/${userId}/`)
 				})
 				.catch(() => {

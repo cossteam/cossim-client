@@ -189,7 +189,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 			receiverInfo: {
 				dialog_id: userInfo?.dialog_id,
 				dialog_avatar: userInfo?.avatar,
-				dialog_name: userInfo?.nickname
+				dialog_name: userInfo?.preferences?.remark ?? userInfo?.nickname
 			},
 			isLabel
 		})

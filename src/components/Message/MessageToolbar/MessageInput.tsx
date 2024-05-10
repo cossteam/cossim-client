@@ -47,7 +47,6 @@ const MessageInput = () => {
 	// 点击键盘时聚焦输入框
 	useEffect(() => {
 		if (messageStore.toolbarType !== emojiOrMore.KEYBOARD) return
-		console.error('handlerSelect: 更改为键盘', messageStore.toolbarType)
 		const quill = toolEditorRef.current?.quill
 		setTimeout(() => quill?.focus(), 0)
 	}, [messageStore.toolbarType])

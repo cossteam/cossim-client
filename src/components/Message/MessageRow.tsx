@@ -262,7 +262,7 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 								arrow={false}
 								interactive={true}
 								appendTo={document.body}
-								theme={getCookie(THEME ?? 'light')}
+								theme={getCookie(THEME) ?? 'light'}
 								animation="shift-away-subtle"
 								// touch={['hold', 300]}
 								// trigger="manual"

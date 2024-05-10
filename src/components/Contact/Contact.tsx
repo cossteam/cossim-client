@@ -111,8 +111,8 @@ const Contact: React.FC<ContactProps> = ({ completed, defaults, opened, setOpene
 										<div slot="media" className="w-10 h-10 ">
 											<img
 												src={contact?.avatar}
-												alt=""
 												className="w-full h-full object-cover rounded-full"
+												alt=""
 											/>
 										</div>
 									</ListItem>

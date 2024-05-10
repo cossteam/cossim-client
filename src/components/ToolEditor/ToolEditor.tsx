@@ -7,6 +7,7 @@ import 'quill-mention-react'
 import Quill from 'quill'
 import useMessageStore from '@/stores/message'
 import { emojiOrMore } from '@/shared'
+import { isWeb } from '@/utils'
 
 interface ToolEditorProps {
 	className?: string
@@ -106,7 +107,7 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 		<div
 			className={clsx('w-full text-[1rem]', props.className)}
 			ref={EditorRef}
-			onFocus={() => messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })}
+			onFocus={async () => !(await isWeb()) && messageStore.update({ toolbarType: emojiOrMore.KEYBOARD })}
 		/>
 	)
 }
