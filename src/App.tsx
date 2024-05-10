@@ -18,16 +18,12 @@ import useCacheStore from '@/stores/cache'
 import run from './run'
 import { isWeb } from './utils'
 import useUserStore from '@/stores/user'
-import useMessageStore, { defaultOptions } from './stores/message'
+import useMessageStore, { defaultInitOptions } from './stores/message'
 import { usePreviewStore } from './stores/preview'
 import DevicePopup from './components/DevicePopup/DevicePopup'
 
 function App() {
 	const router = useRef<Router.Router | null>(null)
-
-	// 是否需要设备验证
-	// const [devicePopupVisible, setDevicePopupVisible] = useState(false)
-
 	const liveRoomStore = useLiveRoomStore()
 	const cacheStore = useCacheStore()
 	const userStore = useUserStore()
@@ -115,7 +111,7 @@ function App() {
 					router.current?.currentRoute.url.indexOf('/message/') !== -1
 				) {
 					// 清空当前消息页数据
-					messageStore.update(defaultOptions)
+					messageStore.update(defaultInitOptions)
 					// 关闭预览
 					previewStore.close()
 				}
@@ -135,7 +131,6 @@ function App() {
 
 			const appChange = async (state: AppState) => {
 				if (state.isActive) {
-					// burnAfterReading()
 					if (hasCookie(TOKEN) && SocketClient.isDisconnect()) {
 						SocketClient.connect()
 					}

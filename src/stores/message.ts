@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { MessageStore, MessageStoreOptions } from './type'
+import { MessageStore, MessageStoreOptions, initOptions } from './type'
 import cacheStore from '@/utils/cache'
 import { MESSAGE_MARK, emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
 import useCacheStore from './cache'
@@ -36,6 +36,14 @@ export const defaultOptions: MessageStoreOptions = {
 	isEmojiFocus: false,
 	isScrollBottom: true,
 	members: [],
+	isLabel: false
+}
+
+export const defaultInitOptions: initOptions = {
+	dialogId: 0,
+	receiverId: '',
+	isGroup: false,
+	receiverInfo: {},
 	isLabel: false
 }
 

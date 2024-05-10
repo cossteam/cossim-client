@@ -37,10 +37,6 @@ const MessageHeader = () => {
 		[groupAnnouncement]
 	)
 
-	// const handlerBack = async () => {
-	// 	await messageStore.update(defaultOptions)
-	// }
-
 	// 获取群聊人员
 	useEffect(() => {
 		if (messageStore.isGroup) {
