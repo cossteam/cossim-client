@@ -24,7 +24,8 @@ const defaultOptions: CacheStoreOptions = {
 	cacheDialogs: [],
 	cacheContacts: [],
 	cacheContactsObj: {},
-	cacheGroup: [],
+	cacheGroups: [],
+	cacheGroupsObj: {},
 	cacheShareKeys: [],
 	cacheSearchMessage: [],
 	unreadCount: 0,
@@ -48,7 +49,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const cacheContacts = (await cacheStore.get(CACHE_CONTACTS)) ?? []
 		const cacheShareKeys = (await cacheStore.get(CACHE_SHARE_KEYS)) ?? []
 		const cacheSearchMessage = (await cacheStore.get(CACHE_SEARCH_MESSAGE)) ?? []
-		const cacheGroup = (await cacheStore.get(CACHE_GROUP)) ?? []
+		const cacheGroups = (await cacheStore.get(CACHE_GROUP)) ?? []
 		const unreadCount = (await cacheStore.get(CACHE_UNREAD_COUNT)) ?? 0
 		const applyCount = (await cacheStore.get(CACHE_APPLY_COUNT)) ?? 0
 		const keyboardHeight = (await cacheStore.get(CACHE_KEYBOARD_HEIGHT)) ?? 300
@@ -63,7 +64,7 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 			cacheDialogs,
 			cacheContacts: groupsToArray(cacheContacts),
 			cacheShareKeys,
-			cacheGroup,
+			cacheGroups,
 			unreadCount,
 			applyCount,
 			keyboardHeight,
@@ -136,6 +137,15 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const cacheContactsObj = arrayToGroups(cacheContacts)
 		await cacheStore.set(CACHE_CONTACTS, cacheContactsObj)
 		set({ cacheContacts, cacheContactsObj })
+	},
+	updateCacheGroups: async (cacheGroups: any[]) => {
+		await cacheStore.set(CACHE_GROUP, cacheGroups)
+		set({ cacheGroups: groupsToArray(cacheGroups), cacheGroupsObj: cacheGroups })
+	},
+	updateCacheGroupsObj: async (cacheGroups: any[]) => {
+		const cacheGroupsObj = arrayToGroups(cacheGroups)
+		await cacheStore.set(CACHE_GROUP, cacheGroupsObj)
+		set({ cacheGroups, cacheGroupsObj })
 	},
 	update: async (options, isUpdateDB = false) => {
 		set((state: CacheStoreOptions) => ({ ...state, ...options }))

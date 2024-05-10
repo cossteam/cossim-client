@@ -163,6 +163,21 @@ export async function getFriendList() {
 }
 
 /**
+ * 获取群聊列表
+ */
+export async function getGroupList() {
+	try {
+		const cacheStore = useCacheStore.getState()
+		const { code, data } = await GroupService.groupListApi()
+		if (code !== 200) return
+		console.log('群聊列表', data)
+		cacheStore.updateCacheGroups(data)
+	} catch (error) {
+		console.error('获取群聊列表', error)
+	}
+}
+
+/**
  * 是否需要根据消息类型来确定是否需要添加或更新消息，标注、取消标注消息
  * @param type 	消息类型
  */
@@ -487,6 +502,7 @@ function run() {
 			getBehindMessage() // 获取落后消息
 			getApplyList()
 			getFriendList()
+			getGroupList()
 			// setInterval(() => {
 			// 	handlerDestroyMessage() // 阅后即焚
 			// }, 2000)

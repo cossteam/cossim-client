@@ -28,9 +28,9 @@ const DevicePopup: React.FC<DevicePopupProps> = ({ opened = false }) => {
 	const handlerClick = () => {
 		if (!text) return toastMessage('请输入密钥对')
 		try {
-			const keyPair = { publicKey: text, privateKey: text }
-			userStore.update({ isNewLogin: false })
-			cacheStore.update({ cacheKeyPair: keyPair }, true)
+			// const keyPair = { publicKey: text, privateKey: text }
+			// userStore.update({ isNewLogin: false })
+			// cacheStore.update({ cacheKeyPair: keyPair }, true)
 			handlerBeforeClose()
 		} catch (error) {
 			toastMessage('密钥对格式不正确或错误')
@@ -68,44 +68,84 @@ const DevicePopup: React.FC<DevicePopupProps> = ({ opened = false }) => {
 		loadGroupMessages()
 	}
 
-	const loadUserMessages = async () => {
-		const userDialogs = cacheStore.cacheContacts.map((item: any) => item.dialog_id)
-		const size = 2
+	// 批量处理
+	const batch = async (arr: any[] = [], size: number = 2, handler: (currentBatch: any[]) => void) => {
 		const next = async () => {
-			const dialogIds = userDialogs.splice(0, size)
+			const currentBatch = arr.splice(0, size)
 			try {
-				const data: any[] = await Promise.allSettled(
-					dialogIds.map((dialog_id: number) => {
-						return MsgService.getUserMessageApi({
-							dialog_id,
-							start_at: dayjs().subtract(7, 'day').valueOf(),
-							end_at: dayjs().valueOf(),
-							page_num: 1,
-							page_size: 1000
-						})
-					})
-				)
-				data.map((item, index) => {
-					const msgs = item?.value?.data?.user_messages
-					console.log(dialogIds[index], msgs)
-				})
+				await handler(currentBatch)
 			} finally {
-				if (userDialogs.length > 0) {
-					next()
+				if (arr.length > 0) {
+					await next()
 				}
 			}
 		}
-		next()
+		await next()
 	}
 
+	// 拉取用户消息
+	const loadUserMessages = async () => {
+		const userDialogs = cacheStore.cacheContacts.map((item: any) => item.dialog_id)
+		batch(userDialogs, 2, async (currentBatch) => {
+			const data: any[] = await Promise.allSettled(
+				currentBatch.map((dialog_id: number) => {
+					return MsgService.getUserMessageApi({
+						dialog_id,
+						start_at: dayjs().subtract(7, 'day').valueOf(),
+						end_at: dayjs().valueOf(),
+						page_num: 1,
+						page_size: 1000
+					})
+				})
+			)
+			data.map(async (item, index) => {
+				const msgs = item?.value?.data?.user_messages
+				// console.log(currentBatch[index], msgs)
+				// 存储消息
+				const tableName = `${currentBatch[index]}`
+				const allMsgs = (await cacheStore.get(tableName)) ?? []
+				// 过滤 msgs 中未保存的数据
+				msgs.map(async (msg: any) => {
+					const isExist = allMsgs.some((item: any) => item.msg_id === msg.msg_id)
+					if (!isExist) {
+						await cacheStore.addCacheMessage(msg)
+					}
+				})
+			})
+		})
+	}
+
+	// 拉取群聊消息
 	const loadGroupMessages = async () => {
-		// 拉取消息
-		// const { data }: any = await MsgService.getGroupMessageApi({
-		// 	group_id: -1,
-		// 	page_num: 1,
-		// 	page_size: 100
-		// })
-		// console.log('群聊', data)
+		const groups = cacheStore.cacheGroups
+		batch(groups, 2, async (currentBatch) => {
+			const data: any[] = await Promise.allSettled(
+				currentBatch.map((group: any) => {
+					return MsgService.getGroupMessageApi({
+						group_id: group.group_id,
+						dialog_id: group.dialog_id,
+						start_at: dayjs().subtract(7, 'day').valueOf(),
+						end_at: dayjs().valueOf(),
+						page_num: 1,
+						page_size: 1000
+					})
+				})
+			)
+			data.map(async (item, index) => {
+				const msgs = item?.value?.data?.group_messages
+				console.log(currentBatch[index].name, msgs)
+				// 存储消息
+				const tableName = `${currentBatch[index].dialog_id}`
+				const allMsgs = (await cacheStore.get(tableName)) ?? []
+				// 过滤 msgs 中未保存的数据
+				msgs.map(async (msg: any) => {
+					const isExist = allMsgs.some((item: any) => item.msg_id === msg.msg_id)
+					if (!isExist) {
+						await cacheStore.addCacheMessage(msg)
+					}
+				})
+			})
+		})
 	}
 
 	return (

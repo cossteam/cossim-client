@@ -43,10 +43,12 @@ export interface CacheStoreOptions {
 	cacheContacts: any[]
 	/** 联系人对象列表 */
 	cacheContactsObj: any
+	/** 缓存群列表 */
+	cacheGroups: any[]
+	/** 缓存群对象列表 */
+	cacheGroupsObj: any
 	/** 缓存共享密钥 */
 	cacheShareKeys: Array<{ user_id: string; shareKey: string }>
-	/** 缓存群信息列表 */
-	cacheGroup: any[]
 	/** 未读消息数 */
 	unreadCount: number
 	/** 好友或群聊申请数 */
@@ -132,6 +134,14 @@ export type CacheStore = CacheStoreOptions & {
 	 * @param {any} message 消息
 	 */
 	updateCacheContactsObj: (contacts: any[]) => void
+	/**
+	 * @description 获取群聊列表
+	 */
+	updateCacheGroups: (contacts: any[]) => void
+	/**
+	 * @description 获取群聊对象列表
+	 */
+	updateCacheGroupsObj: (contacts: any[]) => void
 	/**
 	 * 更新所有缓存信息, 可以只更新部分信息
 	 * @param { Partial<CacheStoreOptions>} options
