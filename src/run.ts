@@ -356,20 +356,18 @@ export async function handlerSocketEdit(data: any) {
  * @param data
  */
 export function handlerSocketRequest(data: any) {
-	console.log('好友/群聊请求', data)
-
-	if (data?.data?.user_id) {
-		savePublicKey(data?.data?.user_id, data?.data?.e2e_public_key)
-	}
-	// 本地通知
-	try {
-		localNotification(LocalNotificationType.MESSAGE, '新请求', data.msg ?? '有新的请求待处理')
-	} catch {
-		console.log('发送本地通知失败')
-	}
 	// 修改未处理请求数
 	const cacheStore = useCacheStore.getState()
 	cacheStore.updateCacheApplyCount(cacheStore.applyCount + 1)
+	// 保存公钥以及通知
+	try {
+		if (data?.data?.user_id) {
+			savePublicKey(data?.data?.user_id, data?.data?.e2e_public_key)
+		}
+		localNotification(LocalNotificationType.MESSAGE, '新请求', data.msg ?? '有新的请求待处理')
+	} catch (e) {
+		console.error('新请求异常', e)
+	}
 }
 
 /**
