@@ -28,9 +28,9 @@ const DevicePopup: React.FC<DevicePopupProps> = ({ opened = false }) => {
 	const handlerClick = () => {
 		if (!text) return toastMessage('请输入密钥对')
 		try {
-			// const keyPair = { publicKey: text, privateKey: text }
-			// userStore.update({ isNewLogin: false })
-			// cacheStore.update({ cacheKeyPair: keyPair }, true)
+			const keyPair = { publicKey: text, privateKey: text }
+			userStore.update({ isNewLogin: false })
+			cacheStore.update({ cacheKeyPair: keyPair }, true)
 			handlerBeforeClose()
 		} catch (error) {
 			toastMessage('密钥对格式不正确或错误')
