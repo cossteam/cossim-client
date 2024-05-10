@@ -1,12 +1,16 @@
 .coss_dialog_list {
-	@apply flex justify-start items-center;
+	@apply flex justify-start items-center w-full;
+
+	a {
+		@apply flex w-[90%];
+	}
 
 	.coss_dialog_list__icon {
 		@apply text-[22px] mr-[10px];
 	}
 
 	.coss_dialog_list__text {
-		@apply text-[15px] mr-2 whitespace-nowrap;
+		@apply flex flex-1 text-[15px] whitespace-nowrap;
 	}
 }
 

@@ -130,10 +130,6 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 		// return ['']
 	}
 
-	// const div = document.createElement('div')
-	// document.body.appendChild(div)
-
-	// @ts-ignore
 	return (
 		<div
 			className="h-auto max-w-[300px] pt-2 w-auto rounded relative z-[100] flex flex-col items-center justify-center"
@@ -154,7 +150,8 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 					</Link>
 				))}
 			</div>
-			<div className="w-full flex gap-1">
+
+			<div className={clsx('w-full gap-1', tooltips.length === 1 ? 'hidden' : 'flex')}>
 				<div style={{ width: '100%', overflowX: 'scroll', display: 'flex', gap: '10px' }}>
 					{getFrequent()
 						.slice(0, 8)
@@ -177,7 +174,6 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 				<PlusCircle
 					onClick={() => {
 						setShow(false)
-						// setShowTippy(true)
 						toggleEmojis && toggleEmojis({ show: true, emoji: null })
 					}}
 					className="toolbar-icon"

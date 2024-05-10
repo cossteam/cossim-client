@@ -11,9 +11,7 @@
 		"format": "prettier --write src/",
 		"build:android": "npm run build && npx cap sync android",
 		"build:ios": "npm run build && npx cap sync ios",
-		"test": "vitest",
-		"ionic:build": "npm run build",
-		"ionic:serve": "npm run dev"
+		"test": "vitest"
 	},
 	"dependencies": {
 		"@capacitor/android": "^5.7.0",

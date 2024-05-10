@@ -81,7 +81,7 @@ const Layout: React.FC = () => {
 			<View id="view-contacts" onTabShow={() => setTabActive('contacts')} tab url="/contacts/" />
 			<View id="view-my" onTabShow={() => setTabActive('my')} tab url="/my/" />
 
-			<Toolbar tabbar icons bottom>
+			<Toolbar tabbar icons bottom outline={false} className="h-14">
 				<button ref={buttonRef}>
 					<Link
 						ref={dialogRef}
