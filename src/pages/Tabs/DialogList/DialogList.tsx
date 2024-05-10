@@ -123,11 +123,12 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 		// const element: any = document.getElementById('dialog-box')
 		const element: any = document.querySelector('.page-content')
 
-		element.scrollTo({
-			top: heightToTop(el) - 50,
-			left: 0,
-			behavior: 'smooth'
-		})
+		element &&
+			element?.scrollTo({
+				top: heightToTop(el) - 50,
+				left: 0,
+				behavior: 'smooth'
+			})
 		// el.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" });
 	}
 
@@ -175,7 +176,7 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 				</List>
 			</Popover>
 
-			<List contactsList noChevron mediaList dividers className="pb-[50px]">
+			<List contactsList noChevron mediaList dividers className="pb-[50px]" id="dialog-box">
 				{cacheStore.cacheDialogs.sort(customSort).map((item, index) => {
 					// @ts-ignore
 					return (
