@@ -120,7 +120,8 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 	function scrollTo(id: string) {
 		const el: any = document.getElementById(id)
 
-		const element: any = document.getElementById('dialog-box')
+		// const element: any = document.getElementById('dialog-box')
+		const element: any = document.querySelector('.page-content')
 
 		element.scrollTo({
 			top: heightToTop(el) - 50,
