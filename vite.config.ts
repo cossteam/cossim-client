@@ -28,7 +28,6 @@ export default defineConfig({
 		// 		drop_debugger: true
 		// 	}
 		// }
-
 		//  拆分超过 1M 的文件代码
 		chunkSizeWarningLimit: 1000,
 		//  生成 map 文件

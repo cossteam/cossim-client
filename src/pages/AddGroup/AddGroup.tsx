@@ -20,7 +20,6 @@ const AddGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 						setGroupInfo(res.data)
 						// 已经在群聊
 						if (res.data.preferences) {
-							console.log()
 							f7router.navigate(`/group_info/${groupId}/`, { reloadCurrent: true })
 						}
 					} else {

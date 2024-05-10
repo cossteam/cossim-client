@@ -1,9 +1,9 @@
-// import { getStorage } from '@/utils/stroage'
-// import { HOST } from '@/utils/request'
-
 import { getCookie } from '@/utils/cookie'
 import { TOKEN } from '.'
 
+/**
+ * @deprecated 已废弃，请使用 socket.io, 该文件将在下个版本删除
+ */
 class Socket {
 	private serverAddress: string
 	public socket: WebSocket | null

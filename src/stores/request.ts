@@ -1,10 +1,14 @@
 import { create } from 'zustand'
+import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 
 interface RequestStore {
 	currentBaseUrl: string
 	currentWsUrl: string
-	historyUrls: Array<{ baseUrl: string; wsUrl: string }>
+	currentRemark: string
+	historyUrls: Array<{ id: string; baseUrl: string; wsUrl: string; remark: string }>
 	update: (options: Partial<RequestStore>) => void
+	pushHistory: (baseUrl: string, wsUrl: string, remark: string) => void
+	deleteHistory: (id: string) => void
 }
 
 const BASE_URL = '/'
@@ -15,15 +19,39 @@ const proWsUrl: string = import.meta.env.VITE_PRO_WS_URL ?? BASE_URL
 
 export const defaultRequestStore = {
 	currentBaseUrl: import.meta.env.MODE === 'production' ? proBaseUrl : devBaseUrl,
-	currentWsUrl: import.meta.env.MODE === 'production' ? proWsUrl : devWsUrl
+	currentWsUrl: import.meta.env.MODE === 'production' ? proWsUrl : devWsUrl,
+	currentRemark: import.meta.env.MODE === 'production' ? '生产环境' : '测试环境'
 }
 
-// 创建 store
-const useRequestStore = create<RequestStore>((set) => ({
+const requestStore = (set: any): RequestStore => ({
 	...defaultRequestStore,
-	currentWsUrl: '',
-	historyUrls: [],
-	update: (options) => set(options)
-}))
+	historyUrls: [
+		{ id: Date.now().toString().slice(0, -4), baseUrl: devBaseUrl, wsUrl: devWsUrl, remark: '测试环境' },
+		{ id: Date.now().toString().slice(0, -3), baseUrl: proBaseUrl, wsUrl: proWsUrl, remark: '生产环境' }
+	],
+	update: (options) => set(options),
+	pushHistory: (baseUrl, wsUrl, remark) => {
+		set((state: RequestStore) => {
+			const historyUrls = state.historyUrls.filter((item) => item.baseUrl !== baseUrl && item.wsUrl !== wsUrl)
+			historyUrls.unshift({ id: Date.now().toString(), baseUrl, wsUrl, remark })
+			return { historyUrls }
+		})
+	},
+	deleteHistory: (id) => {
+		set((state: RequestStore) => {
+			const historyUrls = state.historyUrls.filter((item) => item.id !== id)
+			return { historyUrls }
+		})
+	}
+})
+
+const useRequestStore = create(
+	devtools(
+		persist(requestStore, {
+			name: 'coss-request-storage',
+			storage: createJSONStorage(() => localStorage)
+		})
+	)
+)
 
 export default useRequestStore

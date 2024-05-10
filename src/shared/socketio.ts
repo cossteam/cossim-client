@@ -1,5 +1,5 @@
 import { getCookie, setCookie } from '@/utils/cookie'
-import { DEVICE_ID, SocketEvent, TOKEN, WS_URL } from '.'
+import { DEVICE_ID, SocketEvent, TOKEN } from '.'
 import {
 	handlerSocketEdit,
 	handlerSocketMessage,
@@ -8,13 +8,13 @@ import {
 	handlerSocketResult
 } from '@/run'
 import { useLiveRoomStore } from '@/stores/liveRoom'
-// import { getWsUrl } from '@/stores/requestUrl.ts'
+import useRequestStore from '@/stores/request'
 
 export function createSocket() {
 	const token = getCookie(TOKEN)
 	if (!token) throw new Error('User not logged in')
-	// const url = import.meta.env.VITE_WS_URL
-	const url = getCookie(WS_URL) ?? ''
+	const requestStore = useRequestStore.getState()
+	const url = requestStore.currentWsUrl
 	const urlObject = new URL(url)
 	const path = urlObject.pathname
 	let host = urlObject.origin
