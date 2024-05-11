@@ -170,7 +170,6 @@ export async function getGroupList() {
 		const cacheStore = useCacheStore.getState()
 		const { code, data } = await GroupService.groupListApi()
 		if (code !== 200) return
-		console.log('群聊列表', data)
 		cacheStore.updateCacheGroups(data)
 	} catch (error) {
 		console.error('获取群聊列表', error)
@@ -499,7 +498,7 @@ function run() {
 	useCacheStore.subscribe(async ({ firstOpened }) => {
 		if (firstOpened && hasCookie(TOKEN)) {
 			getRemoteSession()
-			getBehindMessage() // 获取落后消息
+			// getBehindMessage() // 获取落后消息
 			getApplyList()
 			getFriendList()
 			getGroupList()

@@ -13,7 +13,7 @@ import {
 } from 'framework7-icons/react'
 import { Link } from 'framework7-react'
 import useMessageStore from '@/stores/message'
-import React, { useMemo, useRef } from 'react'
+import React, { useRef } from 'react'
 import tooltipStatMachine from '../script/tootip'
 import useUserStore from '@/stores/user'
 import emojiData from '@/shared/emoji_data'
@@ -82,7 +82,7 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 		}
 	]
 
-	const tooltips = useMemo(() => {
+	const tooltips = () => {
 		// 是否错误消息
 		const isError = item?.msg_send_state && item?.msg_send_state !== MESSAGE_SEND.SEND_SUCCESS
 		// 是否是通话消息
@@ -100,12 +100,12 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 		}
 
 		// 如果当前消息已经超过撤回时间
-		if (isOverRecallTime(item?.created_at ?? item?.send_at ?? item?.send_time)) {
+		if (isOverRecallTime(item?.send_at ?? item?.created_at ?? item?.send_time)) {
 			return tips.filter((tip) => tip.name !== tooltipType.RECALL)
 		}
 
 		return tips
-	}, [item])
+	}
 
 	const handlerClick = (data: any) => {
 		const ManualCloseList = [tooltipType.EDIT, tooltipType.FORWARD, tooltipType.REPLY, tooltipType.SELECT]
@@ -135,8 +135,8 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 			className="h-auto max-w-[300px] pt-2 w-auto rounded relative z-[100] flex flex-col items-center justify-center"
 			ref={toolTipRef}
 		>
-			<div className={clsx('grid', tooltips.length >= 6 ? 'grid-cols-6' : `grid-cols-${tooltips.length}`)}>
-				{tooltips.map((item) => (
+			<div className={clsx('grid', tooltips().length >= 6 ? 'grid-cols-6' : `grid-cols-${tooltips().length}`)}>
+				{tooltips().map((item) => (
 					<Link
 						onClick={() => handlerClick(item)}
 						aria-expanded="true"

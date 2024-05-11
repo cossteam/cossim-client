@@ -127,7 +127,7 @@ class CallServiceImpl {
 	 * @param params
 	 * @returns
 	 */
-	getLiveInfoUserApi(params: any): Promise<DataResponse> {
+	getLiveInfoUserApi(params?: any): Promise<DataResponse> {
 		return request({
 			url: this.live + '/user',
 			method: 'GET',

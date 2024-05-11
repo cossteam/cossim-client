@@ -11,8 +11,8 @@ import { Router } from 'framework7/types'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 import Preview from './components/Preview/Preview'
-import LiveRoomNew from '@/components/LiveRoom'
-// import LiveRoom from '@/components/'
+import LiveRoom from '@/components/LiveRoom'
+// import LiveRoomNew from '@/components/Live'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
@@ -179,7 +179,8 @@ function App() {
 				<>
 					<Layout />
 					<Preview />
-					<LiveRoomNew />
+					<LiveRoom />
+					{/* <LiveRoomNew /> */}
 					<DevicePopup />
 				</>
 			) : (
