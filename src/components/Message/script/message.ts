@@ -42,16 +42,17 @@ export const send = async (message: Message, options?: Options): Promise<Message
 		content: encryptMessage,
 		dialog_id: message.dialog_id,
 		reply_id: message.reply_id,
-		is_burn_after_reading: message.is_burn_after_reading
 	}
 
 	// 对群聊或私聊消息参数进行区分
 	if (options?.isGroup || messageStore.isGroup) {
-		params['at_all_user'] = messageStore.atAllUser
+		params['at_all_user'] = messageStore.atAllUser === 1 ? true : false
 		params['at_users'] = messageStore.atUsers
 		params['group_id'] = options?.dialog_receiver_id ?? message.receiver_id
 	} else {
 		params['receiver_id'] = options?.dialog_receiver_id ?? message.receiver_id
+		params['is_burn_after_reading'] =  message.is_burn_after_reading === 1 ? true : false
+
 	}
 
 	const { code, data, msg } = messageStore.isGroup
@@ -174,7 +175,6 @@ export const editMessage = async (content: string) => {
 		const params = {
 			msg_type: message?.msg_type,
 			content,
-			msg_id: message?.msg_id
 		}
 
 		const newMessage = { ...message, content }
@@ -182,8 +182,8 @@ export const editMessage = async (content: string) => {
 		await cacheStore.updateCacheMessage(newMessage)
 
 		const { code, msg } = messageStore.isGroup
-			? await MsgService.editGroupMessageApi(params)
-			: await MsgService.editUserMessageApi(params)
+			? await MsgService.editGroupMessageApi(message?.msg_id,params)
+			: await MsgService.editUserMessageApi(message?.msg_id,params)
 
 		if (code !== 200) throw new Error(msg)
 	} catch (error: any) {
