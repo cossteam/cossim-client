@@ -5,11 +5,12 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite --host --mode development && node --trace-warnings ...",
+		"build:watch": "tsc && vite build  --watch",
 		"build": "tsc && vite build",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"preview": "vite preview",
 		"format": "prettier --write src/",
-		"build:android": "npm run build && npx cap sync android",
+		"build:android": "npm run build:watch && npx cap sync android",
 		"build:ios": "npm run build && npx cap sync ios",
 		"test": "vitest"
 	},

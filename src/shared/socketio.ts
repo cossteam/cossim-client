@@ -53,6 +53,7 @@ function onReply(socket: any) {
 			const event = data.event
 
 			console.log('接收到所有 sokect 通知：', data)
+
 			switch (event) {
 				case SocketEvent.OnlineEvent: // 上线
 					setCookie(DEVICE_ID, data.driverId)
@@ -61,7 +62,6 @@ function onReply(socket: any) {
 				case SocketEvent.GroupChatsEvent: // 接收群聊消息
 				case SocketEvent.SelfChatsEvent: // 接收到自己发送的消息
 					handlerSocketMessage(data)
-
 					break
 				case SocketEvent.ApplyListEvent: // 接收好友申请
 				case SocketEvent.GroupApplyListEvent: // 接收群邀请
