@@ -6,13 +6,20 @@ import useRequestStore from '@/stores/request'
 
 const SetRequestUrl = () => {
 	const requestStore = useRequestStore()
-	const [baseCustomUrl, setBaseCustomUrl] = useState<string>(requestStore.currentBaseUrl)
-	const [wsCustomUrl, setWsCustomUrl] = useState<string>(requestStore.currentWsUrl)
+	const [baseCustomUrl, setBaseCustomUrl] = useState<string>(requestStore.config.baseUrl)
+	const [wsCustomUrl, setWsCustomUrl] = useState<string>(requestStore.config.wsUrl)
 	const [opened, setOpened] = useState<boolean>(false)
 
 	const handleSubmit = () => {
 		if (!baseCustomUrl || !wsCustomUrl) return toastMessage('请输入自定义地址')
-		requestStore.update({ currentBaseUrl: baseCustomUrl, currentWsUrl: wsCustomUrl })
+		requestStore.update({
+			config: {
+				id: Date.now().toString().slice(0, 13),
+				baseUrl: baseCustomUrl,
+				wsUrl: wsCustomUrl,
+				remark: '自定义'
+			}
+		})
 		toastMessage('设置成功')
 		setOpened(false)
 	}
@@ -57,9 +64,17 @@ const SetRequestUrl = () => {
 						<ListItem
 							title="重制地址"
 							smartSelect
-							smartSelectParams={{ openIn: 'sheet', sheetCloseLinkText: $t('重制'), closeOnSelect: true }}
+							smartSelectParams={{
+								openIn: 'sheet',
+								sheetCloseLinkText: $t('重制'),
+								closeOnSelect: true,
+								formatValueText: () => ''
+							}}
 						>
-							<select name="historyUrls" onChange={(e) => handleSelectChange(e)}>
+							<select name="historyUrls" onChange={(e) => handleSelectChange(e)} value={-1}>
+								<option key={-1} value={-1}>
+									请选择
+								</option>
 								{requestStore.historyUrls.map((item) => (
 									<option key={item.id} value={item.id}>
 										{item.remark}

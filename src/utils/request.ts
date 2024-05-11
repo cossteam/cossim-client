@@ -84,7 +84,7 @@ const getClientKeys = async () => {
 service.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
 		const requestStore = useRequestStore.getState()
-		config.baseURL = requestStore.currentBaseUrl
+		config.baseURL = requestStore.config.baseUrl
 		const token = getCookie(TOKEN)
 		if (token) config.headers['Authorization'] = 'Bearer ' + token
 		/////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,10 +1,15 @@
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 
+interface BaseConfig {
+	id: string
+	baseUrl: string
+	wsUrl: string
+	remark: string
+}
+
 interface RequestStore {
-	currentBaseUrl: string
-	currentWsUrl: string
-	currentRemark: string
+	config: BaseConfig
 	historyUrls: Array<{ id: string; baseUrl: string; wsUrl: string; remark: string }>
 	update: (options: Partial<RequestStore>) => void
 	pushHistory: (baseUrl: string, wsUrl: string, remark: string) => void
@@ -18,16 +23,17 @@ const proBaseUrl: string = import.meta.env.VITE_PRO_BASE_URL ?? BASE_URL
 const proWsUrl: string = import.meta.env.VITE_PRO_WS_URL ?? BASE_URL
 
 export const defaultRequestStore = {
-	currentBaseUrl: import.meta.env.MODE === 'production' ? proBaseUrl : devBaseUrl,
-	currentWsUrl: import.meta.env.MODE === 'production' ? proWsUrl : devWsUrl,
-	currentRemark: import.meta.env.MODE === 'production' ? '生产环境' : '测试环境'
+	id: '1',
+	baseUrl: import.meta.env.MODE === 'production' ? proBaseUrl : devBaseUrl,
+	wsUrl: import.meta.env.MODE === 'production' ? proWsUrl : devWsUrl,
+	remark: import.meta.env.MODE === 'production' ? '生产环境' : '测试环境'
 }
 
 const requestStore = (set: any): RequestStore => ({
-	...defaultRequestStore,
+	config: defaultRequestStore,
 	historyUrls: [
-		{ id: Date.now().toString().slice(0, -4), baseUrl: devBaseUrl, wsUrl: devWsUrl, remark: '测试环境' },
-		{ id: Date.now().toString().slice(0, -3), baseUrl: proBaseUrl, wsUrl: proWsUrl, remark: '生产环境' }
+		{ id: '1', baseUrl: devBaseUrl, wsUrl: devWsUrl, remark: '测试环境' },
+		{ id: '2', baseUrl: proBaseUrl, wsUrl: proWsUrl, remark: '生产环境' }
 	],
 	update: (options) => set(options),
 	pushHistory: (baseUrl, wsUrl, remark) => {
