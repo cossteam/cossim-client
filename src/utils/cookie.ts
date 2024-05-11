@@ -1,6 +1,6 @@
 // import Cookies from 'js-cookie'
 
-import { BASE_URL, WS_URL } from '@/shared'
+// import { BASE_URL, WS_URL } from '@/shared'
 
 /**
  * 获取cookie
@@ -48,7 +48,7 @@ export const hasCookie = (name: string) => !!localStorage.getItem(name)
 /**
  * 移除所有 cookie
  */
-export const removeAllCookie = (filters: string[] = [BASE_URL, WS_URL]) => {
+export const removeAllCookie = (filters: string[] = ['coss-request-storage']) => {
 	// const keys = Object.keys(Cookies.get())
 	// keys.forEach((key: string) => {
 	// 	Cookies.remove(key)

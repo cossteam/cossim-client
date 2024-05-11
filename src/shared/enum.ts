@@ -34,6 +34,10 @@ export enum msgType {
 	RECALL = 11,
 	/** 取消标注 */
 	CANCEL_LABEL = 12
+	// /** 取消或拒绝视频通话 */
+	// CANCEL_CALL = 13,
+	// /** 取消或拒绝语音通话 */
+	// CANCEL_VOICE = 14
 }
 
 /** 消息阅读状态 */
