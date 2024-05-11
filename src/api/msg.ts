@@ -36,7 +36,7 @@ class MsgServiceImpl {
 	 */
 	getUserMessageListApi(params: MessageListParams): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/list/user`,
+			url: `${this.baseUrl}/user/list`,
 			params
 		})
 	}
@@ -52,7 +52,7 @@ class MsgServiceImpl {
 	 */
 	sendUserMessageApi(data: SendMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/send/user`,
+			url: `${this.baseUrl}/user/send`,
 			method: 'POST',
 			data
 		})
@@ -69,7 +69,7 @@ class MsgServiceImpl {
 	 */
 	sendGroupMessageApi(data: SendGroupMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/send/group`,
+			url: `${this.baseUrl}/group/send`,
 			method: 'POST',
 			data
 		})
@@ -79,13 +79,13 @@ class MsgServiceImpl {
 	 * 编辑用户信息
 	 * @param {*} data
 	 * @param {string} data.content		消息
-	 * @param {number} data.msg_id		消息id
+	 * @param {number} id		消息id
 	 * @param {number} data.msg_type	消息类型
 	 */
-	editUserMessageApi(data: EditMessage): Promise<DataResponse> {
+	editUserMessageApi(id:number,data: EditMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/edit/user`,
-			method: 'POST',
+			url: `${this.baseUrl}/user/${id}`,
+			method: 'PUT',
 			data
 		})
 	}
@@ -94,13 +94,13 @@ class MsgServiceImpl {
 	 * 编辑群聊消息
 	 * @param {*} data
 	 * @param {*} data.content			消息内容
-	 * @param {*} data.msg_id			消息id
+	 * @param {*} id			消息id
 	 * @param {*} data.type				消息类型
 	 */
-	editGroupMessageApi(data: EditMessage): Promise<DataResponse> {
+	editGroupMessageApi(id:number,data: EditMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/edit/group`,
-			method: 'POST',
+			url: `${this.baseUrl}/group/${id}`,
+			method: 'PUT',
 			data
 		})
 	}
@@ -108,12 +108,12 @@ class MsgServiceImpl {
 	/**
 	 * 标注私聊消息
 	 * @param {*} data
-	 * @param {*} data.msg_id			消息id
+	 * @param {*} id			消息id
 	 * @param {*} data.is_label			是否标记
 	 */
-	labelUserMessageApi(data: LabelMessage): Promise<DataResponse> {
+	labelUserMessageApi(id:number,data: LabelMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/label/user`,
+			url: `${this.baseUrl}/user/${id}/label`,
 			method: 'POST',
 			data
 		})
@@ -122,12 +122,12 @@ class MsgServiceImpl {
 	/**
 	 * 标注群聊消息
 	 * @param {*} data
-	 * @param {*} data.msg_id			消息id
+	 * @param {*} id			消息id
 	 * @param {*} data.is_label			是否标记
 	 */
-	labelGroupMessageApi(data: LabelMessage): Promise<DataResponse> {
+	labelGroupMessageApi(id:number,data: LabelMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/label/group`,
+			url: `${this.baseUrl}/group/${id}/label`,
 			method: 'POST',
 			data
 		})
@@ -139,10 +139,10 @@ class MsgServiceImpl {
 	 * @param {*} data.msg_ids			消息id列表
 	 * @param {*} data.dialog_id		对话id
 	 */
-	readGroupMessageApi(data: ReadGroupMessage): Promise<DataResponse> {
+	readGroupMessageApi(data: ReadMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/group/read/set`,
-			method: 'POST',
+			url: `${this.baseUrl}/group/read`,
+			method: 'PUT',
 			data
 		})
 	}
@@ -155,8 +155,8 @@ class MsgServiceImpl {
 	 */
 	readUserMessageApi(data: ReadMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/read/user`,
-			method: 'POST',
+			url: `${this.baseUrl}/user/read`,
+			method: 'PUT',
 			data
 		})
 	}
@@ -170,7 +170,7 @@ class MsgServiceImpl {
 	 */
 	getBehindMessageApi(data: GetBehindMessage[]): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/after/get`,
+			url: `${this.baseUrl}/dialog/after`,
 			method: 'POST',
 			data
 		})
@@ -183,7 +183,7 @@ class MsgServiceImpl {
 	 */
 	getUserMessageApi(params: GetMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/list/user`,
+			url: `${this.baseUrl}/user/list`,
 			params
 		})
 	}
@@ -195,7 +195,7 @@ class MsgServiceImpl {
 	 */
 	getGroupMessageApi(params: GetGroupMessage): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/list/group`,
+			url: `${this.baseUrl}/group/list`,
 			params
 		})
 	}
@@ -203,28 +203,24 @@ class MsgServiceImpl {
 	/**
 	 * 撤销用户消息
 	 *
-	 * @param {*} data
-	 * @param {*} data.msg_id
+	 * @param {*} id
 	 */
-	revokeUserMessageApi(data: RevokeMessage): Promise<DataResponse> {
+	revokeUserMessageApi(id:number): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/recall/user`,
-			method: 'POST',
-			data
+			url: `${this.baseUrl}/user/${id}`,
+			method: 'DELETE',
 		})
 	}
 
 	/**
 	 * 撤销群聊消息
 	 *
-	 * @param {*} data
-	 * @param {*} data.msg_id
+	 * @param {*} id
 	 */
-	revokeGroupMessageApi(data: RevokeMessage): Promise<DataResponse> {
+	revokeGroupMessageApi(id:number): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/recall/group`,
-			method: 'POST',
-			data
+			url: `${this.baseUrl}/group/${id}`,
+			method: 'DELETE'
 		})
 	}
 
@@ -239,8 +235,8 @@ class MsgServiceImpl {
 	) {
 		return request({
 			///msg/group/read/set
-			url: !isGroup ? `${this.baseUrl}/read/user` : `${this.baseUrl}/read/group`,
-			method: 'POST',
+			url: !isGroup ? `${this.baseUrl}/user/read` : `${this.baseUrl}/group/read`,
+			method: 'PUT',
 			data
 		})
 	}

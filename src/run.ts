@@ -242,7 +242,7 @@ export async function handlerSocketMessage(data: any) {
 
 	const msg = generateMessage({
 		...message,
-		is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK,
+		is_label: type === msgType.LABEL ? true : false,
 		msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
 		is_read: !isDrivered ? MESSAGE_READ.NOT_READ : MESSAGE_READ.READ
 	})
@@ -282,7 +282,7 @@ export async function handlerSocketMessage(data: any) {
 			messages &&
 				messageStore.updateMessage({
 					...messages,
-					is_label: type === msgType.LABEL ? MESSAGE_MARK.MARK : MESSAGE_MARK.NOT_MARK
+					is_label: type === msgType.LABEL ? true : false
 				})
 		}
 

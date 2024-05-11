@@ -26,7 +26,7 @@ export function generateMessage(message?: Partial<Message>): Message {
 		created_at: Date.now(),
 		send_at: Date.now(),
 		dialog_id: messageStore.dialogId,
-		is_label: MESSAGE_MARK.NOT_MARK,
+		is_label: false,
 		is_burn_after_reading: MessageBurnAfterRead.NO,
 		burn_after_reading_time_out: 0,
 		sender_info: {
