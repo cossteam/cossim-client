@@ -14,7 +14,7 @@ export function createSocket() {
 	const token = getCookie(TOKEN)
 	if (!token) throw new Error('User not logged in')
 	const requestStore = useRequestStore.getState()
-	const url = requestStore.config.baseUrl
+	const url = requestStore.config.wsUrl
 	const urlObject = new URL(url)
 	const path = urlObject.pathname
 	let host = urlObject.origin
