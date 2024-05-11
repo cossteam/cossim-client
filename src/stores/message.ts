@@ -59,7 +59,7 @@ const useMessageStore = create<MessageStore>((set, get) => ({
 
 		// 如果是查询标记消息的
 		if (options.isLabel) {
-			allMessages = allMessages.filter((item: Message) => item.is_label === true)
+			allMessages = allMessages.filter((item: Message) => item.is_label === MESSAGE_MARK.MARK)
 		}
 
 		// 添加到搜索消息表名中

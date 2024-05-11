@@ -58,12 +58,13 @@ async function mark() {
 		const message = messageStore.selectedMessage
 
 		const params = {
-			is_label: message?.is_label === true ? false : true
+			msg_id: message?.msg_id,
+			is_label: message?.is_label === MESSAGE_MARK.MARK ? MESSAGE_MARK.NOT_MARK : MESSAGE_MARK.MARK
 		}
 
 		const { code, msg } = messageStore.isGroup
-			? await MsgService.labelGroupMessageApi(message?.msg_id,params)
-			: await MsgService.labelUserMessageApi(message?.msg_id,params)
+			? await MsgService.labelGroupMessageApi(params)
+			: await MsgService.labelUserMessageApi(params)
 
 		if (code !== 200) throw new Error(msg)
 	} catch (error: any) {
@@ -78,10 +79,10 @@ export async function recall(message?: Message) {
 	const messageStore = useMessageStore.getState()
 	try {
 		const msg = message ? message : messageStore.selectedMessage
-		// const params = { msg_id: msg.msg_id }
+		const params = { msg_id: msg.msg_id }
 		const { code, msg: error } = messageStore.isGroup
-			? await MsgService.revokeGroupMessageApi(msg.msg_id)
-			: await MsgService.revokeUserMessageApi(msg.msg_id)
+			? await MsgService.revokeGroupMessageApi(params)
+			: await MsgService.revokeUserMessageApi(params)
 		if (code !== 200) throw new Error(error)
 		messageStore.deleteMessage(message)
 	} catch (error: any) {

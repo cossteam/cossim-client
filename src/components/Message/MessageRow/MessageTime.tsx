@@ -53,7 +53,7 @@ const MessageTime: React.FC<MessageTimeProps> = ({ item, is_self }) => {
 					{item?.msg_send_state === MESSAGE_SEND.SEND_FAILED && <Exclamationmark className="text-red-500" />}
 				</>
 			)}
-			{item?.is_label === true && <Flag className="text-primary ml-[2px]" />}
+			{item?.is_label !== 0 && <Flag className="text-primary ml-[2px]" />}
 		</div>
 	)
 }

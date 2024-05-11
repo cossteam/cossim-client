@@ -72,7 +72,7 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 		},
 		{
 			name: tooltipType.MARK,
-			title: item?.is_label === false ? $t('标注') : $t('取消标注'),
+			title: item?.is_label === MESSAGE_MARK.NOT_MARK ? $t('标注') : $t('取消标注'),
 			icon: <Flag className="text-lg" />
 		},
 		{

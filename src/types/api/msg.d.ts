@@ -12,7 +12,6 @@ export interface SendMessage {
 	replay_id?: number
 	type: number
 	dialog_id: number
-	is_burn_after_reading?: boolean
 }
 
 export interface SendGroupMessage {
@@ -20,25 +19,28 @@ export interface SendGroupMessage {
 	at_users?: string
 	content: string
 	dialog_id: number
+	is_burn_after_reading?: number
 	replay_id?: number
 	type: number
 }
 
 export interface EditMessage {
+	msg_id: number
 	content: string
 	msg_type: number
 }
 
 export interface LabelMessage {
-	is_label: boolean
+	msg_id: number
+	is_label: number
 }
 
 export interface ReadMessage {
 	msg_ids: number[]
 	dialog_id: number
-	read_all: true
 }
 
+export type ReadGroupMessage = { group_id: number } & ReadMessage
 
 export interface GetBehindMessage {
 	dialog_id: number

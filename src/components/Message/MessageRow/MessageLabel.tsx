@@ -8,7 +8,7 @@ interface MessageLabelProps {
 }
 
 const MessageLabel: React.FC<MessageLabelProps> = ({ item }) => {
-	const text = useMemo(() => (item?.is_label === true ? '标注了' : '取消标注'), [item.is_label])
+	const text = useMemo(() => (item?.is_label === MESSAGE_MARK.MARK ? '标注了' : '取消标注'), [item.is_label])
 	// const content = useMemo(() => toJson(item?.content)?.content, [item.content])
 
 	return (
