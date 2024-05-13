@@ -1,17 +1,15 @@
 import CallService from '@/api/call'
+import { useLiveStore } from '@/stores/live'
 import { Icon, Popup } from 'framework7-react'
 import { Room, VideoPresets } from 'livekit-client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 /* 测试 */
 const LiveRoom: React.FC = () => {
+	const liveStore = useLiveStore.getState()
+
 	/** 客户端 */
 	const client = useRef<Room>()
-	/** 隐藏房间 */
-	const [hideRoom, setHideRoom] = useState(true)
-	/** 通话中 */
-	// const [calling, setCalling] = useState(false)
-	const [calling] = useState(false)
 
 	/** 初始化客户端 */
 	const initClient = async () => {
@@ -32,7 +30,7 @@ const LiveRoom: React.FC = () => {
 		console.log('检查通话', data)
 		if (code === 200 && data) {
 			initClient()
-			setHideRoom(false)
+			// setHideRoom(false)
 		}
 	}
 
@@ -44,14 +42,14 @@ const LiveRoom: React.FC = () => {
 	return (
 		<>
 			<Popup
-				opened={!hideRoom}
+				opened={!liveStore.hideRoom}
 				tabletFullscreen
 				closeByBackdropClick={false}
 				className="live-room bg-bgPrimary text-textPrimary"
 			>
 				123
 			</Popup>
-			{hideRoom && calling && (
+			{liveStore.hideRoom && liveStore.calling && (
 				<div className="size-10 rounded-l-lg bg-black text-white opacity-50 transition-opacity-[0.3s] flex justify-center items-center fixed top-1/3 right-0 z-[99999]">
 					<Icon f7="phone_fill" size={20} />
 				</div>
