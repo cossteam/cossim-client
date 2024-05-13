@@ -132,7 +132,7 @@ class RelationServiceImpl {
 	 */
 	addBlackListApi(data: BlackListData): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/add_blacklist`,
+			url: `${this.baseUrl}/add_blacklist/`,
 			method: 'post',
 			data
 		})

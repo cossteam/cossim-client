@@ -96,7 +96,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	// 阅后即焚
 	const burnAfterRead = async (timeout?: number) => {
-		let action: MessageBurnAfterRead
+		let action: boolean
 		if (!timeout) {
 			action =
 				userInfo?.preferences?.open_burn_after_reading === MessageBurnAfterRead.YES

@@ -108,8 +108,8 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 	}
 
 	const handlerClick = (data: any) => {
+		console.log('handlerClick ->', data)
 		const ManualCloseList = [tooltipType.EDIT, tooltipType.FORWARD, tooltipType.REPLY, tooltipType.SELECT]
-
 		if (ManualCloseList.includes(data.name)) {
 			messageStore.update({ manualTipType: data.name })
 		} else {
@@ -137,9 +137,9 @@ const MessageTooltip: React.FC<MessageTooltipProps> = ({ item, setShow, el, togg
 		>
 			<div className={clsx('grid', tooltips().length >= 6 ? 'grid-cols-6' : `grid-cols-${tooltips().length}`)}>
 				{tooltips().map((item) => (
+					// aria-expanded="true"
 					<Link
 						onClick={() => handlerClick(item)}
-						aria-expanded="true"
 						key={item.name}
 						className={clsx('flex min-w-[56px] max-w-[56px] p-3 px-4 text-[1rem]')}
 					>

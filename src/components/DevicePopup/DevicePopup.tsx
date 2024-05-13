@@ -14,17 +14,16 @@ interface DevicePopupProps {
 const DevicePopup: React.FC<DevicePopupProps> = ({ opened = false }) => {
 	const [popupOpened, setPopupOpened] = useState(opened)
 	const [text, setText] = useState('')
+	const [isFirstOpened, setIsFirstOpened] = useState(true)
 
 	const userStore = useUserStore()
 	const cacheStore = useCacheStore()
 
 	// 如果是新设备登录
 	useEffect(() => {
-		console.log('cacheStore', cacheStore, !cacheStore.cacheKeyPair)
-		// userStore.lastLoginTime && userStore.isNewLogin &&
-		if (!cacheStore.cacheKeyPair) {
-			setPopupOpened(true)
-		}
+		// console.log('cacheStore', cacheStore, !cacheStore.cacheKeyPair)
+		if (isFirstOpened) return setIsFirstOpened(false)
+		setPopupOpened(!cacheStore.cacheKeyPair)
 	}, [cacheStore.cacheKeyPair])
 
 	const handlerClick = () => {

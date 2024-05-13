@@ -37,9 +37,7 @@ const MessageToolbar = () => {
 	const handlerToBottom = () => {
 		if (unreadCount === 0) return messageStore.update({ isScrollBottom: true })
 		// 找到未读消息的第一条，然后滚动到这条消息
-		const index = messageStore.messages.findIndex(
-			(v: { is_read: MESSAGE_READ }) => v?.is_read === MESSAGE_READ.NOT_READ
-		)
+		const index = messageStore.messages.findIndex((v: { is_read: boolean }) => v?.is_read === MESSAGE_READ.NOT_READ)
 		if (index === -1) return messageStore.update({ isScrollBottom: true })
 
 		const el = document.getElementById(`row-${messageStore.messages[index]?.msg_id}`)

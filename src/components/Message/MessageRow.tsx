@@ -158,7 +158,7 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 					stop()
 					return
 				}
-				console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
+				// console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
 				// messageStore.updateUnreadList(item.msg_id)
 				await MsgService.readMessagesApi(
 					{

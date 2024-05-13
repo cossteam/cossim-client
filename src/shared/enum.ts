@@ -199,20 +199,34 @@ export enum SocketEvent {
 	UserLeaveGroupCallEvent = 31
 }
 
+// export enum MessageBurnAfterRead {
+// 	/** 否 */
+// 	NO = 0,
+// 	/** 是 */
+// 	YES = 1
+// }
+
 /** 消息是否阅后即焚 */
-export enum MessageBurnAfterRead {
+export const MessageBurnAfterRead = {
 	/** 否 */
-	NO = 0,
+	NO: false,
 	/** 是 */
-	YES = 1
+	YES: true
 }
 
+// export enum MessageNoDisturb {
+// 	/** 否 */
+// 	NO = 0,
+// 	/** 是 */
+// 	YES = 1
+// }
+
 /** 消息是否免打扰 */
-export enum MessageNoDisturb {
+export const MessageNoDisturb = {
 	/** 否 */
-	NO = 0,
+	NO: false,
 	/** 是 */
-	YES = 1
+	YES: true
 }
 
 /** 好友关系 */

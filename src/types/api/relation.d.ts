@@ -21,11 +21,11 @@ export interface BlackListData {
 
 export interface SilenceData {
 	user_id: string
-	is_silent?: number
+	is_silent?: boolean
 }
 
 export interface BurnData {
-	action: number
+	action: boolean
 	user_id: string
 	timeout: number
 }
