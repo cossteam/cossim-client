@@ -1,29 +1,40 @@
 import CallService from '@/api/call'
 import { Icon, Popup } from 'framework7-react'
-import { useEffect, useState } from 'react'
+import { Room, VideoPresets } from 'livekit-client'
+import { useEffect, useRef, useState } from 'react'
 
+/* 测试 */
 const LiveRoom: React.FC = () => {
+	/** 客户端 */
+	const client = useRef<Room>()
 	/** 隐藏房间 */
 	const [hideRoom, setHideRoom] = useState(true)
 	/** 通话中 */
-	const [calling, setCalling] = useState(false)
+	// const [calling, setCalling] = useState(false)
+	const [calling] = useState(false)
+
+	/** 初始化客户端 */
+	const initClient = async () => {
+		client.current = new Room({
+			adaptiveStream: true,
+			dynacast: true,
+			videoCaptureDefaults: {
+				// resolution: VideoPresets.h90.resolution
+				resolution: VideoPresets.h720.resolution
+			}
+		})
+		console.log(client.current)
+	}
 
 	/** 检查用户与好友是否有通话 */
 	const checkCalling = async () => {
 		const { code, data } = await CallService.getLiveInfoUserApi()
+		console.log('检查通话', data)
 		if (code === 200 && data) {
+			initClient()
 			setHideRoom(false)
 		}
 	}
-
-	/** 加入通话 */
-	const joinRoom = async () => {}
-
-	/** 拒绝通话 */
-	const rejectRoom = async () => {}
-
-	/** 离开通话 */
-	const leaveRoom = async () => {}
 
 	/** 初始化 */
 	useEffect(() => {

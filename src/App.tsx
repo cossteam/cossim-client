@@ -12,6 +12,7 @@ import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 import Preview from './components/Preview/Preview'
 import LiveRoom from '@/components/LiveRoom'
+import LiveRoomNew from '@/components/Live'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
@@ -162,6 +163,8 @@ function App() {
 		[liveRoomStore.opened]
 	)
 
+	const test = false
+
 	// 新设备登录弹出验证
 	// const [isFirstOpened, setIsFirstOpened] = useState(true)
 	// const [devicePopupVisible, setDevicePopupVisible] = useState(false)
@@ -176,8 +179,7 @@ function App() {
 				<>
 					<Layout />
 					<Preview />
-					<LiveRoom />
-					{/* <LiveRoomNew /> */}
+					{test ? <LiveRoomNew /> : <LiveRoom />}
 					{/* {devicePopupVisible && <DevicePopup />} */}
 					<DevicePopup />
 				</>

@@ -152,8 +152,10 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 	// 已读
 	const itemRef = useRef<HTMLDivElement | null>(null)
 	const stop = useIntersectionObserver(itemRef, async (entry) => {
+		console.log('entry', entry)
 		entry.map(async (entryItem) => {
 			if (entryItem.isIntersecting && !is_self) {
+				console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
 				if (item.is_read === MESSAGE_READ.READ) {
 					stop()
 					return
