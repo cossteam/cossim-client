@@ -20,10 +20,12 @@ const DevicePopup: React.FC<DevicePopupProps> = ({ opened = false }) => {
 
 	// 如果是新设备登录
 	useEffect(() => {
-		if (userStore.lastLoginTime && userStore.isNewLogin && !cacheStore.cacheKeyPair) {
+		console.log('cacheStore', cacheStore, !cacheStore.cacheKeyPair)
+		// userStore.lastLoginTime && userStore.isNewLogin &&
+		if (!cacheStore.cacheKeyPair) {
 			setPopupOpened(true)
 		}
-	}, [])
+	}, [cacheStore.cacheKeyPair])
 
 	const handlerClick = () => {
 		if (!text) return toastMessage('请输入密钥对')

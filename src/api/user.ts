@@ -22,7 +22,7 @@ class UserServiceImpl {
 	loginApi(data: LoginData): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/login`,
-			method: 'post',
+			method: 'POST',
 			data
 		})
 	}
@@ -36,7 +36,7 @@ class UserServiceImpl {
 	registerApi(data: RegisterData): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/register`,
-			method: 'post',
+			method: 'POST',
 			data
 		})
 	}
@@ -48,8 +48,8 @@ class UserServiceImpl {
 	 */
 	uploadPublicKeyApi(data: PublicKeyData): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/bundle/modify`,
-			method: 'POST',
+			url: `${this.baseUrl}/bundle`,
+			method: 'PUT',
 			data
 		})
 	}
@@ -98,9 +98,9 @@ class UserServiceImpl {
 	 */
 	getUserInfoApi(params: UserInfoParams): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/info`,
-			method: 'get',
-			params
+			url: `${this.baseUrl}/${params.user_id}`,
+			method: 'GET'
+			// params
 		})
 	}
 
@@ -111,8 +111,8 @@ class UserServiceImpl {
 	 */
 	updateUserInfoApi(data: UpdateUserInfData): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/info/modify`,
-			method: 'POST',
+			url: `${this.baseUrl}`,
+			method: 'PUT',
 			data
 		})
 	}
@@ -127,8 +127,8 @@ class UserServiceImpl {
 	 */
 	updatePassWordApi(data: updatePassWorData): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/password/modify`,
-			method: 'POST',
+			url: `${this.baseUrl}/password`,
+			method: 'PUT',
 			data
 		})
 	}
@@ -156,8 +156,8 @@ class UserServiceImpl {
 		formData.append('file', data.file)
 
 		return request({
-			url: `${this.baseUrl}/avatar/modify`,
-			method: 'POST',
+			url: `${this.baseUrl}/avatar`,
+			method: 'PUT',
 			data: formData,
 			headers: {
 				'Content-Type': 'multipart/form-data'
@@ -172,9 +172,9 @@ class UserServiceImpl {
 	 */
 	getPublicKeyApi(params: UserInfoParams): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/bundle/get`,
-			method: 'GET',
-			params
+			url: `${this.baseUrl}/${params.user_id}/bundle`,
+			method: 'GET'
+			// params
 		})
 	}
 

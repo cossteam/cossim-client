@@ -221,7 +221,7 @@ async function updateRecallCacheMessage(message: any) {
  * @param {any} data 推送消息
  */
 export async function handlerSocketMessage(data: any) {
-	console.log('handlerSocketMessage', data)
+	// console.log('handlerSocketMessage', data)
 	const userStore = useUserStore.getState()
 	const messageStore = useMessageStore.getState()
 	const cacheStore = useCacheStore.getState()
@@ -242,8 +242,10 @@ export async function handlerSocketMessage(data: any) {
 		...message,
 		is_label: type === msgType.LABEL ? true : false,
 		msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
-		is_read: !isDrivered ? MESSAGE_READ.NOT_READ : MESSAGE_READ.READ
+		is_read: isDrivered ? MESSAGE_READ.READ : MESSAGE_READ.NOT_READ
 	})
+
+	console.log('msg', isDrivered, msg)
 
 	msg.content = await decrypt(message?.sender_id, message.content)
 
@@ -251,7 +253,9 @@ export async function handlerSocketMessage(data: any) {
 	if (isLableMessage(type)) {
 		const replyMessage = msg.reply_msg
 		if (!replyMessage) return
-		msg.reply_msg.content = await decrypt(replyMessage?.sender_id, replyMessage.content)
+		const senderId = replyMessage?.sender_id === userStore.userId ? message?.receiver_id : replyMessage?.sender_id
+		console.log('解密标注消息用户 ID ->', senderId)
+		msg.reply_msg.content = await decrypt(senderId, replyMessage.content)
 	}
 
 	// 本地通知
@@ -325,12 +329,7 @@ export async function handlerSocketMessage(data: any) {
 		})
 	)
 
-	// let msg_unread_count =
-	// 	cacheStore.cacheDialogs.find((v) => v.dialog_id === message.dialog_id)?.dialog_unread_count ?? 0
-	// console.log('count', count)
-
 	// 更新本地会话
-	// console.log('更新本地会话', message)
 	await updateDialog(msg, msg.dialog_id)
 }
 

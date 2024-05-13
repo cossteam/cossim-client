@@ -82,7 +82,7 @@ export type CacheStore = CacheStoreOptions & {
 	/**
 	 * @description 初始化缓存
 	 */
-	init: () => void
+	init: () => Promise<void>
 	/**
 	 * @description 更新首次进入状态
 	 */
