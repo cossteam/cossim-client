@@ -9,7 +9,6 @@ import useUserStore from './stores/user'
 import {
 	CACHE_MESSAGE,
 	CACHE_TOTAL_MESSAGE,
-	MESSAGE_MARK,
 	MESSAGE_READ,
 	MESSAGE_SEND,
 	TOKEN,

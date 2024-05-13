@@ -3,7 +3,7 @@
  * @author YuHong
  * @date 2024/03/21 16:43:00
  */
-import { MESSAGE_MARK, confirmMessage, tooltipType } from '@/shared'
+import { confirmMessage, tooltipType } from '@/shared'
 import useMessageStore from '@/stores/message'
 import { toastMessage } from '@/shared'
 import { Clipboard } from '@capacitor/clipboard'
@@ -62,8 +62,8 @@ async function mark() {
 		}
 
 		const { code, msg } = messageStore.isGroup
-			? await MsgService.labelGroupMessageApi(message?.msg_id,params)
-			: await MsgService.labelUserMessageApi(message?.msg_id,params)
+			? await MsgService.labelGroupMessageApi(message?.msg_id, params)
+			: await MsgService.labelUserMessageApi(message?.msg_id, params)
 
 		if (code !== 200) throw new Error(msg)
 	} catch (error: any) {

@@ -24,7 +24,6 @@ import useRouterStore from '@/stores/router'
 import useLoading from '@/hooks/useLoading'
 import useCacheStore from '@/stores/cache'
 import MsgService from '@/api/msg'
-import _ from 'lodash-es'
 import MessageEmojis from './MessageToolbar/MessageEmojis'
 import { sendMessage } from './script/message'
 import MessageText from './MessageRow/MessageText'
@@ -152,15 +151,14 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 	// 监听消息是否进入可视区域
 	// 已读
 	const itemRef = useRef<HTMLDivElement | null>(null)
-	const stop = useIntersectionObserver(
-		itemRef,
-		_.debounce(async (entry) => {
-			if (entry[0].isIntersecting && !is_self) {
+	const stop = useIntersectionObserver(itemRef, async (entry) => {
+		entry.map(async (entryItem) => {
+			if (entryItem.isIntersecting && !is_self) {
 				if (item.is_read === MESSAGE_READ.READ) {
 					stop()
 					return
 				}
-				// console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
+				console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
 				// messageStore.updateUnreadList(item.msg_id)
 				await MsgService.readMessagesApi(
 					{
@@ -202,8 +200,8 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 				// console.log('unreadCount', unreadCount)
 				cacheStore.updateCacheUnreadCount(unreadCount < 0 ? 0 : unreadCount)
 			}
-		}, 1000)
-	)
+		})
+	})
 
 	// 无内容
 	if (type === msgType.NONE) return null

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { MessageStore, MessageStoreOptions, initOptions } from './type'
 import cacheStore from '@/utils/cache'
-import { MESSAGE_MARK, emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
+import { emojiOrMore, msgSendType, tooltipType, updateCacheMessage } from '@/shared'
 import useCacheStore from './cache'
 
 export const defaultOptions: MessageStoreOptions = {

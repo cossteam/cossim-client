@@ -6,9 +6,7 @@ import type {
 	GetMessage,
 	LabelMessage,
 	MessageListParams,
-	ReadGroupMessage,
 	ReadMessage,
-	RevokeMessage,
 	SendGroupMessage,
 	SendMessage
 } from '@/types/api/msg'
@@ -82,7 +80,7 @@ class MsgServiceImpl {
 	 * @param {number} id		消息id
 	 * @param {number} data.msg_type	消息类型
 	 */
-	editUserMessageApi(id:number,data: EditMessage): Promise<DataResponse> {
+	editUserMessageApi(id: number, data: EditMessage): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/user/${id}`,
 			method: 'PUT',
@@ -97,7 +95,7 @@ class MsgServiceImpl {
 	 * @param {*} id			消息id
 	 * @param {*} data.type				消息类型
 	 */
-	editGroupMessageApi(id:number,data: EditMessage): Promise<DataResponse> {
+	editGroupMessageApi(id: number, data: EditMessage): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/group/${id}`,
 			method: 'PUT',
@@ -111,7 +109,7 @@ class MsgServiceImpl {
 	 * @param {*} id			消息id
 	 * @param {*} data.is_label			是否标记
 	 */
-	labelUserMessageApi(id:number,data: LabelMessage): Promise<DataResponse> {
+	labelUserMessageApi(id: number, data: LabelMessage): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/user/${id}/label`,
 			method: 'POST',
@@ -125,7 +123,7 @@ class MsgServiceImpl {
 	 * @param {*} id			消息id
 	 * @param {*} data.is_label			是否标记
 	 */
-	labelGroupMessageApi(id:number,data: LabelMessage): Promise<DataResponse> {
+	labelGroupMessageApi(id: number, data: LabelMessage): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/group/${id}/label`,
 			method: 'POST',
@@ -205,10 +203,10 @@ class MsgServiceImpl {
 	 *
 	 * @param {*} id
 	 */
-	revokeUserMessageApi(id:number): Promise<DataResponse> {
+	revokeUserMessageApi(id: number): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/user/${id}`,
-			method: 'DELETE',
+			method: 'DELETE'
 		})
 	}
 
@@ -217,7 +215,7 @@ class MsgServiceImpl {
 	 *
 	 * @param {*} id
 	 */
-	revokeGroupMessageApi(id:number): Promise<DataResponse> {
+	revokeGroupMessageApi(id: number): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/group/${id}`,
 			method: 'DELETE'

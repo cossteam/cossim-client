@@ -1,4 +1,4 @@
-import { MESSAGE_MARK, MESSAGE_READ, MESSAGE_SEND, MessageBurnAfterRead, msgType } from '@/shared'
+import { MESSAGE_READ, MESSAGE_SEND, MessageBurnAfterRead, msgType } from '@/shared'
 import useMessageStore from '@/stores/message'
 import { v4 as uuidv4 } from 'uuid'
 import useUserStore from '@/stores/user'

@@ -1,4 +1,4 @@
-import { $t, isOverRecallTime, MESSAGE_MARK, MESSAGE_SEND, msgType, tooltipType } from '@/shared'
+import { $t, isOverRecallTime, MESSAGE_SEND, msgType, tooltipType } from '@/shared'
 import clsx from 'clsx'
 import {
 	ArrowUpRight,

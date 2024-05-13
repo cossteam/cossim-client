@@ -1,4 +1,4 @@
-import { $t, MESSAGE_MARK } from '@/shared'
+import { $t } from '@/shared'
 import ReadEditor from '@/components/ReadEditor/ReadEditor'
 import { useMemo } from 'react'
 // import { toJson } from '@/utils'
