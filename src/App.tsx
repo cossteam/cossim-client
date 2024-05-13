@@ -1,18 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { App as AppComponent, View, f7 } from 'framework7-react'
 import { Framework7Parameters } from 'framework7/types'
 import '@/utils/notification'
 import routes from './router'
 import Layout from './components/Layout'
-import { $t, TOKEN, SocketClient, createSocket, toastMessage, uploadPublicKey } from '@/shared'
-import { hasCookie } from '@/utils/cookie'
+import { $t, TOKEN, SocketClient, createSocket, toastMessage, uploadPublicKey, THEME } from '@/shared'
+import { getCookie, hasCookie } from '@/utils/cookie'
 import { AppState, App as CapApp } from '@capacitor/app'
 import { Router } from 'framework7/types'
 import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 import Preview from './components/Preview/Preview'
 import LiveRoom from '@/components/LiveRoom'
-// import LiveRoomNew from '@/components/Live'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
@@ -23,13 +22,16 @@ import useMessageStore, { defaultInitOptions } from './stores/message'
 import { usePreviewStore } from './stores/preview'
 import DevicePopup from './components/DevicePopup/DevicePopup'
 
+/**
+ * Good advice, this is bullshit
+ * @returns
+ */
 function App() {
 	const router = useRef<Router.Router | null>(null)
 	const liveRoomStore = useLiveRoomStore()
 	const cacheStore = useCacheStore()
 	const userStore = useUserStore()
-	const [theme] = useState(localStorage.getItem('theme') || 'light')
-
+	const [theme] = useState(getCookie(THEME) ?? 'light')
 	const [f7params] = useState<Framework7Parameters>({
 		name: '',
 		theme: 'ios',
@@ -70,19 +72,6 @@ function App() {
 				userStore.update({ lastLoginTime: Date.now() })
 			}
 			createSocket()
-			// if (!cacheStore.cacheKeyPair) setDevicePopupVisible(true)
-
-			// 如果是新设备登录
-			// if (userStore.lastLoginTime && userStore.isNewLogin) {
-			// 	toastMessage('检测到新设备登录')
-			// }
-
-			// SocketClient.connect()
-			// SocketClient.addListener('onWsMessage', handlerInit)
-		}
-
-		return () => {
-			// SocketClient.removeListener('onWsMessage', handlerInit)
 		}
 	}, [])
 
@@ -173,6 +162,14 @@ function App() {
 		[liveRoomStore.opened]
 	)
 
+	// 新设备登录弹出验证
+	// const [isFirstOpened, setIsFirstOpened] = useState(true)
+	// const [devicePopupVisible, setDevicePopupVisible] = useState(false)
+	// useEffect(() => {
+	// 	if (isFirstOpened) return setIsFirstOpened(false)
+	// 	if (!cacheStore.cacheKeyPair && !devicePopupVisible) setDevicePopupVisible(true)
+	// }, [cacheStore])
+
 	return (
 		<AppComponent {...f7params}>
 			{hasCookie(TOKEN) ? (
@@ -181,6 +178,7 @@ function App() {
 					<Preview />
 					<LiveRoom />
 					{/* <LiveRoomNew /> */}
+					{/* {devicePopupVisible && <DevicePopup />} */}
 					<DevicePopup />
 				</>
 			) : (

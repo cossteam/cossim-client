@@ -6,6 +6,7 @@ import { cretateNonce, decryptMessageWithKey, encryptMessage, generateKeyPair, p
  * 根据用户 id 获取其共享密钥
  * @param {string} userId 用户 id
  * @returns
+ *
  */
 export async function getCacheShareKey(userId: string) {
 	const cacheStore = useCacheStore.getState()

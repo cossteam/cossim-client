@@ -40,14 +40,21 @@ export enum msgType {
 	// CANCEL_VOICE = 14
 }
 
-/** 消息阅读状态 */
-export enum MESSAGE_READ {
+// /** 消息阅读状态 */
+// export enum MESSAGE_READ {
+// 	/** 未读 */
+// 	NOT_READ = 0,
+// 	/** 已读 */
+// 	READ = 1,
+// 	/** 已删除 */
+// 	DELETED = 2
+// }
+
+export const MESSAGE_READ = {
 	/** 未读 */
-	NOT_READ = 0,
+	NOT_READ: false,
 	/** 已读 */
-	READ = 1,
-	/** 已删除 */
-	DELETED = 2
+	READ: true
 }
 
 /** 消息发送状态 */

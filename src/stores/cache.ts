@@ -57,9 +57,6 @@ const useCacheStore = create<CacheStore>((set, get) => ({
 		const totalMessages = (await cacheStore.get(CACHE_TOTAL_MESSAGE)) ?? []
 		const isSyncRemote = (await cacheStore.get(CACHE_SYNC_REMOTE)) ?? false
 		const onlineStatus = (await cacheStore.get(CACHE_FRIEND_ONLINE_STATUS)) ?? []
-
-		// console.log('cacheKeyPair', cacheKeyPair)
-
 		set({
 			cacheDialogs,
 			cacheContacts: groupsToArray(cacheContacts),
