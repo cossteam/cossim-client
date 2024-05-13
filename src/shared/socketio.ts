@@ -8,6 +8,7 @@ import {
 	handlerSocketResult
 } from '@/run'
 import { useLiveRoomStore } from '@/stores/liveRoom'
+import { useLiveStore } from '@/stores/live'
 import useRequestStore from '@/stores/request'
 
 export function createSocket() {
@@ -46,6 +47,7 @@ export function closeSocket(socket: any) {
  */
 function onReply(socket: any) {
 	const liveRoomStore = useLiveRoomStore.getState()
+	const liveStore = useLiveStore.getState()
 
 	socket.on('reply', function (msg: any) {
 		const handlerInit = async (msg: any) => {
@@ -78,7 +80,13 @@ function onReply(socket: any) {
 				case SocketEvent.UserCallHangupEvent:
 				case SocketEvent.GroupCallHangupEvent:
 				case SocketEvent.UserLeaveGroupCallEvent:
-					liveRoomStore.handlerEvent(event, data)
+					// eslint-disable-next-line no-case-declarations
+					const test = false
+					if (test) {
+						liveRoomStore.handlerEvent(event, data)
+					} else {
+						liveStore.handlerEvent(event, data) // 测试
+					}
 					break
 				case SocketEvent.MessageEditEvent:
 					handlerSocketEdit(data)

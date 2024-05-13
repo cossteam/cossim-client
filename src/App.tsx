@@ -12,7 +12,7 @@ import { useAsyncEffect } from '@reactuses/core'
 import { PluginListenerHandle } from '@capacitor/core'
 import Preview from './components/Preview/Preview'
 import LiveRoom from '@/components/LiveRoom'
-// import LiveRoomNew from '@/components/Live'
+import LiveRoomNew from '@/components/Live'
 import { useLiveRoomStore } from './stores/liveRoom'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import useCacheStore from '@/stores/cache'
@@ -173,14 +173,15 @@ function App() {
 		[liveRoomStore.opened]
 	)
 
+	const test = false
+
 	return (
 		<AppComponent {...f7params}>
 			{hasCookie(TOKEN) ? (
 				<>
 					<Layout />
 					<Preview />
-					<LiveRoom />
-					{/* <LiveRoomNew /> */}
+					{test ? <LiveRoomNew /> : <LiveRoom />}
 					<DevicePopup />
 				</>
 			) : (
