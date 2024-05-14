@@ -4,6 +4,7 @@ import { $t, MessageBurnAfterRead, MessageNoDisturb, RelationStatus, confirmMess
 import UserService from '@/api/user'
 import RelationService from '@/api/relation'
 import { useLiveRoomStore } from '@/stores/liveRoom'
+import { useLiveStore } from '@/stores/live'
 import Avatar from '@/components/Avatar/Avatar.tsx'
 import useMessageStore from '@/stores/message'
 import useCacheStore from '@/stores/cache'
@@ -22,6 +23,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	const dialog_id = Number(f7route.query.dialog_id) ?? 0
 
 	const liveRoomStore = useLiveRoomStore()
+	const liveStore = useLiveStore()
 	const cacheStore = useCacheStore()
 	const messageStore = useMessageStore()
 
@@ -197,6 +199,15 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 		f7router?.navigate(`/message/${user_id}/${dialog_id}/?is_group=false&dialog_name=${userInfo.nickname}`)
 	}
 
+	const test = false
+	const call = async (video: boolean = false) => {
+		if (test) {
+			liveStore.createRoom({ recipient: user_id, isGroup: false, video })
+		} else {
+			liveRoomStore.call({ recipient: user_id, isGroup: false, video })
+		}
+	}
+
 	return (
 		<Page className="profile-page" noToolbar onPageBeforeIn={onPageBeforeIn}>
 			<Navbar title={$t('用户信息')} backLink className="hidden-navbar-bg" />
@@ -216,19 +227,13 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 							<span className="text-xs">消息</span>
 						</div>
 					)}
-					<div
-						className="size-10 flex flex-col justify-center items-center"
-						onClick={() => liveRoomStore.call({ recipient: user_id, isGroup: false, video: false })}
-					>
+					<div className="size-10 flex flex-col justify-center items-center" onClick={() => call()}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 							<Icon f7="phone_fill" size={22} />
 						</div>
 						<span className="text-xs">语音</span>
 					</div>
-					<div
-						className="size-10  flex flex-col justify-center items-center"
-						onClick={() => liveRoomStore.call({ recipient: user_id, isGroup: false, video: true })}
-					>
+					<div className="size-10  flex flex-col justify-center items-center" onClick={() => call(true)}>
 						<div className="mb-2 p-2 rounded-full bg-black bg-opacity-10">
 							<Icon f7="videocam_fill" size={22} />
 						</div>

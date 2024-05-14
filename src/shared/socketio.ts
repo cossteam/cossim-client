@@ -83,9 +83,9 @@ function onReply(socket: any) {
 					// eslint-disable-next-line no-case-declarations
 					const test = false
 					if (test) {
-						liveRoomStore.handlerEvent(event, data)
-					} else {
 						liveStore.handlerEvent(event, data) // 测试
+					} else {
+						liveRoomStore.handlerEvent(event, data)
 					}
 					break
 				case SocketEvent.MessageEditEvent:

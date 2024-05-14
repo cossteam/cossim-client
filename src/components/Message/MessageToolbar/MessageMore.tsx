@@ -1,4 +1,5 @@
 import { useLiveRoomStore } from '@/stores/liveRoom'
+import { useLiveStore } from '@/stores/live'
 import useMessageStore from '@/stores/message'
 import { useAsyncEffect, useFileDialog } from '@reactuses/core'
 import clsx from 'clsx'
@@ -26,6 +27,7 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		accept: '*'
 	})
 	const liveRoomStore = useLiveRoomStore()
+	const liveStore = useLiveStore()
 	const [members, setMembers] = useState<any>()
 
 	// 监听群成员变化
@@ -71,6 +73,15 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		props.onSelectFiles && props.onSelectFiles(e.target.files)
 	}
 
+	const test = false
+	const call = async (video: boolean = false) => {
+		if (test) {
+			liveStore.createRoom({ recipient: id, isGroup, members, video })
+		} else {
+			liveRoomStore.call({ recipient: id, isGroup: isGroup, members, video })
+		}
+	}
+
 	// 工具栏选项
 	const tools = [
 		{
@@ -86,12 +97,12 @@ const MessageMore: React.FC<MessageMoreProps> = (props) => {
 		{
 			f7Icon: 'phone',
 			text: '语音',
-			func: () => liveRoomStore.call({ recipient: id, isGroup: isGroup, members, video: false })
+			func: () => call(false)
 		},
 		{
 			f7Icon: 'videocam',
 			text: '视频',
-			func: () => liveRoomStore.call({ recipient: id, isGroup: isGroup, members, video: true })
+			func: () => call(true)
 		}
 	]
 
