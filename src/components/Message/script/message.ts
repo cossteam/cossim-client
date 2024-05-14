@@ -41,7 +41,7 @@ export const send = async (message: Message, options?: Options): Promise<Message
 		type: message.msg_type,
 		content: encryptMessage,
 		dialog_id: message.dialog_id,
-		reply_id: message.reply_id,
+		reply_id: message.reply_id
 	}
 
 	// 对群聊或私聊消息参数进行区分
@@ -51,8 +51,7 @@ export const send = async (message: Message, options?: Options): Promise<Message
 		params['group_id'] = options?.dialog_receiver_id ?? message.receiver_id
 	} else {
 		params['receiver_id'] = options?.dialog_receiver_id ?? message.receiver_id
-		params['is_burn_after_reading'] =  message.is_burn_after_reading === 1 ? true : false
-
+		params['is_burn_after_reading'] = message.is_burn_after_reading === 1 ? true : false
 	}
 
 	const { code, data, msg } = messageStore.isGroup
@@ -152,13 +151,6 @@ export const sendMessage = async (options: Options) => {
 		}
 	}
 
-	// 以防万一，在10秒后再次更新消息状态
-	// setTimeout(() => {
-	// 	if (message.msg_send_state === MESSAGE_SEND.SEND_SUCCESS) return
-	// 	message.msg_send_state = MESSAGE_SEND.SEND_FAILED
-	// 	messageStore.updateMessage(message)
-	// }, 10000)
-
 	return message
 }
 
@@ -174,7 +166,7 @@ export const editMessage = async (content: string) => {
 	try {
 		const params = {
 			msg_type: message?.msg_type,
-			content,
+			content
 		}
 
 		const newMessage = { ...message, content }
@@ -182,8 +174,8 @@ export const editMessage = async (content: string) => {
 		await cacheStore.updateCacheMessage(newMessage)
 
 		const { code, msg } = messageStore.isGroup
-			? await MsgService.editGroupMessageApi(message?.msg_id,params)
-			: await MsgService.editUserMessageApi(message?.msg_id,params)
+			? await MsgService.editGroupMessageApi(message?.msg_id, params)
+			: await MsgService.editUserMessageApi(message?.msg_id, params)
 
 		if (code !== 200) throw new Error(msg)
 	} catch (error: any) {
@@ -297,7 +289,6 @@ export const revokeMessage = async (message: Message) => {
 		const newEmojis = reply_emojis.filter((item: any) => item.msg_id !== message.msg_id)
 		item.reply_emojis = newEmojis
 		await messageStore.updateMessage(item)
-		// await messageStore.deleteMessage(message)
 	} catch (error: any) {
 		console.log('撤回失败')
 	}

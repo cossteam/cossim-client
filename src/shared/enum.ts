@@ -183,6 +183,8 @@ export enum SocketEvent {
 	UserCallHangupEvent = 18,
 	/** 群聊通话挂断事件 */
 	GroupCallHangupEvent = 19,
+	/** 用户在线状态变更 */
+	UserStatusEvent = 21,
 	/** 用户在线状态 */
 	UserOnlineEvent = 22,
 	/** 接收到消息标注信息 */

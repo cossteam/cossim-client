@@ -385,6 +385,9 @@ export function handlerSocketRequest(data: any) {
  */
 export function handlerSocketResult(data: any) {
 	console.log('好友同意或拒绝', data)
+
+	if (data.status === 1) getFriendList()
+
 	try {
 		localNotification(
 			LocalNotificationType.MESSAGE,
@@ -478,10 +481,20 @@ export const handlerDestroyMessage = _.debounce(() => {
  * @param data 推送消息
  */
 export function handlerSocketOnline(data: any) {
-	// const userStore = useUserStore.getState()
-	// console.log('用户在线状态d', data)
 	const cacheStore = useCacheStore.getState()
 	cacheStore.update({ onlineStatus: data.data }, true)
+}
+
+/**
+ * 修改用户在线状态
+ * @param data 推送消息
+ */
+export async function handlerSocketUpdateOnlineStatus(data: any) {
+	const cacheStore = useCacheStore.getState()
+	const index = cacheStore.onlineStatus?.findIndex((v) => v.user_id === data.data.user_id)
+	if (index === -1) return
+	cacheStore.onlineStatus[index].status = data.data.status
+	cacheStore.update({ onlineStatus: cacheStore.onlineStatus }, true)
 }
 
 /**

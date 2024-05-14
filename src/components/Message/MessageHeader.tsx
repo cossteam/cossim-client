@@ -57,8 +57,9 @@ const MessageHeader = () => {
 		if (messageStore.isGroup) return ''
 		if (is_system) return ''
 		const user = cacheStore.onlineStatus?.find((v: { user_id: any }) => v.user_id === messageStore.receiverId)
+		// console.log('onlineStatus', user, cacheStore.onlineStatus, messageStore.receiverId)
 		return user?.status === 1 ? '在线' : '离线'
-	}, [cacheStore.onlineStatus, messageStore.isGroup, messageStore.receiverId])
+	}, [cacheStore, cacheStore.onlineStatus, messageStore.isGroup, messageStore.receiverId])
 
 	return (
 		<div className="min-h-12 bg-bgPrimary sticky top-0 z-50">
@@ -68,7 +69,6 @@ const MessageHeader = () => {
 				backLink
 				outline={false}
 				className="coss_message_navbar"
-				// onClickBack={() => handlerBack()}
 			>
 				{!messageStore.isLabel && (
 					<NavRight>
