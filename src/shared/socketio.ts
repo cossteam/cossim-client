@@ -5,11 +5,14 @@ import {
 	handlerSocketMessage,
 	handlerSocketOnline,
 	handlerSocketRequest,
-	handlerSocketResult
+	handlerSocketResult,
+	handlerSocketUpdateOnlineStatus
 } from '@/run'
 import { useLiveRoomStore } from '@/stores/liveRoom'
 import { useLiveStore } from '@/stores/live'
 import useRequestStore from '@/stores/request'
+
+let socket: any = null
 
 export function createSocket() {
 	const token = getCookie(TOKEN)
@@ -25,7 +28,7 @@ export function createSocket() {
 		host += ':' + port
 	}
 	// @ts-ignore
-	const socket = io(host, {
+	socket = io(host, {
 		query: {
 			token
 		},
@@ -37,8 +40,9 @@ export function createSocket() {
 	return socket
 }
 
-export function closeSocket(socket: any) {
-	socket.close()
+export function closeSocket(Socket?: any) {
+	if (Socket) Socket.close()
+	else socket.close()
 }
 
 /**
@@ -90,6 +94,10 @@ function onReply(socket: any) {
 					break
 				case SocketEvent.MessageEditEvent:
 					handlerSocketEdit(data)
+					break
+				case SocketEvent.UserStatusEvent:
+					// handlerSocketOnline(data)
+					handlerSocketUpdateOnlineStatus(data)
 					break
 				case SocketEvent.UserOnlineEvent:
 					handlerSocketOnline(data)

@@ -3,7 +3,7 @@ import { f7, Page, Navbar, List, ListItem, Button, Block, Popup } from 'framewor
 import { useClipboard } from '@reactuses/core'
 import { encode } from 'js-base64'
 
-import { $t, toastMessage } from '@/shared'
+import { $t, closeSocket, toastMessage } from '@/shared'
 import UserService from '@/api/user'
 import { removeAllCookie } from '@/utils/cookie'
 import useUserStore, { defaultOptions } from '@/stores/user'
@@ -23,12 +23,11 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 	const logout = () => {
 		f7.dialog.confirm($t('退出登录'), $t('确定要退出登录吗？'), async () => {
 			try {
-				console.log(userStore?.userInfo)
-
 				f7.dialog.preloader($t('正在退出...'))
 				await UserService.logoutApi({
 					driver_id: userStore?.deviceId
 				})
+				closeSocket()
 			} catch (error) {
 				toastMessage($t('退出登录失败'))
 			} finally {
@@ -45,6 +44,8 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 		try {
 			if (cacheStore.cacheKeyPair) {
 				const text = JSON.stringify(cacheStore.cacheKeyPair)
+
+				console.log('text', text)
 
 				copy(encode(text))
 					.then(() => {

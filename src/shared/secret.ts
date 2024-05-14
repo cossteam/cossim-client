@@ -78,6 +78,8 @@ export async function encrypt(userId: string, content: string) {
 export async function decrypt(userId: string, content: string) {
 	try {
 		const shareKey = await getCacheShareKey(userId)
+		// console.log('查找 shareKey 成功 ====> ', shareKey)
+
 		const message = decryptMessageWithKey(content, shareKey)
 		return message
 	} catch {
