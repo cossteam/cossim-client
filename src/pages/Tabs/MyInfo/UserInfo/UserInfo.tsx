@@ -46,6 +46,8 @@ const Userinfo: React.FC<RouterProps> = ({ f7router }) => {
 			if (cacheStore.cacheKeyPair) {
 				const text = JSON.stringify(cacheStore.cacheKeyPair)
 
+				console.log('text', text)
+
 				copy(encode(text))
 					.then(() => {
 						toastMessage('已经成功导出到剪切板')

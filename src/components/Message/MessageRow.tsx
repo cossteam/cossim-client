@@ -110,19 +110,6 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 		[messageStore.manualTipType]
 	)
 
-	// const replyMessage = useMemo(() => {
-	// 	const reply = { replyName: '', replyContent: '' }
-	// 	if (!item?.reply_id) return reply
-	// 	const message = messageStore.allMessages.find((msg) => msg?.msg_id === item?.reply_id)
-	// 	if (!message) {
-	// 		reply.replyContent = '消息已删除'
-	// 	} else {
-	// 		reply.replyName = message?.sender_info?.name
-	// 		reply.replyContent = message?.content
-	// 	}
-	// 	return reply
-	// }, [item?.reply_id])
-
 	const render = useCallback(() => {
 		switch (type) {
 			case msgType.IMAGE:
@@ -152,10 +139,9 @@ const MessageRow: React.FC<MessageRowProps> = memo(({ item }) => {
 	// 已读
 	const itemRef = useRef<HTMLDivElement | null>(null)
 	const stop = useIntersectionObserver(itemRef, async (entry) => {
-		console.log('entry', entry)
 		entry.map(async (entryItem) => {
 			if (entryItem.isIntersecting && !is_self) {
-				console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
+				// console.log('进入可视区域', `${['未读', '已读'][item.is_read]}(${item.msg_id})`, item.content, item)
 				if (item.is_read === MESSAGE_READ.READ) {
 					stop()
 					return

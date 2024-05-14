@@ -244,10 +244,8 @@ export async function handlerSocketMessage(data: any) {
 		msg_send_state: MESSAGE_SEND.SEND_SUCCESS,
 		is_read: isDrivered ? MESSAGE_READ.READ : MESSAGE_READ.NOT_READ
 	})
-
-	console.log('msg', isDrivered, msg)
-
-	msg.content = await decrypt(message?.sender_id, message.content)
+	const senderId = message?.sender_id === userStore.userId ? message?.receiver_id : message?.sender_id
+	msg.content = await decrypt(senderId, message.content)
 
 	// TODO: 解密标注消息
 	if (isLableMessage(type)) {
