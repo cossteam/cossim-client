@@ -1,12 +1,22 @@
 import CallService from '@/api/call'
 import { useLiveStore } from '@/stores/live'
 import { Icon, Popup } from 'framework7-react'
-import { LocalTrackPublication, Room, VideoPresets } from 'livekit-client'
-import { useEffect, useRef, useState } from 'react'
+import { LocalTrackPublication, Room, RoomEvent, VideoPresets } from 'livekit-client'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import OperateButton from './OperateButton'
+import useUserStore from '@/stores/user'
 
-/* 测试 */
 const LiveRoom: React.FC = () => {
+	// 获取用户信息
+	const userStore = useUserStore()
+	const userName = useMemo(() => {
+		return userStore.userInfo.nickname ?? '-'
+	}, [userStore.userInfo])
+	const userId = useMemo(() => {
+		return userStore?.userInfo?.user_id
+	}, [userStore.userInfo])
+	console.log(`${userName}(${userId})`)
+
 	/** 通话状态 */
 	const liveStore = useLiveStore()
 
@@ -40,18 +50,17 @@ const LiveRoom: React.FC = () => {
 	/**
 	 * 开关本地视频流
 	 */
-	const toggleVideoTrack = async () => {
+	const toggleVideoTrack = async (close?: boolean) => {
 		if (!client.current) return
-		if (localVideoTrack) {
+		if (close ?? localVideoTrack) {
 			client.current.localParticipant.setCameraEnabled(false) // 禁用视频
 			setLocalVideoTrack(null)
 		} else {
-			setLocalVideoTrack(await client.current.localParticipant.setCameraEnabled(true)) // 启用视频
-			if (!localVideoTrack) return
+			const _localVideoTrack = await client.current.localParticipant.setCameraEnabled(true)
+			setLocalVideoTrack(_localVideoTrack)
+			if (!_localVideoTrack) return
 			const parentElement = document.querySelector('.live-room') // local-video-container
-			//播放本地视频
-			const element = (localVideoTrack as LocalTrackPublication)?.track?.attach()
-			console.log(element)
+			const element = (_localVideoTrack as LocalTrackPublication)?.track?.attach() // 播放本地视频
 			element && parentElement?.appendChild(element)
 		}
 	}
@@ -59,13 +68,14 @@ const LiveRoom: React.FC = () => {
 	/**
 	 * 开关本地音频流
 	 */
-	const toggleAudioTrack = async () => {
+	const toggleAudioTrack = async (close?: boolean) => {
 		if (!client.current) return
-		if (localAudioTrack) {
+		if (close ?? localAudioTrack) {
 			client.current.localParticipant.setMicrophoneEnabled(false) // 禁用音频
 			setLocalAudioTrack(null)
 		} else {
-			setLocalAudioTrack(await client.current.localParticipant.setMicrophoneEnabled(true)) // 启用音频
+			const _localAudioTrack = await client.current.localParticipant.setMicrophoneEnabled(true)
+			setLocalAudioTrack(_localAudioTrack)
 		}
 	}
 
@@ -83,7 +93,15 @@ const LiveRoom: React.FC = () => {
 				resolution: VideoPresets.h720.resolution
 			}
 		})
-		console.log(client.current)
+		// 监听订阅事件
+		client.current.on(RoomEvent.TrackSubscribed, (remoteTrack, remotePublication, remoteParticipant) => {
+			console.log('订阅成功 START')
+			console.log(
+				`订阅到【${remoteParticipant.name}】的远程【${remoteTrack.kind === 'audio' ? '音频' : '视频'}】频道`
+			)
+			console.log({ remoteTrack, remotePublication, remoteParticipant })
+			console.log('订阅成功 END')
+		})
 	}
 
 	/** 连接房间 */
@@ -92,8 +110,8 @@ const LiveRoom: React.FC = () => {
 			!client.current && (await initClient())
 			await client.current?.connect(url, token).then(() => {
 				console.log('已连接房间', client.current)
-				toggleAudioTrack()
-				liveStore.isVideo && toggleVideoTrack()
+				toggleAudioTrack(false)
+				liveStore.isVideo && toggleVideoTrack(false)
 			})
 		} catch (error) {
 			console.error('连接房间失败', error)
@@ -102,13 +120,14 @@ const LiveRoom: React.FC = () => {
 
 	/** 检查用户与好友是否有通话 */
 	const checkCalling = async () => {
-		liveStore.updateHideRoom(true)
-		liveStore.updateCalling(false)
+		// liveStore.updateHideRoom(true)
+		// liveStore.updateCalling(false)
 		const { code, data } = await CallService.getLiveInfoUserApi()
 		console.log('检查通话', data)
 		if (code === 200 && data) {
 			initClient()
 			liveStore.updateHideRoom(false)
+			liveStore.updateCalling(true)
 			return
 		}
 	}
@@ -147,29 +166,36 @@ const LiveRoom: React.FC = () => {
 						text="麦克风"
 						onClick={() => toggleAudioTrack()}
 					/>
-					<OperateButton
-						f7Icon="phone_fill"
-						text="接通"
-						iconColor="#fff"
-						backgroundColor="#43d143"
-						onClick={liveStore.joinRoom}
-					/>
-					<OperateButton
-						f7Icon="phone_fill"
-						text="拒绝"
-						iconRotate={134}
-						iconColor="#fff"
-						backgroundColor="#ff4949"
-						onClick={() => liveStore.rejectRoom()}
-					/>
-					<OperateButton
-						f7Icon="phone_fill"
-						text="挂断"
-						iconRotate={134}
-						iconColor="#fff"
-						backgroundColor="#ff4949"
-						onClick={() => liveStore.leaveRoom()}
-					/>
+					{!liveStore.calling ? (
+						<>
+							<OperateButton
+								f7Icon="phone_fill"
+								text="接通"
+								iconColor="#fff"
+								backgroundColor="#43d143"
+								onClick={liveStore.joinRoom}
+							/>
+							<OperateButton
+								f7Icon="phone_fill"
+								text="拒绝"
+								iconRotate={134}
+								iconColor="#fff"
+								backgroundColor="#ff4949"
+								onClick={() => liveStore.rejectRoom()}
+							/>
+						</>
+					) : (
+						<>
+							<OperateButton
+								f7Icon="phone_fill"
+								text="挂断"
+								iconRotate={134}
+								iconColor="#fff"
+								backgroundColor="#ff4949"
+								onClick={() => liveStore.leaveRoom()}
+							/>
+						</>
+					)}
 				</div>
 			</Popup>
 			{liveStore.hideRoom && liveStore.calling && (
