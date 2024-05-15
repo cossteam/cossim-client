@@ -1,27 +1,45 @@
 import CallService from '@/api/call'
 import { useLiveStore } from '@/stores/live'
 import { Icon, Popup } from 'framework7-react'
-import { LocalTrackPublication, Room, RoomEvent, VideoPresets } from 'livekit-client'
+import { LocalTrack, LocalTrackPublication, RemoteTrack, Room, RoomEvent, VideoPresets } from 'livekit-client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import OperateButton from './OperateButton'
 import useUserStore from '@/stores/user'
+import { RoomParticipant } from '@/types/live'
 
 const LiveRoom: React.FC = () => {
 	// 获取用户信息
 	const userStore = useUserStore()
-	const userName = useMemo(() => {
-		return userStore.userInfo.nickname ?? '-'
+	const userInfo = useMemo(() => {
+		return userStore.userInfo
 	}, [userStore.userInfo])
-	const userId = useMemo(() => {
-		return userStore?.userInfo?.user_id
-	}, [userStore.userInfo])
-	console.log(`${userName}(${userId})`)
+	console.log('userInfo', userInfo)
 
 	/** 通话状态 */
 	const liveStore = useLiveStore()
 
 	/** 客户端 */
 	const client = useRef<Room>()
+
+	/** 参与人 */
+	const ParticipantData = useRef<Map<string, RoomParticipant>>(new Map())
+
+	const addRoomParticipant = (id: string, roomParticipant: RoomParticipant) => {
+		if (!ParticipantData.current.has(id)) {
+			ParticipantData.current.set(id, roomParticipant)
+			return
+		}
+		const _roomParticipant = ParticipantData.current.get(id)
+		if (_roomParticipant && roomParticipant.vedioTrack) {
+			_roomParticipant['vedioTrack'] = roomParticipant.vedioTrack
+		}
+		if (_roomParticipant && roomParticipant.audioTrack) {
+			_roomParticipant['audioTrack'] = roomParticipant.audioTrack
+		}
+		if (_roomParticipant && roomParticipant.userInfo) {
+			_roomParticipant['userInfo'] = roomParticipant.userInfo
+		}
+	}
 
 	/** 视频 */
 	const [localVideoTrack, setLocalVideoTrack] = useState<LocalTrackPublication | null>()
@@ -57,11 +75,11 @@ const LiveRoom: React.FC = () => {
 			setLocalVideoTrack(null)
 		} else {
 			const _localVideoTrack = await client.current.localParticipant.setCameraEnabled(true)
-			setLocalVideoTrack(_localVideoTrack)
 			if (!_localVideoTrack) return
-			const parentElement = document.querySelector('.live-room') // local-video-container
-			const element = (_localVideoTrack as LocalTrackPublication)?.track?.attach() // 播放本地视频
-			element && parentElement?.appendChild(element)
+			// setLocalVideoTrack(_localVideoTrack)
+			// const parentElement = document.querySelector('.live-room') // local-video-container
+			// const element = (_localVideoTrack as LocalTrackPublication)?.track?.attach() // 播放本地视频
+			// element && parentElement?.appendChild(element)
 		}
 	}
 

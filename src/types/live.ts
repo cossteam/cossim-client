@@ -1,8 +1,11 @@
+import { LocalTrack, RemoteTrack } from 'livekit-client'
+
 export interface CreateRoomOption {
-	recipient: string | number
 	/** 是否群聊 */
 	isGroup: boolean
-	/** 成员 */
+	/** 聊天对象（非群聊有效） */
+	recipient: string | number
+	/** 成员（群聊有效） */
 	members?: Array<any>
 	/** 开启摄音频 */
 	audio?: boolean
@@ -13,4 +16,10 @@ export interface CreateRoomOption {
 export interface RoomConnectionInfo {
 	token: string
 	url: string
+}
+
+export interface RoomParticipant {
+	vedioTrack?: LocalTrack | RemoteTrack
+	audioTrack?: LocalTrack | RemoteTrack
+	userInfo?: any
 }
