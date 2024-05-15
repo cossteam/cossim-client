@@ -51,7 +51,7 @@
 		"html5-qrcode": "^2.3.8",
 		"js-base64": "^3.7.6",
 		"js-cookie": "^3.0.5",
-		"livekit-client": "^1.15.11",
+		"livekit-client": "^1.15.13",
 		"localforage-cordovasqlitedriver": "^1.8.0",
 		"lodash-es": "^4.17.21",
 		"lottie-web": "^5.12.2",
