@@ -96,7 +96,9 @@ export async function getApplyList() {
 		const cacheStore = useCacheStore.getState()
 		// 获取申请列表
 		const friend = await RelationService.friendApplyListApi({ user_id: userStore.userId })
-		const group = await GroupService.groupRequestListApi({ user_id: userStore.userId })
+		// const group = await GroupService.groupRequestListApi({ user_id: userStore.userId })
+
+		const group = await GroupService.groupRequestListApi()
 
 		const friendApply: any = []
 		const groupApply: any = []
@@ -154,8 +156,8 @@ export async function getFriendList() {
 		const cacheStore = useCacheStore.getState()
 		const { code, data } = await RelationService.getFriendListApi({ user_id: userStore.userId })
 		if (code !== 200) return
-		// console.log('好友申请列表', data)
-		cacheStore.updateCacheContacts(data)
+		console.log('获取好友列表', data.list)
+		cacheStore.updateCacheContacts(data.list ?? [])
 	} catch (error) {
 		console.error('获取好友列表', error)
 	}
@@ -169,7 +171,7 @@ export async function getGroupList() {
 		const cacheStore = useCacheStore.getState()
 		const { code, data } = await GroupService.groupListApi()
 		if (code !== 200) return
-		cacheStore.updateCacheGroups(data)
+		cacheStore.updateCacheGroups(data.list)
 	} catch (error) {
 		console.error('获取群聊列表', error)
 	}

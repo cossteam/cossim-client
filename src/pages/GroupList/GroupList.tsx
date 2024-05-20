@@ -14,7 +14,7 @@ const GroupListList: React.FC<RouterProps> = ({ f7router }) => {
 			try {
 				f7.dialog.preloader($t('获取中...'))
 				const { code, data } = await GroupService.groupListApi()
-				code === 200 && setGroups(data)
+				code === 200 && setGroups(data.list)
 			} catch (error: any) {
 				f7.dialog.alert($t(error?.message || '获取群列表失败...'))
 			} finally {

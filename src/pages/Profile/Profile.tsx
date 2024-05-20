@@ -98,21 +98,21 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	// 阅后即焚
 	const burnAfterRead = async (timeout?: number) => {
-		let action: boolean
+		let burn: boolean
 		if (!timeout) {
-			action =
+			burn =
 				userInfo?.preferences?.open_burn_after_reading === MessageBurnAfterRead.YES
 					? MessageBurnAfterRead.NO
 					: MessageBurnAfterRead.YES
 			timeout = 10
 		} else {
-			action = MessageBurnAfterRead.YES
+			burn = MessageBurnAfterRead.YES
 		}
 
-		const tips_error = action === MessageBurnAfterRead.YES ? $t('阅后即焚失败') : $t('取消阅后即焚失败')
-		updateCache({ open_burn_after_reading_time_out: timeout, open_burn_after_reading: action })
+		const tips_error = burn === MessageBurnAfterRead.YES ? $t('阅后即焚失败') : $t('取消阅后即焚失败')
+		updateCache({ open_burn_after_reading_time_out: timeout, open_burn_after_reading: burn })
 		try {
-			const { code } = await RelationService.setBurnApi({ action, user_id, timeout: timeout ?? 10 })
+			const { code } = await RelationService.setBurnApi({ burn, user_id, timeout: timeout ?? 10 })
 			if (code !== 200) {
 				toastMessage(tips_error)
 				return
@@ -124,14 +124,14 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	// 消息免打扰
 	const messageDisturb = async () => {
-		const is_silent =
+		const silent =
 			userInfo?.preferences?.silent_notification === MessageNoDisturb.YES
 				? MessageNoDisturb.NO
 				: MessageNoDisturb.YES
-		const tips_error = is_silent === MessageNoDisturb.YES ? $t('消息免打扰失败') : $t('取消消息免打扰失败')
-		updateCache({ silent_notification: is_silent })
+		const tips_error = silent === MessageNoDisturb.YES ? $t('消息免打扰失败') : $t('取消消息免打扰失败')
+		updateCache({ silent_notification: silent })
 		try {
-			const { code } = await RelationService.setSilenceApi({ is_silent, user_id })
+			const { code } = await RelationService.setSilenceApi({ silent, user_id })
 			if (code !== 200) {
 				toastMessage(tips_error)
 				return

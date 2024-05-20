@@ -42,9 +42,9 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 			// 获取成员信息
 			const { code, data } = await GroupService.groupMemberApi({ group_id: GroupId })
 			if (code !== 200) return
-			const identity = data?.find((i: any) => i.user_id === user_id).identity
+			const identity = data?.list.find((i: any) => i.user_id === user_id).identity
 			identity && setIdentity(identity)
-			setMembers(data)
+			setMembers(data.list)
 		})()
 	}, [])
 

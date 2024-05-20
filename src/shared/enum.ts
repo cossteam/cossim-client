@@ -233,7 +233,7 @@ export const MessageNoDisturb = {
 
 /** 好友关系 */
 export enum RelationStatus {
-	/** 已删除 */
+	/** 陌生人 */
 	NOT = 0,
 	/** 正常 */
 	YES = 1,

@@ -20,8 +20,8 @@ class RelationServiceImpl {
 	 */
 	getFriendListApi(params?: FriendListParams): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/friend_list`,
-			params
+			url: `${this.baseUrl}/friend`
+			// params
 		})
 	}
 
@@ -36,7 +36,7 @@ class RelationServiceImpl {
 	 */
 	addFriendApi(data: AddFriendData): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/add_friend`,
+			url: `${this.baseUrl}/friend`,
 			method: 'post',
 			data
 		})
@@ -46,12 +46,14 @@ class RelationServiceImpl {
 	 * 好友申请列表
 	 *
 	 * @param {FriendListParams} params -API 请求的参数
-	 * @return {Promise<DataResponse>} 包含 API 响应数据的 Promise
+	 * @param {FriendListParams} params.page_num 页码
+	 * @param {FriendListParams} params.page_size 页大小
+	 * @return {Promise<DataResponse>}
 	 */
 	friendApplyListApi(params: FriendListParams): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/request_list`,
-			params
+			url: `${this.baseUrl}/friend_request`
+			// params
 		})
 	}
 
@@ -74,11 +76,10 @@ class RelationServiceImpl {
 	 * @returns
 	 */
 	deleteFriendApplyApi(data: any): Promise<DataResponse> {
-		console.log(this.baseUrl)
+		const { id } = data
 		return request({
-			url: `${this.baseUrl}/delete_request_record`,
-			method: 'POST',
-			data
+			url: `${this.baseUrl}/friend_request/${id}`,
+			method: 'DELETE'
 		})
 	}
 
@@ -89,9 +90,8 @@ class RelationServiceImpl {
 	 */
 	deleteGroupApplyApi(data: any): Promise<DataResponse> {
 		return request({
-			url: `${this.relationGroup}/delete_request_record`,
-			method: 'POST',
-			data
+			url: `${this.relationGroup}/request/${data.id}`,
+			method: 'DELETE'
 		})
 	}
 
@@ -101,10 +101,11 @@ class RelationServiceImpl {
 	 * @param {ManageFriendData} data
 	 */
 	manageFriendApplyApi(data: ManageFriendData): Promise<DataResponse> {
+		const { request_id, ...requestData } = data
 		return request({
-			url: `${this.baseUrl}/manage_friend`,
-			method: 'post',
-			data
+			url: `${this.baseUrl}/friend_request/${request_id}`,
+			method: 'PUT',
+			data: requestData
 		})
 	}
 
@@ -115,25 +116,22 @@ class RelationServiceImpl {
 	 */
 	deleteFriendApi(user_id: string): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/delete_friend`,
-			method: 'post',
-			data: {
-				user_id
-			}
+			url: `${this.baseUrl}/friend/${user_id}`,
+			method: 'DELETE'
 		})
 	}
 
 	/**
 	 * 添加黑名单
 	 * @param {Object} data
-	 * @param {String} data.user_id         用户id
-	 * @param {String} data.friend_id       好友id
+	 * @param {String} data.user_id         添加到黑名单的用户id
 	 * @returns {Promise<Object>}
 	 */
 	addBlackListApi(data: BlackListData): Promise<DataResponse> {
+		console.log('addBlackListApi', data)
 		return request({
-			url: `${this.baseUrl}/add_blacklist/`,
-			method: 'post',
+			url: `${this.baseUrl}/blacklist`,
+			method: 'POST',
 			data
 		})
 	}
@@ -142,14 +140,13 @@ class RelationServiceImpl {
 	 * 删除黑名单
 	 *
 	 * @param {Object} data
-	 * @param {String} data.user_id         用户id
-	 * @param {String} data.friend_id       好友id
+	 * @param {String} data.user_id         要从黑名单中移除的用户的id
 	 * @returns {Promise<Object>}
 	 */
 	deleteBlackListApi(data: BlackListData): Promise<DataResponse> {
 		return request({
-			url: `${this.baseUrl}/delete_blacklist`,
-			method: 'post',
+			url: `${this.baseUrl}/blacklist/${data.user_id}`,
+			method: 'DELETE',
 			data
 		})
 	}
@@ -160,7 +157,7 @@ class RelationServiceImpl {
 	getBlackList(): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/blacklist`,
-			method: 'get'
+			method: 'GET'
 		})
 	}
 
@@ -169,13 +166,14 @@ class RelationServiceImpl {
 	 *
 	 * @param {Object} data
 	 * @param {String} data.user_id
-	 * @param {String} data.is_silent
+	 * @param {String} data.silent
 	 */
 	setSilenceApi(data: SilenceData): Promise<DataResponse> {
+		const { user_id, ...requestData } = data
 		return request({
-			url: `${this.baseUrl}/silent`,
+			url: `${this.baseUrl}/friend/${user_id}/silent`,
 			method: 'POST',
-			data
+			data: requestData
 		})
 	}
 
@@ -185,40 +183,43 @@ class RelationServiceImpl {
 	 *
 	 */
 	setBurnApi(data: BurnData): Promise<DataResponse> {
+		const { user_id, ...requestData } = data
 		return request({
-			url: `${this.baseUrl}/burn/open`,
+			url: `${this.baseUrl}/friend/${user_id}/burn`,
 			method: 'POST',
-			data
+			data: requestData
 		})
 	}
 
 	/**
-	 * 是否置顶对话(action: 0:关闭取消置顶对话, 1:置顶对话)
+	 * 是否置顶对话(top: false:关闭取消置顶对话, true:置顶对话)
+	 * @param data
+	 * @param {number} data.dialog_id
+	 * @param {number} data.top
+	 * @returns
+	 */
+	topDialogApi(data: { dialog_id: number; top: boolean }): Promise<DataResponse> {
+		const { dialog_id, ...requestData } = data
+		return request({
+			url: `${this.relationDialog}/${dialog_id}/top`,
+			method: 'POST',
+			data: requestData
+		})
+	}
+
+	/**
+	 * 关闭或打开对话(show: false:关闭对话, true:打开对话)
 	 * @param data
 	 * @param {number} data.dialog_id
 	 * @param {number} data.action
 	 * @returns
 	 */
-	topDialogApi(data: { dialog_id: number; action: number }): Promise<DataResponse> {
+	showDialogApi(data: { dialog_id: number; show: boolean }): Promise<DataResponse> {
+		const { dialog_id, ...requestData } = data
 		return request({
-			url: `${this.relationDialog}/top`,
+			url: `${this.relationDialog}/${dialog_id}/show`,
 			method: 'POST',
-			data
-		})
-	}
-
-	/**
-	 * 关闭或打开对话(action: 0:关闭对话, 1:打开对话)
-	 * @param data
-	 * @param {number} data.dialog_id
-	 * @param {number} data.action
-	 * @returns
-	 */
-	showDialogApi(data: { dialog_id: number; action: number }): Promise<DataResponse> {
-		return request({
-			url: `${this.relationDialog}/show`,
-			method: 'POST',
-			data
+			data: requestData
 		})
 	}
 
@@ -231,10 +232,11 @@ class RelationServiceImpl {
 	 * @returns
 	 */
 	createGroupNoticeApi(data: { group_id: number; content: string; title: string }): Promise<DataResponse> {
+		const { group_id, ...requestData } = data
 		return request({
-			url: `${this.relationGroup}/admin/announcement`,
+			url: `${this.relationGroup}/${group_id}/announcement`,
 			method: 'POST',
-			data
+			data: requestData
 		})
 	}
 
@@ -243,14 +245,15 @@ class RelationServiceImpl {
 	 *
 	 * @param data
 	 * @param {string} data.friend_id
-	 * @param {number} data.open_burn_after_reading_time_out
+	 * @param {number} data.timeout 阅后即焚时间 (单位秒)
 	 * @returns
 	 */
-	setBurnTimeApi(data: { friend_id: string; open_burn_after_reading_time_out: number }): Promise<DataResponse> {
+	setBurnTimeApi(data: { friend_id: string; timeout: number }): Promise<DataResponse> {
+		const { friend_id, ...requestData } = data
 		return request({
-			url: `${this.baseUrl}/burn/timeout/set`,
+			url: `${this.baseUrl}/friend/${friend_id}/burn`,
 			method: 'POST',
-			data
+			data: requestData
 		})
 	}
 
@@ -260,35 +263,40 @@ class RelationServiceImpl {
 	 * @returns
 	 */
 	setGroupUserDisplayName(data: { group_id: number; remark: string }): Promise<DataResponse> {
+		const { group_id, ...requestData } = data
 		return request({
-			url: `${this.relationGroup}/remark/set`,
-			method: 'POST',
-			data
+			url: `${this.relationGroup}/${group_id}/remark`,
+			method: 'PUT',
+			data: requestData
 		})
 	}
 
 	/**
 	 * 设置好友备注
 	 * @param data
+	 * @param data.user_id 好友id
+	 * @param data.remark 备注内容
 	 * @returns
 	 */
 	setUserRemark(data: { remark: string; user_id: string }): Promise<DataResponse> {
+		const { user_id, ...requestData } = data
 		return request({
-			url: `${this.baseUrl}/remark/set`,
+			url: `${this.baseUrl}/friend/${user_id}/remark`,
 			method: 'POST',
-			data
+			data: requestData
 		})
 	}
 
 	/**
-	 * 加入群聊
+	 * 添加入群申请
 	 * @param groupId
+	 * @param remark 申请备注
 	 */
-	addGruop(groupId: number): Promise<DataResponse> {
+	addGruop(groupId: number, remark: string): Promise<DataResponse> {
 		return request({
-			url: `${this.relationGroup}/join`,
+			url: `${this.relationGroup}/${groupId}/request`,
 			method: 'POST',
-			data: { group_id: groupId }
+			data: { remark: remark }
 		})
 	}
 }

@@ -11,7 +11,7 @@ const BlackList = () => {
 	useEffect(() => {
 		watchAsyncFn(() =>
 			RelationService.getBlackList().then((res) => {
-				setBlackList(res.data.users)
+				setBlackList(res.data.list)
 				console.log('黑名单', res)
 			})
 		)

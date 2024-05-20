@@ -43,7 +43,7 @@ const ToolEditor: React.ForwardRefRenderFunction<ToolEditorMethods, ToolEditorPr
 					try {
 						const { data } = await GroupService.groupMemberApi({ group_id: Number(props.id ?? 0) })
 						const members = [{ id: 0, name: '全体成员' }].concat(
-							data.map((v: any) => ({ ...v, name: v.nickname }))
+							data.list.map((v: any) => ({ ...v, name: v.nickname }))
 						)
 						return members
 					} catch (error) {

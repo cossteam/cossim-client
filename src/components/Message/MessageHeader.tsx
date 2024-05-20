@@ -23,7 +23,7 @@ const MessageHeader = () => {
 	const getGroupAnnouncement = () => {
 		const params = { group_id: Number(messageStore.receiverId) }
 		GroupService.groupAnnouncementApi(params).then((res) => {
-			setGroupAnnouncement(getLatestGroupAnnouncement(res.data ?? []))
+			setGroupAnnouncement(getLatestGroupAnnouncement(res.data?.list ?? []))
 		})
 	}
 
@@ -42,8 +42,8 @@ const MessageHeader = () => {
 		if (messageStore.isGroup) {
 			getGroupAnnouncement()
 			GroupService.groupMemberApi({ group_id: Number(messageStore.receiverId) }).then((res) => {
-				setMembers(res.data)
-				messageStore.update({ members: res.data })
+				setMembers(res.data.list)
+				messageStore.update({ members: res.data.list })
 			})
 		}
 	}, [])

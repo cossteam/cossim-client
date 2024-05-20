@@ -1,5 +1,7 @@
 export interface FriendListParams {
 	user_id?: string
+	page_num?: number
+	page_size?: number
 }
 
 export interface AddFriendData {
@@ -21,11 +23,11 @@ export interface BlackListData {
 
 export interface SilenceData {
 	user_id: string
-	is_silent?: boolean
+	silent?: boolean
 }
 
 export interface BurnData {
-	action: boolean
+	burn: boolean
 	user_id: string
 	timeout: number
 }

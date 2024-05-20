@@ -49,14 +49,14 @@ const DialogList: React.FC<RouterProps> = ({ f7router }) => {
 
 	// 置顶对话
 	const topDialog = async (item: any) => {
-		await RelationService.topDialogApi({ dialog_id: item?.dialog_id, action: item?.top_at ? 0 : 1 })
+		await RelationService.topDialogApi({ dialog_id: item?.dialog_id, top: item?.top_at ? false : true })
 		await getRemoteSession()
 	}
 
 	// 删除对话
 	const deleteDialog = async (e: any, item: any) => {
 		console.log('delete', e, item)
-		await RelationService.showDialogApi({ dialog_id: item?.dialog_id, action: 0 })
+		await RelationService.showDialogApi({ dialog_id: item?.dialog_id, show: false })
 		await getRemoteSession()
 	}
 

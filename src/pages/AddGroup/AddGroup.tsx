@@ -34,7 +34,7 @@ const AddGroup: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	}, [])
 
 	const addGroup = () => {
-		RelationService.addGruop(Number(groupId)).then((res) => {
+		RelationService.addGruop(Number(groupId), '').then((res) => {
 			console.log('添加群', res)
 			if (res.code == 200) {
 				toastMessage($t('添加成功'))
