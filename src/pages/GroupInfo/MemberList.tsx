@@ -34,9 +34,9 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 	const loadMembers = async () => {
 		const { code, data } = await GroupService.groupMemberApi({ group_id: props.group_id })
 		if (code === 200) {
-			const identity = data?.find((i: any) => i.user_id === user_id).identity
+			const identity = data?.list.find((i: any) => i.user_id === user_id).identity
 			identity && setIdentity(identity)
-			setMembers(data)
+			setMembers(data.list)
 		}
 	}
 
@@ -47,7 +47,7 @@ const MemberList: React.FC<MemberListProps & RouterProps> = (props) => {
 		const { code, data: groups } = await RelationService.getFriendListApi()
 		if (code === 200) {
 			const groupMember = []
-			for (const group in groups) {
+			for (const group in groups.list) {
 				if (Object.hasOwnProperty.call(groups, group)) {
 					const groupItem = groups[group] || []
 					for (const friend of groupItem) {

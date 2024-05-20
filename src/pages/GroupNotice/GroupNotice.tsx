@@ -16,8 +16,8 @@ const GroupNotice: React.FC<RouterProps> = ({ f7route, f7router }) => {
 
 	const loadNotification = async () => {
 		const groupAnnouncement = await GroupService.groupAnnouncementApi({ group_id })
-		setGroupAnnouncement(groupAnnouncement.data)
-		return groupAnnouncement?.data || []
+		setGroupAnnouncement(groupAnnouncement.data.list)
+		return groupAnnouncement?.data.list || []
 	}
 
 	useAsyncEffect(

@@ -10,9 +10,9 @@ class GroupServiceImpl {
 	 * @param {*} params
 	 * @returns
 	 */
-	groupRequestListApi(params: groupListParams): Promise<DataResponse> {
+	groupRequestListApi(params?: groupListParams): Promise<DataResponse> {
 		return request({
-			url: `${this.baseGroupUrl}/request_list`,
+			url: `${this.baseGroupUrl}/request`,
 			method: 'GET',
 			params
 		})
@@ -57,10 +57,11 @@ class GroupServiceImpl {
 	 * @returns
 	 */
 	groupInviteMemberApi(data: any): Promise<DataResponse> {
+		const { group_id, ...requestData } = data
 		return request({
-			url: this.baseGroupUrl + '/invite',
+			url: `${this.baseGroupUrl}/${group_id}/invite`,
 			method: 'POST',
-			data
+			data: requestData
 		})
 	}
 
@@ -84,7 +85,7 @@ class GroupServiceImpl {
 	 */
 	groupListApi(param?: any): Promise<DataResponse> {
 		return request({
-			url: this.baseGroupUrl + '/list',
+			url: this.baseGroupUrl,
 			method: 'GET',
 			params: param
 		})
@@ -125,10 +126,11 @@ class GroupServiceImpl {
 	 * @returns
 	 */
 	groupMemberApi(param: any): Promise<DataResponse> {
+		const { group_id, ...params } = param
 		return request({
-			url: this.baseGroupUrl + '/member',
+			url: `${this.baseGroupUrl}/${group_id}/member`,
 			method: 'GET',
-			params: param
+			params: params
 		})
 	}
 
@@ -140,10 +142,11 @@ class GroupServiceImpl {
 	 * @returns
 	 */
 	groupInviteApi(data: any): Promise<DataResponse> {
+		const { group_id, ...requestData } = data
 		return request({
-			url: this.baseGroupUrl + '/invite',
+			url: `${this.baseGroupUrl}/${group_id}/invite`,
 			method: 'POST',
-			data
+			data: requestData
 		})
 	}
 
@@ -155,10 +158,11 @@ class GroupServiceImpl {
 	 * @returns
 	 */
 	groupRemoveApi(data: any): Promise<DataResponse> {
+		const { group_id, ...requestData } = data
 		return request({
-			url: this.baseGroupUrl + '/admin/manage/remove',
-			method: 'POST',
-			data
+			url: `${this.baseGroupUrl}/${group_id}/member`,
+			method: 'DELETE',
+			data: requestData
 		})
 	}
 
@@ -169,10 +173,11 @@ class GroupServiceImpl {
 	 * @returns
 	 */
 	groupQuitApi(data: any): Promise<DataResponse> {
+		const { group_id, ...requestData } = data
 		return request({
-			url: this.baseGroupUrl + '/quit',
-			method: 'POST',
-			data
+			url: `${this.baseGroupUrl}/${group_id}`,
+			method: 'DELETE',
+			data: requestData
 		})
 	}
 
@@ -260,10 +265,11 @@ class GroupServiceImpl {
 	 * @returns
 	 */
 	groupAnnouncementApi(param: any): Promise<DataResponse> {
+		const { group_id, ...params } = param
 		return request({
-			url: this.baseGroupUrl + '/announcement/list',
+			url: `${this.baseGroupUrl}/${group_id}/announcement`,
 			method: 'GET',
-			params: param
+			params: params
 		})
 	}
 
@@ -277,10 +283,11 @@ class GroupServiceImpl {
 	 * @returns
 	 */
 	createGroupAnnouncementApi(data: any): Promise<DataResponse> {
+		const { group_id, ...requestData } = data
 		return request({
-			url: this.baseGroupUrl + '/admin/announcement',
+			url: `${this.baseGroupUrl}/${group_id}/announcement`,
 			method: 'POST',
-			data
+			data: requestData
 		})
 	}
 
@@ -293,10 +300,11 @@ class GroupServiceImpl {
 	 * @returns
 	 */
 	deleteGroupAnnouncementApi(data: any): Promise<DataResponse> {
+		const { group_id, id } = data
 		return request({
-			url: this.baseGroupUrl + '/admin/announcement/delete',
-			method: 'POST',
-			data
+			url: `${this.baseGroupUrl}/${group_id}/announcement/${id}`,
+			method: 'DELETE'
+			// data
 		})
 	}
 
@@ -309,10 +317,11 @@ class GroupServiceImpl {
 	 * @returns
 	 */
 	getGroupAnnouncementApi(params: any): Promise<DataResponse> {
+		const { group_id, id, ...param } = params
 		return request({
-			url: this.baseGroupUrl + '/announcement/detail',
+			url: `${this.baseGroupUrl}/${group_id}/announcement/${id}`,
 			method: 'GET',
-			params
+			params: param
 		})
 	}
 
@@ -327,10 +336,11 @@ class GroupServiceImpl {
 	 * @returns
 	 */
 	updateGroupAnnouncementApi(data: any): Promise<DataResponse> {
+		const { group_id, id, ...requestData } = data
 		return request({
-			url: this.baseGroupUrl + '/admin/announcement/update',
-			method: 'POST',
-			data
+			url: `${this.baseGroupUrl}/${group_id}/announcement/${id}`,
+			method: 'PUT',
+			data: requestData
 		})
 	}
 
@@ -341,10 +351,11 @@ class GroupServiceImpl {
 	 * @param {*} data.id
 	 */
 	readGroupAnnouncementApi(data: any): Promise<DataResponse> {
+		const { group_id, id, ...requestData } = data
 		return request({
-			url: this.baseGroupUrl + '/announcement/read',
+			url: `${this.baseGroupUrl}/${group_id}/announcement/${id}/read`,
 			method: 'POST',
-			data
+			data: requestData
 		})
 	}
 }
