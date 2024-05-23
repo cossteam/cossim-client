@@ -1,4 +1,3 @@
-import useThemeStore from '@/stores/theme'
 import ReactDOM from 'react-dom/client'
 import { StrictMode, Suspense } from 'react'
 import { BrowserRouter } from 'react-router-dom'
@@ -8,9 +7,10 @@ import Loading from '@/components/loading'
 import '@/i18n'
 import '@/styles/base.scss'
 import { ConfigProvider } from 'antd'
+import { useCommonStore } from '@/stores/common'
 
-const themeStore = useThemeStore.getState()
-themeStore.init()
+const commonStore = useCommonStore.getState()
+// commonStore.
 
 // eslint-disable-next-line react-refresh/only-export-components
 const App = () => (
@@ -26,5 +26,3 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 		</BrowserRouter>
 	</StrictMode>
 )
-
-console.log('🚀 ~ file: main.tsx: 当前主题', themeStore.theme)
