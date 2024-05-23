@@ -1,0 +1,37 @@
+{
+    "translateModel": 1,
+    "strict": false,
+    "filePath": "./",
+    "targetPath": "/src/i18n/locales",
+    "languageList": [
+        "ZH",
+        "EN",
+        "TC"
+    ],
+    "channel": "google",
+    "appKey": "",
+    "secretKey": "",
+    "excludes": [
+        "node_modules",
+        "vendor",
+        "build",
+        "dist",
+        ".git",
+        ".vscode",
+        "storage",
+        "public",
+        "language",
+        "database",
+        "i18n",
+        "locales"
+    ],
+    "fileSuffix": [
+        ".vue",
+        ".html",
+        ".js",
+        ".ts",
+        ".php",
+        "jsx",
+        "tsx"
+    ]
+}

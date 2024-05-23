@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, devtools } from 'zustand/middleware'
-import { UserStore } from './type'
+import { UserStore } from '@/types/store'
 
 const userStore = (): UserStore => ({
 	userId: '',

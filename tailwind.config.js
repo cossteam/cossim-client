@@ -21,7 +21,7 @@ export default {
 				/** @description 文本 */
 				textPrimary: 'var(--coss-text-primary)',
 				textSecondary: 'var(--coss-text-secondary)',
-				textTertiary: 'var(--coss-text-tertiary)',
+				textTertiary: 'var(--coss-text-tertiary)'
 			}
 		}
 	},

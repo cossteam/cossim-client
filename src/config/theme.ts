@@ -1,11 +1,10 @@
 export default {
 	light: {
-		bgPrimary: '#fff',
-		bgSecondary: '#F8F8F8',
-		bgTertiary: '#EFEFF4',
-		textPrimary: '#2c3e50',
-		textSecondary: '#606266',
-		textTertiary: '#909399'
+		colorPrimary: '#42b883',
+		colorInfo: '#42b883',
+		fontSize: 16,
+		wireframe: true,
+		borderRadius: 4
 	},
 
 	dark: {
