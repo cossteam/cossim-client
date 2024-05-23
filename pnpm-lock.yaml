@@ -20,6 +20,9 @@ importers:
       '@capacitor/ios':
         specifier: ^6.0.0
         version: 6.0.0(@capacitor/core@6.0.0)
+      '@capacitor/status-bar':
+        specifier: ^6.0.0
+        version: 6.0.0(@capacitor/core@6.0.0)
       antd:
         specifier: ^5.17.3
         version: 5.17.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -66,6 +69,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.19(postcss@8.4.38)
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
@@ -277,6 +283,11 @@ packages:
 
   '@capacitor/ios@6.0.0':
     resolution: {integrity: sha512-7mAs3gjWiE5DPM4AGPduqFSDGXCPwwqQRMzbohVway7/cTWnHomHV8mIojMZE4GILeWO2fILbyu3C8q9pHg2vg==}
+    peerDependencies:
+      '@capacitor/core': ^6.0.0
+
+  '@capacitor/status-bar@6.0.0':
+    resolution: {integrity: sha512-Wo0ILugYlmENegKDgTzVCPjbvP8h1ObgHslLdgeVG643ViMS/diausHIq8e104WIKCXtKIELmQeYVp9mX7932g==}
     peerDependencies:
       '@capacitor/core': ^6.0.0
 
@@ -1194,6 +1205,10 @@ packages:
 
   clone-response@1.0.3:
     resolution: {integrity: sha512-ROoL94jJH2dUVML2Y/5PEDNaSHgeOdSDicUyS7izcF63G6sTc/FTjLub4b8Il9S8S0beOfYt0TaA5qvFK+w0wA==}
+
+  clsx@2.1.1:
+    resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
+    engines: {node: '>=6'}
 
   code-point-at@1.1.0:
     resolution: {integrity: sha512-RpAVKQA5T63xEj6/giIbUEtZwJ4UFIc3ZtvEkiaUERylqe8xb5IvqcgOurZLahv93CLKfxcw5YI+DZcUBRyLXA==}
@@ -3648,6 +3663,10 @@ snapshots:
     dependencies:
       '@capacitor/core': 6.0.0
 
+  '@capacitor/status-bar@6.0.0(@capacitor/core@6.0.0)':
+    dependencies:
+      '@capacitor/core': 6.0.0
+
   '@ctrl/tinycolor@3.6.1': {}
 
   '@develar/schema-utils@2.6.5':
@@ -4758,6 +4777,8 @@ snapshots:
   clone-response@1.0.3:
     dependencies:
       mimic-response: 1.0.1
+
+  clsx@2.1.1: {}
 
   code-point-at@1.1.0: {}
 

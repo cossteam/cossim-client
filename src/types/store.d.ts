@@ -9,7 +9,7 @@ export interface UserOptions {
 
 export interface UserStoreMethods {
 	/** @description 更新某个值 */
-	update: (options: UserOptions) => Promise<void>
+	update: (options: Partial<UserOptions>) => Promise<void>
 }
 
 export interface CommonOptions {
@@ -20,16 +20,15 @@ export interface CommonOptions {
 	theme: string
 	/** @description 主题色 */
 	themeColor: string
+	/** @description 语言 */
+	lang: string
 }
 
 export interface CommonStoreMethods {
 	/** @description 初始化操作，数据初始化，主题初始化等 */
 	init(): Promise<void>
-}
-
-export type StoreSetMethods = (partial: unknown, replace?: boolean | undefined, action?: A | undefined) => void
-export type StoreGetMethods<T, R> = {
-	[K in keyof T as `get${Capitalize<string & K>}`]: () => R
+	/** @description 更新某个值 */
+	update: (options: Partial<CommonOptions>) => Promise<void>
 }
 
 // 用户仓库

@@ -5,7 +5,7 @@ const Home = () => {
 	return (
 		<p>
 			{$t('你好assay')}
-			<Button>{$t('点击我')}</Button>
+			<Button type="primary">{$t('点ss击我222')}</Button>
 		</p>
 	)
 }

@@ -6,7 +6,9 @@ const config: CapacitorConfig = {
 	appName: 'COSS',
 	webDir: 'dist',
 	server: {
-		androidScheme: 'https'
+		// url: 'http://192.168.100.191:5173/',
+		// cleartext: true
+		// androidScheme: 'https'
 	},
 	plugins: {
 		// LocalNotifications: {

@@ -1,23 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    // signingConfigs {
-    //     debug {
-    //         // storeFile file('/Users/mac-os12/Documents/project/im/coss/COSS_KEYS')
-    //         storeFile file('G:\\im\\coss\\COSS_KEYS')
-    //         storePassword 'hitosea.coss'
-    //         keyPassword 'hitosea.coss'
-    //         keyAlias 'hitosea_coss'
-    //     }
-    // }
     namespace "com.hitosea.coss"
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.hitosea.coss"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -31,20 +22,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    android.applicationVariants.all {
-        variant -> variant.outputs.all { output ->
-                def date = new Date().format("yyyyMMddHHmmss",
-                        TimeZone.getTimeZone("GMT+08"))
-                if (variant.buildType.name == 'debug') {
-                    output.outputFileName = "coss_" +
-                            "${android.defaultConfig.versionName}_${date}_debug.apk"
-                }else if (variant.buildType.name == 'release'){
-                    output.outputFileName = "coss_" +
-                            "${android.defaultConfig.versionName}_${date}_release.apk"
-                }
-            }
-    }
 }
 
 repositories {
@@ -54,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
@@ -63,11 +40,6 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
-
-    // 以下依赖都需要添加
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'commons-codec:commons-codec:1.6'
-    implementation 'androidx.annotation:annotation:1.1.0'
 }
 
 apply from: 'capacitor.build.gradle'

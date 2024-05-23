@@ -1,3 +1,4 @@
+import { LANG } from '@/utils/constants'
 import i18next from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 
@@ -24,7 +25,7 @@ export default (async () => {
 
 	i18next.use(LanguageDetector).init({
 		detection: {
-			lookupLocalStorage: 'coss_language'
+			lookupLocalStorage: LANG
 		},
 		resources: locales,
 		fallbackLng: defaultLanguage,

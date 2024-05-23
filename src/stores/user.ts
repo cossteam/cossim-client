@@ -17,13 +17,13 @@ const commonStore = (set: any): UserStore => ({
 	...actions(set)
 })
 
-const useCommonStore = create(
+const useUserStore = create(
 	devtools(
 		persist(commonStore, {
-			name: 'USER_STORE',
+			name: 'COSS_USER_STORE',
 			storage: createJSONStorage(() => localStorage)
 		})
 	)
 )
 
-export default useCommonStore
+export default useUserStore
