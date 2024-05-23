@@ -7,10 +7,10 @@ import Loading from '@/components/loading'
 import '@/i18n'
 import '@/styles/base.scss'
 import { ConfigProvider } from 'antd'
-import { useCommonStore } from '@/stores/common'
+import useCommonStore from '@/stores/common'
 
 const commonStore = useCommonStore.getState()
-// commonStore.
+commonStore.init()
 
 // eslint-disable-next-line react-refresh/only-export-components
 const App = () => (

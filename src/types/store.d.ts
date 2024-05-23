@@ -7,7 +7,10 @@ export interface UserOptions {
 	token: string
 }
 
-export interface UserStoreMethods {}
+export interface UserStoreMethods {
+	/** @description 更新某个值 */
+	update: (options: UserOptions) => Promise<void>
+}
 
 export interface CommonOptions {
 	/**
