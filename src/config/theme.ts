@@ -6,7 +6,6 @@ export default {
 		wireframe: true,
 		borderRadius: 4
 	},
-
 	dark: {
 		bgPrimary: '#666',
 		bgSecondary: '#555',

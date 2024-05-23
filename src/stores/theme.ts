@@ -11,7 +11,7 @@ const themeStore = (set: any, get: any): ThemeStore => ({
 		/** 主题色 */
 		colorPrimary: '#00b96b',
 		/** 圆角 */
-		borderRadius: 2,
+		borderRadius: 4,
 		/** 背景色 */
 		colorBgContainer: '#f6ffed'
 	},
