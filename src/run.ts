@@ -95,7 +95,8 @@ export async function getApplyList() {
 		const userStore = useUserStore.getState()
 		const cacheStore = useCacheStore.getState()
 		// 获取申请列表
-		const friend = await RelationService.friendApplyListApi({ user_id: userStore.userId })
+		// const friend = await RelationService.friendApplyListApi({ user_id: userStore.userId })
+		const friend = await RelationService.friendApplyListApi()
 		// const group = await GroupService.groupRequestListApi({ user_id: userStore.userId })
 
 		const group = await GroupService.groupRequestListApi()
@@ -152,9 +153,10 @@ export async function getBehindMessage(dialogs?: any[]) {
  */
 export async function getFriendList() {
 	try {
-		const userStore = useUserStore.getState()
+		// const userStore = useUserStore.getState()
 		const cacheStore = useCacheStore.getState()
-		const { code, data } = await RelationService.getFriendListApi({ user_id: userStore.userId })
+		// const { code, data } = await RelationService.getFriendListApi({ user_id: userStore.userId })
+		const { code, data } = await RelationService.getFriendListApi()
 		if (code !== 200) return
 		console.log('获取好友列表', data.list)
 		cacheStore.updateCacheContacts(data.list ?? [])

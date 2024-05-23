@@ -18,7 +18,8 @@ class RelationServiceImpl {
 	 *
 	 * @param {FriendListParams} params.user_id
 	 */
-	getFriendListApi(params?: FriendListParams): Promise<DataResponse> {
+	// getFriendListApi(params?: FriendListParams): Promise<DataResponse> {
+	getFriendListApi(): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/friend`
 			// params
@@ -50,7 +51,8 @@ class RelationServiceImpl {
 	 * @param {FriendListParams} params.page_size 页大小
 	 * @return {Promise<DataResponse>}
 	 */
-	friendApplyListApi(params: FriendListParams): Promise<DataResponse> {
+	// friendApplyListApi(params: FriendListParams): Promise<DataResponse> {
+	friendApplyListApi(): Promise<DataResponse> {
 		return request({
 			url: `${this.baseUrl}/friend_request`
 			// params

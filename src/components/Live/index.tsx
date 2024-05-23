@@ -1,11 +1,11 @@
 import CallService from '@/api/call'
 import { useLiveStore } from '@/stores/live'
 import { Icon, Popup } from 'framework7-react'
-import { LocalTrack, LocalTrackPublication, RemoteTrack, Room, RoomEvent, VideoPresets } from 'livekit-client'
+import { LocalTrackPublication, Room, RoomEvent, VideoPresets } from 'livekit-client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import OperateButton from './OperateButton'
 import useUserStore from '@/stores/user'
-import { RoomParticipant } from '@/types/live'
+// import { RoomParticipant } from '@/types/live'
 
 const LiveRoom: React.FC = () => {
 	// 获取用户信息
@@ -22,24 +22,24 @@ const LiveRoom: React.FC = () => {
 	const client = useRef<Room>()
 
 	/** 参与人 */
-	const ParticipantData = useRef<Map<string, RoomParticipant>>(new Map())
+	// const ParticipantData = useRef<Map<string, RoomParticipant>>(new Map())
 
-	const addRoomParticipant = (id: string, roomParticipant: RoomParticipant) => {
-		if (!ParticipantData.current.has(id)) {
-			ParticipantData.current.set(id, roomParticipant)
-			return
-		}
-		const _roomParticipant = ParticipantData.current.get(id)
-		if (_roomParticipant && roomParticipant.vedioTrack) {
-			_roomParticipant['vedioTrack'] = roomParticipant.vedioTrack
-		}
-		if (_roomParticipant && roomParticipant.audioTrack) {
-			_roomParticipant['audioTrack'] = roomParticipant.audioTrack
-		}
-		if (_roomParticipant && roomParticipant.userInfo) {
-			_roomParticipant['userInfo'] = roomParticipant.userInfo
-		}
-	}
+	// const addRoomParticipant = (id: string, roomParticipant: RoomParticipant) => {
+	// 	if (!ParticipantData.current.has(id)) {
+	// 		ParticipantData.current.set(id, roomParticipant)
+	// 		return
+	// 	}
+	// 	const _roomParticipant = ParticipantData.current.get(id)
+	// 	if (_roomParticipant && roomParticipant.vedioTrack) {
+	// 		_roomParticipant['vedioTrack'] = roomParticipant.vedioTrack
+	// 	}
+	// 	if (_roomParticipant && roomParticipant.audioTrack) {
+	// 		_roomParticipant['audioTrack'] = roomParticipant.audioTrack
+	// 	}
+	// 	if (_roomParticipant && roomParticipant.userInfo) {
+	// 		_roomParticipant['userInfo'] = roomParticipant.userInfo
+	// 	}
+	// }
 
 	/** 视频 */
 	const [localVideoTrack, setLocalVideoTrack] = useState<LocalTrackPublication | null>()
