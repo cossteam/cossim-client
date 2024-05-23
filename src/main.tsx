@@ -10,11 +10,10 @@ import { ConfigProvider } from 'antd'
 import useCommonStore from '@/stores/common'
 
 const commonStore = useCommonStore.getState()
-commonStore.init()
 
 // eslint-disable-next-line react-refresh/only-export-components
 const App = () => (
-	<ConfigProvider>
+	<ConfigProvider theme={{ token: { colorPrimary: commonStore.themeColor, borderRadius: 4 } }}>
 		<Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
 	</ConfigProvider>
 )

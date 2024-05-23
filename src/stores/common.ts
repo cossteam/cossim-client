@@ -12,6 +12,8 @@ const actions = (set: any, get: any): CommonStoreMethods => ({
 	init: async () => {
 		const options = get()
 		console.log('🚀 ~ 当前主题', options.theme)
+
+		// 这里可以做一些初始化操作，比如获取本地存储的用户信息等
 	}
 })
 
