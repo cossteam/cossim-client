@@ -17,7 +17,7 @@ export interface CommonOptions {
 	 * @description 当前主题  'light' | 'dark'
 	 * @default 'light'
 	 */
-	theme: string
+	theme: 'light' | 'dark'
 	/** @description 主题色 */
 	themeColor: string
 	/** @description 语言 */
