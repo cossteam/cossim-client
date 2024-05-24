@@ -199,13 +199,13 @@ class GroupServiceImpl {
 	 * 设置群聊消息静默通知
 	 * @param {Object} data
 	 * @param {String} data.group_id
-	 * @param {String} data.is_silence
+	 * @param {Boolean} data.silent
 	 */
-	setGroupSilenceApi(data: any): Promise<DataResponse> {
+	setGroupSilenceApi(id: any,data: any): Promise<DataResponse> {
 		return request({
-			url: this.baseGroupUrl + `/silent`,
+			url: this.baseGroupUrl + `/${id}/silent`,
 			method: 'POST',
-			data
+			data,
 		})
 	}
 
