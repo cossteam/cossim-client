@@ -125,11 +125,11 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 	// 消息免打扰
 	const messageDisturb = async () => {
 		const silent =
-			userInfo?.preferences?.silent_notification === MessageNoDisturb.YES
+			userInfo?.preferences?.silent === MessageNoDisturb.YES
 				? MessageNoDisturb.NO
 				: MessageNoDisturb.YES
 		const tips_error = silent === MessageNoDisturb.YES ? $t('消息免打扰失败') : $t('取消消息免打扰失败')
-		updateCache({ silent_notification: silent })
+		updateCache({ silent: silent })
 		try {
 			const { code } = await RelationService.setSilenceApi({ silent, user_id })
 			if (code !== 200) {
@@ -279,7 +279,7 @@ const Profile: React.FC<RouterProps> = ({ f7route, f7router }) => {
 				<ListItem title={$t('消息免打扰')}>
 					<Toggle
 						slot="after"
-						checked={userInfo?.preferences?.silent_notification === MessageNoDisturb.YES}
+						checked={userInfo?.preferences?.silent === MessageNoDisturb.YES}
 						onChange={messageDisturb}
 					/>
 				</ListItem>
