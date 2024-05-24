@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import { Flex } from 'antd'
 import ChatList from '@/components/chat-list'
+import { generateChatList } from '@/mock/data'
 
 const Home = memo(() => {
 	// const commonStore = useCommonStore()
@@ -8,8 +9,8 @@ const Home = memo(() => {
 
 	return (
 		<Flex align="start">
-			<ChatList />
-			<p>Select align :</p>
+			<ChatList data={generateChatList(100)} />
+			<p className="w750:flex hidden">Select align :</p>
 		</Flex>
 	)
 })

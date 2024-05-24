@@ -12,7 +12,7 @@ export const generateChatList = (count: number = 10) => {
 			id: faker.string.uuid(),
 			dialog_avatar: faker.image.avatar(),
 			dialog_name: faker.person.firstName(),
-			dialog_create_at: faker.date.recent(),
+			dialog_create_at: new Date(faker.date.recent()).getTime(),
 			dialog_id: faker.number.int(),
 			dialog_type: 0,
 			dialog_unread_count: faker.number.int({ max: 200 }),
@@ -24,7 +24,7 @@ export const generateChatList = (count: number = 10) => {
 				is_label: faker.datatype.boolean(),
 				msg_id: faker.number.int(),
 				msg_type: faker.number.int({ min: 0, max: 10 }),
-				send_time: faker.date.recent(),
+				send_time: new Date(faker.date.recent()).getTime(),
 				sender_id: faker.string.uuid(),
 				sender_info: {
 					user_id: faker.string.uuid(),
@@ -60,7 +60,7 @@ export const generateMessageList = (count: number = 10) => {
 		return {
 			at_all_user: faker.number.int({ min: 0, max: 1 }),
 			content: faker.lorem.sentence(),
-			create_at: faker.date.recent(),
+			create_at: new Date(faker.date.recent()).getTime(),
 			id: faker.number.int()
 			// TODO: add more message type
 		}

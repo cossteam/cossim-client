@@ -1,5 +1,4 @@
-import { $t } from '@/i18n'
-import { Button, Flex } from 'antd'
+import { Flex } from 'antd'
 import { memo } from 'react'
 
 const Home = memo(() => {
