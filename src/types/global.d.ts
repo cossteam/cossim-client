@@ -33,4 +33,10 @@ export declare global {
 			// receiver_info: {}
 		}
 	}
+
+	declare const __IS_ELECTRON__: boolean
+	declare const __IS_WEB__: boolean
+	declare const __IS_ANDROID__: boolean
+	declare const __IS_IOS__: boolean
+	declare const __IS_NATIVE__: boolean
 }

@@ -5,6 +5,7 @@ import Loading from '@/components/loading'
 import { useRoutes } from 'react-router'
 import routes from '~react-pages'
 import { App as AppComponent } from 'antd'
+// import useLogin from '@/hooks/useLogin'
 
 const App = memo(() => {
 	const commonStore = useCommonStore()

@@ -4,12 +4,13 @@ import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 import path from 'node:path'
 import pages from 'vite-plugin-pages'
+import { Capacitor } from '@capacitor/core'
 
-const target = process.env.TARGET
 const ELECTRON_ENTRY = path.resolve(__dirname, 'electron/main.ts')
 const PRELOAD_INPUT = path.resolve(__dirname, 'electron/preload.ts')
 
 export default (): UserConfig => {
+	const target = process.env.TARGET
 	return defineConfig({
 		plugins: [
 			react(),
@@ -23,13 +24,27 @@ export default (): UserConfig => {
 					},
 					renderer: process.env.NODE_ENV === 'test' ? undefined : {}
 				}),
-			pages()
+			pages({
+				onRoutesGenerated: (routes) => {
+					routes.push({
+						path: '*',
+						element: '/src/pages/not-found.tsx'
+					})
+					return routes
+				}
+			})
 		],
 		resolve: {
 			alias: {
 				'@': fileURLToPath(new URL('./src', import.meta.url))
 			}
 		},
-		server: {}
+		define: {
+			__IS_ELECTRON__: JSON.stringify(target === 'electron'),
+			__IS_WEB__: Capacitor.getPlatform() === 'web',
+			__IS_ANDROID__: Capacitor.getPlatform() === 'android',
+			__IS_IOS__: Capacitor.getPlatform() === 'ios',
+			__IS_NATIVE__: JSON.stringify(Capacitor.isNativePlatform())
+		}
 	})
 }

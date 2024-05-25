@@ -7,7 +7,7 @@ import { Capacitor } from '@capacitor/core'
 const Home = memo(() => {
 	// const commonStore = useCommonStore()
 	// console.log('Home:')
-	console.log('Capacitor', Capacitor, import.meta.env)
+	console.log('Capacitor', Capacitor.getPlatform(), __IS_NATIVE__)
 
 	return (
 		<Flex align="start">
