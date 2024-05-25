@@ -2,10 +2,10 @@ import { Avatar, Badge, Flex, List } from 'antd'
 // import VirtualList from 'rc-virtual-list'
 import { memo } from 'react'
 import { formatTime } from '@/utils/format-time'
-// import { useWindowSize } from '@reactuses/core'
+import { useWindowSize } from '@reactuses/core'
 // import InfiniteScroll from 'react-infinite-scroll-component'
 
-const headerHeight = 80
+const headerHeight = 64
 
 interface ChatListProps {
 	data: ChatData[]
@@ -13,7 +13,9 @@ interface ChatListProps {
 }
 
 const ChatList: React.FC<ChatListProps> = memo((props) => {
-	// const { height } = useWindowSize()
+	const { height } = useWindowSize()
+
+	// console.log('pr', import.meta.env)
 
 	// const onScroll = useCallback(() => {
 	// 	console.log('onScroll')
@@ -22,7 +24,7 @@ const ChatList: React.FC<ChatListProps> = memo((props) => {
 	// const loadMoreData = () => {}
 
 	return (
-		<div className="min-w-[320px] w750:w-auto w-full border-r h-screen overflow-auto">
+		<div className="min-w-[180px] w750:max-w-[300px]  w750:w-[250px] w-full border-r h-screen overflow-auto">
 			<div className="sticky top-0 z-10 bg-background" style={{ height: headerHeight }}>
 				Header
 			</div>
@@ -35,11 +37,15 @@ const ChatList: React.FC<ChatListProps> = memo((props) => {
 				scrollableTarget="scrollableDiv"
 			> */}
 
-			<div className="scrollbar-track--custom h-[calc(100vh-80px)] overflow-auto">
+			<div
+				className="scrollbar-track--custom  overflow-auto cursor-pointer"
+				style={{ height: height - headerHeight }}
+			>
 				<List
 					dataSource={props.data}
 					renderItem={(chat) => (
 						<List.Item
+							className="!px-3 select-none hover:bg-background-hover cursor-pointer"
 							key={chat.dialog_id}
 							extra={
 								<Flex vertical align="flex-end">
@@ -49,13 +55,12 @@ const ChatList: React.FC<ChatListProps> = memo((props) => {
 									<Badge count={chat.dialog_unread_count} size="small" />
 								</Flex>
 							}
-							className="!px-5"
 						>
 							<List.Item.Meta
 								avatar={<Avatar src={chat.dialog_avatar} size={48} />}
 								title={chat.dialog_name}
 								description={
-									<div slot="description" className="text-nowrap text-ellipsis overflow-hidden">
+									<div className="text-nowrap line-clamp-1 text-ellipsis overflow-hidden">
 										{chat.last_message.sender_info.name}:&nbsp;{chat.last_message.content}
 									</div>
 								}
