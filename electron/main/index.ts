@@ -15,7 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // │ │ ├── main.js
 // │ │ └── preload.mjs
 // │
-process.env.APP_ROOT = path.join(__dirname, '..')
+process.env.APP_ROOT = path.join(__dirname, '../..')
 
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
@@ -30,10 +30,16 @@ function createWindow() {
 	win = new BrowserWindow({
 		icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
 		webPreferences: {
-			preload: path.join(__dirname, 'preload.mjs')
+			preload: path.join(__dirname, 'preload.mjs'),
+			webSecurity: false
+			// nodeIntegration: true,
+			// contextIsolation: false
 		},
 		width: 1000,
-		height: 600
+		height: 600,
+		titleBarStyle: 'hidden',
+		titleBarOverlay: true,
+		show: false
 	})
 
 	// Test active push message to Renderer-process.
@@ -51,7 +57,9 @@ function createWindow() {
 		win.loadFile(path.join(RENDERER_DIST, 'index.html'))
 	}
 
-	// 打开控制台
+	win.once('ready-to-show', () => {
+		win?.show()
+	})
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common

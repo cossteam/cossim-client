@@ -6,8 +6,8 @@ import path from 'node:path'
 import pages from 'vite-plugin-pages'
 import { Capacitor } from '@capacitor/core'
 
-const ELECTRON_ENTRY = path.resolve(__dirname, 'electron/main.ts')
-const PRELOAD_INPUT = path.resolve(__dirname, 'electron/preload.ts')
+const ELECTRON_ENTRY = path.resolve(__dirname, 'electron/main/index.ts')
+const PRELOAD_INPUT = path.resolve(__dirname, 'electron/preload/index.ts')
 
 export default (): UserConfig => {
 	const target = process.env.TARGET
@@ -28,7 +28,8 @@ export default (): UserConfig => {
 		],
 		resolve: {
 			alias: {
-				'@': fileURLToPath(new URL('./src', import.meta.url))
+				'@': fileURLToPath(new URL('./src', import.meta.url)),
+				'~': fileURLToPath(new URL('./electron', import.meta.url))
 			}
 		},
 		define: {
