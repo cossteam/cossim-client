@@ -1,10 +1,12 @@
 export declare global {
+	/** api 响应数据 */
 	interface ResponseData<T = any> {
 		code: number
 		data: T
 		msg: string
 	}
 
+	/** 会话列表 */
 	interface ChatData {
 		dialog_avatar: string
 		dialog_name: string
@@ -34,9 +36,14 @@ export declare global {
 		}
 	}
 
+	/** 是否是 Electron */
 	declare const __IS_ELECTRON__: boolean
+	/** 是否是 Web */
 	declare const __IS_WEB__: boolean
+	/** 是否是 Android */
 	declare const __IS_ANDROID__: boolean
+	/** 是否是 iOS */
 	declare const __IS_IOS__: boolean
+	/** 是否是原生平台 */
 	declare const __IS_NATIVE__: boolean
 }

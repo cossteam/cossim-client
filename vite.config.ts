@@ -11,6 +11,12 @@ const PRELOAD_INPUT = path.resolve(__dirname, 'electron/preload.ts')
 
 export default (): UserConfig => {
 	const target = process.env.TARGET
+	const __IS_ELECTRON__ = target === 'electron'
+	const __IS_WEB__ = Capacitor.getPlatform() === 'web'
+	const __IS_ANDROID__ = Capacitor.getPlatform() === 'android'
+	const __IS_IOS__ = Capacitor.getPlatform() === 'ios'
+	const __IS_NATIVE__ = Capacitor.isNativePlatform()
+
 	return defineConfig({
 		plugins: [
 			react(),
@@ -25,13 +31,7 @@ export default (): UserConfig => {
 					renderer: process.env.NODE_ENV === 'test' ? undefined : {}
 				}),
 			pages({
-				onRoutesGenerated: (routes) => {
-					routes.push({
-						path: '*',
-						element: '/src/pages/not-found.tsx'
-					})
-					return routes
-				}
+				importMode: () => 'async'
 			})
 		],
 		resolve: {
@@ -40,11 +40,11 @@ export default (): UserConfig => {
 			}
 		},
 		define: {
-			__IS_ELECTRON__: JSON.stringify(target === 'electron'),
-			__IS_WEB__: Capacitor.getPlatform() === 'web',
-			__IS_ANDROID__: Capacitor.getPlatform() === 'android',
-			__IS_IOS__: Capacitor.getPlatform() === 'ios',
-			__IS_NATIVE__: JSON.stringify(Capacitor.isNativePlatform())
+			__IS_ELECTRON__,
+			__IS_WEB__,
+			__IS_ANDROID__,
+			__IS_IOS__,
+			__IS_NATIVE__
 		}
 	})
 }
