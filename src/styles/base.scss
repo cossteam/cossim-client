@@ -27,6 +27,9 @@ body {
     // bottom: calc(1rem + env(safe-area-inset-bottom));
     // margin: 0;
     // box-sizing: border-box;
+
+    padding-top: var(--safe-area-inset-top);
+    padding-bottom: var(--safe-area-inset-bottom);
 }
 
 // 修改手机端样式
