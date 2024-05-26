@@ -1,8 +1,23 @@
 {
-  "name": "vite-react-capacitor-electron",
+  "name": "coss-client",
   "version": "0.0.0",
   "type": "module",
-  "description": "A cross-platform desktop app built with Vite, React, Capacitor, and Electron.",
+  "description": "coss 及时通讯的客户端",
+  "keywords": [
+    "IM",
+    "COSS",
+    "coss",
+    "react",
+    "vite",
+    "electron",
+    "capacitor",
+    "socket.io",
+    "sql.js",
+    "zustand",
+    "antd",
+    "i18next",
+    "react-router"
+  ],
   "scripts": {
     "dev": "cross-env TARGET=web vite --mode development --host 0.0.0.0",
     "dev:electron": "cross-env TARGET=electron vite --mode development",
