@@ -24,15 +24,7 @@ export default (): UserConfig => {
 					},
 					renderer: process.env.NODE_ENV === 'test' ? undefined : {}
 				}),
-			pages({
-				onRoutesGenerated: (routes) => {
-					routes.push({
-						path: '*',
-						element: '/src/pages/not-found.tsx'
-					})
-					return routes
-				}
-			})
+			pages()
 		],
 		resolve: {
 			alias: {
