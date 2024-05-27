@@ -1,19 +1,8 @@
 import { memo } from 'react'
-import { Flex } from 'antd'
-import ChatList from '@/components/chat-list'
-import { generateChatList } from '@/mock/data'
+import { Navigate } from 'react-router'
 
 const Home = memo(() => {
-	// const commonStore = useCommonStore()
-	// console.log('Home:')
-	console.log('Capacitor', __IS_WEB__)
-
-	return (
-		<Flex align="start">
-			<ChatList data={generateChatList(100)} />
-			<p className="w750:flex hidden">Select align :</p>
-		</Flex>
-	)
+	return <Navigate to="/account/login" />
 })
 
 export default Home

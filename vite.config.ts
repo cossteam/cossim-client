@@ -6,11 +6,17 @@ import path from 'node:path'
 import pages from 'vite-plugin-pages'
 import { Capacitor } from '@capacitor/core'
 
-const ELECTRON_ENTRY = path.resolve(__dirname, 'electron/main/index.ts')
-const PRELOAD_INPUT = path.resolve(__dirname, 'electron/preload/index.ts')
+const ELECTRON_ENTRY = path.resolve(__dirname, 'electron/main/main.ts')
+const PRELOAD_INPUT = path.resolve(__dirname, 'electron/preload/preload.ts')
 
 export default (): UserConfig => {
 	const target = process.env.TARGET
+	const __IS_ELECTRON__ = JSON.stringify(target === 'electron')
+	const __IS_WEB__ = Capacitor.getPlatform() === 'web'
+	const __IS_ANDROID__ = Capacitor.getPlatform() === 'android'
+	const __IS_IOS__ = Capacitor.getPlatform() === 'ios'
+	const __IS_NATIVE__ = JSON.stringify(Capacitor.isNativePlatform())
+
 	return defineConfig({
 		plugins: [
 			react(),
@@ -33,11 +39,11 @@ export default (): UserConfig => {
 			}
 		},
 		define: {
-			__IS_ELECTRON__: JSON.stringify(target === 'electron'),
-			__IS_WEB__: Capacitor.getPlatform() === 'web',
-			__IS_ANDROID__: Capacitor.getPlatform() === 'android',
-			__IS_IOS__: Capacitor.getPlatform() === 'ios',
-			__IS_NATIVE__: JSON.stringify(Capacitor.isNativePlatform())
+			__IS_ELECTRON__,
+			__IS_WEB__,
+			__IS_ANDROID__,
+			__IS_IOS__,
+			__IS_NATIVE__
 		}
 	})
 }

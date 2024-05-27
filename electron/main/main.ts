@@ -30,16 +30,16 @@ function createWindow() {
 	win = new BrowserWindow({
 		icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
 		webPreferences: {
-			preload: path.join(__dirname, 'preload.mjs'),
-			webSecurity: false
+			preload: path.join(__dirname, 'preload.mjs')
+			// webSecurity: false
 			// nodeIntegration: true,
 			// contextIsolation: false
 		},
 		width: 1000,
-		height: 600,
-		titleBarStyle: 'hidden',
-		titleBarOverlay: true,
-		show: false
+		height: 600
+		// titleBarStyle: 'hidden',
+		// titleBarOverlay: true,
+		// show: false
 	})
 
 	// Test active push message to Renderer-process.
@@ -56,10 +56,6 @@ function createWindow() {
 		// win.loadFile('dist/index.html')
 		win.loadFile(path.join(RENDERER_DIST, 'index.html'))
 	}
-
-	win.once('ready-to-show', () => {
-		win?.show()
-	})
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -73,13 +69,11 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-	// On OS X it's common to re-create a window in the app when the
-	// dock icon is clicked and there are no other windows open.
+	// 在 OS X 上，当出现以下情况时，通常会在应用程序中重新创建一个窗口：
+	// 单击停靠图标，并且没有打开其他窗口。
 	if (BrowserWindow.getAllWindows().length === 0) {
 		createWindow()
 	}
-
-	//
 })
 
 app.whenReady().then(createWindow)

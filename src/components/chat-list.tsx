@@ -3,6 +3,7 @@ import { Avatar, Badge, Flex, List } from 'antd'
 import { memo } from 'react'
 import { formatTime } from '@/utils/format-time'
 import { useWindowSize } from '@reactuses/core'
+import clsx from 'clsx'
 // import InfiniteScroll from 'react-infinite-scroll-component'
 
 const headerHeight = 64
@@ -24,7 +25,13 @@ const ChatList: React.FC<ChatListProps> = memo((props) => {
 	// const loadMoreData = () => {}
 
 	return (
-		<div className="min-w-[180px] w750:max-w-[300px]  w750:w-[250px] w-full border-r h-screen overflow-auto">
+		<div
+			className={clsx(
+				'min-w-[180px] w-full border-r h-screen overflow-auto',
+				__IS_ELECTRON__ && ' w750:w-[250px] w750:max-w-[300px] ',
+				!__IS_ELECTRON__ && __IS_WEB__ && 'w750:w-[350px] w750:max-w-[500px] '
+			)}
+		>
 			<div className="sticky top-0 z-10 bg-background" style={{ height: headerHeight }}>
 				Header
 			</div>
