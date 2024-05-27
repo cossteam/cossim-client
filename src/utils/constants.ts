@@ -1,3 +1,4 @@
+/** 本地存储的语言设置 */
 export const LANG = 'COSS_LANG'
-// export const IS_ELECTRON = process.env.TARGET === 'electron'
-// export const IS_WEB = process.env.TARGET === 'web'
+/** 小屏幕宽度 */
+export const SMALL_SCREEN = 750

@@ -1,10 +1,12 @@
-import { Avatar, Badge, Flex, List } from 'antd'
+import { Avatar, Badge, Flex, List, Typography } from 'antd'
 import VirtualList from 'rc-virtual-list'
 import { memo, useCallback } from 'react'
 import { formatTime } from '@/utils/format-time'
 import { useWindowSize } from '@reactuses/core'
 // import InfiniteScroll from 'react-infinite-scroll-component'
 import { headerHeight } from '@/components/layout/layout-header'
+import { useNavigate, useParams } from 'react-router'
+import clsx from 'clsx'
 
 interface ChatListProps {
 	data: ChatData[]
@@ -13,6 +15,8 @@ interface ChatListProps {
 
 const ChatList: React.FC<ChatListProps> = memo((props) => {
 	const { height } = useWindowSize()
+	const navigate = useNavigate()
+	const params = useParams()
 
 	const onScroll = useCallback(() => {
 		console.log('onScroll')
@@ -29,24 +33,28 @@ const ChatList: React.FC<ChatListProps> = memo((props) => {
 			>
 				{(chat) => (
 					<List.Item
+						className={clsx(
+							'!px-3 select-none hover:bg-background-hover cursor-pointer',
+							Number(params.id) === chat.dialog_id && '!bg-primary/90'
+						)}
 						key={chat.dialog_id}
 						extra={
 							<Flex vertical align="flex-end">
-								<span className="text-gray-400 text-xs mb-2">
+								<Typography.Text className="text-gray-500 text-xs mb-2">
 									{formatTime(chat.last_message.send_time)}
-								</span>
-								<Badge count={chat.dialog_unread_count} size="small" />
+								</Typography.Text>
+								<Badge count={chat.dialog_unread_count} />
 							</Flex>
 						}
-						className="!px-5"
+						onClick={() => navigate(`/dashboard/${chat.dialog_id}`)}
 					>
 						<List.Item.Meta
 							avatar={<Avatar src={chat.dialog_avatar} size={48} />}
 							title={chat.dialog_name}
 							description={
-								<div slot="description" className="text-nowrap text-ellipsis overflow-hidden">
+								<Typography.Paragraph className="text-gray-500 !mb-0" ellipsis={{ rows: 1 }}>
 									{chat.last_message.sender_info.name}:&nbsp;{chat.last_message.content}
-								</div>
+								</Typography.Paragraph>
 							}
 						/>
 					</List.Item>

@@ -4,8 +4,6 @@ import { Button, Flex, Typography } from 'antd'
 import { memo, useState } from 'react'
 import LayoutDrawer from './layout-drawer'
 
-const { Text } = Typography
-
 export const headerHeight = 64
 
 const LayoutHeader = memo(() => {
@@ -22,10 +20,10 @@ const LayoutHeader = memo(() => {
 				/>
 				<Flex className="flex-1 bg-background2 h-10 rounded px-5 cursor-pointer" align="center">
 					<SearchOutlined className="mr-2 text-gray-500 text-base" />
-					<Text className="text-gray-500 text-sm">{$t('搜索')}</Text>
+					<Typography.Text className="text-gray-500 text-sm">{$t('搜索')}</Typography.Text>
 				</Flex>
 			</Flex>
-			<LayoutDrawer open={open} onClose={() => setOpen(false)} />
+			<LayoutDrawer open={open} onClose={() => setOpen(false)} setOpen={setOpen} />
 		</>
 	)
 })
