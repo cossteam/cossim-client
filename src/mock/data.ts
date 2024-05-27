@@ -66,3 +66,13 @@ export const generateMessageList = (count: number = 10) => {
 		}
 	})
 }
+
+export const generateUserInfo = () => {
+	return {
+		avatar: faker.image.avatar(),
+		email: faker.internet.email(),
+		login_number: 0,
+		nickname: faker.person.firstName(),
+		user_id: faker.string.uuid()
+	}
+}

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@ant-design/icons':
+        specifier: ^5.3.7
+        version: 5.3.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@capacitor-community/safe-area':
         specifier: ^6.0.0-alpha.3
         version: 6.0.0-alpha.3(@capacitor/core@6.0.0)

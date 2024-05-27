@@ -14,7 +14,8 @@ export default {
 				primary: {
 					DEFAULT: 'hsl(var(--primary))'
 				},
-				'background-hover': 'hsl(var(--background-hover))'
+				'background-hover': 'hsl(var(--background-hover))',
+				background2: 'hsl(var(--background2))'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
