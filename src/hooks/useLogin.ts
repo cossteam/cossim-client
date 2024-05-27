@@ -10,7 +10,9 @@ function useLogin() {
 	useEffect(() => {
 		if (!userStore.token) {
 			if (location.pathname.includes('account')) return
-			navigate(`/account/login`)
+			navigate(`/account/login`, {
+				replace: true
+			})
 		}
 	}, [userStore.token, location])
 }
