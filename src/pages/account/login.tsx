@@ -4,15 +4,17 @@ import { Button, Form, Input, Avatar, Flex, Checkbox } from 'antd'
 import { $t } from '@/i18n'
 import clsx from 'clsx'
 import { NavigateOptions, useNavigate } from 'react-router'
-// import useUserStore from '@/stores/user'
+import useUserStore from '@/stores/user'
 
 const Login: React.FC = () => {
-	// const userStore = useUserStore()
+	const userStore = useUserStore()
 	const navigate = useNavigate()
 
 	const onFinish = (values: any) => {
 		console.log('Received values of form: ', values)
-		// userStore.
+		userStore.update({
+			token: 'xie392'
+		})
 		navigate('/dashboard', {
 			replace: true
 		})
@@ -30,7 +32,7 @@ const Login: React.FC = () => {
 					src={'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp'}
 				/>
 				<Form
-					className={clsx('w-2/3 w750:w-1/6')}
+					className={clsx('w-2/3 w750:min-w-[350px] w750:w-1/6')}
 					layout="vertical"
 					initialValues={{ email: '1005@qq.com', password: '123456qq' }}
 					onFinish={onFinish}

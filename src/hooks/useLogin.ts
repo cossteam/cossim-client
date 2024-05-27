@@ -13,6 +13,12 @@ function useLogin() {
 			navigate(`/account/login`, {
 				replace: true
 			})
+		} else {
+			if (location.pathname.includes('account')) {
+				navigate(`/dashboard`, {
+					replace: true
+				})
+			}
 		}
 	}, [userStore.token, location])
 }
