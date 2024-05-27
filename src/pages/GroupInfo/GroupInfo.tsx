@@ -30,8 +30,8 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 			const { code, data } = await GroupService.groupInfoApi({ group_id: GroupId })
 			if (code !== 200) return
 			code === 200 && setGroupInfo(data)
-			const isSilence = data?.preferences?.silent_notification
-			setSilence(isSilence === 1)
+			const isSilence = data?.preferences?.silent
+			setSilence(isSilence)
 		})()
 	}, [])
 
@@ -84,9 +84,9 @@ const GroupInfo: React.FC<GroupInfoProps & RouterProps> = (props) => {
 		const isSilence = !silence
 		setSilence(isSilence)
 		try {
-			const { code } = await GroupService.setGroupSilenceApi({
-				group_id: Number(GroupId),
-				is_silent: isSilence ? 1 : 0
+			const { code } = await GroupService.setGroupSilenceApi(Number(GroupId),
+			{
+				silent: isSilence
 			})
 			if (code !== 200) return
 		} catch (error: any) {

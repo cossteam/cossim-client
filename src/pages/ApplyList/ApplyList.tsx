@@ -198,10 +198,10 @@ const ApplyList = () => {
 							// 好友
 							<ListItem key={index} text={$t(item?.remark || '对方没有留言')} swipeout>
 								<div slot="media" className="w-12 h-12">
-									<Avatar size={50} src={item?.receiver_info?.user_avatar} />
+									<Avatar size={50} src={item?.receiver_info?.avatar} />
 								</div>
 								<div slot="title">
-									<span>{$t(item?.receiver_info?.user_name)}</span>
+									<span>{$t(item?.receiver_info?.nickname)}</span>
 								</div>
 								<div slot="content" className="pr-2 flex">
 									{!isOperate(item) ? (
