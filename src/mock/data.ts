@@ -76,3 +76,7 @@ export const generateUserInfo = () => {
 		user_id: faker.string.uuid()
 	}
 }
+
+export const generateGroupInfo = () => {
+	return {}
+}

@@ -52,3 +52,7 @@ body {
 //     background: rgba(221, 221, 221, 0.8);
 //     border-radius: 10px;
 // }
+
+.container--background {
+    background: var(--gradient);
+}

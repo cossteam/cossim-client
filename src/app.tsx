@@ -12,7 +12,7 @@ const App = memo(() => {
 	// 鉴权
 	// useLogin()
 	return (
-		<ConfigProvider theme={{ token: { colorPrimary: commonStore.themeColor, borderRadius: 4 } }}>
+		<ConfigProvider theme={{ token: { colorPrimary: commonStore.themeColor, borderRadius: 4, fontSize: 16 } }}>
 			<AppComponent>
 				<Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
 			</AppComponent>
