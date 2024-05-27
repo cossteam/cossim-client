@@ -2,7 +2,7 @@ import useUserStore from '@/stores/user'
 import { useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router'
 
-function useLogin() {
+function useAuth() {
 	const userStore = useUserStore()
 	const location = useLocation()
 	const navigate = useNavigate()
@@ -23,4 +23,4 @@ function useLogin() {
 	}, [userStore.token, location])
 }
 
-export default useLogin
+export default useAuth
