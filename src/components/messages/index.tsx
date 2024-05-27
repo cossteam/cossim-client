@@ -4,13 +4,11 @@ import { memo } from 'react'
 import MessageHeader from './message-header'
 import MessageContent from './message-content'
 import MessageFooter from './message-footer'
-import { useParams } from 'react-router'
+// import { useParams } from 'react-router'
 
 const Messages = memo(() => {
 	const { height } = useWindowSize()
-	const params = useParams()
-
-	console.log('params', params)
+	// const params = useParams()
 
 	return (
 		<Flex className="container--background flex-1 h-screen" style={{ height }} vertical align="stretch">
