@@ -15,7 +15,7 @@ export const generateChatList = (count: number = 10) => {
 			dialog_create_at: new Date(faker.date.recent()).getTime(),
 			dialog_id: index + 1,
 			dialog_type: 0,
-			dialog_unread_count: faker.number.int({ max: 200 }),
+			dialog_unread_count: faker.number.int({ max: 30 }),
 			top_at: faker.number.int({ min: 0, max: 1 }),
 			[isGroup ? 'group_id' : 'user_id']: isGroup ? faker.number.int({ min: 0, max: 1000 }) : faker.string.uuid(),
 			last_message: {
@@ -32,7 +32,11 @@ export const generateChatList = (count: number = 10) => {
 					avatar: faker.image.avatar()
 				},
 				reply: faker.number.int(),
-				receiver_info: {}
+				receiver_info: {
+					user_id: faker.string.uuid(),
+					name: faker.person.firstName(),
+					avatar: faker.image.avatar()
+				}
 			}
 		}
 	})
@@ -55,16 +59,16 @@ export const generateFriendList = (count: number = 10) => {
 	})
 }
 
-export const generateMessageList = (count: number = 10) => {
+export const generateMessageList = (count: number = 10): Message[] => {
 	return Array.from({ length: count }, () => {
 		return {
-			at_all_user: faker.number.int({ min: 0, max: 1 }),
-			content: faker.lorem.sentence(),
+			at_all_user: faker.datatype.boolean(),
+			content: faker.lorem.sentence({ min: 3, max: 20 }),
 			create_at: new Date(faker.date.recent()).getTime(),
 			id: faker.number.int(),
 			is_brun_after_reading: faker.datatype.boolean(),
 			is_label: faker.datatype.boolean(),
-			msg_id: faker.string.uuid(),
+			msg_id: faker.number.int(),
 			msg_send_state: faker.number.int({ min: 0, max: 2 }),
 			read_at: new Date(faker.date.recent()).getTime(),
 			receiver_id: faker.string.uuid(),

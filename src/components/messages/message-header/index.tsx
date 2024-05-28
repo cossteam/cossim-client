@@ -26,7 +26,7 @@ const MessageHeader = memo(() => {
 	)
 
 	return (
-		<Flex className="mobile:min-h-[80px] min-h-16 bg-background pl-5 pr-3" justify="center" vertical>
+		<Flex className="mobile:min-h-20 min-h-16 bg-background pl-5 pr-3" justify="center" vertical>
 			<Flex justify="space-between">
 				<Flex vertical>
 					<Typography.Text className="text-lg">NotionNext 交流群</Typography.Text>

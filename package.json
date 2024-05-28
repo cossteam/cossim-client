@@ -41,6 +41,7 @@
         "@capacitor/ios": "^6.0.0",
         "@capacitor/status-bar": "^6.0.0",
         "@reactuses/core": "^5.0.14",
+        "@tanstack/react-virtual": "^3.5.0",
         "antd": "^5.17.3",
         "axios": "^1.7.2",
         "clsx": "^2.1.1",
