@@ -42,6 +42,7 @@
         "@capacitor/status-bar": "^6.0.0",
         "@reactuses/core": "^5.0.14",
         "antd": "^5.17.3",
+        "axios": "^1.7.2",
         "clsx": "^2.1.1",
         "i18next": "^23.11.5",
         "i18next-browser-languagedetector": "^8.0.0",

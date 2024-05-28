@@ -20,6 +20,10 @@ const Login: React.FC = () => {
 		})
 	}
 
+	const toQRCode = (options?: NavigateOptions | undefined) => {
+		navigate('/account/qr-code', options)
+	}
+
 	const toRegister = (options?: NavigateOptions | undefined) => {
 		navigate('/account/register', options)
 	}
@@ -89,13 +93,14 @@ const Login: React.FC = () => {
 						</Button>
 					</Form.Item>
 					<Form.Item>
-						<Button
-							type="text"
-							className="w-full text-primary"
-							onClick={() => toRegister({ replace: true })}
-						>
-							{$t('注册')}
-						</Button>
+						<Flex justify="space-between">
+							<span className="text-primary" onClick={() => toQRCode({ replace: true })}>
+								{$t('扫码登陆')}
+							</span>
+							<span className="text-primary" onClick={() => toRegister({ replace: true })}>
+								{$t('注册')}
+							</span>
+						</Flex>
 					</Form.Item>
 				</Form>
 			</Flex>
