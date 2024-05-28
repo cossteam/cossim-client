@@ -1,12 +1,12 @@
 // import useUserStore from '@/stores/user'
 import { $t } from '@/i18n'
-import { Image, Button, Flex, Form } from 'antd'
+import { Button, Flex, Form, QRCode } from 'antd'
 import clsx from 'clsx'
 import { NavigateOptions, useNavigate } from 'react-router'
-import QRCodeImg from '@/assets/qrcode.png'
+// import QRCodeImg from '@/assets/qrcode.png'
 import { useEffect, useState } from 'react'
 
-const QRCode: React.FC = () => {
+const QRCodePage: React.FC = () => {
 	// const userStore = useUserStore()
 	const navigate = useNavigate()
 
@@ -18,6 +18,11 @@ const QRCode: React.FC = () => {
 
 	const toRegister = (options?: NavigateOptions | undefined) => {
 		navigate('/account/register', options)
+	}
+
+	const reLoadQRCode = () => {
+		window.location.reload()
+		setIsExpire(false)
 	}
 
 	useEffect(() => {
@@ -33,23 +38,22 @@ const QRCode: React.FC = () => {
 	return (
 		<>
 			<Flex className="w-screen h-screen" vertical justify="center" align="center" gap="large">
-				{/* <Avatar
-					size={120}
-					src={'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp'}
-				/> */}
 				<div className="relative rounded-sm overflow-hidden">
-					<Image width={250} height={250} preview={false} src={QRCodeImg} />
+					{/* <Image width={250} height={250} preview={false} src={QRCodeImg} />
 					{isExpire && (
 						<div
 							className="w-full h-full bg-black opacity-90 flex justify-center items-center absolute top-0 right-0 text-white cursor-pointer"
-							onClick={() => {
-								window.location.reload()
-								setIsExpire(false)
-							}}
+							onClick={() => reLoadQRCode()}
 						>
 							{$t('点击刷新')}
 						</div>
-					)}
+					)} */}
+					<QRCode
+						type="svg"
+						value="https://www.coss.im/"
+						status={isExpire ? 'expired' : 'active'}
+						onRefresh={() => reLoadQRCode()}
+					/>
 				</div>
 				<div className="text-center text-primary">{$t('请使用客户端APP扫码登录')}</div>
 				<Form
@@ -93,4 +97,4 @@ const QRCode: React.FC = () => {
 	)
 }
 
-export default QRCode
+export default QRCodePage
