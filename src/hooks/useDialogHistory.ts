@@ -8,8 +8,7 @@ function useDialogHistory() {
 	const commonStore = useCommonStore()
 
 	useEffect(() => {
-		if (location.pathname.includes('dashboard')) {
-			// console.log('~ dialog history hook, id changed =>', params.id)
+		if (location.pathname.includes('dashboard') && params?.id) {
 			commonStore.update({ lastDialogId: Number(params.id || 0) })
 		}
 	}, [params?.id, location.pathname])

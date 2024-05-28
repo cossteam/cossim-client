@@ -1,7 +1,7 @@
 :root {
     --primary: 153 47% 49%;
     --radius: 0.5rem;
-    --gradient: linear-gradient(to bottom, #ffd45295, #544a7dca);
+    --gradient: linear-gradient(to bottom, hsl(var(--primary)/0.3), hsl(252 26% 39% /0.3));
 }
 
 :root {

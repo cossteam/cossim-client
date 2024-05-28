@@ -11,7 +11,7 @@ const Dashboard = memo(() => {
 		<div>
 			<Flex align="start">
 				<LayoutSidebar />
-				<Flex className="w750:!flex !hidden flex-1">
+				<Flex className="mobile:!flex !hidden flex-1">
 					<Outlet />
 				</Flex>
 			</Flex>

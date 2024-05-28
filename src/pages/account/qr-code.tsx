@@ -57,7 +57,7 @@ const QRCodePage: React.FC = () => {
 				</div>
 				<div className="text-center text-primary">{$t('请使用客户端APP扫码登录')}</div>
 				<Form
-					className={clsx('w-2/3 w750:min-w-[350px] w750:w-1/6')}
+					className={clsx('w-2/3 mobile:min-w-[350px] mobile:w-1/6')}
 					layout="vertical"
 					initialValues={{ email: '1005@qq.com', password: '123456qq' }}
 				>

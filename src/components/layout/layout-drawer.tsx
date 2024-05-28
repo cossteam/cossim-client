@@ -11,10 +11,14 @@ import { THEME } from '@/utils/enum'
 import { useWindowSize } from '@reactuses/core'
 import { SMALL_SCREEN } from '@/utils/constants'
 import type { DrawerStyles } from 'antd/es/drawer/DrawerPanel'
+import ContactList from '@/components/contact-list'
+import GroupCreate from '@/components/group/group-create'
+import SettingList from '@/components/setting-list'
 
 interface Menus {
 	icon: React.ForwardRefExoticComponent<any>
 	title: string
+	component: React.MemoExoticComponent<() => JSX.Element>
 }
 
 interface LayoutDrawerProps extends DrawerProps {
@@ -39,47 +43,53 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = memo((props) => {
 		() => [
 			{
 				icon: UsergroupAddOutlined,
-				title: $t('新建群组')
+				title: $t('新建群组'),
+				component: GroupCreate
 			},
 			{
 				icon: UserOutlined,
-				title: $t('联系人')
+				title: $t('联系人'),
+				component: ContactList
 			},
 			{
 				icon: SettingOutlined,
-				title: $t('设置')
+				title: $t('设置'),
+				component: SettingList
 			}
 		],
 		[]
 	)
 
-	const handlerMenusClick = (item: Menus) => {
+	const [activeIndex, setActiveIndex] = useState<number>(0)
+	const handlerMenusClick = (item: Menus, index: number) => {
 		props.setOpen && props.setOpen(false)
 		setTitle(item.title)
 		setModalOpen(true)
+		setActiveIndex(index)
 	}
 
 	const [modalOpen, setModalOpen] = useState<boolean>(false)
 	const [title, setTitle] = useState<string>('')
 
+	const Component = useMemo(() => menus[activeIndex].component, [activeIndex, menus])
+
 	return (
 		<>
 			<Drawer
 				className="p-0"
-				// width={width < SMALL_SCREEN ? '70%' : '400'}
 				placement="left"
 				closable={false}
 				styles={drawerStyles}
 				style={{ width: width < SMALL_SCREEN ? '70%' : '400px' }}
 				{...props}
 			>
-				<Flex className="w750:px-5 px-3" align="center">
+				<Flex className="mobile:px-5 px-3" align="center">
 					<Avatar className="mr-4" src={userInfo.avatar} size={64} />
 					<Flex vertical>
-						<Typography.Text className="!mb-1 font-bold w750:text-xl text-lg">
+						<Typography.Text className="!mb-1 font-bold mobile:text-xl text-lg">
 							{userInfo.nickname}
 						</Typography.Text>
-						<Typography.Text className="break-all line-clamp-1 w750:text-base text-sm">
+						<Typography.Text className="break-all line-clamp-1 mobile:text-base text-sm">
 							{userInfo.email}
 						</Typography.Text>
 					</Flex>
@@ -90,27 +100,27 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = memo((props) => {
 				<Flex vertical>
 					{menus.map((item, index) => (
 						<Flex
-							className="w750:py-3 py-2 w750:px-5 px-4 select-none hover:bg-background-hover cursor-pointer rounded"
+							className="mobile:py-3 py-2 mobile:px-5 px-4 select-none hover:bg-background-hover cursor-pointer rounded"
 							key={index}
 							gap="middle"
-							onClick={() => handlerMenusClick(item)}
+							onClick={() => handlerMenusClick(item, index)}
 						>
-							<CustomIcon className="w750:text-2xl text-xl text-gray-500" component={item.icon} />
-							<Typography.Text className="w750:text-lg text-base">{item.title}</Typography.Text>
+							<CustomIcon className="mobile:text-2xl text-xl text-gray-500" component={item.icon} />
+							<Typography.Text className="mobile:text-lg text-base">{item.title}</Typography.Text>
 						</Flex>
 					))}
 					<Flex
-						className="w750:py-3 py-2 w750:px-5 px-4 select-none hover:bg-background-hover cursor-pointer rounded"
+						className="mobile:py-3 py-2 mobile:px-5 px-4 select-none hover:bg-background-hover cursor-pointer rounded"
 						gap="middle"
 						justify="space-between"
 						onClick={() => commonStore.update({ theme: isLight ? THEME.DARK : THEME.LIGHT })}
 					>
 						<Flex gap="middle">
 							<CustomIcon
-								className="w750:text-2xl text-xl text-gray-500"
+								className="mobile:text-2xl text-xl text-gray-500"
 								component={isLight ? DarkIcon : LightIcon}
 							/>
-							<Typography.Text className="w750:text-lg text-base">
+							<Typography.Text className="mobile:text-lg text-base">
 								{isLight ? $t('夜间模式') : $t('日间模式')}
 							</Typography.Text>
 						</Flex>
@@ -120,7 +130,7 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = memo((props) => {
 			</Drawer>
 
 			<Modal open={modalOpen} onCancel={() => setModalOpen(false)} title={title}>
-				111
+				{Component && <Component />}
 			</Modal>
 		</>
 	)

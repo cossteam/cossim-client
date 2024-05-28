@@ -4,7 +4,8 @@ export default {
 	theme: {
 		screens: {
 			// mobile
-			w750: '750px'
+			w750: '750px',
+			mobile: '769px'
 		},
 		extend: {
 			colors: {
