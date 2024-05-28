@@ -1,8 +1,12 @@
 import { Flex } from 'antd'
 import LayoutSidebar from '@/components/layout/layout-sidebar'
 import { Outlet } from 'react-router'
+import useDialogHistory from '@/hooks/useDialogHistory'
+import { memo } from 'react'
 
-const Dashboard = () => {
+const Dashboard = memo(() => {
+	useDialogHistory()
+
 	return (
 		<div>
 			<Flex align="start">
@@ -13,6 +17,6 @@ const Dashboard = () => {
 			</Flex>
 		</div>
 	)
-}
+})
 
 export default Dashboard

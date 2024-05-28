@@ -66,10 +66,11 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = memo((props) => {
 		<>
 			<Drawer
 				className="p-0"
-				width={width < SMALL_SCREEN ? '70%' : '400'}
+				// width={width < SMALL_SCREEN ? '70%' : '400'}
 				placement="left"
 				closable={false}
 				styles={drawerStyles}
+				style={{ width: width < SMALL_SCREEN ? '70%' : '400px' }}
 				{...props}
 			>
 				<Flex className="w750:px-5 px-3" align="center">

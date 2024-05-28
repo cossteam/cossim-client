@@ -22,6 +22,8 @@ export interface CommonOptions {
 	themeColor: string
 	/** @description 语言 */
 	lang: string
+	/** @description 记录上一次记录的会话 id */
+	lastDialogId: number
 }
 
 export interface CommonStoreMethods {

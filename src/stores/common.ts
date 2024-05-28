@@ -4,10 +4,13 @@ import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { THEME } from '@/utils/enum'
 import { defaultLanguage } from '@/i18n'
 
+const defaultThemeColor = getComputedStyle(document.documentElement).getPropertyValue('--primary')
+
 const states: CommonOptions = {
 	theme: THEME.LIGHT,
-	themeColor: '#00b96b',
-	lang: defaultLanguage
+	themeColor: `hsl(${defaultThemeColor})`,
+	lang: defaultLanguage,
+	lastDialogId: 0
 }
 
 const actions = (set: any, get: any): CommonStoreMethods => ({
