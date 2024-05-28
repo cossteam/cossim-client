@@ -6,14 +6,14 @@
 import { faker } from '@faker-js/faker'
 
 export const generateChatList = (count: number = 10) => {
-	return Array.from({ length: count }, () => {
+	return Array.from({ length: count }, (_, index) => {
 		const isGroup = faker.datatype.boolean()
 		return {
 			id: faker.string.uuid(),
 			dialog_avatar: faker.image.avatar(),
 			dialog_name: faker.person.firstName(),
 			dialog_create_at: new Date(faker.date.recent()).getTime(),
-			dialog_id: faker.number.int(),
+			dialog_id: index + 1,
 			dialog_type: 0,
 			dialog_unread_count: faker.number.int({ max: 200 }),
 			top_at: faker.number.int({ min: 0, max: 1 }),
@@ -61,8 +61,24 @@ export const generateMessageList = (count: number = 10) => {
 			at_all_user: faker.number.int({ min: 0, max: 1 }),
 			content: faker.lorem.sentence(),
 			create_at: new Date(faker.date.recent()).getTime(),
-			id: faker.number.int()
-			// TODO: add more message type
+			id: faker.number.int(),
+			is_brun_after_reading: faker.datatype.boolean(),
+			is_label: faker.datatype.boolean(),
+			msg_id: faker.string.uuid(),
+			msg_send_state: faker.number.int({ min: 0, max: 2 }),
+			read_at: new Date(faker.date.recent()).getTime(),
+			receiver_id: faker.string.uuid(),
+			receiver_info: {
+				avatar: faker.image.avatar(),
+				name: faker.person.fullName(),
+				user_id: faker.string.uuid()
+			},
+			sender_info: {
+				avatar: faker.image.avatar(),
+				name: faker.person.fullName(),
+				user_id: faker.string.uuid()
+			},
+			type: faker.number.int({ min: 0, max: 10 })
 		}
 	})
 }

@@ -66,7 +66,7 @@ const ChatList: React.FC<ChatListProps> = memo((props) => {
 					<List.Item
 						className={clsx(
 							'!px-3 select-none hover:bg-background-hover cursor-pointer',
-							Number(params.id) === chat.dialog_id && '!bg-primary/90'
+							Number(params.id) === chat.dialog_id && '!bg-primary'
 						)}
 						key={chat.dialog_id}
 						extra={<ChatListItemExtra chat={chat} />}

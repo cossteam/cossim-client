@@ -7,7 +7,7 @@ interface ModalProps extends AntdModalProps {
 
 const Modal: React.FC<ModalProps> = memo((props) => {
 	return (
-		<AntdModal centered footer={false} {...props}>
+		<AntdModal centered footer={false} style={{ maxHeight: '80vh' }} {...props}>
 			{props.children}
 		</AntdModal>
 	)
