@@ -13,23 +13,19 @@ const ContactListPage = memo(() => {
     if (loading) {
       return;
     }
-    // console.log('加载更多数据'); 
     setLoading(true);
-    // 模拟加载更多数据的逻辑
-    const moreContacts = generateContactList(10); // 加载更多联系人
+	
+    const moreContacts = generateContactList(10); 
     setContactList(prevState => ({
       list: { ...prevState.list, ...moreContacts.list },
       total: prevState.total + moreContacts.total,
     }));
-	// console.log('contactList2', contactList.total);
     setLoading(false);
   };
 
-  // 使用 useEffect 获取数据并设置状态
   useEffect(() => {
-    const contacts = generateContactList(10); // 假设我们需要 10 个联系人
+    const contacts = generateContactList(10); 
     setContactList(contacts);
-	// console.log('contactList1', contactList.total);
   }, []);
 
 	useEffect(() => {
@@ -69,13 +65,12 @@ const ContactListPage = memo(() => {
 						<List
 							dataSource={item.list}
 							renderItem={(c) => (
-								<List.Item key={c.email}>
+								<List.Item key={c.user_id}>
 								<List.Item.Meta
 								  avatar={<Avatar size={40} src={c.avatar} />}
 								  title={c.nickname}
 								  description={c.signature}
 								/>
-								{/* <div>Content</div> */}
 							  </List.Item>
 							)}
 						/>
