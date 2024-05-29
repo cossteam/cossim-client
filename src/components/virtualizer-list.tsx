@@ -126,7 +126,9 @@ const VirtualizerList: React.ForwardRefRenderFunction<
 
 	useEffect(() => {
 		if (isRendering) onRendering && onRendering(virtualizer.getVirtualItems()[0])
-		if (isRenderFinish && isScrollToEnd) scrollToEnd()
+		if (isRenderFinish && isScrollToEnd) {
+			parentRef.current?.scrollTo({ top: parentRef.current.scrollHeight, behavior: 'instant' })
+		}
 		if (isRenderFinish) onRenderFinish && onRenderFinish()
 	}, [isRendering, isRenderFinish])
 

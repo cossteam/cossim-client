@@ -16,7 +16,7 @@ const MessageContent = memo(() => {
 
 	const [data, setData] = useState<Message[]>([])
 	const [, setLoading] = useState<boolean>(false)
-	const [isScrolled, setIsScrolled] = useState<boolean>(false)
+	// const [isScrolled, setIsScrolled] = useState<boolean>(false)
 	// const [isFetchingNextPage, setIsFetchingNextPage] = useState<boolean>(false)
 	// const [firstRender, setFirstRender] = useState<boolean>(true)
 
@@ -36,7 +36,7 @@ const MessageContent = memo(() => {
 			resolve(generateMessageList(20))
 		})
 		setData(newData)
-		setIsScrolled(true)
+		// setIsScrolled(true)
 	}
 
 	useEffect(() => {
