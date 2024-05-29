@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { UserOptions, UserStoreMethods, UserStore } from '@/types/store'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
+import { LoginParams, LogoutParams } from '@/types/api'
+import { loginApi, logoutApi } from '@/api/user'
 
 const states: UserOptions = {
 	userId: '',
@@ -9,7 +11,43 @@ const states: UserOptions = {
 }
 
 const actions = (set: any): UserStoreMethods => ({
-	update: async (options) => set(options)
+	update: async (options) => set(options),
+	login: async (params: LoginParams) => {
+		try {
+			const { code, data } = await loginApi(params)
+			console.log(code, data)
+			if (code === 200) {
+				set({
+					userId: data.user_info.user_id,
+					userInfo: data.user_info,
+					token: data.token
+				})
+				return Promise.resolve(data)
+			}
+			return Promise.reject(data)
+		} catch (error) {
+			console.log('错误', error)
+			return Promise.reject(error)
+		}
+	},
+	logout: async (params: LogoutParams) => {
+		try {
+			const { code, data } = await logoutApi(params)
+			console.log(code, data)
+			if (code === 200) {
+				set({
+					userId: '',
+					userInfo: '',
+					token: ''
+				})
+				return Promise.resolve(data)
+			}
+			return Promise.reject(data)
+		} catch (error) {
+			console.log('错误', error)
+			return Promise.reject(error)
+		}
+	}
 })
 
 const commonStore = (set: any): UserStore => ({

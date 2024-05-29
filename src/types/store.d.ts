@@ -1,3 +1,5 @@
+import { LoginParams, LogoutParams } from './api'
+
 export interface UserOptions {
 	/*** @description 用户 id*/
 	userId: string
@@ -10,6 +12,8 @@ export interface UserOptions {
 export interface UserStoreMethods {
 	/** @description 更新某个值 */
 	update: (options: Partial<UserOptions>) => Promise<void>
+	login: (params: LoginParams) => Promise<void>
+	logout: (params: LogoutParams) => Promise<void>
 }
 
 export interface CommonOptions {

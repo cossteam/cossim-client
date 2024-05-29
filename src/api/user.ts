@@ -108,7 +108,7 @@ export function updatePassWordApi(data: PassWordUpdateParams): Promise<ResponseD
  * 退出登录
  * @returns
  */
-export function logoutApi(data: LogoutParams) {
+export function logoutApi(data: LogoutParams): Promise<ResponseData> {
 	return request({
 		url: `${baseUrl}/logout`,
 		method: 'POST',

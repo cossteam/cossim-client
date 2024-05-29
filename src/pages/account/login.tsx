@@ -10,14 +10,22 @@ const Login: React.FC = memo(() => {
 	const userStore = useUserStore()
 	const navigate = useNavigate()
 
-	const onFinish = (values: any) => {
+	const onFinish = async (values: any) => {
 		console.log('Received values of form: ', values)
-		userStore.update({
-			token: 'xie392'
-		})
-		navigate('/dashboard', {
-			replace: true
-		})
+		try {
+			await userStore.login({
+				driver_id: 'ff1005',
+				driver_token: 'ff1005',
+				email: values.email,
+				password: values.password,
+				platform: 'android'
+			})
+			navigate('/dashboard', {
+				replace: true
+			})
+		} catch (error) {
+			console.log(error)
+		}
 	}
 
 	const toQRCode = (options?: NavigateOptions | undefined) => {
