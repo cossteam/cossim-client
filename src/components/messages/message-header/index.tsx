@@ -26,11 +26,11 @@ const MessageHeader = memo(() => {
 	)
 
 	return (
-		<Flex className="mobile:min-h-20 min-h-16 bg-background pl-5 pr-3" justify="center" vertical>
+		<Flex className="mobile:min-h-16 min-h-16 bg-background pl-5 pr-3" justify="center" vertical>
 			<Flex justify="space-between">
 				<Flex vertical>
-					<Typography.Text className="text-lg">NotionNext 交流群</Typography.Text>
-					<Typography.Text className="text-gray-500 text-base">664位成员</Typography.Text>
+					<Typography.Text className="text-base">NotionNext 交流群</Typography.Text>
+					<Typography.Text className="text-gray-500 text-sm">664位成员</Typography.Text>
 				</Flex>
 				<Flex align="center" gap={10}>
 					<IconButton className="text-xl text-gray-500" component={SearchOutlined} />

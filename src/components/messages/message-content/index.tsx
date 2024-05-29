@@ -1,38 +1,42 @@
 import { useElementSize } from '@reactuses/core'
 import { Flex } from 'antd'
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { generateMessageList } from '@/mock/data'
-import { useVirtualizer } from '@tanstack/react-virtual'
+// import { useVirtualizer } from '@tanstack/react-virtual'
 import MessageItem from './message-item'
+import VirtualizerList, { VirtualizerListHandle } from '@/components/virtualizer-list'
+// import useDefer from '@/hooks/useDefer'
+// import clsx from 'clsx'
 
 const MessageContent = memo(() => {
 	const parentRef = useRef<HTMLDivElement>(null)
 	const [, height] = useElementSize(parentRef)
 
+	const virtualizerRef = useRef<VirtualizerListHandle>(null)
+
 	const [data, setData] = useState<Message[]>([])
 	const [, setLoading] = useState<boolean>(false)
-	const [isScrolled, setIsScrolled] = useState<boolean>(false)
+	// const [isScrolled, setIsScrolled] = useState<boolean>(false)
 	// const [isFetchingNextPage, setIsFetchingNextPage] = useState<boolean>(false)
 	// const [firstRender, setFirstRender] = useState<boolean>(true)
 
 	const count = useMemo(() => data.length, [data])
-	const virtualizer = useVirtualizer({
-		count,
-		getScrollElement: () => parentRef.current,
-		estimateSize: () => 45,
-		overscan: 5
-	})
+	// const { defer, isRendering, isRenderFinish } = useDefer(count)
+	// const virtualizer = useVirtualizer({
+	// 	count,
+	// 	getScrollElement: () => parentRef.current,
+	// 	estimateSize: () => 45,
+	// 	overscan: 5
+	// })
 
 	// 异步加载数据，防止阻塞渲染
 	const loadData = async () => {
 		setLoading(true)
 		const newData = await new Promise<Message[]>((resolve) => {
-			setTimeout(() => {
-				resolve(generateMessageList(100))
-			}, 0)
+			resolve(generateMessageList(20))
 		})
 		setData(newData)
-		setIsScrolled(true)
+		// setIsScrolled(true)
 	}
 
 	useEffect(() => {
@@ -40,10 +44,11 @@ const MessageContent = memo(() => {
 	}, [])
 
 	// 首次渲染完成后滚动到底部
-	useEffect(() => {
-		if (!virtualizer || !isScrolled) return
-		virtualizer.scrollToIndex(count - 1)
-	}, [isScrolled])
+	// useEffect(() => {
+	// 	if (isRenderFinish && virtualizerRef.current) {
+	// 		virtualizerRef.current?.virtualizer?.scrollToIndex(count - 1)
+	// 	}
+	// }, [isRenderFinish, virtualizerRef.current?.virtualizer])
 
 	// const isTop = useCallback(
 	// 	(index: number) => {
@@ -83,13 +88,43 @@ const MessageContent = memo(() => {
 	// 	// setIsFetchingNextPage(false)
 	// }, [])
 
+	const renderItem = useCallback(
+		(index: number) => {
+			return (
+				<div>
+					{index} <MessageItem message={data[index]} />
+				</div>
+			)
+		},
+		[data]
+	)
+
 	return (
 		<Flex
-			className="flex-1 overflow-y-auto overflow-x-hidden"
+			className="flex-1 overflow-y-auto overflow-x-hidden flex-col-reverse relative"
 			style={{ height, contain: 'strict' }}
 			ref={parentRef}
+			vertical
 		>
-			<Flex
+			{/* <Flex
+				className={clsx(
+					'flex-1 h-full bg-background absolute top-0 left-0 w-full z-10',
+					isRendering ? '!flex' : '!hidden'
+				)}
+				align="center"
+				justify="center"
+			>
+				loading...
+			</Flex> */}
+			<VirtualizerList
+				count={count}
+				listHeight={height}
+				renderItem={renderItem}
+				ref={virtualizerRef}
+				loading
+				isScrollToEnd
+			/>
+			{/* <Flex
 				style={{
 					height: virtualizer.getTotalSize(),
 					width: '100%',
@@ -112,7 +147,7 @@ const MessageContent = memo(() => {
 						<MessageItem message={data[virtualRow.index]} />
 					</Flex>
 				))}
-			</Flex>
+			</Flex> */}
 		</Flex>
 	)
 })
