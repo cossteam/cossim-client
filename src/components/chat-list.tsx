@@ -1,5 +1,5 @@
 import { Avatar, Badge, Flex, List, Typography } from 'antd'
-import VirtualList from 'rc-virtual-list'
+// import VirtualList from 'rc-virtual-list'
 import React, { memo, useCallback } from 'react'
 import { formatTime } from '@/utils/format-time'
 import { useWindowSize } from '@reactuses/core'
@@ -7,6 +7,7 @@ import { useWindowSize } from '@reactuses/core'
 import { headerHeight } from '@/components/layout/layout-header'
 import { useNavigate, useParams } from 'react-router'
 import clsx from 'clsx'
+import VirtualizerList from '@/components/virtualizer-list'
 
 interface ChatListProps {
 	data: ChatData[]
@@ -49,37 +50,33 @@ const ChatList: React.FC<ChatListProps> = memo((props) => {
 	const navigate = useNavigate()
 	const params = useParams()
 
-	const onScroll = useCallback(() => {
-		// console.log('onScroll')
-	}, [])
+	const renderItem = useCallback(
+		(index: number) => {
+			const chat = props.data[index]
+			return (
+				<List.Item
+					className={clsx(
+						'!px-3 select-none hover:bg-background-hover cursor-pointer w-full',
+						Number(params.id) === chat.dialog_id && '!bg-primary'
+					)}
+					key={chat.dialog_id}
+					extra={<ChatListItemExtra chat={chat} />}
+					onClick={() => navigate(`/dashboard/${chat.dialog_id}`)}
+				>
+					<List.Item.Meta
+						avatar={<ChatListItemAvatar chat={chat} />}
+						title={<ChatListItemTitle chat={chat} />}
+						description={<ChatListItemDescription chat={chat} />}
+					/>
+				</List.Item>
+			)
+		},
+		[params.id, props.data]
+	)
 
 	return (
 		<List>
-			<VirtualList
-				data={props.data}
-				height={height - headerHeight}
-				itemHeight={70}
-				itemKey="dialog_id"
-				onScroll={onScroll}
-			>
-				{(chat) => (
-					<List.Item
-						className={clsx(
-							'!px-3 select-none hover:bg-background-hover cursor-pointer',
-							Number(params.id) === chat.dialog_id && '!bg-primary'
-						)}
-						key={chat.dialog_id}
-						extra={<ChatListItemExtra chat={chat} />}
-						onClick={() => navigate(`/dashboard/${chat.dialog_id}`)}
-					>
-						<List.Item.Meta
-							avatar={<ChatListItemAvatar chat={chat} />}
-							title={<ChatListItemTitle chat={chat} />}
-							description={<ChatListItemDescription chat={chat} />}
-						/>
-					</List.Item>
-				)}
-			</VirtualList>
+			<VirtualizerList listHeight={height - headerHeight} count={props.data.length} renderItem={renderItem} />
 		</List>
 	)
 })
