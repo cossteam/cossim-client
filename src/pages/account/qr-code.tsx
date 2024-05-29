@@ -4,9 +4,9 @@ import { Button, Flex, Form, QRCode } from 'antd'
 import clsx from 'clsx'
 import { NavigateOptions, useNavigate } from 'react-router'
 // import QRCodeImg from '@/assets/qrcode.png'
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 
-const QRCodePage: React.FC = () => {
+const QRCodePage: React.FC = memo(() => {
 	// const userStore = useUserStore()
 	const navigate = useNavigate()
 
@@ -95,6 +95,6 @@ const QRCodePage: React.FC = () => {
 			</Flex>
 		</>
 	)
-}
+})
 
 export default QRCodePage
