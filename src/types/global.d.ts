@@ -1,3 +1,5 @@
+import { MESSAGE_SEND_STATE, MESSAGE_TYPE } from '@/utils/enum'
+
 export declare global {
 	interface ResponseData<T = any> {
 		code: number
@@ -29,9 +31,34 @@ export declare global {
 				avatar: string
 			}
 			reply: number
-			// TODO: 添加接收者信息
-			// receiver_info: {}
+			receiver_info: {
+				avatar: string
+				name: string
+				user_id: string
+			}
 		}
+	}
+
+	interface Message {
+		at_all_user: boolean
+		content: string
+		is_brun_after_reading: boolean
+		is_label: boolean
+		msg_id: number
+		msg_send_state: MESSAGE_SEND_STATE
+		read_at: number
+		receiver_id: string
+		receiver_info: {
+			avatar: string
+			name: string
+			user_id: string
+		}
+		sender_info: {
+			avatar: string
+			name: string
+			user_id: string
+		}
+		type: MESSAGE_TYPE
 	}
 
 	/** Electron 环境 */

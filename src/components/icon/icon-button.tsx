@@ -6,14 +6,18 @@ interface IconButtonProps {
 	component: React.ForwardRefExoticComponent<any> | React.FC<React.SVGProps<SVGSVGElement>>
 	className?: string
 	buttonClassName?: string
+	hover?: boolean
+	active?: boolean
 }
 
 const IconButton: React.FC<IconButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>> = memo(
-	({ component, className, buttonClassName, ...props }) => {
+	({ component, className, buttonClassName, hover, active, ...props }) => {
 		return (
 			<button
 				className={clsx(
-					'p-2 bg-transparent border-none outline-none rounded-md hover:bg-gray-100 focus:outline-none active:bg-gray-100 duration-300',
+					'p-2 bg-transparent border-none outline-none rounded-md focus:outline-none duration-300',
+					hover && 'hover:bg-gray-100',
+					active && 'active:bg-gray-100',
 					buttonClassName
 				)}
 				{...props}

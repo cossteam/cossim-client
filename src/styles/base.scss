@@ -39,19 +39,19 @@ body {
 
 
 ::-webkit-scrollbar {
-    width: 0px;
-    display: none;
+    width: 6px;
+    // display: none;
 }
 
-// ::-webkit-scrollbar-track {
-//     background: transparent;
-//     border-radius: 10px;
-// }
+::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
 
-// ::-webkit-scrollbar-thumb {
-//     background: rgba(221, 221, 221, 0.8);
-//     border-radius: 10px;
-// }
+::-webkit-scrollbar-thumb {
+    background: rgb(103, 102, 102);
+    border-radius: 10px;
+}
 
 .container--background {
     background: var(--gradient);
