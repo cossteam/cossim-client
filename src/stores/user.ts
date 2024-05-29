@@ -3,7 +3,7 @@ import { UserOptions, UserStoreMethods, UserStore } from '@/types/store'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 
 const states: UserOptions = {
-	userId: '',
+	userId: '1',
 	userInfo: '',
 	token: ''
 }

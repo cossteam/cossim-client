@@ -11,7 +11,12 @@ const Messages = memo(() => {
 	// const params = useParams()
 
 	return (
-		<Flex className="container--background flex-1 h-screen" style={{ height }} vertical align="stretch">
+		<Flex
+			className="container--background bg-background3  flex-1 h-screen"
+			style={{ height }}
+			vertical
+			align="stretch"
+		>
 			<MessageHeader />
 			<MessageContent />
 			<MessageFooter />
