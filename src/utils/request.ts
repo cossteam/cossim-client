@@ -82,7 +82,7 @@ service.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
 		const requestStore = useRequestStore.getState()
 		config.baseURL = requestStore.config.baseUrl
-		const token = useUserStore().token
+		const token = useUserStore.getState().token
 		if (token) config.headers['Authorization'] = 'Bearer ' + token
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		// PGP 加密 Start
