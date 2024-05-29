@@ -4,6 +4,7 @@
  * @author YuHong
  */
 import { faker } from '@faker-js/faker'
+import { useEffect,useState } from 'react'
 
 export const generateChatList = (count: number = 10) => {
 	return Array.from({ length: count }, (_, index) => {
@@ -169,3 +170,18 @@ export const generateContactList = (count: number = 10) => {
 	};
 };
 
+// export interface ContactList {
+// 	list: { [key: string]: Contact[] };
+// 	total: number;
+//   }
+  
+// export const useContactList = () => {
+// 	const [contactList, setContactList] = useState<ContactList>({ list: {}, total: 0 });
+  
+// 	useEffect(() => {
+// 	  const contacts = generateContactList(10); // Change the number as needed
+// 	  setContactList(contacts);
+// 	}, []);
+  
+// 	return contactList;
+// };

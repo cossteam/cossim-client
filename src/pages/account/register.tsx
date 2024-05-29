@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Avatar, Flex } from 'antd'
 import { $t } from '@/i18n'
 import clsx from 'clsx'
 import { NavigateOptions, useNavigate } from 'react-router'
 
-const Register: React.FC = () => {
+const Register: React.FC = memo(() => {
 	const navigate = useNavigate()
 
 	const onFinish = (values: any) => {
@@ -112,6 +112,6 @@ const Register: React.FC = () => {
 			</Form>
 		</Flex>
 	)
-}
+})
 
 export default Register

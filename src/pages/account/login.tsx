@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Avatar, Flex, Checkbox } from 'antd'
 import { $t } from '@/i18n'
@@ -6,7 +6,7 @@ import clsx from 'clsx'
 import { NavigateOptions, useNavigate } from 'react-router'
 import useUserStore from '@/stores/user'
 
-const Login: React.FC = () => {
+const Login: React.FC = memo(() => {
 	const userStore = useUserStore()
 	const navigate = useNavigate()
 
@@ -106,6 +106,6 @@ const Login: React.FC = () => {
 			</Flex>
 		</>
 	)
-}
+})
 
 export default Login
