@@ -35,17 +35,18 @@ const actions = (set: any): UserStoreMethods => ({
 			const { code, data } = await logoutApi(params)
 			console.log(code, data)
 			if (code === 200) {
-				set({
-					userId: '',
-					userInfo: null,
-					token: ''
-				})
 				return Promise.resolve(data)
 			}
 			return Promise.reject(data)
 		} catch (error) {
 			console.log('错误', error)
 			return Promise.reject(error)
+		} finally {
+			set({
+				userId: '',
+				userInfo: null,
+				token: ''
+			})
 		}
 	}
 })
