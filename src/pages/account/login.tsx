@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React from 'react'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Avatar, Flex, Checkbox } from 'antd'
 import { $t } from '@/i18n'
@@ -7,7 +7,7 @@ import { NavigateOptions, useNavigate } from 'react-router'
 import useUserStore from '@/stores/user'
 import { createFingerprint } from '@/utils/fingerprint'
 
-const Login: React.FC = memo(() => {
+const Login: React.FC = () => {
 	const userStore = useUserStore()
 	const navigate = useNavigate()
 
@@ -115,6 +115,6 @@ const Login: React.FC = memo(() => {
 			</Flex>
 		</>
 	)
-})
+}
 
 export default Login
