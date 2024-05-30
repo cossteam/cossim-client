@@ -1,6 +1,6 @@
 import { Flex } from 'antd'
 import InfiniteScrollComponent, { Props } from 'react-infinite-scroll-component'
-import { forwardRef, memo, useImperativeHandle, useMemo, useRef } from 'react'
+import { forwardRef, memo, useImperativeHandle, useRef } from 'react'
 import { useElementSize } from '@reactuses/core'
 
 interface InfiniteScrollProps {
@@ -20,7 +20,7 @@ const InfiniteScroll: React.ForwardRefRenderFunction<InfiniteScrollPropsHandle, 
 
 	const [, height] = useElementSize(parentRef)
 
-	const scrollThreshold = useMemo(() => Math.floor((props.height || height) / 2), [height, props.height])
+	// const scrollThreshold = useMemo(() => Math.floor((props.height || height) / 2), [height, props.height])
 
 	useImperativeHandle(ref, () => ({}))
 
@@ -44,8 +44,8 @@ const InfiniteScroll: React.ForwardRefRenderFunction<InfiniteScrollPropsHandle, 
 				hasMore={true}
 				scrollableTarget="scrollableDiv"
 				ref={infiniteRef}
-				loader
-				scrollThreshold={scrollThreshold}
+				loader={<>loading...</>}
+				scrollThreshold={0}
 				{...props.options}
 			>
 				{props.children}
