@@ -187,3 +187,7 @@ export const generateContactList = (count: number = 10) => {
 
 // 	return contactList;
 // };
+
+export const createGroup = (value:any)=>{
+	return value
+}

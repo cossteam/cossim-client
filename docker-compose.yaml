@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  client:
+    image: hub.hitosea.com/cossim/client
+    container_name: cossim_client
+    ports:
+      - "801:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
