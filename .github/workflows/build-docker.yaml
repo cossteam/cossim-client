@@ -1,4 +1,4 @@
-name: Admin Docker Image
+name: Client Docker Image
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
         run: |
           docker buildx create --use
           docker buildx inspect --bootstrap
-          docker buildx build --platform linux/amd64,linux/arm64 \
+          docker buildx build --platform linux/amd64 \
             --tag ${{ secrets.REGISTRY }}/client:${{ github.sha }} \
             --tag ${{ secrets.REGISTRY }}/client:latest \
             --push .
