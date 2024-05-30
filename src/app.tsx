@@ -10,6 +10,7 @@ import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import dayjs from 'dayjs'
 import { Locale } from 'antd/es/locale'
+// import Call from '@/components/call'
 
 const App = memo(() => {
 	const commonStore = useCommonStore()
@@ -28,6 +29,8 @@ const App = memo(() => {
 
 	// 鉴权
 	useAuth()
+	console.log(useRoutes(routes))
+
 	return (
 		<ConfigProvider
 			theme={{
@@ -42,6 +45,8 @@ const App = memo(() => {
 		>
 			<AppComponent>
 				<Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
+				{/* 通话组件 */}
+				{/* <Call /> */}
 			</AppComponent>
 		</ConfigProvider>
 	)

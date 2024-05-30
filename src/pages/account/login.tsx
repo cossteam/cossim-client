@@ -1,12 +1,13 @@
-import React, { memo } from 'react'
+import React from 'react'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Avatar, Flex, Checkbox } from 'antd'
 import { $t } from '@/i18n'
 import clsx from 'clsx'
 import { NavigateOptions, useNavigate } from 'react-router'
 import useUserStore from '@/stores/user'
+import { createFingerprint } from '@/utils/fingerprint'
 
-const Login: React.FC = memo(() => {
+const Login: React.FC = () => {
 	const userStore = useUserStore()
 	const navigate = useNavigate()
 
@@ -14,7 +15,7 @@ const Login: React.FC = memo(() => {
 		console.log('Received values of form: ', values)
 		try {
 			await userStore.login({
-				driver_id: 'ff1005',
+				driver_id: createFingerprint(),
 				driver_token: 'ff1005',
 				email: values.email,
 				password: values.password,
@@ -114,6 +115,6 @@ const Login: React.FC = memo(() => {
 			</Flex>
 		</>
 	)
-})
+}
 
 export default Login

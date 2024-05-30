@@ -16,6 +16,7 @@ import SettingList from '@/components/setting-list'
 import useMobile from '@/hooks/useMobile'
 import useUserStore from '@/stores/user'
 import { useNavigate } from 'react-router'
+import { createFingerprint } from '@/utils/fingerprint'
 
 interface Menus {
 	icon: React.ForwardRefExoticComponent<any>
@@ -69,23 +70,24 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
 	const [activeIndex, setActiveIndex] = useState<number>(0)
 	const handlerMenusClick = (item: Menus, index: number) => {
 		props.setOpen && props.setOpen(false)
-		setTitle(item.title)
+		setModalTitle(item.title)
 		setModalOpen(true)
 		setActiveIndex(index)
 	}
 
 	const [modalOpen, setModalOpen] = useState<boolean>(false)
-	const [title, setTitle] = useState<string>('')
+	const [modalTitle, setModalTitle] = useState<string>('')
 
 	const Component = useMemo(() => menus[activeIndex].component, [activeIndex, menus])
 
 	// 退出登录
+	const [openLogoutModal, setOpenLogoutModal] = useState(false)
 	const logout = async () => {
 		try {
 			const data = await userStore.logout({
-				driver_id: 'ff1005'
+				driver_id: createFingerprint()
 			})
-			console.log('退出登录', data)
+			console.log($t('退出登录'), data)
 		} catch (error) {
 			console.log(error)
 		} finally {
@@ -154,15 +156,28 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
 						className="w-full mx-[24px] p-[20px] flex justify-center items-center"
 						type="primary"
 						danger
-						onClick={() => logout()}
+						onClick={() => setOpenLogoutModal(true)}
 					>
 						{$t('退出登陆')}
 					</Button>
 				</Flex>
 			</Drawer>
 
-			<Modal open={modalOpen} onCancel={() => setModalOpen(false)} title={title}>
+			<Modal open={modalOpen} title={modalTitle} onCancel={() => setModalOpen(false)} footer={null}>
 				{Component}
+			</Modal>
+
+			<Modal
+				title={$t('退出登陆')}
+				centered
+				open={openLogoutModal}
+				onOk={() => {
+					logout()
+					setOpenLogoutModal(false)
+				}}
+				onCancel={() => setOpenLogoutModal(false)}
+			>
+				<p>{$t('确定要退出登陆吗？')}</p>
 			</Modal>
 		</>
 	)

@@ -1,4 +1,4 @@
-import { MoreOutlined, SearchOutlined } from '@ant-design/icons'
+import { MoreOutlined, SearchOutlined, PhoneOutlined, VideoCameraOutlined } from '@ant-design/icons'
 import { Flex, Typography, Dropdown, MenuProps } from 'antd'
 import { useMemo } from 'react'
 import IconButton from '@/components/icon/icon-button'
@@ -34,6 +34,8 @@ const MessageHeader = () => {
 				</Flex>
 				<Flex align="center" gap={10}>
 					<IconButton className="text-xl text-gray-500" component={SearchOutlined} />
+					<IconButton className="text-xl text-gray-500" component={PhoneOutlined} />
+					<IconButton className="text-xl text-gray-500" component={VideoCameraOutlined} />
 					<Dropdown menu={{ items }} trigger={['click']}>
 						<a onClick={(e) => e.preventDefault()}>
 							<IconButton className="text-xl text-gray-500" component={MoreOutlined} />
