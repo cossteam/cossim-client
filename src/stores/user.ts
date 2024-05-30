@@ -6,7 +6,7 @@ import { loginApi, logoutApi } from '@/api/user'
 
 const states: UserOptions = {
 	userId: '',
-	userInfo: '',
+	userInfo: null,
 	token: ''
 }
 
@@ -37,7 +37,7 @@ const actions = (set: any): UserStoreMethods => ({
 			if (code === 200) {
 				set({
 					userId: '',
-					userInfo: '',
+					userInfo: null,
 					token: ''
 				})
 				return Promise.resolve(data)

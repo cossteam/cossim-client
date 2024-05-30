@@ -54,7 +54,7 @@ const requestStore = (set: any): RequestStore => ({
 const useRequestStore = create(
 	devtools(
 		persist(requestStore, {
-			name: 'coss-request-storage',
+			name: 'COSS_REQUEST_STORE',
 			storage: createJSONStorage(() => localStorage)
 		})
 	)
