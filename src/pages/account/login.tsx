@@ -5,6 +5,7 @@ import { $t } from '@/i18n'
 import clsx from 'clsx'
 import { NavigateOptions, useNavigate } from 'react-router'
 import useUserStore from '@/stores/user'
+import { createFingerprint } from '@/utils/fingerprint'
 
 const Login: React.FC = memo(() => {
 	const userStore = useUserStore()
@@ -14,7 +15,7 @@ const Login: React.FC = memo(() => {
 		console.log('Received values of form: ', values)
 		try {
 			await userStore.login({
-				driver_id: 'ff1005',
+				driver_id: createFingerprint(),
 				driver_token: 'ff1005',
 				email: values.email,
 				password: values.password,
