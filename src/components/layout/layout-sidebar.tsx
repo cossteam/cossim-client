@@ -1,11 +1,10 @@
-import { memo } from 'react'
 import clsx from 'clsx'
 import ChatList from '@/components/chat-list'
 import { generateChatList } from '@/mock/data'
 import LayoutHeader from './layout-header'
 import { Flex } from 'antd'
 
-const LayoutSidebar = memo(() => {
+const LayoutSidebar = () => {
 	return (
 		<Flex
 			className={clsx(
@@ -18,6 +17,6 @@ const LayoutSidebar = memo(() => {
 			<ChatList data={generateChatList(30)} />
 		</Flex>
 	)
-})
+}
 
 export default LayoutSidebar

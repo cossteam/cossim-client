@@ -1,9 +1,9 @@
-import { memo, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Avatar, List, Divider, Skeleton } from 'antd'
 import { Contact, ContactList, generateContactList } from '@/mock/data'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-const ContactListPage = memo(() => {
+const ContactListPage = () => {
 	const [loading, setLoading] = useState(false)
 	const [contactList, setContactList] = useState<ContactList>({ list: {}, total: 0 })
 	const [data, setData] = useState<{ key: string; list: Contact[] }[]>([])
@@ -83,6 +83,6 @@ const ContactListPage = memo(() => {
 			</InfiniteScroll>
 		</div>
 	)
-})
+}
 
 export default ContactListPage

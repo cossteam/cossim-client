@@ -1,9 +1,9 @@
 import { MoreOutlined, SearchOutlined } from '@ant-design/icons'
 import { Flex, Typography, Dropdown, MenuProps } from 'antd'
-import { memo, useMemo } from 'react'
+import { useMemo } from 'react'
 import IconButton from '@/components/icon/icon-button'
 
-const MessageHeader = memo(() => {
+const MessageHeader = () => {
 	const items = useMemo<MenuProps['items']>(
 		() => [
 			{
@@ -43,6 +43,6 @@ const MessageHeader = memo(() => {
 			</Flex>
 		</Flex>
 	)
-})
+}
 
 export default MessageHeader
