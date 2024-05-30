@@ -1,4 +1,4 @@
-import { Avatar, Badge, Flex, List, Typography } from 'antd'
+import { Avatar, Flex, Badge, List, Typography } from 'antd'
 import React, { useCallback } from 'react'
 import { formatTime } from '@/utils/format-time'
 import { headerHeight } from '@/components/layout/layout-header'
@@ -54,7 +54,7 @@ const ChatListItemExtra: React.FC<{ chat: ChatData }> = ({ chat }) => {
 			<Typography.Text className="text-gray-500 text-xs mb-2">
 				{formatTime(chat.last_message.send_time)}
 			</Typography.Text>
-			<Badge count={chat.dialog_unread_count} />
+			<Badge className="badge" count={chat.dialog_unread_count} />
 		</Flex>
 	)
 }

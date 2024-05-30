@@ -30,7 +30,14 @@ const App = memo(() => {
 	useAuth()
 	return (
 		<ConfigProvider
-			theme={{ token: { colorPrimary: commonStore.themeColor, borderRadius: 4, fontSize: 16 } }}
+			theme={{
+				token: {
+					colorPrimary: commonStore.themeColor,
+					borderRadius: 4,
+					fontSize: 16
+					// colorBgElevated: 'transparent'
+				}
+			}}
 			locale={locale}
 		>
 			<AppComponent>

@@ -5,6 +5,8 @@ import { SendIcon } from '@/components/icon/icon'
 import { useState } from 'react'
 import MessageEmojis from './message-emojis'
 import useMobile from '@/hooks/useMobile'
+import MessageInput from './message-input'
+import { $t } from '@/i18n'
 
 const MessageFooter = () => {
 	const [open, setOpen] = useState<boolean>(false)
@@ -12,13 +14,15 @@ const MessageFooter = () => {
 	const { isMobile } = useMobile()
 
 	return (
-		<Flex className="min-h-16 bg-background px-3" align="center">
+		<Flex className="bg-background px-3 max-h-[300px] py-3" align="end">
 			<IconButton className="text-2xl text-gray-500" component={PaperClipOutlined} hover={false} active={false} />
-			<input
+
+			{/* <input
 				type="text"
 				placeholder="Type a message"
 				className="w-full h-10 px-3 rounded-lg bg-gray-100 focus:outline-none"
-			/>
+			/> */}
+			<MessageInput placeholder={$t('输入消息...')} />
 
 			{isMobile ? (
 				<IconButton className="text-2xl text-gray-500" component={MehOutlined} hover={false} active={false} />
@@ -29,8 +33,10 @@ const MessageFooter = () => {
 					open={open}
 					onOpenChange={(open) => setOpen(open)}
 					arrow={false}
-					rootClassName="container--filter"
-					overlayClassName="container--filter"
+					rootClassName="container--filter popover--padding"
+					overlayStyle={{ padding: 0 }}
+					placement="topLeft"
+					destroyTooltipOnHide
 				>
 					<a className="flex">
 						<IconButton
@@ -42,7 +48,6 @@ const MessageFooter = () => {
 					</a>
 				</Popover>
 			)}
-
 			<IconButton className="text-2xl text-gray-500" component={PlusOutlined} hover={false} active={false} />
 			<IconButton className="text-2xl text-primary" component={SendIcon} hover={false} active={false} />
 			{/* <IconButton className="text-2xl text-primary" component={AudioIcon} hover={false} active={false} /> */}
