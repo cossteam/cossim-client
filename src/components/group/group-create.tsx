@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button, Form, Input, Tooltip, Space, Divider, Avatar, List, Checkbox, Radio } from 'antd'
 import { $t } from '@/i18n'
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
-import { Contact, generateContactList } from '@/mock/data'
+import { Contact, generateContactList, createGroup } from '@/mock/data'
 
 const layout = {
 	labelCol: { span: 10 },
@@ -22,7 +22,8 @@ const GroupCreate = () => {
 
 	//完成创建群组
 	const onFinish = (values: any) => {
-		console.log(values)
+		createGroup(values)
+		// console.log(values);
 		// console.log('Selected Contacts:', selectedContacts);
 	}
 
