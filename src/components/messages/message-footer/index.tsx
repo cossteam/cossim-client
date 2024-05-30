@@ -38,7 +38,7 @@ const MessageFooter = () => {
 					placement="topLeft"
 					destroyTooltipOnHide
 				>
-					<a className="flex">
+					<a className="flex" onClick={(e) => e.preventDefault()}>
 						<IconButton
 							className="text-2xl text-gray-500"
 							component={MehOutlined}
