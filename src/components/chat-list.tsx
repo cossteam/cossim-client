@@ -23,8 +23,8 @@ const ChatList: React.FC<ChatListProps> = (props) => {
 			return (
 				<List.Item
 					className={clsx(
-						'!px-3 select-none hover:bg-background-hover cursor-pointer w-full',
-						Number(params.id) === chat.dialog_id && '!bg-primary'
+						'!px-3 select-none w750:hover:bg-background-hover cursor-pointer w-full',
+						Number(params.id) === chat.dialog_id && 'w750:!bg-primary'
 					)}
 					key={chat.dialog_id}
 					extra={<ChatListItemExtra chat={chat} />}
