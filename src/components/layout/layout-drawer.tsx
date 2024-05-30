@@ -2,23 +2,23 @@ import { $t } from '@/i18n'
 import { generateUserInfo } from '@/mock/data'
 import { SettingOutlined, UserOutlined, UsergroupAddOutlined } from '@ant-design/icons'
 import { Avatar, Drawer, DrawerProps, Flex, Divider, Typography, Switch } from 'antd'
-import { memo, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import CustomIcon from '@/components/icon'
 import Modal from '@/components/modal'
 import { LightIcon, DarkIcon } from '@/components/icon/icon'
 import useCommonStore from '@/stores/common'
 import { THEME } from '@/utils/enum'
-import { useWindowSize } from '@reactuses/core'
 import { SMALL_SCREEN } from '@/utils/constants'
 import type { DrawerStyles } from 'antd/es/drawer/DrawerPanel'
 import ContactList from '@/components/contact-list'
 import GroupCreate from '@/components/group/group-create'
 import SettingList from '@/components/setting-list'
+import useMobile from '@/hooks/useMobile'
 
 interface Menus {
 	icon: React.ForwardRefExoticComponent<any>
 	title: string
-	component: React.MemoExoticComponent<() => JSX.Element>
+	component: JSX.Element
 }
 
 interface LayoutDrawerProps extends DrawerProps {
@@ -33,9 +33,9 @@ const drawerStyles: DrawerStyles = {
 	}
 }
 
-const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = memo((props) => {
+const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
 	const commonStore = useCommonStore()
-	const { width } = useWindowSize()
+	const { width } = useMobile()
 
 	const isLight = useMemo(() => commonStore.theme === THEME.LIGHT, [commonStore.theme])
 
@@ -44,17 +44,17 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = memo((props) => {
 			{
 				icon: UsergroupAddOutlined,
 				title: $t('新建群组'),
-				component: GroupCreate
+				component: <GroupCreate />
 			},
 			{
 				icon: UserOutlined,
 				title: $t('联系人'),
-				component: ContactList
+				component: <ContactList />
 			},
 			{
 				icon: SettingOutlined,
 				title: $t('设置'),
-				component: SettingList
+				component: <SettingList />
 			}
 		],
 		[]
@@ -130,10 +130,10 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = memo((props) => {
 			</Drawer>
 
 			<Modal open={modalOpen} onCancel={() => setModalOpen(false)} title={title}>
-				{Component && <Component />}
+				{Component}
 			</Modal>
 		</>
 	)
-})
+}
 
 export default LayoutDrawer

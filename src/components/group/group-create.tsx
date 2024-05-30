@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Button, Form, Input, Tooltip, Space, Divider, Avatar, List, Checkbox, Radio } from 'antd'
 import { $t } from '@/i18n'
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
@@ -13,7 +13,7 @@ const tailLayout = {
 	wrapperCol: { offset: 8, span: 16 }
 }
 
-const GroupCreate = memo(() => {
+const GroupCreate = () => {
 	const [form] = Form.useForm()
 	const [showContacts, setShowContacts] = useState(false)
 	const [groupType, setGroupType] = useState('public')
@@ -142,6 +142,6 @@ const GroupCreate = memo(() => {
 			)}
 		</Form>
 	)
-})
+}
 
 export default GroupCreate

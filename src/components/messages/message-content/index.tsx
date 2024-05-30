@@ -1,11 +1,11 @@
 import { useElementSize } from '@reactuses/core'
 import { Flex } from 'antd'
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { generateMessageList } from '@/mock/data'
 import MessageItem from './message-item'
 import InfiniteScroll from '@/components/infinite-scroll'
 
-const MessageContent = memo(() => {
+const MessageContent = () => {
 	const parentRef = useRef<HTMLDivElement>(null)
 	const [, height] = useElementSize(parentRef)
 
@@ -85,6 +85,6 @@ const MessageContent = memo(() => {
 			</InfiniteScroll>
 		</Flex>
 	)
-})
+}
 
 export default MessageContent

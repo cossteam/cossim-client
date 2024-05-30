@@ -1,6 +1,6 @@
 import { Flex } from 'antd'
 import InfiniteScrollComponent, { Props } from 'react-infinite-scroll-component'
-import { forwardRef, memo, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { useElementSize } from '@reactuses/core'
 
 interface InfiniteScrollProps {
@@ -56,4 +56,4 @@ const InfiniteScroll: React.ForwardRefRenderFunction<InfiniteScrollPropsHandle, 
 
 InfiniteScroll.displayName = 'InfiniteScroll'
 
-export default memo(forwardRef(InfiniteScroll))
+export default forwardRef(InfiniteScroll)

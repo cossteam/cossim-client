@@ -1,5 +1,5 @@
 import { Flex, Typography } from 'antd'
-import React, { forwardRef, memo, useEffect, useImperativeHandle, useRef } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { VirtualItem, Virtualizer, VirtualizerOptions, useWindowVirtualizer } from '@tanstack/react-virtual'
 import { useElementSize } from '@reactuses/core'
 import useDefer from '@/hooks/useDefer'
@@ -185,4 +185,4 @@ const VirtualizerList: React.ForwardRefRenderFunction<
 
 VirtualizerList.displayName = 'VirtualizerList'
 
-export default memo(forwardRef(VirtualizerList))
+export default forwardRef(VirtualizerList)

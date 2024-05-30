@@ -1,7 +1,5 @@
 import Messages from '@/components/messages'
 
-const LayoutContent = () => {
-	return <Messages />
-}
+const LayoutContent = () => <Messages />
 
 export default LayoutContent

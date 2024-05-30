@@ -1,13 +1,13 @@
 import { $t } from '@/i18n'
 import { MenuOutlined, SearchOutlined } from '@ant-design/icons'
 import { Flex, Typography } from 'antd'
-import { memo, useState } from 'react'
+import { useState } from 'react'
 import LayoutDrawer from './layout-drawer'
 import IconButton from '@/components/icon/icon-button'
 
 export const headerHeight = 64
 
-const LayoutHeader = memo(() => {
+const LayoutHeader = () => {
 	const [open, setOpen] = useState<boolean>(false)
 	return (
 		<>
@@ -26,6 +26,6 @@ const LayoutHeader = memo(() => {
 			<LayoutDrawer open={open} onClose={() => setOpen(false)} setOpen={setOpen} />
 		</>
 	)
-})
+}
 
 export default LayoutHeader

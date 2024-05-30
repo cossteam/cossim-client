@@ -1,14 +1,11 @@
-import { useWindowSize } from '@reactuses/core'
 import { Flex } from 'antd'
-import { memo } from 'react'
 import MessageHeader from './message-header'
 import MessageContent from './message-content'
 import MessageFooter from './message-footer'
-// import { useParams } from 'react-router'
+import useMobile from '@/hooks/useMobile'
 
-const Messages = memo(() => {
-	const { height } = useWindowSize()
-	// const params = useParams()
+const Messages = () => {
+	const { height } = useMobile()
 
 	return (
 		<Flex
@@ -22,6 +19,6 @@ const Messages = memo(() => {
 			<MessageFooter />
 		</Flex>
 	)
-})
+}
 
 export default Messages

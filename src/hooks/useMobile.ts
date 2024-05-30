@@ -1,11 +1,20 @@
+import { SMALL_SCREEN } from '@/utils/constants'
 import { useWindowSize } from '@reactuses/core'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 function useMobile() {
-	// const [isMobile, setIsMobile] = useState<boolean>(false)
-	const { width } = useWindowSize()
+	const [isMobile, setIsMobile] = useState<boolean>(false)
+	const { width, height } = useWindowSize()
 
-	useEffect(() => {}, [width])
+	useEffect(() => {
+		setIsMobile(width <= SMALL_SCREEN)
+	}, [width])
+
+	return {
+		isMobile,
+		width,
+		height
+	}
 }
 
 export default useMobile
