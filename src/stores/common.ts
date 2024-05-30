@@ -10,7 +10,8 @@ const states: CommonOptions = {
 	theme: THEME.LIGHT,
 	themeColor: `hsl(${defaultThemeColor})`,
 	lang: defaultLanguage,
-	lastDialogId: 0
+	lastDialogId: 0,
+	historyEmoji: []
 }
 
 const actions = (set: any, get: any): CommonStoreMethods => ({

@@ -28,6 +28,8 @@ export interface CommonOptions {
 	lang: string
 	/** @description 记录上一次记录的会话 id */
 	lastDialogId: number
+	/** @description  记录历史表情 */
+	historyEmoji: string[]
 }
 
 export interface CommonStoreMethods {

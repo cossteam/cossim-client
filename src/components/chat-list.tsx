@@ -1,5 +1,5 @@
 import { Avatar, Badge, Flex, List, Typography } from 'antd'
-import React, { memo, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { formatTime } from '@/utils/format-time'
 import { headerHeight } from '@/components/layout/layout-header'
 import { useNavigate, useParams } from 'react-router'
@@ -12,7 +12,7 @@ interface ChatListProps {
 	height?: number
 }
 
-const ChatList: React.FC<ChatListProps> = memo((props) => {
+const ChatList: React.FC<ChatListProps> = (props) => {
 	const { height } = useMobile()
 	const navigate = useNavigate()
 	const params = useParams()
@@ -46,7 +46,7 @@ const ChatList: React.FC<ChatListProps> = memo((props) => {
 			<VirtualizerList listHeight={height - headerHeight} count={props.data.length} renderItem={renderItem} />
 		</List>
 	)
-})
+}
 
 const ChatListItemExtra: React.FC<{ chat: ChatData }> = ({ chat }) => {
 	return (
