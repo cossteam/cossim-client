@@ -51,3 +51,13 @@ export enum MESSAGE_SEND_STATE {
 	/** 发送失败 */
 	FAILED = 2
 }
+
+/** 语言类型 */
+export enum LANGUAGE_TYPE {
+	/** 英文 */
+	EN = 'en',
+	/** 简体中文 */
+	ZH = 'zh',
+	/** 繁体中文 */
+	TC = 'tc'
+}

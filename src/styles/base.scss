@@ -42,7 +42,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgb(103, 102, 102);
+    background: rgba(103, 102, 102, 0.2);
     border-radius: 10px;
 }
 
@@ -55,10 +55,24 @@ body {
     -webkit-backdrop-filter: blur(25px) saturate(47%);
 }
 
+.popover--padding {
+    .ant-popover-inner {
+        padding: 0;
+    }
+}
+
 em-emoji-picker {
     width: 100%;
+    border-color: transparent;
+    box-shadow: none;
+    // --rgb-background: 0 0 0 / 0;
+
 }
 
 .emojis-picker>div {
     width: 100%;
+}
+
+.badge .ant-badge-count {
+    box-shadow: none;
 }
