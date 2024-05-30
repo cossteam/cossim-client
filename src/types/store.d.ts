@@ -12,8 +12,8 @@ export interface UserOptions {
 export interface UserStoreMethods {
 	/** @description 更新某个值 */
 	update: (options: Partial<UserOptions>) => Promise<void>
-	login: (params: LoginParams) => Promise<void>
-	logout: (params: LogoutParams) => Promise<void>
+	login: (params: LoginParams) => Promise<ResponseData<any>>
+	logout: (params: LogoutParams) => Promise<ResponseData<any>>
 }
 
 export interface CommonOptions {

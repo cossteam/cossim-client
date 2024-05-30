@@ -1,7 +1,7 @@
 import { $t } from '@/i18n'
 import { generateUserInfo } from '@/mock/data'
 import { SettingOutlined, UserOutlined, UsergroupAddOutlined } from '@ant-design/icons'
-import { Avatar, Drawer, DrawerProps, Flex, Divider, Typography, Switch } from 'antd'
+import { Avatar, Drawer, DrawerProps, Flex, Divider, Typography, Switch, Button } from 'antd'
 import { useMemo, useState } from 'react'
 import CustomIcon from '@/components/icon'
 import Modal from '@/components/modal'
@@ -14,6 +14,8 @@ import ContactList from '@/components/contact-list'
 import GroupCreate from '@/components/group/group-create'
 import SettingList from '@/components/setting-list'
 import useMobile from '@/hooks/useMobile'
+import useUserStore from '@/stores/user'
+import { useNavigate } from 'react-router'
 
 interface Menus {
 	icon: React.ForwardRefExoticComponent<any>
@@ -29,11 +31,15 @@ const userInfo = generateUserInfo()
 
 const drawerStyles: DrawerStyles = {
 	body: {
+		display: 'flex',
+		flexDirection: 'column',
 		padding: '24px 0px'
 	}
 }
 
 const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
+	const userStore = useUserStore()
+	const navigate = useNavigate()
 	const commonStore = useCommonStore()
 	const { width } = useMobile()
 
@@ -73,6 +79,22 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
 
 	const Component = useMemo(() => menus[activeIndex].component, [activeIndex, menus])
 
+	// 退出登录
+	const logout = async () => {
+		try {
+			const data = await userStore.logout({
+				driver_id: 'ff1005'
+			})
+			console.log('退出登录', data)
+		} catch (error) {
+			console.log(error)
+		} finally {
+			navigate('/account/login', {
+				replace: true
+			})
+		}
+	}
+
 	return (
 		<>
 			<Drawer
@@ -84,7 +106,7 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
 				{...props}
 			>
 				<Flex className="mobile:px-5 px-3" align="center">
-					<Avatar className="mr-4" src={userInfo.avatar} size={64} />
+					<Avatar className="mr-4 min-w-[64px] min-h-[64px]" src={userInfo.avatar} size={64} />
 					<Flex vertical>
 						<Typography.Text className="!mb-1 font-bold mobile:text-xl text-lg">
 							{userInfo.nickname}
@@ -126,6 +148,16 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
 						</Flex>
 						<Switch checked={!isLight} />
 					</Flex>
+				</Flex>
+				<Flex className="flex-1 h-fit" justify="center" align="flex-end">
+					<Button
+						className="w-full mx-[24px] p-[20px] flex justify-center items-center"
+						type="primary"
+						danger
+						onClick={() => logout()}
+					>
+						{$t('退出登陆')}
+					</Button>
 				</Flex>
 			</Drawer>
 
