@@ -12,7 +12,6 @@
         "electron",
         "capacitor",
         "socket.io",
-        "sql.js",
         "zustand",
         "antd",
         "i18next",
@@ -21,16 +20,15 @@
     "scripts": {
         "dev": "cross-env TARGET=web vite --mode development --host 0.0.0.0",
         "dev:electron": "cross-env TARGET=electron vite --mode development",
-        "dev:android": "npm run build:mobile && npx cap copy",
-        "dev:ios": "npm run build:mobile && npx cap copy",
+        "dev:android": "cross-env TARGET=development && npm run build:mobile && npx cap copy",
+        "dev:ios": "cross-env TARGET=development && npm run build:mobile && npx cap copy",
         "build": "tsc && vite build",
         "build:electron": "cross-env TARGET=electron tsc && vite build && electron-builder",
-        "build:mobile": "npm run build && npx cap sync",
+        "build:mobile": "cross-env TARGET=production && npm run build && npx cap sync",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
         "translate": "node node_modules/vue-auto-translate/server.js",
-        "format": "prettier --write ./src/**/*.{ts,tsx,js,jsx,json,md,mdx}",
-        "copy:sql:wasm": "copyfiles -u 3 node_modules/sql.js/dist/sql-wasm.wasm public/assets"
+        "format": "prettier --write ./src/**/*.{ts,tsx,js,jsx,json,md,mdx}"
     },
     "dependencies": {
         "@ant-design/icons": "^5.3.7",

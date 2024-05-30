@@ -17,11 +17,6 @@ const MessageFooter = () => {
 		<Flex className="bg-background px-3 max-h-[300px] py-3" align="end">
 			<IconButton className="text-2xl text-gray-500" component={PaperClipOutlined} hover={false} active={false} />
 
-			{/* <input
-				type="text"
-				placeholder="Type a message"
-				className="w-full h-10 px-3 rounded-lg bg-gray-100 focus:outline-none"
-			/> */}
 			<MessageInput placeholder={$t('输入消息...')} />
 
 			{isMobile ? (

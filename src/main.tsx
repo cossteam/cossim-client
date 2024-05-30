@@ -21,8 +21,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 if (__IS_NATIVE__) {
 	SafeArea.enable({
 		config: {
-			customColorsForSystemBars: false
-			// statusBarColor: '#00000000',
+			customColorsForSystemBars: true,
+			statusBarColor: '#00000000'
 			// statusBarContent: 'light',
 			// navigationBarColor: '#00000000',
 			// navigationBarContent: 'light'
