@@ -21,7 +21,6 @@ export default class Virtual {
 	init(param, callUpdate) {
 		this.param = param
 		this.callUpdate = callUpdate
-
 		this.sizes = new Map()
 		this.firstRangeTotalSize = 0
 		this.firstRangeAverageSize = 0

@@ -72,7 +72,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ readOnly = false, pl
 	}, [])
 
 	return (
-		<Flex className="flex-1 bg-gray-100 rounded-md" align="center">
+		<Flex className="flex-1 bg-gray-100 rounded-lg" align="center">
 			<div className="w-full" ref={messageInputRef} />
 		</Flex>
 	)

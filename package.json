@@ -12,7 +12,6 @@
         "electron",
         "capacitor",
         "socket.io",
-        "sql.js",
         "zustand",
         "antd",
         "i18next",
@@ -29,8 +28,7 @@
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
         "translate": "node node_modules/vue-auto-translate/server.js",
-        "format": "prettier --write ./src/**/*.{ts,tsx,js,jsx,json,md,mdx}",
-        "copy:sql:wasm": "copyfiles -u 3 node_modules/sql.js/dist/sql-wasm.wasm public/assets"
+        "format": "prettier --write ./src/**/*.{ts,tsx,js,jsx,json,md,mdx}"
     },
     "dependencies": {
         "@ant-design/icons": "^5.3.7",
