@@ -48,6 +48,7 @@ export declare global {
 		msg_send_state: MESSAGE_SEND_STATE
 		read_at: number
 		receiver_id: string
+		sender_id: string
 		receiver_info: {
 			avatar: string
 			name: string

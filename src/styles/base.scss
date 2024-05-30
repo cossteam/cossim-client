@@ -54,5 +54,6 @@ body {
 }
 
 .container--background {
-    background: var(--gradient);
+    // background: var(--gradient);
+    background: hsl(var(--background3));
 }

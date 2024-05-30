@@ -1,7 +1,7 @@
 import { $t } from '@/i18n'
 
 const Loading = () => {
-	return <p>{$t('loading...')}</p>
+	return <>{$t('loading...')}</>
 }
 
 export default Loading

@@ -4,7 +4,6 @@
  * @author YuHong
  */
 import { faker } from '@faker-js/faker'
-import { useEffect,useState } from 'react'
 
 export const generateChatList = (count: number = 10) => {
 	return Array.from({ length: count }, (_, index) => {
@@ -83,7 +82,8 @@ export const generateMessageList = (count: number = 10): Message[] => {
 				name: faker.person.fullName(),
 				user_id: faker.string.uuid()
 			},
-			type: faker.number.int({ min: 0, max: 10 })
+			type: faker.number.int({ min: 0, max: 10 }),
+			sender_id: faker.number.int({ min: 0, max: 1 }) ? '1' : '2'
 		}
 	})
 }
@@ -102,33 +102,32 @@ export const generateGroupInfo = () => {
 	return {}
 }
 
-
 export interface Preferences {
-	open_burn_after_reading: boolean;
-	open_burn_after_reading_time_out: number;
-	remark: string;
-	silent_notification: boolean;
-  }
-  
-export interface Contact {
-	avatar: string;
-	coss_id: string;
-	dialog_id: number;
-	email: string;
-	nickname: string;
-	preferences: Preferences;
-	relation_status: number;
-	signature: string;
-	status: number;
-	tel: string;
-	user_id: string;
+	open_burn_after_reading: boolean
+	open_burn_after_reading_time_out: number
+	remark: string
+	silent_notification: boolean
 }
 
-export interface ContactList{
-	list: Record<string, Contact[]>;
-	total: number;
+export interface Contact {
+	avatar: string
+	coss_id: string
+	dialog_id: number
+	email: string
+	nickname: string
+	preferences: Preferences
+	relation_status: number
+	signature: string
+	status: number
+	tel: string
+	user_id: string
 }
-  
+
+export interface ContactList {
+	list: Record<string, Contact[]>
+	total: number
+}
+
 const generateContact = (): Contact => {
 	return {
 		avatar: faker.image.avatar(),
@@ -137,51 +136,54 @@ const generateContact = (): Contact => {
 		email: faker.internet.email(),
 		nickname: faker.person.firstName(),
 		preferences: {
-		open_burn_after_reading: faker.datatype.boolean(),
-		open_burn_after_reading_time_out: faker.number.int({ min: 1, max: 60 }),
-		remark: faker.lorem.sentence(4),
-		silent_notification: faker.datatype.boolean()
+			open_burn_after_reading: faker.datatype.boolean(),
+			open_burn_after_reading_time_out: faker.number.int({ min: 1, max: 60 }),
+			remark: faker.lorem.sentence(4),
+			silent_notification: faker.datatype.boolean()
 		},
 		relation_status: faker.number.int({ min: 0, max: 1 }),
 		signature: faker.lorem.sentence(4),
 		status: faker.number.int({ min: 0, max: 1 }),
 		tel: faker.phone.number(),
 		user_id: faker.string.uuid()
-	};
-};
+	}
+}
 
 export const groupContactsByInitial = (contacts: Contact[]): Record<string, Contact[]> => {
-	return contacts.reduce((acc, contact) => {
-		const initial = contact.nickname[0].toUpperCase();
-		if (!acc[initial]) {
-		acc[initial] = [];
-		}
-		acc[initial].push(contact);
-		return acc;
-	}, {} as Record<string, Contact[]>);
-};
+	return contacts.reduce(
+		(acc, contact) => {
+			const initial = contact.nickname[0].toUpperCase()
+			if (!acc[initial]) {
+				acc[initial] = []
+			}
+			acc[initial].push(contact)
+			return acc
+		},
+		{} as Record<string, Contact[]>
+	)
+}
 
 export const generateContactList = (count: number = 10) => {
-	const contacts = Array.from({ length: count }, () => generateContact());
-	const groupedContacts = groupContactsByInitial(contacts);
+	const contacts = Array.from({ length: count }, () => generateContact())
+	const groupedContacts = groupContactsByInitial(contacts)
 	return {
 		list: groupedContacts,
 		total: count
-	};
-};
+	}
+}
 
 // export interface ContactList {
 // 	list: { [key: string]: Contact[] };
 // 	total: number;
 //   }
-  
+
 // export const useContactList = () => {
 // 	const [contactList, setContactList] = useState<ContactList>({ list: {}, total: 0 });
-  
+
 // 	useEffect(() => {
 // 	  const contacts = generateContactList(10); // Change the number as needed
 // 	  setContactList(contacts);
 // 	}, []);
-  
+
 // 	return contactList;
 // };

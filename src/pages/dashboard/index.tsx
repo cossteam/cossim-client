@@ -9,7 +9,7 @@ const Dashboard = memo(() => {
 	return commonStore.lastDialogId ? (
 		<Navigate to={`/dashboard/${commonStore.lastDialogId}`} />
 	) : (
-		<Flex className="container--background flex-1 h-screen" align="center" justify="center" vertical>
+		<Flex className="flex-1 h-screen" align="center" justify="center" vertical>
 			<Avatar className="mb-5" size={128} />
 		</Flex>
 	)

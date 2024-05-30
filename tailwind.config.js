@@ -17,6 +17,7 @@ export default {
 				},
 				'background-hover': 'hsl(var(--background-hover))',
 				background2: 'hsl(var(--background2))',
+				background3: 'var(--background3)',
 				gradient: 'var(--gradient)'
 			},
 			borderRadius: {
