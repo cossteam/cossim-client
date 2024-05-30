@@ -3,7 +3,7 @@ name: Client Docker Image
 on:
   push:
     branches:
-      - 'new'
+      - 'master'
 jobs:
   build:
     runs-on: ubuntu-latest
