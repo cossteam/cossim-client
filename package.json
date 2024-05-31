@@ -24,7 +24,7 @@
         "dev:ios": "npm run build:mobile && npx cap copy",
         "build": "tsc && vite build",
         "build:electron": "tsc && vite build -c vite.electron.config.ts && electron-builder",
-        "build:mobile": "npm run build && npx cap sync",
+        "build:mobile": " npm run build && npx cap sync",
         "build:action": "tsc && vite build -c vite.electron.config.ts",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",

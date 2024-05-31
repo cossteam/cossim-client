@@ -1,8 +1,8 @@
 import { ConfigProvider } from 'antd'
-import { Suspense, memo, useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import useCommonStore from '@/stores/common'
 import Loading from '@/components/loading'
-import { useRoutes } from 'react-router'
+import { useRoutes, useLocation } from 'react-router'
 import routes from '~react-pages'
 import { App as AppComponent } from 'antd'
 import useAuth from '@/hooks/useLogin'
@@ -12,8 +12,9 @@ import dayjs from 'dayjs'
 import { Locale } from 'antd/es/locale'
 import Call from '@/components/call'
 
-const App = memo(() => {
+const App = () => {
     const commonStore = useCommonStore()
+    const location = useLocation()
 
     const [locale, setLocal] = useState<Locale>(enUS)
 
@@ -30,6 +31,8 @@ const App = memo(() => {
     // 鉴权
     useAuth()
 
+    console.log('routes: ', routes)
+
     return (
         <ConfigProvider
             theme={{
@@ -42,6 +45,7 @@ const App = memo(() => {
             }}
             locale={locale}
         >
+            当前路由：{location.pathname}
             <AppComponent>
                 <Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
                 {/* 通话组件 */}
@@ -49,6 +53,6 @@ const App = memo(() => {
             </AppComponent>
         </ConfigProvider>
     )
-})
+}
 
 export default App
