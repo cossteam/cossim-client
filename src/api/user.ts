@@ -1,13 +1,13 @@
 import type {
-	LoginParams,
-	LogoutParams,
-	PassWordUpdateParams,
-	PublicKeyParams,
-	RegisterParams,
-	SearchUserParams,
-	UserInfUpdateParams,
-	UserInfoQueryParams,
-	UserPublicKeyQueryParams
+  LoginParams,
+  LogoutParams,
+  PassWordUpdateParams,
+  PublicKeyParams,
+  RegisterParams,
+  SearchUserParams,
+  UserInfUpdateParams,
+  UserInfoQueryParams,
+  UserPublicKeyQueryParams
 } from '@/types/api'
 import request from '@/utils/request'
 
@@ -19,11 +19,11 @@ const baseUrl: string = '/user'
  * @returns
  */
 export function loginApi(data: LoginParams): Promise<ResponseData> {
-	return request({
-		url: `${baseUrl}/login`,
-		method: 'POST',
-		data
-	})
+  return request({
+    url: `${baseUrl}/login`,
+    method: 'POST',
+    data
+  })
 }
 
 /**
@@ -32,11 +32,11 @@ export function loginApi(data: LoginParams): Promise<ResponseData> {
  * @returns
  */
 export function registerApi(data: RegisterParams): Promise<ResponseData> {
-	return request({
-		url: `${baseUrl}/register`,
-		method: 'POST',
-		data
-	})
+  return request({
+    url: `${baseUrl}/register`,
+    method: 'POST',
+    data
+  })
 }
 
 /**
@@ -45,11 +45,11 @@ export function registerApi(data: RegisterParams): Promise<ResponseData> {
  * @returns
  */
 export function uploadPublicKeyApi(data: PublicKeyParams): Promise<ResponseData> {
-	return request({
-		url: `${baseUrl}/bundle`,
-		method: 'PUT',
-		data
-	})
+  return request({
+    url: `${baseUrl}/bundle`,
+    method: 'PUT',
+    data
+  })
 }
 
 /**
@@ -58,11 +58,11 @@ export function uploadPublicKeyApi(data: PublicKeyParams): Promise<ResponseData>
  * @returns
  */
 export function searchUserApi(params: SearchUserParams): Promise<ResponseData> {
-	return request({
-		url: `${baseUrl}/search`,
-		method: 'GET',
-		params
-	})
+  return request({
+    url: `${baseUrl}/search`,
+    method: 'GET',
+    params
+  })
 }
 
 /**
@@ -71,11 +71,11 @@ export function searchUserApi(params: SearchUserParams): Promise<ResponseData> {
  * @returns
  */
 export function getUserInfoApi(params: UserInfoQueryParams): Promise<ResponseData> {
-	return request({
-		url: `${baseUrl}/${params.id}`,
-		method: 'GET',
-		params
-	})
+  return request({
+    url: `${baseUrl}/${params.id}`,
+    method: 'GET',
+    params
+  })
 }
 
 /**
@@ -84,11 +84,11 @@ export function getUserInfoApi(params: UserInfoQueryParams): Promise<ResponseDat
  * @returns
  */
 export function updateUserInfoApi(data: UserInfUpdateParams): Promise<ResponseData> {
-	return request({
-		url: `${baseUrl}`,
-		method: 'PUT',
-		data
-	})
+  return request({
+    url: `${baseUrl}`,
+    method: 'PUT',
+    data
+  })
 }
 
 /**
@@ -97,11 +97,11 @@ export function updateUserInfoApi(data: UserInfUpdateParams): Promise<ResponseDa
  * @returns
  */
 export function updatePassWordApi(data: PassWordUpdateParams): Promise<ResponseData> {
-	return request({
-		url: `${baseUrl}/password`,
-		method: 'PUT',
-		data
-	})
+  return request({
+    url: `${baseUrl}/password`,
+    method: 'PUT',
+    data
+  })
 }
 
 /**
@@ -109,11 +109,11 @@ export function updatePassWordApi(data: PassWordUpdateParams): Promise<ResponseD
  * @returns
  */
 export function logoutApi(data: LogoutParams): Promise<ResponseData> {
-	return request({
-		url: `${baseUrl}/logout`,
-		method: 'POST',
-		data
-	})
+  return request({
+    url: `${baseUrl}/logout`,
+    method: 'POST',
+    data
+  })
 }
 
 /**
@@ -122,16 +122,16 @@ export function logoutApi(data: LogoutParams): Promise<ResponseData> {
  * @returns {Promise<ResponseData>}
  */
 export function updateAvatarApi(data: { file: File }): Promise<ResponseData> {
-	const formData = new FormData()
-	formData.append('file', data.file)
-	return request({
-		url: `${baseUrl}/avatar`,
-		method: 'PUT',
-		data: formData,
-		headers: {
-			'Content-Type': 'multipart/form-data'
-		}
-	})
+  const formData = new FormData()
+  formData.append('file', data.file)
+  return request({
+    url: `${baseUrl}/avatar`,
+    method: 'PUT',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
 }
 
 /**
@@ -140,11 +140,11 @@ export function updateAvatarApi(data: { file: File }): Promise<ResponseData> {
  * @returns
  */
 export function getPublicKeyApi(params: UserPublicKeyQueryParams): Promise<ResponseData> {
-	return request({
-		url: `${baseUrl}/${params.user_id}/bundle`,
-		method: 'GET',
-		params
-	})
+  return request({
+    url: `${baseUrl}/${params.user_id}/bundle`,
+    method: 'GET',
+    params
+  })
 }
 
 // /**

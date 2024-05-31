@@ -9,45 +9,65 @@ import MessageInput from './message-input'
 import { $t } from '@/i18n'
 
 const MessageFooter = () => {
-	const [open, setOpen] = useState<boolean>(false)
+  const [open, setOpen] = useState<boolean>(false)
 
-	const { isMobile } = useMobile()
+  const { isMobile } = useMobile()
 
-	return (
-		<Flex className="bg-background px-3 max-h-[300px] py-3" align="end">
-			<IconButton className="text-2xl text-gray-500" component={PaperClipOutlined} hover={false} active={false} />
+  return (
+    <Flex className="bg-background px-3 max-h-[300px] py-3" align="end">
+      <IconButton
+        className="text-2xl text-gray-500"
+        component={PaperClipOutlined}
+        hover={false}
+        active={false}
+      />
 
-			<MessageInput placeholder={$t('输入消息...')} />
+      <MessageInput placeholder={$t('输入消息...')} />
 
-			{isMobile ? (
-				<IconButton className="text-2xl text-gray-500" component={MehOutlined} hover={false} active={false} />
-			) : (
-				<Popover
-					content={<MessageEmojis />}
-					trigger="click"
-					open={open}
-					onOpenChange={(open) => setOpen(open)}
-					arrow={false}
-					rootClassName="container--filter popover--padding"
-					overlayStyle={{ padding: 0 }}
-					placement="topLeft"
-					destroyTooltipOnHide
-				>
-					<a className="flex" onClick={(e) => e.preventDefault()}>
-						<IconButton
-							className="text-2xl text-gray-500"
-							component={MehOutlined}
-							hover={false}
-							active={false}
-						/>
-					</a>
-				</Popover>
-			)}
-			<IconButton className="text-2xl text-gray-500" component={PlusOutlined} hover={false} active={false} />
-			<IconButton className="text-2xl text-primary" component={SendIcon} hover={false} active={false} />
-			{/* <IconButton className="text-2xl text-primary" component={AudioIcon} hover={false} active={false} /> */}
-		</Flex>
-	)
+      {isMobile ? (
+        <IconButton
+          className="text-2xl text-gray-500"
+          component={MehOutlined}
+          hover={false}
+          active={false}
+        />
+      ) : (
+        <Popover
+          content={<MessageEmojis />}
+          trigger="click"
+          open={open}
+          onOpenChange={(open) => setOpen(open)}
+          arrow={false}
+          rootClassName="container--filter popover--padding"
+          overlayStyle={{ padding: 0 }}
+          placement="topLeft"
+          destroyTooltipOnHide
+        >
+          <a className="flex" onClick={(e) => e.preventDefault()}>
+            <IconButton
+              className="text-2xl text-gray-500"
+              component={MehOutlined}
+              hover={false}
+              active={false}
+            />
+          </a>
+        </Popover>
+      )}
+      <IconButton
+        className="text-2xl text-gray-500"
+        component={PlusOutlined}
+        hover={false}
+        active={false}
+      />
+      <IconButton
+        className="text-2xl text-primary"
+        component={SendIcon}
+        hover={false}
+        active={false}
+      />
+      {/* <IconButton className="text-2xl text-primary" component={AudioIcon} hover={false} active={false} /> */}
+    </Flex>
+  )
 }
 
 export default MessageFooter

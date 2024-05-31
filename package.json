@@ -18,17 +18,17 @@
         "react-router"
     ],
     "scripts": {
-        "dev": "cross-env TARGET=web vite --mode development --host 0.0.0.0",
-        "dev:electron": "cross-env TARGET=electron vite --mode development",
-        "dev:android": "cross-env TARGET=development && npm run build:mobile && npx cap copy",
-        "dev:ios": "cross-env TARGET=development && npm run build:mobile && npx cap copy",
+        "dev": "vite --mode development --host 0.0.0.0",
+        "dev:electron": "vite -c vite.electron.config.ts --mode development --host 0.0.0.0",
+        "dev:android": "npm run build:mobile && npx cap copy",
+        "dev:ios": "npm run build:mobile && npx cap copy",
         "build": "tsc && vite build",
-        "build:electron": "cross-env TARGET=electron tsc && vite build && electron-builder",
-        "build:mobile": "cross-env TARGET=production && npm run build && npx cap sync",
+        "build:electron": "tsc && vite build -c vite.electron.config.ts && electron-builder",
+        "build:mobile": "npm run build && npx cap sync",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
         "translate": "node node_modules/vue-auto-translate/server.js",
-        "format": "prettier --write ./src/**/*.{ts,tsx,js,jsx,json,md,mdx}"
+        "format": "prettier --write ./src/*"
     },
     "dependencies": {
         "@ant-design/icons": "^5.3.7",
@@ -69,7 +69,6 @@
         "@vitejs/plugin-react": "^4.2.1",
         "autoprefixer": "^10.4.19",
         "copyfiles": "^2.4.1",
-        "cross-env": "^7.0.3",
         "electron": "^30.0.7",
         "electron-builder": "^24.13.3",
         "eslint": "^8.57.0",

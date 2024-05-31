@@ -10,40 +10,40 @@ import { useEffect, useState } from 'react'
  * }
  */
 const useDefer = (max = 20) => {
-	const [isRendering, setIsRendering] = useState<boolean>(true)
-	const [isRenderFinish, setIsRenderFinish] = useState<boolean>(false)
+  const [isRendering, setIsRendering] = useState<boolean>(true)
+  const [isRenderFinish, setIsRenderFinish] = useState<boolean>(false)
 
-	let frameCount = 0
-	let refId = 0
+  let frameCount = 0
+  let refId = 0
 
-	const updateFrameCount = () => {
-		refId = requestAnimationFrame(() => {
-			frameCount++
-			if (frameCount >= max) {
-				cancelAnimationFrame(refId)
-				setIsRendering(false)
-				setIsRenderFinish(true)
-				return
-			}
-			updateFrameCount()
-		})
-	}
+  const updateFrameCount = () => {
+    refId = requestAnimationFrame(() => {
+      frameCount++
+      if (frameCount >= max) {
+        cancelAnimationFrame(refId)
+        setIsRendering(false)
+        setIsRenderFinish(true)
+        return
+      }
+      updateFrameCount()
+    })
+  }
 
-	useEffect(() => {
-		if (!max) return
-		return () => cancelAnimationFrame(refId)
-	}, [max])
+  useEffect(() => {
+    if (!max) return
+    return () => cancelAnimationFrame(refId)
+  }, [max])
 
-	const defer = (n: number) => {
-		if (!refId && !!max) updateFrameCount()
-		return n <= max
-	}
+  const defer = (n: number) => {
+    if (!refId && !!max) updateFrameCount()
+    return n <= max
+  }
 
-	return {
-		defer,
-		isRendering,
-		isRenderFinish
-	}
+  return {
+    defer,
+    isRendering,
+    isRenderFinish
+  }
 }
 
 export default useDefer
