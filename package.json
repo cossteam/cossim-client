@@ -1,6 +1,6 @@
 {
     "name": "coss-client",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "type": "module",
     "description": "coss 及时通讯的客户端",
     "keywords": [
@@ -25,6 +25,7 @@
         "build": "tsc && vite build",
         "build:electron": "tsc && vite build -c vite.electron.config.ts && electron-builder",
         "build:mobile": "npm run build && npx cap sync",
+        "build:action": "tsc && vite build -c vite.electron.config.ts",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
         "translate": "node node_modules/vue-auto-translate/server.js",
