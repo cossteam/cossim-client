@@ -2,7 +2,7 @@ import { ConfigProvider } from 'antd'
 import { Suspense, useEffect, useState } from 'react'
 import useCommonStore from '@/stores/common'
 import Loading from '@/components/loading'
-import { useRoutes, useLocation } from 'react-router'
+import { useRoutes } from 'react-router'
 import routes from '~react-pages'
 import { App as AppComponent } from 'antd'
 import useAuth from '@/hooks/useLogin'
@@ -14,7 +14,6 @@ import Call from '@/components/call'
 
 const App = () => {
     const commonStore = useCommonStore()
-    const location = useLocation()
 
     const [locale, setLocal] = useState<Locale>(enUS)
 
@@ -31,8 +30,6 @@ const App = () => {
     // 鉴权
     useAuth()
 
-    console.log('routes: ', routes)
-
     return (
         <ConfigProvider
             theme={{
@@ -45,7 +42,6 @@ const App = () => {
             }}
             locale={locale}
         >
-            当前路由：{location.pathname}
             <AppComponent>
                 <Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
                 <Call />
