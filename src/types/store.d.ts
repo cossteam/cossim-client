@@ -1,21 +1,5 @@
 import { LoginParams, LogoutParams } from './api'
 
-export interface UserOptions {
-	/*** @description 用户 id*/
-	userId: string
-	/*** @description 用户所有信息*/
-	userInfo: any
-	/** @description token */
-	token: string
-}
-
-export interface UserStoreMethods {
-	/** @description 更新某个值 */
-	update: (options: Partial<UserOptions>) => Promise<void>
-	login: (params: LoginParams) => Promise<ResponseData<any>>
-	logout: (params: LogoutParams) => Promise<ResponseData<any>>
-}
-
 export interface CommonOptions {
 	/**
 	 * @description 当前主题  'light' | 'dark'
@@ -39,7 +23,67 @@ export interface CommonStoreMethods {
 	update: (options: Partial<CommonOptions>) => Promise<void>
 }
 
-// 用户仓库
-export type UserStore = UserOptions & UserStoreMethods
+export interface UserOptions {
+	/*** @description 用户 id*/
+	userId: string
+	/*** @description 用户所有信息*/
+	userInfo: any
+	/** @description token */
+	token: string
+}
+
+export interface UserStoreMethods {
+	/** @description 更新某个值 */
+	update: (options: Partial<UserOptions>) => Promise<void>
+	login: (params: LoginParams) => Promise<ResponseData<any>>
+	logout: (params: LogoutParams) => Promise<ResponseData<any>>
+}
+
+export interface CallOptions {
+	/** @description 当前通话 id */
+	callId: string
+	/** @description 当前通话类型 */
+	callType: string
+	/** @description 当前通话状态 */
+	callStatus: string
+	/** @description 当前通话是否是视频通话 */
+	isVideo: boolean
+	/** @description 当前通话是否是音频通话 */
+	isAudio: boolean
+	/** @description 当前通话是否是群聊 */
+	isGroup: boolean
+}
+
+export interface CallStoreMethods {
+	/** @description 更新某个值 */
+	update: (options: Partial<CallOptions>) => Promise<void>
+	/** @description 创建通话 */
+	create: (
+		callId: string,
+		callType: string,
+		isVideo: boolean,
+		isAudio: boolean,
+		isGroup: boolean
+	) => Promise<ResponseData<any>>
+	/** @description 加入通话 */
+	join: (
+		callId: string,
+		callType: string,
+		isVideo: boolean,
+		isAudio: boolean,
+		isGroup: boolean
+	) => Promise<ResponseData<any>>
+	/** @description 离开通话 */
+	leave: () => Promise<ResponseData<any>>
+	/** @description 拒绝通话 */
+	reject: () => Promise<ResponseData<any>>
+	/** @description 挂断通话 */
+	hangup: () => Promise<ResponseData<any>>
+}
+
 // 通用仓库
 export type CommonStore = CommonOptions & CommonStoreMethods
+// 用户仓库
+export type UserStore = UserOptions & UserStoreMethods
+// 通话仓库
+export type CallStore = CallOptions & CallStoreMethods

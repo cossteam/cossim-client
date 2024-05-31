@@ -45,7 +45,7 @@ const App = memo(() => {
 			<AppComponent>
 				<Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
 				{/* 通话组件 */}
-				{/* <Call /> */}
+				<Call />
 			</AppComponent>
 		</ConfigProvider>
 	)

@@ -20,7 +20,7 @@ const Call: React.FC<CallProps> = memo(() => {
 	const [avatar, setAvatar] = useState('')
 
 	useEffect(() => {
-		setOpen(true)
+		setOpen(false)
 		setAvatar('https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp')
 		return () => {
 			setOpen(false)
