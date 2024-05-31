@@ -6,7 +6,7 @@
     directories: {
         output: 'release/${version}'
     },
-    files: ['dist/**/*', 'dist-electron/**/*'],
+    files: ['dist', 'dist-electron'],
     mac: {
         target: ['dmg'],
         artifactName: '${productName}-${os}-${arch}-${version}-Installer.${ext}'
@@ -29,5 +29,10 @@
     linux: {
         target: ['AppImage'],
         artifactName: '${productName}-${os}-${arch}-${version}.${ext}'
+    },
+    publish: {
+        provider: 'github',
+        releaseType: 'release',
+        publishAutoUpdate: false
     }
 }
