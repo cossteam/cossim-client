@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import pages from 'vite-plugin-pages'
 import { Capacitor } from '@capacitor/core'
-import { visualizer } from 'rollup-plugin-visualizer'
+// import { visualizer } from 'rollup-plugin-visualizer'
 
 const __IS_WEB__ = Capacitor.getPlatform() === 'web'
 const __IS_ANDROID__ = Capacitor.getPlatform() === 'android'
@@ -11,7 +11,11 @@ const __IS_IOS__ = Capacitor.getPlatform() === 'ios'
 const __IS_NATIVE__ = JSON.stringify(Capacitor.isNativePlatform())
 
 export default defineConfig({
-  plugins: [react(), pages(), visualizer({ open: true })],
+  plugins: [
+    react(),
+    pages()
+    // visualizer({ open: false })
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
