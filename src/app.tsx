@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd'
-import { Suspense, memo, useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import useCommonStore from '@/stores/common'
 import Loading from '@/components/loading'
 import { useRoutes } from 'react-router'
@@ -12,7 +12,7 @@ import dayjs from 'dayjs'
 import { Locale } from 'antd/es/locale'
 import Call from '@/components/call'
 
-const App = memo(() => {
+const App = () => {
     const commonStore = useCommonStore()
 
     const [locale, setLocal] = useState<Locale>(enUS)
@@ -44,11 +44,10 @@ const App = memo(() => {
         >
             <AppComponent>
                 <Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
-                {/* 通话组件 */}
                 <Call />
             </AppComponent>
         </ConfigProvider>
     )
-})
+}
 
 export default App

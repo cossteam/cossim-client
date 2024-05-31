@@ -1,33 +1,33 @@
 {
-  $schema: 'https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json',
-  appId: 'YourAppID',
-  asar: true,
-  productName: 'COSS',
-  directories: {
-    output: 'release/${version}'
-  },
-  files: ['dist', 'dist-electron'],
-  mac: {
-    target: ['dmg'],
-    artifactName: '${productName}-${os}-${arch}-${version}-Installer.${ext}'
-  },
-  win: {
-    target: [
-      {
-        target: 'nsis',
-        arch: ['x64', 'arm64']
-      }
-    ],
-    artifactName: '${productName}-${os}-${arch}-${version}-Setup.${ext}'
-  },
-  nsis: {
-    oneClick: false,
-    perMachine: false,
-    allowToChangeInstallationDirectory: true,
-    deleteAppDataOnUninstall: false
-  },
-  linux: {
-    target: ['AppImage'],
-    artifactName: '${productName}-${os}-${arch}-${version}.${ext}'
-  }
+    $schema: 'https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json',
+    appId: 'YourAppID',
+    asar: true,
+    productName: 'COSS',
+    directories: {
+        output: 'release/${version}'
+    },
+    files: ['dist/**/*', 'dist-electron/**/*'],
+    mac: {
+        target: ['dmg'],
+        artifactName: '${productName}-${os}-${arch}-${version}-Installer.${ext}'
+    },
+    win: {
+        target: [
+            {
+                target: 'nsis',
+                arch: ['x64', 'arm64']
+            }
+        ],
+        artifactName: '${productName}-${os}-${arch}-${version}-Setup.${ext}'
+    },
+    nsis: {
+        oneClick: false,
+        perMachine: false,
+        allowToChangeInstallationDirectory: true,
+        deleteAppDataOnUninstall: false
+    },
+    linux: {
+        target: ['AppImage'],
+        artifactName: '${productName}-${os}-${arch}-${version}.${ext}'
+    }
 }

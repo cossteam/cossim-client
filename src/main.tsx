@@ -1,16 +1,18 @@
 import ReactDOM from 'react-dom/client'
 import { StrictMode } from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, HashRouter } from 'react-router-dom'
 import '@/i18n'
 import '@/styles/base.scss'
 import App from './app'
 import { SafeArea } from '@capacitor-community/safe-area'
 
+const Router = __IS_ELECTRON__ ? HashRouter : BrowserRouter
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <BrowserRouter>
+        <Router>
             <App />
-        </BrowserRouter>
+        </Router>
     </StrictMode>
 )
 
