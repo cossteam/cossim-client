@@ -87,8 +87,5 @@
         "vite-plugin-pages": "^0.32.1",
         "vue-auto-translate": "^1.1.13"
     },
-    "main": "dist-electron/main.js",
-    "publish": {
-        "releaseType": "release"
-      }
+    "main": "dist-electron/main.js"
 }
