@@ -1,4 +1,11 @@
-import { PhoneFilled, RollbackOutlined } from '@ant-design/icons'
+import {
+    AudioMutedOutlined,
+    AudioOutlined,
+    MutedOutlined,
+    PhoneFilled,
+    RollbackOutlined,
+    SoundOutlined
+} from '@ant-design/icons'
 import { Avatar, Flex } from 'antd'
 import clsx from 'clsx'
 import React, { memo, useEffect, useMemo, useState } from 'react'
@@ -86,9 +93,11 @@ const Call: React.FC<CallProps> = memo(() => {
                             <div className="">00:00</div>
                             <div className="flex-1"></div>
                         </Flex>
-                        <Flex className="flex-1 font-bold gap-2" vertical justify="center">
-                            <Avatar size={120} src={avatar} />
-                            <span className="text-xl text-center">ff1005</span>
+                        <Flex className="flex-1 w-full h-full" justify="center">
+                            <Flex className="font-bold gap-2" vertical justify="center">
+                                <Avatar size={120} src={avatar} />
+                                <span className="text-xl text-center">ff1005</span>
+                            </Flex>
                         </Flex>
                         <Flex className="gap-[50px]">
                             {/* 圆形按钮 */}
@@ -98,13 +107,14 @@ const Call: React.FC<CallProps> = memo(() => {
                                         className="gap-2"
                                         vertical
                                         align="center"
-                                        onClick={() => callStore.hangup()}
+                                        onClick={() => {}}
                                     >
                                         <Flex
-                                            className="size-16 text-2xl bg-red-500 rounded-full rotate-[-135deg]"
+                                            className="size-16 text-2xl bg-white rounded-full rotate-[0deg]"
                                             justify="center"
                                         >
-                                            <PhoneFilled />
+                                            {/* <AudioMutedOutlined className="text-gray-500" /> */}
+                                            <AudioOutlined className="text-gray-500" />
                                         </Flex>
                                         <span className="text-sm">{$t('静音')}</span>
                                     </Flex>
@@ -126,13 +136,14 @@ const Call: React.FC<CallProps> = memo(() => {
                                         className="gap-2"
                                         vertical
                                         align="center"
-                                        onClick={() => callStore.hangup()}
+                                        onClick={() => {}}
                                     >
                                         <Flex
-                                            className="size-16 text-2xl bg-white rounded-full rotate-[-135deg]"
+                                            className="size-16 text-2xl bg-white rounded-full rotate-[0deg]"
                                             justify="center"
                                         >
-                                            <PhoneFilled className="text-gray-500" />
+                                            {/* <MutedOutlined className="text-gray-500" /> */}
+                                            <SoundOutlined className="text-gray-500" />
                                         </Flex>
                                         <span className="text-sm">{$t('扬声器')}</span>
                                     </Flex>

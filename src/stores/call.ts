@@ -49,7 +49,8 @@ const actions = (set: any, get: any): CallStoreMethods => ({
         const { update } = get()
         update({
             isAudio: !isVideo,
-            isVideo: isVideo
+            isVideo: isVideo,
+            callStatus: 'connected'
         })
         return Promise.resolve({
             code: 0,
