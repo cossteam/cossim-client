@@ -92,8 +92,7 @@
     "build": {
         "publish": {
             "provider": "github",
-            "releaseType": "release",
-            "publishAutoUpdate": false
+            "releaseType": "release"
           }
     },
     "main": "dist-electron/main.js"
