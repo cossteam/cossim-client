@@ -1,3 +1,0 @@
-com.hitosea.coss.test
-style WhiteBackgroundDialogTheme
-style WhiteBackgroundTheme
