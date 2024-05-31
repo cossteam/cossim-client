@@ -10,7 +10,7 @@
   files: ['dist', 'dist-electron'],
   mac: {
     target: ['dmg'],
-    arch: ['amd64', 'arm64']
+    arch: ['x64', 'arm64']
     artifactName: '${productName}-${os}-${arch}-${version}-Installer.${ext}'
   },
   win: {
@@ -30,6 +30,7 @@
   },
   linux: {
     target: ['AppImage'],
+	arch: ['x64', 'arm64']
     artifactName: '${productName}-${os}-${arch}-${version}.${ext}'
   }
 }
