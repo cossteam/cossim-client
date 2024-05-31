@@ -1,9 +1,9 @@
 import { PhoneFilled, RollbackOutlined } from '@ant-design/icons'
 import { Avatar, Flex } from 'antd'
 import clsx from 'clsx'
-import React, { memo, useEffect, useRef, useState } from 'react'
+import React, { memo, useEffect, useMemo, useState } from 'react'
 import useMobile from '@/hooks/useMobile'
-import useDraggable from '@/hooks/useDraggable'
+import useCallStore from '@/stores/call'
 
 export interface CallProps {
   mask?: boolean
@@ -11,21 +11,23 @@ export interface CallProps {
 
 const Call: React.FC<CallProps> = memo(() => {
   const { isMobile } = useMobile()
-  const [open, setOpen] = useState(false)
-  const [runningBackground, setRunningBackground] = useState(false)
+  const callStore = useCallStore()
 
-  const el = useRef<HTMLDivElement>(null)
-  const { isDraggable } = useDraggable(el.current)
+  const open = useMemo(() => {
+    return callStore.isAudio || callStore.isVideo
+  }, [callStore.isAudio, callStore.isVideo])
+  const isVideo = useMemo(() => {
+    return false
+  }, [callStore.isVideo])
+  const [runningBackground, setRunningBackground] = useState(false)
 
   const [avatar, setAvatar] = useState('')
 
   useEffect(() => {
-    setOpen(true)
     setAvatar(
       'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp'
     )
     return () => {
-      setOpen(false)
       setAvatar('')
     }
   }, [])
@@ -34,13 +36,12 @@ const Call: React.FC<CallProps> = memo(() => {
     <>
       <div
         className={clsx(
-          'size-14 text-white bg-black bg-opacity-40 flex justify-center items-center rounded-sm fixed top-0 right-0 z-[9999]',
+          'size-14 text-white bg-black bg-opacity-40 flex justify-center items-center rounded-sm fixed top-1/3 right-0 z-[9999]',
           open && runningBackground ? 'block' : 'hidden'
         )}
         onClick={() => setRunningBackground(false)}
       >
         <PhoneFilled className="text-2xl" />
-        {isDraggable ? '拖动' : '未拖动'}
       </div>
       <div
         className={clsx(
@@ -49,7 +50,6 @@ const Call: React.FC<CallProps> = memo(() => {
         )}
       >
         <Flex
-          ref={el}
           className={clsx(
             'relative p-4 rounded-sm top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 backdrop-blur overflow-hidden',
             isMobile ? 'w-full h-full' : 'w-[400px] h-[550px]'
@@ -88,7 +88,7 @@ const Call: React.FC<CallProps> = memo(() => {
             </Flex>
             <Flex className="gap-20">
               {/* 圆形按钮 */}
-              <Flex className="gap-2" vertical align="center">
+              <Flex className="gap-2" vertical align="center" onClick={() => callStore.hangup()}>
                 <Flex
                   className="size-16 text-2xl bg-red-500 rounded-full rotate-[-135deg]"
                   justify="center"
@@ -97,7 +97,20 @@ const Call: React.FC<CallProps> = memo(() => {
                 </Flex>
                 <span className="text-sm">挂断</span>
               </Flex>
-              <Flex className="gap-2" vertical align="center">
+              <Flex
+                className="gap-2"
+                vertical
+                align="center"
+                onClick={() =>
+                  callStore.join(
+                    `${Date.now()}`,
+                    isVideo ? 'video' : 'audio',
+                    isVideo,
+                    !isVideo,
+                    false
+                  )
+                }
+              >
                 <Flex className="size-16 text-2xl bg-green-500 rounded-full" justify="center">
                   <PhoneFilled />
                 </Flex>

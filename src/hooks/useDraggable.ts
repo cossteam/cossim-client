@@ -17,13 +17,10 @@ const useDraggable = (el: HTMLElement | null) => {
     console.log('useDraggable', el)
     if (!el) return
     el.addEventListener('mousedown', handleMouseDown)
-    el.addEventListener('mouseup', handleMouseUp)
-    el.addEventListener('mousemove', (e) => {
-      console.log(e)
-    })
+    document.addEventListener('mouseup', handleMouseUp)
     return () => {
       el.removeEventListener('mousedown', handleMouseDown)
-      el.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('mouseup', handleMouseUp)
     }
   }, [el])
 
