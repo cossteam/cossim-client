@@ -1,4 +1,15 @@
-import * as openpgp from 'openpgp'
+// import * as openpgp from 'openpgp'
+import {
+	WebStream,
+	createMessage,
+	decrypt,
+	decryptKey,
+	encrypt,
+	generateKey,
+	readKey,
+	readMessage,
+	readPrivateKey
+} from 'openpgp'
 
 export default class PGPUtils {
 	/**
@@ -14,7 +25,7 @@ export default class PGPUtils {
 			return null
 		}
 		try {
-			const { privateKey, publicKey, revocationCertificate } = await openpgp.generateKey({
+			const { privateKey, publicKey, revocationCertificate } = await generateKey({
 				type: 'rsa', // 密钥的类型，默认为ECC
 				rsaBits: 2048, // RSA密钥大小（默认为4096位）
 				curve: 'curve25519', // ECC曲线名称，默认为curve25519
@@ -37,10 +48,10 @@ export default class PGPUtils {
 	static async rsaEncrypt(publicKeyArmored: string, message: string | object) {
 		try {
 			if (typeof message === 'object') message = JSON.stringify(message)
-			const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored })
+			const publicKey = await readKey({ armoredKey: publicKeyArmored })
 
-			const encrypted = await openpgp.encrypt({
-				message: await openpgp.createMessage({
+			const encrypted = await encrypt({
+				message: await createMessage({
 					text: message
 				}),
 				encryptionKeys: [publicKey]
@@ -60,16 +71,16 @@ export default class PGPUtils {
 	 */
 	static async rsaDecrypt(privateKeyArmored: string, passphrase: string, encryptedMessage: any) {
 		try {
-			const readPrivateKey = await openpgp.readPrivateKey({ armoredKey: privateKeyArmored })
-			const privateKey = await openpgp.decryptKey({
-				privateKey: readPrivateKey,
+			const _readPrivateKey = await readPrivateKey({ armoredKey: privateKeyArmored })
+			const privateKey = await decryptKey({
+				privateKey: _readPrivateKey,
 				passphrase
 			})
 
-			const message = await openpgp.readMessage({
+			const message = await readMessage({
 				armoredMessage: encryptedMessage
 			})
-			const decrypted = await openpgp.decrypt({
+			const decrypted = await decrypt({
 				message,
 				decryptionKeys: [privateKey]
 			})
@@ -90,11 +101,11 @@ export default class PGPUtils {
 	 * @param {*} key
 	 * @returns
 	 */
-	static async aes256Encrypt(data: object | string, key: string): Promise<openpgp.WebStream<string> | null> {
+	static async aes256Encrypt(data: object | string, key: string): Promise<WebStream<string> | null> {
 		try {
 			if (typeof data === 'object') data = JSON.stringify(data)
-			const encrypted = await openpgp.encrypt({
-				message: await openpgp.createMessage({
+			const encrypted = await encrypt({
+				message: await createMessage({
 					text: data
 				}),
 				passwords: [key]
@@ -113,8 +124,8 @@ export default class PGPUtils {
 	 */
 	static async aes256Decrypt(data: any, key: string) {
 		try {
-			const { data: decrypted } = await openpgp.decrypt({
-				message: await openpgp.readMessage({
+			const { data: decrypted } = await decrypt({
+				message: await readMessage({
 					armoredMessage: data
 				}),
 				passwords: [key]

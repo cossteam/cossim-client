@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import React, { memo, useEffect, useMemo, useState } from 'react'
 import useMobile from '@/hooks/useMobile'
 import useCallStore from '@/stores/call'
+import { $t } from '@/i18n'
 
 export interface CallProps {
 	mask?: boolean
@@ -53,7 +54,7 @@ const Call: React.FC<CallProps> = memo(() => {
 				<Flex
 					className={clsx(
 						'relative p-4 rounded-sm top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 backdrop-blur overflow-hidden',
-						isMobile ? 'w-full h-full' : 'w-[400px] h-[550px]'
+						isMobile ? 'w-full h-full' : 'w-[400px] h-[600px]'
 					)}
 					style={{
 						backgroundColor: avatar ? '#000' : '#fff',
@@ -87,7 +88,7 @@ const Call: React.FC<CallProps> = memo(() => {
 							<Avatar size={120} src={avatar} />
 							<span className="text-xl text-center">ff1005</span>
 						</Flex>
-						<Flex className="gap-20">
+						<Flex className="gap-[50px]">
 							{/* 圆形按钮 */}
 							{connected ? (
 								<>
@@ -98,7 +99,25 @@ const Call: React.FC<CallProps> = memo(() => {
 										>
 											<PhoneFilled />
 										</Flex>
-										<span className="text-sm">挂断</span>
+										<span className="text-sm">{$t('静音')}</span>
+									</Flex>
+									<Flex className="gap-2" vertical align="center" onClick={() => callStore.hangup()}>
+										<Flex
+											className="size-16 text-2xl bg-red-500 rounded-full rotate-[-135deg]"
+											justify="center"
+										>
+											<PhoneFilled />
+										</Flex>
+										<span className="text-sm">{$t('挂断')}</span>
+									</Flex>
+									<Flex className="gap-2" vertical align="center" onClick={() => callStore.hangup()}>
+										<Flex
+											className="size-16 text-2xl bg-white rounded-full rotate-[-135deg]"
+											justify="center"
+										>
+											<PhoneFilled className="text-gray-500" />
+										</Flex>
+										<span className="text-sm">{$t('扬声器')}</span>
 									</Flex>
 								</>
 							) : (
@@ -110,7 +129,7 @@ const Call: React.FC<CallProps> = memo(() => {
 										>
 											<PhoneFilled />
 										</Flex>
-										<span className="text-sm">拒绝</span>
+										<span className="text-sm">{$t('拒绝')}</span>
 									</Flex>
 									<Flex
 										className="gap-2"
@@ -129,7 +148,7 @@ const Call: React.FC<CallProps> = memo(() => {
 										<Flex className="size-16 text-2xl bg-green-500 rounded-full" justify="center">
 											<PhoneFilled />
 										</Flex>
-										<span className="text-sm">接通</span>
+										<span className="text-sm">{$t('接通')}</span>
 									</Flex>
 								</>
 							)}
