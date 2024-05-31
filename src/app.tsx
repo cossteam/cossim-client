@@ -48,7 +48,6 @@ const App = () => {
             当前路由：{location.pathname}
             <AppComponent>
                 <Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
-                {/* 通话组件 */}
                 <Call />
             </AppComponent>
         </ConfigProvider>

@@ -1,0 +1,6 @@
+framework module CapacitorCommunitySafeArea {
+  umbrella header "CapacitorCommunitySafeArea-umbrella.h"
+
+  export *
+  module * { export * }
+}
