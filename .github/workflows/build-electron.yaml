@@ -1,6 +1,9 @@
 name: Build/release
 
-on: push
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # 只在 tag push 时触发工作流
 
 jobs:
   release:
@@ -21,7 +24,7 @@ jobs:
           node-version: 20
 
       - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
+        uses: Yan-Jobs/action-electron-builder@v1.7.0
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
@@ -30,4 +33,3 @@ jobs:
           # release the app after building
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
           build_script_name: build:electron
-          args: --publish always
