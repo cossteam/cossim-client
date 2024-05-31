@@ -1,0 +1,6 @@
+framework module CapacitorVoiceRecorder {
+  umbrella header "CapacitorVoiceRecorder-umbrella.h"
+
+  export *
+  module * { export * }
+}

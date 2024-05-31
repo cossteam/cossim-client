@@ -1,0 +1,70 @@
+PODS:
+  - Capacitor (5.7.0):
+    - CapacitorCordova
+  - CapacitorApp (5.0.7):
+    - Capacitor
+  - CapacitorCamera (5.0.9):
+    - Capacitor
+  - CapacitorClipboard (5.0.7):
+    - Capacitor
+  - CapacitorCordova (5.7.0)
+  - CapacitorDevice (5.0.7):
+    - Capacitor
+  - CapacitorKeyboard (5.0.8):
+    - Capacitor
+  - CapacitorLocalNotifications (5.0.7):
+    - Capacitor
+  - CapacitorStatusBar (5.0.7):
+    - Capacitor
+  - CapacitorVoiceRecorder (5.0.0):
+    - Capacitor
+
+DEPENDENCIES:
+  - "Capacitor (from `../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios`)"
+  - "CapacitorApp (from `../../node_modules/.pnpm/@capacitor+app@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/app`)"
+  - "CapacitorCamera (from `../../node_modules/.pnpm/@capacitor+camera@5.0.9_@capacitor+core@5.7.0/node_modules/@capacitor/camera`)"
+  - "CapacitorClipboard (from `../../node_modules/.pnpm/@capacitor+clipboard@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/clipboard`)"
+  - "CapacitorCordova (from `../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios`)"
+  - "CapacitorDevice (from `../../node_modules/.pnpm/@capacitor+device@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/device`)"
+  - "CapacitorKeyboard (from `../../node_modules/.pnpm/@capacitor+keyboard@5.0.8_@capacitor+core@5.7.0/node_modules/@capacitor/keyboard`)"
+  - "CapacitorLocalNotifications (from `../../node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications`)"
+  - "CapacitorStatusBar (from `../../node_modules/.pnpm/@capacitor+status-bar@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/status-bar`)"
+  - "CapacitorVoiceRecorder (from `../../node_modules/.pnpm/capacitor-voice-recorder@5.0.0_@capacitor+core@5.7.0/node_modules/capacitor-voice-recorder`)"
+
+EXTERNAL SOURCES:
+  Capacitor:
+    :path: "../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios"
+  CapacitorApp:
+    :path: "../../node_modules/.pnpm/@capacitor+app@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/app"
+  CapacitorCamera:
+    :path: "../../node_modules/.pnpm/@capacitor+camera@5.0.9_@capacitor+core@5.7.0/node_modules/@capacitor/camera"
+  CapacitorClipboard:
+    :path: "../../node_modules/.pnpm/@capacitor+clipboard@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/clipboard"
+  CapacitorCordova:
+    :path: "../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios"
+  CapacitorDevice:
+    :path: "../../node_modules/.pnpm/@capacitor+device@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/device"
+  CapacitorKeyboard:
+    :path: "../../node_modules/.pnpm/@capacitor+keyboard@5.0.8_@capacitor+core@5.7.0/node_modules/@capacitor/keyboard"
+  CapacitorLocalNotifications:
+    :path: "../../node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications"
+  CapacitorStatusBar:
+    :path: "../../node_modules/.pnpm/@capacitor+status-bar@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/status-bar"
+  CapacitorVoiceRecorder:
+    :path: "../../node_modules/.pnpm/capacitor-voice-recorder@5.0.0_@capacitor+core@5.7.0/node_modules/capacitor-voice-recorder"
+
+SPEC CHECKSUMS:
+  Capacitor: fc155ee2ee45a2093d716f13cf5aa5a865e2d85a
+  CapacitorApp: 17fecd0e6cb23feafac7eb0939417389038b0979
+  CapacitorCamera: 4892c5c392f60039d853dde78bc50ba19fbd113e
+  CapacitorClipboard: 45e5e25f2271f98712985d422776cdc5a779cca1
+  CapacitorCordova: e825fce1a2e14e4b5730641c7e098dccf74397b7
+  CapacitorDevice: fc91bdb484dc0e70755e9b621cd557afe642613a
+  CapacitorKeyboard: aec619a578235c6ce279075009a2689c2cf5c42c
+  CapacitorLocalNotifications: c58afadd159f6bc540ef9b3cbdbc82510a2bf112
+  CapacitorStatusBar: f390fbb49b82ffb754ea4b3cf71dc8b048baf3e7
+  CapacitorVoiceRecorder: 872ea857b497ce2c71afe3e4eb5de0a74290c0db
+
+PODFILE CHECKSUM: 12ccfb1be762319cca6adeeb8d783ddb2f99c4b1
+
+COCOAPODS: 1.14.3

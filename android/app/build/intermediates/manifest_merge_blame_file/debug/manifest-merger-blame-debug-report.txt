@@ -1,0 +1,348 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.hitosea.coss"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+7-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:5:5-44
+8        android:minSdkVersion="22"
+8-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:5:16-42
+9        android:targetSdkVersion="33" />
+9-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:5:5-44
+10
+11    <!-- Permissions -->
+12    <!-- 连接网络权限 -->
+13    <uses-permission android:name="android.permission.INTERNET" />
+13-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:9:5-66
+13-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:9:22-64
+14    <!-- 读取网络信息状态 -->
+15    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+15-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:11:5-78
+15-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:11:22-76
+16    <!-- 获取当前wifi状态 -->
+17    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+17-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:13:5-75
+17-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:13:22-73
+18    <!-- 允许程序改变网络连接状态 -->
+19    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+19-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:15:5-78
+19-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:15:22-76
+20    <!-- 读取手机信息权限 -->
+21    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+21-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:17:5-74
+21-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:17:22-72
+22    <!-- 存储权限用于读取/保存照片文件 -->
+23    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+23-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:19:5-75
+23-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:19:22-73
+24    <!-- 外存储写权限 -->
+25    <uses-permission
+25-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:21:5-23:40
+26        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+26-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:21:22-78
+27        android:maxSdkVersion="32" />
+27-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:22:9-35
+28    <!-- 外存储读权限 -->
+29    <uses-permission
+29-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:25:5-26:38
+30        android:name="android.permission.READ_EXTERNAL_STORAGE"
+30-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:25:22-77
+31        android:maxSdkVersion="32" />
+31-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:26:9-35
+32    <!-- 本地通知权限 -->
+33    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+33-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:28:5-29:40
+33-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:28:22-76
+34    <!-- 录制音频 -->
+35    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+35-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:31:5-71
+35-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:31:22-68
+36    <!-- 修改音频设置 -->
+37    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+37-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:33:5-79
+37-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:33:22-77
+38    <!-- 相机 -->
+39    <uses-feature android:name="android.hardware.camera" />
+39-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:35:5-60
+39-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:35:19-57
+40    <uses-feature android:name="android.hardware.IMAGE_CAPTURE" />
+40-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:36:5-67
+40-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:36:19-64
+41
+42    <uses-permission android:name="android.permission.CAMERA" />
+42-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:37:5-65
+42-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:37:22-62
+43
+44    <queries>
+44-->[:capacitor-camera] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+camera@5.0.9_@capacitor+core@5.7.0/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:7:5-11:15
+45        <intent>
+45-->[:capacitor-camera] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+camera@5.0.9_@capacitor+core@5.7.0/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:8:9-10:18
+46            <action android:name="android.media.action.IMAGE_CAPTURE" />
+46-->[:capacitor-camera] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+camera@5.0.9_@capacitor+core@5.7.0/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:13-73
+46-->[:capacitor-camera] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+camera@5.0.9_@capacitor+core@5.7.0/node_modules/@capacitor/camera/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:21-70
+47        </intent>
+48    </queries>
+49
+50    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+50-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:7:5-81
+50-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:7:22-78
+51    <uses-permission android:name="android.permission.WAKE_LOCK" />
+51-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:8:5-68
+51-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:8:22-65
+52    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+52-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-77
+52-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:22-74
+53
+54    <permission
+54-->[androidx.core:core:1.10.0] /Users/mac-os12/gradle/caches/transforms-3/4084e7bcb4a1738e1ff26326a1997c6e/transformed/core-1.10.0/AndroidManifest.xml:22:5-24:47
+55        android:name="com.hitosea.coss.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+55-->[androidx.core:core:1.10.0] /Users/mac-os12/gradle/caches/transforms-3/4084e7bcb4a1738e1ff26326a1997c6e/transformed/core-1.10.0/AndroidManifest.xml:23:9-81
+56        android:protectionLevel="signature" />
+56-->[androidx.core:core:1.10.0] /Users/mac-os12/gradle/caches/transforms-3/4084e7bcb4a1738e1ff26326a1997c6e/transformed/core-1.10.0/AndroidManifest.xml:24:9-44
+57
+58    <uses-permission android:name="com.hitosea.coss.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+58-->[androidx.core:core:1.10.0] /Users/mac-os12/gradle/caches/transforms-3/4084e7bcb4a1738e1ff26326a1997c6e/transformed/core-1.10.0/AndroidManifest.xml:26:5-97
+58-->[androidx.core:core:1.10.0] /Users/mac-os12/gradle/caches/transforms-3/4084e7bcb4a1738e1ff26326a1997c6e/transformed/core-1.10.0/AndroidManifest.xml:26:22-94
+59
+60    <application
+60-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:39:5-109:19
+61        android:allowBackup="true"
+61-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:40:9-35
+62        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+62-->[androidx.core:core:1.10.0] /Users/mac-os12/gradle/caches/transforms-3/4084e7bcb4a1738e1ff26326a1997c6e/transformed/core-1.10.0/AndroidManifest.xml:28:18-86
+63        android:debuggable="true"
+64        android:icon="@mipmap/ic_launcher"
+64-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:41:9-43
+65        android:label="@string/app_name"
+65-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:42:9-41
+66        android:roundIcon="@mipmap/ic_launcher_round"
+66-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:43:9-54
+67        android:supportsRtl="true"
+67-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:44:9-35
+68        android:testOnly="true"
+69        android:theme="@style/AppTheme" >
+69-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:45:9-40
+70        <activity
+70-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:47:9-71:20
+71            android:name="com.hitosea.coss.MainActivity"
+71-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:49:13-41
+72            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
+72-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:48:13-129
+73            android:exported="true"
+73-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:53:13-36
+74            android:label="@string/title_activity_main"
+74-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:50:13-56
+75            android:launchMode="singleTask"
+75-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:52:13-44
+76            android:theme="@style/AppTheme.NoActionBarLaunch"
+76-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:51:13-62
+77            android:windowSoftInputMode="adjustNothing" >
+77-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:54:13-56
+78
+79            <!-- android:windowSoftInputMode="adjustNothing" -->
+80            <!-- android:windowSoftInputMode="adjustNothing" -->
+81
+82            <intent-filter>
+82-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:59:13-62:29
+83                <action android:name="android.intent.action.MAIN" />
+83-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:60:17-69
+83-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:60:25-66
+84
+85                <category android:name="android.intent.category.LAUNCHER" />
+85-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:61:17-77
+85-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:61:27-74
+86            </intent-filter>
+87            <intent-filter>
+87-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:64:13-69:29
+88                <action android:name="android.intent.action.VIEW" />
+88-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:65:17-69
+88-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:65:25-66
+89
+90                <category android:name="android.intent.category.DEFAULT" />
+90-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:66:17-76
+90-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:66:27-73
+91                <category android:name="android.intent.category.BROWSABLE" />
+91-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:67:17-78
+91-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:67:27-75
+92
+93                <data android:scheme="@string/custom_url_scheme" />
+93-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:68:17-68
+93-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:68:23-65
+94            </intent-filter>
+95        </activity>
+96
+97        <!--
+98       如果应用需要解析和处理Push消息（如透传消息），则继承PushService来处理，并在此申明
+99       如果不需要处理Push消息，则直接申明PsuhService即可
+100        -->
+101        <!-- <service -->
+102        <!-- android:name=".service.PushMessageService" -->
+103        <!-- android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE" -->
+104        <!-- android:exported="true"> -->
+105        <!-- <intent-filter> -->
+106        <!-- <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE" /> -->
+107        <!-- </intent-filter> -->
+108        <!-- </service> -->
+109
+110
+111        <!-- <service android:name=".service.AppPushMessageService" -->
+112        <!-- android:permission="com.heytap.mcs.permission.SEND_PUSH_MESSAGE" -->
+113        <!-- android:exported="true"> -->
+114        <!-- <intent-filter> -->
+115        <!-- <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE"/> -->
+116        <!-- <action android:name="com.heytap.msp.push.RECEIVE_MCS_MESSAGE" /> -->
+117        <!-- </intent-filter> -->
+118        <!-- </service> -->
+119        <!-- <service android:name=".service.DemoService" > -->
+120        <!-- <intent-filter> -->
+121        <!-- <action android:name="com.heytap.push.demo.action"/> -->
+122        <!-- </intent-filter> -->
+123        <!-- </service> -->
+124
+125        <provider
+126            android:name="androidx.core.content.FileProvider"
+126-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:101:13-62
+127            android:authorities="com.hitosea.coss.fileprovider"
+127-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:102:13-64
+128            android:exported="false"
+128-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:103:13-37
+129            android:grantUriPermissions="true" >
+129-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:104:13-47
+130            <meta-data
+130-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:105:13-107:53
+131                android:name="android.support.FILE_PROVIDER_PATHS"
+131-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:106:17-67
+132                android:resource="@xml/file_paths" />
+132-->/Users/mac-os12/Documents/project/im/coss-client/android/app/src/main/AndroidManifest.xml:107:17-51
+133        </provider>
+134        <!-- 该字段大于等于480，则表示支持点击消息直接打开应用activity，优化启动慢问题。 -->
+135        <meta-data
+135-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:16:9-18:35
+136            android:name="sdk_version_vivo"
+136-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:17:13-44
+137            android:value="500" />
+137-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:18:13-32
+138
+139        <service
+139-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:20:9-22:39
+140            android:name="com.vivo.push.sdk.service.CommandClientService"
+140-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:21:13-74
+141            android:exported="true" />
+141-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:22:13-36
+142
+143        <meta-data
+143-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:24:9-26:295
+144            android:name="local_iv"
+144-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:25:13-36
+145            android:value="MzMsMzQsMzUsMzYsMzcsMzgsMzksNDAsNDEsMzIsMzgsMzcsMzYsMzUsMzQsMzMsI0AzNCwzMiwzMywzNywzMywzNCwzMiwzMywzMywzMywzNCw0MSwzNSwzNSwzMiwzMiwjQDMzLDM0LDM1LDM2LDM3LDM4LDM5LDQwLDQxLDMyLDM4LDM3LDMzLDM1LDM0LDMzLCNAMzQsMzIsMzMsMzcsMzMsMzQsMzIsMzMsMzMsMzMsMzQsNDEsMzUsMzIsMzIsMzI" /> <!-- 支持性能监控 -->
+145-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:26:13-292
+146        <meta-data
+146-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:27:9-29:33
+147            android:name="com.vivo.push.support_monitor"
+147-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:28:13-57
+148            android:value="1" />
+148-->[vivo_pushSDK_v4.0.0.0_500.aar] /Users/mac-os12/gradle/caches/transforms-3/c08f3d67d6e141f5641a65cc53f2c565/transformed/vivo_pushSDK_v4.0.0.0_500/AndroidManifest.xml:29:13-30
+149        <meta-data
+149-->[com.heytap.msp_3.4.0.aar] /Users/mac-os12/gradle/caches/transforms-3/33e843c2c25c0ed8eadcbf356be07944/transformed/com.heytap.msp_3.4.0/AndroidManifest.xml:12:9-14:36
+150            android:name="sdkVersion"
+150-->[com.heytap.msp_3.4.0.aar] /Users/mac-os12/gradle/caches/transforms-3/33e843c2c25c0ed8eadcbf356be07944/transformed/com.heytap.msp_3.4.0/AndroidManifest.xml:13:13-38
+151            android:value="3400" />
+151-->[com.heytap.msp_3.4.0.aar] /Users/mac-os12/gradle/caches/transforms-3/33e843c2c25c0ed8eadcbf356be07944/transformed/com.heytap.msp_3.4.0/AndroidManifest.xml:14:13-33
+152
+153        <receiver android:name="com.capacitorjs.plugins.localnotifications.TimedNotificationPublisher" />
+153-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:12:9-106
+153-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:12:19-103
+154        <receiver android:name="com.capacitorjs.plugins.localnotifications.NotificationDismissReceiver" />
+154-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:13:9-107
+154-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:13:19-104
+155        <receiver
+155-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:14:9-23:20
+156            android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver"
+156-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:15:13-103
+157            android:directBootAware="true"
+157-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:16:13-43
+158            android:exported="false" >
+158-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:17:13-37
+159            <intent-filter>
+159-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:18:13-22:29
+160                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+160-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:19:17-86
+160-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:19:25-83
+161                <action android:name="android.intent.action.BOOT_COMPLETED" />
+161-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:20:17-79
+161-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:20:25-76
+162                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+162-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:21:17-82
+162-->[:capacitor-local-notifications] /Users/mac-os12/Documents/project/im/coss-client/node_modules/.pnpm/@capacitor+local-notifications@5.0.7_@capacitor+core@5.7.0/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:21:25-79
+163            </intent-filter>
+164        </receiver>
+165
+166        <provider
+166-->[androidx.emoji2:emoji2:1.2.0] /Users/mac-os12/gradle/caches/transforms-3/bc4e404d2e4e27a8333e074e645fe6c4/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+167            android:name="androidx.startup.InitializationProvider"
+167-->[androidx.emoji2:emoji2:1.2.0] /Users/mac-os12/gradle/caches/transforms-3/bc4e404d2e4e27a8333e074e645fe6c4/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+168            android:authorities="com.hitosea.coss.androidx-startup"
+168-->[androidx.emoji2:emoji2:1.2.0] /Users/mac-os12/gradle/caches/transforms-3/bc4e404d2e4e27a8333e074e645fe6c4/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+169            android:exported="false" >
+169-->[androidx.emoji2:emoji2:1.2.0] /Users/mac-os12/gradle/caches/transforms-3/bc4e404d2e4e27a8333e074e645fe6c4/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+170            <meta-data
+170-->[androidx.emoji2:emoji2:1.2.0] /Users/mac-os12/gradle/caches/transforms-3/bc4e404d2e4e27a8333e074e645fe6c4/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+171                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+171-->[androidx.emoji2:emoji2:1.2.0] /Users/mac-os12/gradle/caches/transforms-3/bc4e404d2e4e27a8333e074e645fe6c4/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+172                android:value="androidx.startup" />
+172-->[androidx.emoji2:emoji2:1.2.0] /Users/mac-os12/gradle/caches/transforms-3/bc4e404d2e4e27a8333e074e645fe6c4/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+173            <meta-data
+173-->[androidx.lifecycle:lifecycle-process:2.6.1] /Users/mac-os12/gradle/caches/transforms-3/6965ddfd7c9bb67e76de74f23369d3cb/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:29:13-31:52
+174                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+174-->[androidx.lifecycle:lifecycle-process:2.6.1] /Users/mac-os12/gradle/caches/transforms-3/6965ddfd7c9bb67e76de74f23369d3cb/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:30:17-78
+175                android:value="androidx.startup" />
+175-->[androidx.lifecycle:lifecycle-process:2.6.1] /Users/mac-os12/gradle/caches/transforms-3/6965ddfd7c9bb67e76de74f23369d3cb/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:31:17-49
+176            <meta-data
+176-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+177                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+177-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+178                android:value="androidx.startup" />
+178-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+179        </provider>
+180
+181        <receiver
+181-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+182            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+182-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+183            android:directBootAware="false"
+183-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+184            android:enabled="true"
+184-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+185            android:exported="true"
+185-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+186            android:permission="android.permission.DUMP" >
+186-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+187            <intent-filter>
+187-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+188                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+188-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+188-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+189            </intent-filter>
+190            <intent-filter>
+190-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+191                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+191-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+191-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+192            </intent-filter>
+193            <intent-filter>
+193-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+194                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+194-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+194-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+195            </intent-filter>
+196            <intent-filter>
+196-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+197                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+197-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+197-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/mac-os12/gradle/caches/transforms-3/a916dcd0a76c646859857390ab72a1c7/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92
+198            </intent-filter>
+199        </receiver>
+200    </application>
+201
+202</manifest>

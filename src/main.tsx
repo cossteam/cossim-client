@@ -7,11 +7,11 @@ import App from './app'
 import { SafeArea } from '@capacitor-community/safe-area'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-	<StrictMode>
-		<BrowserRouter>
-			<App />
-		</BrowserRouter>
-	</StrictMode>
+  <StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </StrictMode>
 )
 
 /**
@@ -19,13 +19,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
  * @see: https://github.com/capacitor-community/safe-area?tab=readme-ov-file#using-the-api
  */
 if (__IS_NATIVE__) {
-	SafeArea.enable({
-		config: {
-			customColorsForSystemBars: true,
-			statusBarColor: '#00000000'
-			// statusBarContent: 'light',
-			// navigationBarColor: '#00000000',
-			// navigationBarContent: 'light'
-		}
-	})
+  SafeArea.enable({
+    config: {
+      customColorsForSystemBars: true,
+      statusBarColor: '#00000000'
+      // statusBarContent: 'light',
+      // navigationBarColor: '#00000000',
+      // navigationBarContent: 'light'
+    }
+  })
 }
