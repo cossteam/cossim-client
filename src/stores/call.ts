@@ -11,7 +11,7 @@ const states: CallOptions = {
 	isGroup: false
 }
 
-const actions = (set: any): CallStoreMethods => ({
+const actions = (set: any, get: any): CallStoreMethods => ({
 	update: async (options) => set(options),
 	create: function (
 		callId: string,
@@ -21,6 +21,11 @@ const actions = (set: any): CallStoreMethods => ({
 		isGroup: boolean
 	): Promise<ResponseData<any>> {
 		console.log('create', callId, callType, isVideo, isAudio, isGroup)
+		const { update } = get()
+		update({
+			isAudio: !isVideo,
+			isVideo: isVideo
+		})
 		return Promise.resolve({
 			code: 200,
 			data: {
@@ -41,6 +46,11 @@ const actions = (set: any): CallStoreMethods => ({
 		isGroup: boolean
 	): Promise<ResponseData<any>> {
 		console.log('join', callId, callType, isVideo, isAudio, isGroup)
+		const { update } = get()
+		update({
+			isAudio: !isVideo,
+			isVideo: isVideo
+		})
 		return Promise.resolve({
 			code: 0,
 			data: {
@@ -55,6 +65,15 @@ const actions = (set: any): CallStoreMethods => ({
 	},
 	leave: function (): Promise<ResponseData<any>> {
 		console.log('leave')
+		const { update } = get()
+		update({
+			callId: '',
+			callType: '',
+			callStatus: '',
+			isVideo: false,
+			isAudio: false,
+			isGroup: false
+		})
 		return Promise.resolve({
 			code: 0,
 			data: {},
@@ -63,6 +82,15 @@ const actions = (set: any): CallStoreMethods => ({
 	},
 	reject: function (): Promise<ResponseData<any>> {
 		console.log('reject')
+		const { update } = get()
+		update({
+			callId: '',
+			callType: '',
+			callStatus: '',
+			isVideo: false,
+			isAudio: false,
+			isGroup: false
+		})
 		return Promise.resolve({
 			code: 0,
 			data: {},
@@ -71,6 +99,15 @@ const actions = (set: any): CallStoreMethods => ({
 	},
 	hangup: function (): Promise<ResponseData<any>> {
 		console.log('hangup')
+		const { update } = get()
+		update({
+			callId: '',
+			callType: '',
+			callStatus: '',
+			isVideo: false,
+			isAudio: false,
+			isGroup: false
+		})
 		return Promise.resolve({
 			code: 0,
 			data: {},
@@ -79,9 +116,9 @@ const actions = (set: any): CallStoreMethods => ({
 	}
 })
 
-const commonStore = (set: any): CallStore => ({
+const commonStore = (set: any, get: any): CallStore => ({
 	...states,
-	...actions(set)
+	...actions(set, get)
 })
 
 const useCallStore = create(

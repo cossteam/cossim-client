@@ -9,8 +9,16 @@ import { Flex, Typography, Dropdown, Divider } from 'antd'
 import { useMemo } from 'react'
 import IconButton from '@/components/icon/icon-button'
 import { $t } from '@/i18n'
+import useCallStore from '@/stores/call'
 
 const MessageHeader = () => {
+	const callStore = useCallStore()
+
+	const call = (video: boolean) => {
+		if (callStore.isAudio || callStore.isVideo) return
+		callStore.create(`${Date.now()}`, video ? 'video' : 'audio', video, !video, false)
+	}
+
 	return (
 		<Flex className="mobile:min-h-16 min-h-16 bg-background pl-5 pr-3" justify="center" vertical>
 			<Flex justify="space-between">
@@ -20,8 +28,16 @@ const MessageHeader = () => {
 				</Flex>
 				<Flex align="center" gap={10}>
 					<IconButton className="text-xl text-gray-500" component={SearchOutlined} />
-					<IconButton className="text-xl text-gray-500" component={PhoneOutlined} />
-					<IconButton className="text-xl text-gray-500" component={VideoCameraOutlined} />
+					<IconButton
+						className="text-xl text-gray-500"
+						component={PhoneOutlined}
+						onClick={() => call(true)}
+					/>
+					<IconButton
+						className="text-xl text-gray-500"
+						component={VideoCameraOutlined}
+						onClick={() => call(false)}
+					/>
 					<Dropdown
 						// menu={{ items }}
 						trigger={['click']}
