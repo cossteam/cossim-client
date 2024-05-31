@@ -1,27 +1,27 @@
 .ql-editor {
-  @apply text-sm break-all overflow-y-auto w750:max-h-[200px] max-h-[150px];
+    @apply text-sm break-all overflow-y-auto w750:max-h-[200px] max-h-[150px];
 
-  &:focus-visible {
-    outline: none;
-  }
+    &:focus-visible {
+        outline: none;
+    }
 
-  &.ql-blank::before {
-    content: attr(data-placeholder);
-    font-size: 0.9rem;
-    left: 15px !important;
-    right: auto !important;
-    font-style: normal !important;
-  }
+    &.ql-blank::before {
+        content: attr(data-placeholder);
+        font-size: 0.9rem;
+        left: 15px !important;
+        right: auto !important;
+        font-style: normal !important;
+    }
 
-  &.ql-blank:focus:before {
-    content: '';
-  }
+    &.ql-blank:focus:before {
+        content: '';
+    }
 
-  code {
-    color: var(--coss-text-primary);
-    background: #ccc;
-    padding: 4px;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
+    code {
+        color: var(--coss-text-primary);
+        background: #ccc;
+        padding: 4px;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
 }

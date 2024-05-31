@@ -7,34 +7,34 @@ import { defaultLanguage } from '@/i18n'
 const defaultThemeColor = getComputedStyle(document.documentElement).getPropertyValue('--primary')
 
 const states: CommonOptions = {
-  theme: THEME.LIGHT,
-  themeColor: `hsl(${defaultThemeColor})`,
-  lang: defaultLanguage,
-  lastDialogId: 0,
-  historyEmoji: []
+    theme: THEME.LIGHT,
+    themeColor: `hsl(${defaultThemeColor})`,
+    lang: defaultLanguage,
+    lastDialogId: 0,
+    historyEmoji: []
 }
 
 const actions = (set: any, get: any): CommonStoreMethods => ({
-  init: async () => {
-    const options = get()
-    console.log('🚀 ~ 当前主题', options.theme)
-    // 这里可以做一些初始化操作，比如获取本地存储的用户信息等
-  },
-  update: async (options) => set(options)
+    init: async () => {
+        const options = get()
+        console.log('🚀 ~ 当前主题', options.theme)
+        // 这里可以做一些初始化操作，比如获取本地存储的用户信息等
+    },
+    update: async (options) => set(options)
 })
 
 const commonStore = (set: any, get: any): CommonStore => ({
-  ...states,
-  ...actions(set, get)
+    ...states,
+    ...actions(set, get)
 })
 
 const useCommonStore = create(
-  devtools(
-    persist(commonStore, {
-      name: 'COSS_COMMON_STORE',
-      storage: createJSONStorage(() => localStorage)
-    })
-  )
+    devtools(
+        persist(commonStore, {
+            name: 'COSS_COMMON_STORE',
+            storage: createJSONStorage(() => localStorage)
+        })
+    )
 )
 
 export default useCommonStore
