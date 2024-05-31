@@ -9,7 +9,6 @@
   files: ['dist', 'dist-electron'],
   mac: {
     target: ['dmg'],
-    arch: ['x64', 'arm64'],
     artifactName: '${productName}-${os}-${arch}-${version}-Installer.${ext}'
   },
   win: {
@@ -29,7 +28,6 @@
   },
   linux: {
     target: ['AppImage'],
-	arch: ['x64', 'arm64'],
     artifactName: '${productName}-${os}-${arch}-${version}.${ext}'
   }
 }
