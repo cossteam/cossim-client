@@ -91,6 +91,7 @@
     },
     "build": {
         "publish": {
+            "provider": "github",
             "publishAutoUpdate": false
           }
     },
