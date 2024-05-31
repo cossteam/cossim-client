@@ -90,9 +90,11 @@
         "vue-auto-translate": "^1.1.13"
     },
     "build": {
-        "publish": ["github"],
-        "publishAutoUpdate": false,
-        "releaseType": "release"
+        "publish": {
+            "provider": "github",
+            "releaseType": "release",
+            "publishAutoUpdate": false
+          }
     },
     "main": "dist-electron/main.js"
 }
