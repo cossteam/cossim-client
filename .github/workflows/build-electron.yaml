@@ -1,0 +1,39 @@
+name: Build/release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Only trigger the workflow on tag push
+
+jobs:
+  release:
+    permissions: write-all
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+        architecture: [amd64,arm64]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 20
+
+      - name: Build/release Electron app
+        uses: Yan-Jobs/action-electron-builder@v1.7.0
+        env:
+          EP_RELEASE: true
+        with:
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.github_token }}
+          # If the commit is tagged with a version (e.g. "v1.0.0"),
+          # release the app after building
+          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          build_script_name: build:electron
+          release_type: release

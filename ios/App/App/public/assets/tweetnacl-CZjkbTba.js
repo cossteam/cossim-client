@@ -1,1 +1,0 @@
-import{v as i,w as o}from"./index-BMnTsVIf.js";const y=()=>{const e=i.box.keyPair();return{privateKey:e.secretKey,publicKey:e.publicKey}},r=e=>o(e),n=e=>{const t=r(e.privateKey),a=r(e.publicKey);return JSON.stringify({privateKey:t,publicKey:a})};export{n as e,y as g};
