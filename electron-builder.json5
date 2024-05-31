@@ -29,5 +29,10 @@
   linux: {
     target: ['AppImage'],
     artifactName: '${productName}-${os}-${arch}-${version}.${ext}'
-  }
+  },
+  publish: {
+		provider: "github",
+		releaseType: "release",
+		publishAutoUpdate: false
+	}
 }

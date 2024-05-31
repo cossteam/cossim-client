@@ -26,10 +26,6 @@ jobs:
 
       - name: Build/release Electron app
         uses: Yan-Jobs/action-electron-builder@v1.7.0
-        env:
-          EP_DRAFT: false
-          EP_PRE_RELEASE: false
-          EP_RELEASE: true
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
