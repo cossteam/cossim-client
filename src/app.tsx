@@ -10,45 +10,44 @@ import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import dayjs from 'dayjs'
 import { Locale } from 'antd/es/locale'
-import Call from '@/components/call'
 
 const App = memo(() => {
-	const commonStore = useCommonStore()
+  const commonStore = useCommonStore()
 
-	const [locale, setLocal] = useState<Locale>(enUS)
+  const [locale, setLocal] = useState<Locale>(enUS)
 
-	useEffect(() => {
-		if (localStorage.getItem('locale') !== 'zh-CN') {
-			setLocal(zhCN)
-			dayjs.locale('zh-cn')
-		} else {
-			setLocal(enUS)
-			dayjs.locale('en')
-		}
-	}, [])
+  useEffect(() => {
+    if (localStorage.getItem('locale') !== 'zh-CN') {
+      setLocal(zhCN)
+      dayjs.locale('zh-cn')
+    } else {
+      setLocal(enUS)
+      dayjs.locale('en')
+    }
+  }, [])
 
-	// 鉴权
-	useAuth()
+  // 鉴权
+  useAuth()
 
-	return (
-		<ConfigProvider
-			theme={{
-				token: {
-					colorPrimary: commonStore.themeColor,
-					borderRadius: 4,
-					fontSize: 16
-					// colorBgElevated: 'transparent'
-				}
-			}}
-			locale={locale}
-		>
-			<AppComponent>
-				<Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
-				{/* 通话组件 */}
-				{/* <Call /> */}
-			</AppComponent>
-		</ConfigProvider>
-	)
+  return (
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: commonStore.themeColor,
+          borderRadius: 4,
+          fontSize: 16
+          // colorBgElevated: 'transparent'
+        }
+      }}
+      locale={locale}
+    >
+      <AppComponent>
+        <Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
+        {/* 通话组件 */}
+        {/* <Call /> */}
+      </AppComponent>
+    </ConfigProvider>
+  )
 })
 
 export default App

@@ -1,42 +1,42 @@
 import { LoginParams, LogoutParams } from './api'
 
 export interface UserOptions {
-	/*** @description 用户 id*/
-	userId: string
-	/*** @description 用户所有信息*/
-	userInfo: any
-	/** @description token */
-	token: string
+  /*** @description 用户 id*/
+  userId: string
+  /*** @description 用户所有信息*/
+  userInfo: any
+  /** @description token */
+  token: string
 }
 
 export interface UserStoreMethods {
-	/** @description 更新某个值 */
-	update: (options: Partial<UserOptions>) => Promise<void>
-	login: (params: LoginParams) => Promise<ResponseData<any>>
-	logout: (params: LogoutParams) => Promise<ResponseData<any>>
+  /** @description 更新某个值 */
+  update: (options: Partial<UserOptions>) => Promise<void>
+  login: (params: LoginParams) => Promise<ResponseData<any>>
+  logout: (params: LogoutParams) => Promise<ResponseData<any>>
 }
 
 export interface CommonOptions {
-	/**
-	 * @description 当前主题  'light' | 'dark'
-	 * @default 'light'
-	 */
-	theme: 'light' | 'dark'
-	/** @description 主题色 */
-	themeColor: string
-	/** @description 语言 */
-	lang: string
-	/** @description 记录上一次记录的会话 id */
-	lastDialogId: number
-	/** @description  记录历史表情 */
-	historyEmoji: string[]
+  /**
+   * @description 当前主题  'light' | 'dark'
+   * @default 'light'
+   */
+  theme: 'light' | 'dark'
+  /** @description 主题色 */
+  themeColor: string
+  /** @description 语言 */
+  lang: string
+  /** @description 记录上一次记录的会话 id */
+  lastDialogId: number
+  /** @description  记录历史表情 */
+  historyEmoji: string[]
 }
 
 export interface CommonStoreMethods {
-	/** @description 初始化操作，数据初始化，主题初始化等 */
-	init(): Promise<void>
-	/** @description 更新某个值 */
-	update: (options: Partial<CommonOptions>) => Promise<void>
+  /** @description 初始化操作，数据初始化，主题初始化等 */
+  init(): Promise<void>
+  /** @description 更新某个值 */
+  update: (options: Partial<CommonOptions>) => Promise<void>
 }
 
 // 用户仓库
