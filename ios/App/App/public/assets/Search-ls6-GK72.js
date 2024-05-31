@@ -1,0 +1,1 @@
+import{j as s,P as e,N as a,W as r,$ as t,L as n}from"./index-BMnTsVIf.js";const o=()=>s.jsxs(e,{className:"group-page",noToolbar:!0,messagesContent:!0,children:[s.jsx(a,{className:"messages-navbar",backLink:!0,children:s.jsx(r,{children:s.jsx("div",{className:"",children:t("搜索")})})}),s.jsx(n,{contactsList:!0,noChevron:!0,dividers:!0})]});export{o as default};

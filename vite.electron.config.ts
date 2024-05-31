@@ -3,8 +3,8 @@ import electron from 'vite-plugin-electron/simple'
 import path from 'node:path'
 import config from './vite.config'
 
-const ELECTRON_ENTRY = path.resolve(__dirname, 'electron/main/main.ts')
-const PRELOAD_INPUT = path.resolve(__dirname, 'electron/preload/preload.ts')
+const ELECTRON_ENTRY = path.resolve(__dirname, 'electron/main.ts')
+const PRELOAD_INPUT = path.resolve(__dirname, 'electron/preload.ts')
 
 export default defineConfig({
   ...config,
