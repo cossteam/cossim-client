@@ -19,6 +19,9 @@ const Call: React.FC<CallProps> = memo(() => {
 	const isVideo = useMemo(() => {
 		return false
 	}, [callStore.isVideo])
+	const connected = useMemo(() => {
+		return callStore.callStatus === 'connected'
+	}, [callStore.callStatus])
 	const [runningBackground, setRunningBackground] = useState(false)
 
 	const [avatar, setAvatar] = useState('')
@@ -86,34 +89,50 @@ const Call: React.FC<CallProps> = memo(() => {
 						</Flex>
 						<Flex className="gap-20">
 							{/* 圆形按钮 */}
-							<Flex className="gap-2" vertical align="center" onClick={() => callStore.hangup()}>
-								<Flex
-									className="size-16 text-2xl bg-red-500 rounded-full rotate-[-135deg]"
-									justify="center"
-								>
-									<PhoneFilled />
-								</Flex>
-								<span className="text-sm">挂断</span>
-							</Flex>
-							<Flex
-								className="gap-2"
-								vertical
-								align="center"
-								onClick={() =>
-									callStore.join(
-										`${Date.now()}`,
-										isVideo ? 'video' : 'audio',
-										isVideo,
-										!isVideo,
-										false
-									)
-								}
-							>
-								<Flex className="size-16 text-2xl bg-green-500 rounded-full" justify="center">
-									<PhoneFilled />
-								</Flex>
-								<span className="text-sm">接通</span>
-							</Flex>
+							{connected ? (
+								<>
+									<Flex className="gap-2" vertical align="center" onClick={() => callStore.hangup()}>
+										<Flex
+											className="size-16 text-2xl bg-red-500 rounded-full rotate-[-135deg]"
+											justify="center"
+										>
+											<PhoneFilled />
+										</Flex>
+										<span className="text-sm">挂断</span>
+									</Flex>
+								</>
+							) : (
+								<>
+									<Flex className="gap-2" vertical align="center" onClick={() => callStore.hangup()}>
+										<Flex
+											className="size-16 text-2xl bg-red-500 rounded-full rotate-[-135deg]"
+											justify="center"
+										>
+											<PhoneFilled />
+										</Flex>
+										<span className="text-sm">拒绝</span>
+									</Flex>
+									<Flex
+										className="gap-2"
+										vertical
+										align="center"
+										onClick={() =>
+											callStore.join(
+												`${Date.now()}`,
+												isVideo ? 'video' : 'audio',
+												isVideo,
+												!isVideo,
+												false
+											)
+										}
+									>
+										<Flex className="size-16 text-2xl bg-green-500 rounded-full" justify="center">
+											<PhoneFilled />
+										</Flex>
+										<span className="text-sm">接通</span>
+									</Flex>
+								</>
+							)}
 						</Flex>
 					</Flex>
 				</Flex>
