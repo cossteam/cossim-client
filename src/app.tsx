@@ -10,7 +10,7 @@ import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import dayjs from 'dayjs'
 import { Locale } from 'antd/es/locale'
-import Call from '@/components/call'
+// import Call from '@/components/call'
 
 const App = memo(() => {
 	const commonStore = useCommonStore()
