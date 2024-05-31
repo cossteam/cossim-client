@@ -50,6 +50,7 @@ function createWindow() {
   })
 
   if (VITE_DEV_SERVER_URL) {
+    win.webContents.openDevTools()
     // 开发环境下打开控制台
     win.loadURL(VITE_DEV_SERVER_URL)
     // win.loadURL('http://localhost:8081')
@@ -57,8 +58,6 @@ function createWindow() {
     // win.loadFile('dist/index.html')
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
-
-  win.webContents.openDevTools()
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
