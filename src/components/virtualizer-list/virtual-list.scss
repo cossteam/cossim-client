@@ -1,0 +1,21 @@
+.virtual-container {
+    height: 600px;
+    width: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    position: relative;
+  }
+  
+  .virtual-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+  
+  .virtual-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    box-sizing: border-box;
+  }
+  

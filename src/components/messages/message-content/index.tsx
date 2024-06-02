@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { generateMessageList } from '@/mock/data'
 import MessageItem from './message-item'
 import InfiniteScroll from '@/components/infinite-scroll'
+// import VirtualList from '@/components/virtualizer-list/virtual-list'
 
 const MessageContent = () => {
     const parentRef = useRef<HTMLDivElement>(null)
@@ -88,6 +89,7 @@ const MessageContent = () => {
             >
                 {data.reverse().map((_, index) => renderItem(index))}
             </InfiniteScroll>
+            {/* <VirtualList data={data} itemHeight={50} height={height} children={renderItem} /> */}
         </Flex>
     )
 }
