@@ -15,12 +15,44 @@ android {
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
+        signingConfigs {
+            // release {
+            //     storeFile file('release.keystore')
+            //     storePassword 'release'
+            //     keyAlias 'release'
+            //     keyPassword 'release'
+            // }
+             debug {
+                storeFile file('COSS_KEYS')
+                storePassword 'hitosea.coss'
+                keyPassword 'hitosea.coss'
+                keyAlias 'hitosea_coss'
+             }
+        }
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //警告！在生产中，您需要生成自己的密钥库文件。
+            // signingConfig signingConfigs.release
+            // shrinkResources false
+            // proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
+    }
+
+     android.applicationVariants.all {
+        variant -> variant.outputs.all { output ->
+                def date = new Date().format("yyyyMMddHHmmss",
+                        TimeZone.getTimeZone("GMT+08"))
+                if (variant.buildType.name == 'debug') {
+                    output.outputFileName = "coss_" +
+                            "${android.defaultConfig.versionName}_${date}_debug.apk"
+                }else if (variant.buildType.name == 'release'){
+                    output.outputFileName = "coss_" +
+                            "${android.defaultConfig.versionName}_${date}_release.apk"
+                }
+            }
     }
 }
 
@@ -40,6 +72,11 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
+
+    // 以下依赖都需要添加
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'commons-codec:commons-codec:1.6'
+    implementation 'androidx.annotation:annotation:1.1.0'
 }
 
 apply from: 'capacitor.build.gradle'

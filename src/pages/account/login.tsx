@@ -24,8 +24,8 @@ const Login: React.FC = () => {
             navigate('/dashboard', {
                 replace: true
             })
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            console.log('login error: ', error.message)
         }
     }
 

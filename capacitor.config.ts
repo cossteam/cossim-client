@@ -5,10 +5,10 @@ const config: CapacitorConfig = {
     appId: 'com.hitosea.coss',
     appName: 'COSS',
     webDir: 'dist',
-    server: {
-        url: 'http://192.168.100.192:5173/',
-        cleartext: true
-    },
+    // server: {
+    //     url: 'http://192.168.100.192:5173/',
+    //     cleartext: true
+    // },
     plugins: {
         // LocalNotifications: {
         // 	smallIcon: 'ic_stat_icon_config_sample',

@@ -1,1 +1,0 @@
-import{r as s,j as a,N as e,F as r,A as t}from"./.pnpm-DxDKAttv.js";import{a as o}from"./index-Dp_jhVP-.js";const l=s.memo((()=>{const s=o();return s.lastDialogId?a.jsx(e,{to:`/dashboard/${s.lastDialogId}`}):a.jsx(r,{className:"flex-1 h-screen",align:"center",justify:"center",vertical:!0,children:a.jsx(t,{className:"mb-5",size:128})})}));export{l as default};

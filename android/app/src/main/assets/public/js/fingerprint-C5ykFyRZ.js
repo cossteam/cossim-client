@@ -1,1 +1,0 @@
-import{ag as t}from"./.pnpm-DxDKAttv.js";const e=()=>{const e=document.createElement("canvas"),n=e.getContext("2d");null==n||n.fillRect(0,0,0,10);const o=e.toDataURL();return e.remove(),t.md5(o)};export{e as c};

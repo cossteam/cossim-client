@@ -5,6 +5,7 @@ import '@/i18n'
 import '@/styles/base.scss'
 import App from './app'
 import { SafeArea } from '@capacitor-community/safe-area'
+import 'reflect-metadata'
 
 const Router = __IS_ELECTRON__ ? HashRouter : BrowserRouter
 

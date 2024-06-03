@@ -1,24 +1,32 @@
 <!doctype html>
 <html lang="zh-CN">
-
-<head>
-	<meta charset="UTF-8" />
-	<!-- <meta http-equiv="Content-Security-Policy"
+    <head>
+        <meta charset="UTF-8" />
+        <!-- <meta http-equiv="Content-Security-Policy"
 		content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: content:" /> -->
-	<!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';"> -->
-	<meta name="viewport"
-		content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="theme-color" content="#fff" />
-	<meta name="format-detection" content="telephone=no" />
-	<meta name="msapplication-tap-highlight" content="no" />
-	<title>COSS</title>
-</head>
+        <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';"> -->
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;"
+        />
+        <meta
+            name="viewport"
+            content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#fff" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <title>COSS</title>
+    </head>
 
-<body>
-	<div id="root"></div>
-	<script src="/assets/js/socket.io-1.2.0.js"></script>
-	<script type="module" src="/src/main.tsx"></script>
-</body>
-
+    <body>
+        <div id="root"></div>
+        <script src="/assets/js/socket.io-1.2.0.js"></script>
+        <script type="module" src="/src/main.tsx"></script>
+        <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+        <script>
+            eruda.init()
+        </script>
+    </body>
 </html>
