@@ -8,7 +8,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -43,14 +43,14 @@ android {
 
      android.applicationVariants.all {
         variant -> variant.outputs.all { output ->
-                def date = new Date().format("yyyyMMddHHmmss",
-                        TimeZone.getTimeZone("GMT+08"))
+                // def date = new Date().format("yyyyMMddHHmmss",
+                //         TimeZone.getTimeZone("GMT+08"))
                 if (variant.buildType.name == 'debug') {
-                    output.outputFileName = "coss_" +
-                            "${android.defaultConfig.versionName}_${date}_debug.apk"
+                    output.outputFileName = "COSS-" +
+                            "${android.defaultConfig.versionName}_debug.apk"
                 }else if (variant.buildType.name == 'release'){
-                    output.outputFileName = "coss_" +
-                            "${android.defaultConfig.versionName}_${date}_release.apk"
+                    output.outputFileName = "COSS-" +
+                            "${android.defaultConfig.versionName}.apk"
                 }
             }
     }
