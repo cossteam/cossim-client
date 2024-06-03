@@ -25,11 +25,15 @@
         perMachine: false,
         allowToChangeInstallationDirectory: true,
         deleteAppDataOnUninstall: false
+        differentialPackage: false
     },
     linux: {
         target: ['AppImage'],
         artifactName: '${productName}-${os}-${arch}-${version}.${ext}'
     },
+    dmg: {
+        writeUpdateInfo: false
+    }
     publish: {
         provider: 'github',
         releaseType: 'release',
