@@ -41,9 +41,11 @@ const Login: React.FC = () => {
                 })
                 return
             }
-            navigate('/dashboard', {
-                replace: true
-            })
+            // 暂时注释
+            // 跳转在 src/hooks/useLogin.ts 做处理了
+            // navigate('/dashboard', {
+            //     replace: true
+            // })
         } catch (error: any) {
             messageApi.open({
                 type: 'error',
