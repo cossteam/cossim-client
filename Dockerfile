@@ -8,8 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # 安装依赖
-RUN npm install --registry http://registry.npmmirror.com
+RUN npm install -g pnpm --registry http://registry.npmmirror.com
 
+RUN pnpm i
 # 复制项目文件到工作目录
 COPY . .
 
