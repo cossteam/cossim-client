@@ -2,7 +2,7 @@ import { $t } from '@/i18n'
 import { generateUserInfo } from '@/mock/data'
 import { SettingOutlined, UserOutlined, UsergroupAddOutlined } from '@ant-design/icons'
 import { Avatar, Drawer, DrawerProps, Flex, Divider, Typography, Switch, Button } from 'antd'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import CustomIcon from '@/components/icon'
 import Modal from '@/components/modal'
 import { LightIcon, DarkIcon } from '@/components/icon/icon'
@@ -17,6 +17,7 @@ import useMobile from '@/hooks/useMobile'
 import useUserStore from '@/stores/user'
 import { useNavigate } from 'react-router'
 import { createFingerprint } from '@/utils/fingerprint'
+import { getUserInfoApi } from '@/api/user'
 
 interface Menus {
     icon: React.ForwardRefExoticComponent<any>
@@ -28,7 +29,7 @@ interface LayoutDrawerProps extends DrawerProps {
     setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const userInfo = generateUserInfo()
+const mockUserInfo = generateUserInfo()
 
 const drawerStyles: DrawerStyles = {
     body: {
@@ -43,6 +44,27 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
     const navigate = useNavigate()
     const commonStore = useCommonStore()
     const { width } = useMobile()
+
+    useEffect(() => {
+        if (userStore.userId) {
+            getUserInfoApi({ id: userStore.userId })
+                .then((res) => {
+                    console.log('获取用户信息成功: ', res)
+                    userStore.update({
+                        userInfo: res.data
+                    })
+                })
+                .catch((error) => {
+                    console.log('获取用户信息失败: ', error)
+                })
+        }
+    }, [userStore.userId])
+
+    const userInfo = {
+        avatar: userStore.userInfo?.avatar || mockUserInfo.avatar,
+        nickname: userStore.userInfo?.nickname || mockUserInfo.nickname,
+        email: userStore.userInfo?.email || mockUserInfo.email
+    }
 
     const isLight = useMemo(() => commonStore.theme === THEME.LIGHT, [commonStore.theme])
 
