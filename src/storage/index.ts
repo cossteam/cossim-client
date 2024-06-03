@@ -1,24 +1,24 @@
 import useUserStore from '@/stores/user'
+import type { FriendData, GroupData, RequestData } from '@/types/storage'
 import Dexie, { Table } from 'dexie'
-import { injectable, Container } from 'inversify'
-import GroupMessagesService from './services/group-messages'
 
-export const TYPES = {
-    Storage: Symbol.for('Storage')
-}
-
-@injectable()
 class Storage extends Dexie {
     private_messages!: Table<Message>
     group_messages!: Table<Message>
-    chatList!: Table<ChatData>
+    chat_list!: Table<ChatData>
+    request_list!: Table<RequestData>
+    friends!: Table<FriendData>
+    groups!: Table<GroupData>
 
     constructor(name: string, version: number = 1) {
         super(name)
         this.version(version).stores({
-            private_messages: '++id, sender, receiver, content, timestamp',
-            group_messages: '++id, sender, group, content, timestamp',
-            chatList: '++id, name, members, lastMessage, lastMessageTime'
+            private_messages: '++id, msg_id, dialog_id, content, type, sender_id, receiver_id',
+            group_messages: '++id, msg_id, dialog_id, content, type, sender_id, receiver_id, group_id',
+            chat_list: '++id, dialog_id, dialog_name, dialog_avatar, top_at, last_message',
+            request_list: '++id, request_id, dialog_id', // TODO: add more fields
+            friends: '++id, user_id', // TODO: add more fields
+            groups: '++id, group_id' // TODO: add more fields
         })
     }
 }
@@ -29,13 +29,4 @@ export function createStorage(name: string = 'coss-storage', version: number = 1
     return new Storage(`${name}-${userId}`, version)
 }
 
-const container = new Container()
-
-container.bind<Storage>(TYPES.Storage).to(Storage).inSingletonScope()
-
-container.bind<GroupMessagesService>(GroupMessagesService).toSelf().inSingletonScope()
-
-const groupMessagesService = container.get<GroupMessagesService>(GroupMessagesService)
-
-export { groupMessagesService }
 export default Storage

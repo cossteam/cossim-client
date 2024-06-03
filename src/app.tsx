@@ -8,7 +8,7 @@ import { App as AppComponent } from 'antd'
 import useAuth from '@/hooks/useLogin'
 import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
-import dayjs from 'dayjs'
+import { locale as dayjsLocale } from 'dayjs'
 import { Locale } from 'antd/es/locale'
 import Call from '@/components/call'
 
@@ -20,10 +20,10 @@ const App = () => {
     useEffect(() => {
         if (localStorage.getItem('locale') !== 'zh-CN') {
             setLocal(zhCN)
-            dayjs.locale('zh-cn')
+            dayjsLocale('zh-cn')
         } else {
             setLocal(enUS)
-            dayjs.locale('en')
+            dayjsLocale('en')
         }
     }, [])
 
