@@ -1,31 +1,56 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Avatar, Flex, Checkbox } from 'antd'
+import { Button, Form, Input, Avatar, Flex, Checkbox, message } from 'antd'
 import { $t } from '@/i18n'
 import clsx from 'clsx'
-import { NavigateOptions, useNavigate } from 'react-router'
+import { NavigateOptions, useLocation, useNavigate } from 'react-router'
 import useUserStore from '@/stores/user'
 import { createFingerprint } from '@/utils/fingerprint'
 
 const Login: React.FC = () => {
     const userStore = useUserStore()
     const navigate = useNavigate()
+    const location = useLocation()
+    const [form] = Form.useForm()
+
+    const [messageApi, contextHolder] = message.useMessage()
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (location.state) {
+            const { email, password } = location.state as { email: string; password: string }
+            form.setFieldsValue({ email, password })
+        }
+    }, [location.state, form])
 
     const onFinish = async (values: any) => {
         console.log('Received values of form: ', values)
+        setLoading(true)
         try {
-            await userStore.login({
+            const res = await userStore.login({
                 driver_id: createFingerprint(),
                 driver_token: 'ff1005',
                 email: values.email,
                 password: values.password,
                 platform: 'android'
             })
+            if (res.code !== 200) {
+                messageApi.open({
+                    type: 'error',
+                    content: res.msg
+                })
+                return
+            }
             navigate('/dashboard', {
                 replace: true
             })
         } catch (error: any) {
-            console.log('login error: ', error.message)
+            messageApi.open({
+                type: 'error',
+                content: error
+            })
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -39,6 +64,7 @@ const Login: React.FC = () => {
 
     return (
         <>
+            {contextHolder}
             <Flex
                 className="w-screen h-screen"
                 vertical
@@ -53,6 +79,7 @@ const Login: React.FC = () => {
                     }
                 />
                 <Form
+                    form={form}
                     className={clsx('w-2/3 mobile:min-w-[350px] mobile:w-1/6')}
                     layout="vertical"
                     initialValues={{ email: '1005@qq.com', password: '123456qq' }}
@@ -114,7 +141,13 @@ const Login: React.FC = () => {
                         </Flex>
                     </Form.Item>
                     <Form.Item>
-                        <Button size="large" type="primary" htmlType="submit" className="w-full">
+                        <Button
+                            size="large"
+                            type="primary"
+                            htmlType="submit"
+                            className="w-full"
+                            loading={loading}
+                        >
                             {$t('登陆')}
                         </Button>
                     </Form.Item>

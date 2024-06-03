@@ -1,18 +1,49 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Avatar, Flex } from 'antd'
+import { Button, Form, Input, Avatar, Flex, message } from 'antd'
 import { $t } from '@/i18n'
 import clsx from 'clsx'
 import { NavigateOptions, useNavigate } from 'react-router'
+import { registerApi } from '@/api/user'
+import useUserStore from '@/stores/user'
 
 const Register: React.FC = () => {
     const navigate = useNavigate()
+    const userStore = useUserStore()
+    const [messageApi, contextHolder] = message.useMessage()
+    const [loading, setLoading] = useState(false)
 
-    const onFinish = (values: any) => {
-        console.log('Received values of form: ', values)
-        toLogin({
-            replace: true
-        })
+    const onFinish = async (values: any) => {
+        setLoading(true)
+        try {
+            const { code, data, msg } = await registerApi({
+                nickname: values.nickname,
+                email: values.email,
+                password: values.password,
+                confirm_password: values.confirm_password
+                // public_key: values.public_key
+            })
+            if (code !== 200) {
+                messageApi.open({
+                    type: 'error',
+                    content: msg
+                })
+                return
+            }
+            userStore.update({ userId: data?.user_id })
+            // await cretaeIdentity(data.user_id, fromData.email)
+            toLogin({
+                replace: true,
+                state: { email: values.email, password: values.password }
+            })
+        } catch {
+            messageApi.open({
+                type: 'error',
+                content: '注册失败，请稍后重试'
+            })
+        } finally {
+            setLoading(false)
+        }
     }
 
     const toQRCode = (options?: NavigateOptions | undefined) => {
@@ -25,6 +56,7 @@ const Register: React.FC = () => {
 
     return (
         <Flex className="w-screen h-screen" vertical justify="center" align="center" gap="large">
+            {contextHolder}
             <Avatar
                 size={120}
                 src={
@@ -101,7 +133,13 @@ const Register: React.FC = () => {
                     <Input prefix={<LockOutlined />} type="password" placeholder={$t('确认密码')} />
                 </Form.Item>
                 <Form.Item>
-                    <Button size="large" type="primary" htmlType="submit" className="w-full">
+                    <Button
+                        size="large"
+                        type="primary"
+                        htmlType="submit"
+                        className="w-full"
+                        loading={loading}
+                    >
                         {$t('注册')}
                     </Button>
                 </Form.Item>
