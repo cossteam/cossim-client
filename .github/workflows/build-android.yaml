@@ -1,101 +1,102 @@
-name: Build Android
-run-name: Creating Production Ready Android App 🚀
-on: push
+# name: Build Android
+# run-name: Creating Production Ready Android App 🚀
 
-jobs:
-  build:
-    name: Build APK
-    runs-on: ubuntu-latest
-    # TODO: add the default directory - COMMENT IF IT'S NOT IN SUBFOLDER
-    # defaults:
-    #   run:
-    #     working-directory: ./frontend
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v3
+# on:
+#     push:
+#         tags:
+#             - 'v*.*.*' # Only trigger the workflow on tag push
 
-      - name: Setup java
-        uses: actions/setup-java@v3
-        with:
-          distribution: "zulu"
-          java-version: "17"
+# jobs:
+#     build:
+#         permissions: write-all
+#         name: Build APK
+#         runs-on: ubuntu-latest
+#         steps:
+#           - name: Checkout source
+#             uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
+#           - name: Setup java
+#             uses: actions/setup-java@v3
+#             with:
+#                 distribution: 'zulu'
+#                 java-version: '17'
 
-      - name: Install pnpm
-        run: npm install -g pnpm --registry http://registry.npmmirror.com
+#           - name: Setup Node.js
+#             uses: actions/setup-node@v3
+#             with:
+#                 node-version: 20.x
 
-      - name: install dependencies
-        run: pnpm i
+#           - name: Install pnpm
+#             run: npm install -g pnpm --registry http://registry.npmmirror.com
 
-      - name: Create Build Folder
-        run: npm run build
+#           - name: install dependencies
+#             run: pnpm i
 
-      - name: Add android folder if not present
-        run: if [ ! -d "./android" ]; then npx cap add android; fi
+#           - name: Create Build Folder
+#             run: pnpm build:mobile
 
-      - name: Capacitor update
-        run: npx cap update
+#           - name: Add android folder if not present
+#             run: if [ ! -d "./android" ]; then npx cap add android; fi
 
-      - name: Capacitor copy
-        run: npx cap copy
+#           - name: Capacitor update
+#             run: npx cap update
 
-      # TODO: Check for folder structure in README for generating splash screen
-      - name: Generate icons and splash screen to android folder
-        run: if [ -d "./resources" ]; then npm install @capacitor/assets --save-dev && npx capacitor-assets generate --android; fi
+#           - name: Capacitor copy
+#             run: npx cap copy
 
-      - name: Build app bundle
-        run: cd android && ./gradlew bundle && ./gradlew assembleDebug
+#           # TODO: Check for folder structure in README for generating splash screen
+#           - name: Generate icons and splash screen to android folder
+#             run: if [ -d "./resources" ]; then npm install @capacitor/assets --save-dev && npx capacitor-assets generate --android; fi
 
-      - name: Extract Android signing key from env
-        run: |
-          echo "${{ secrets.RELEASE_KEYSTORE }}" > android/release.jks.base64
-          base64 -d android/release.jks.base64 > android/release.decrypted.jks
+#           - name: Build app bundle
+#             run: cd android && ./gradlew bundle && ./gradlew assembleRelease
 
-      - name: Sign dev build
-        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab release
+#           - name: Extract Android signing key from env
+#             run: |
+#                 echo "${{ secrets.RELEASE_KEYSTORE }}" > android/release.jks.base64
+#                 base64 -d android/release.jks.base64 > android/release.decrypted.jks
 
-      - name: Check folder content of android output
-        run: ls ./android/app/build/outputs/bundle/release
+#           - name: Sign dev build
+#             run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab release
 
-      - name: Set version
-        id: version
-        run: echo "VERSION=v0.0.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+#           - name: Check folder content of android output
+#             run: ls ./android/app/build/outputs/bundle/release
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          tag_name: ${{ steps.version.outputs.VERSION }}
-          release_name: Release ${{ steps.version.outputs.VERSION }}
-          draft: false
-          prerelease: true
+#           - name: Set version
+#             id: version
+#             run: echo "VERSION=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
 
-      - name: Upload Release Asset .aab
-        id: upload-release-asset-aab
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./android/app/build/outputs/bundle/release/app-release-signed.aab
-          # Customize the asset name. If not specified, the file name is used.
-          asset_name: app-release-signed.aab
-          asset_content_type: application/zip
+#           - name: Create Release
+#             id: create_release
+#             uses: actions/create-release@v1
+#             env:
+#                 GITHUB_TOKEN: ${{ secrets.github_token }}
+#             with:
+#                 tag_name: ${{ steps.version.outputs.VERSION }}
+#                 release_name: Release ${{ steps.version.outputs.VERSION }}
+#                 draft: false
+#                 prerelease: true
 
-      - name: Upload Release Asset .apk
-        id: upload-release-asset-apk
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./android/app/build/outputs/apk/debug/app-debug.apk
-          # Customize the asset name. If not specified, the file name is used.
-          asset_name: app-debug.apk
-          asset_content_type: application/vnd.android.package-archive
+#           - name: Upload Release Asset .aab
+#             id: upload-release-asset-aab
+#             uses: actions/upload-release-asset@v1
+#             env:
+#                 GITHUB_TOKEN: ${{ secrets.github_token }}
+#             with:
+#                 upload_url: ${{ steps.create_release.outputs.upload_url }}
+#                 asset_path: ./android/app/build/outputs/bundle/release/app-release-signed.aab
+#                 # Customize the asset name. If not specified, the file name is used.
+#                 asset_name: app-release-signed.aab
+#                 asset_content_type: application/zip
+
+#           - name: Upload Release Asset .apk
+#             id: upload-release-asset-apk
+#             uses: actions/upload-release-asset@v1
+#             env:
+#                 GITHUB_TOKEN: ${{ secrets.github_token }}
+#             with:
+#                 upload_url: ${{ steps.create_release.outputs.upload_url }}
+#                 asset_path: ./android/app/build/outputs/apk/release/COSS-${{ github.ref_name }}.apk
+#                 # Customize the asset name. If not specified, the file name is used.
+#                 asset_name: COSS-${{ github.ref_name }}.apk
+#                 asset_content_type: application/vnd.android.package-archive
