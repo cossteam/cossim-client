@@ -1,6 +1,6 @@
 {
     "name": "coss-client",
-    "version": "0.0.2",
+    "version": "v0.0.2",
     "type": "module",
     "description": "coss 及时通讯的客户端",
     "keywords": [
