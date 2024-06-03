@@ -20,10 +20,6 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
 
-        "types": ["reflect-metadata"],
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-
         "baseUrl": ".",
         "paths": {
             "@/*": ["./src/*"],

@@ -6,6 +6,7 @@ import MessageItem from './message-item'
 import InfiniteScroll from '@/components/infinite-scroll'
 // import VirtualList from '@/components/virtualizer-list/virtual-list'
 
+// TODO: 优化虚拟列表
 const MessageContent = () => {
     const parentRef = useRef<HTMLDivElement>(null)
     const [, height] = useElementSize(parentRef)
@@ -81,12 +82,7 @@ const MessageContent = () => {
 				isScrollToEnd
 			/> */}
 
-            <InfiniteScroll
-                dataLength={count}
-                next={loadMoreData}
-                height={height}
-                reverse={reverse}
-            >
+            <InfiniteScroll dataLength={count} next={loadMoreData} height={height} reverse={reverse}>
                 {data.reverse().map((_, index) => renderItem(index))}
             </InfiniteScroll>
             {/* <VirtualList data={data} itemHeight={50} height={height} children={renderItem} /> */}

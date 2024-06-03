@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react'
  *      Array.from({ length: 100 }).map((_,index)=> defer(index) ? <div>自定义内容<div> : null)
  * }
  */
-const useDefer = (max = 20) => {
+function useDefer(max = 20) {
     const [isRendering, setIsRendering] = useState<boolean>(true)
     const [isRenderFinish, setIsRenderFinish] = useState<boolean>(false)
 

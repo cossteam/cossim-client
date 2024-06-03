@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const useDraggable = (el: HTMLElement | null) => {
+function useDraggable(el: HTMLElement | null) {
     const [isDraggable, setIsDraggable] = useState(false)
 
     const handleMouseDown = (e: MouseEvent) => {

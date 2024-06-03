@@ -1,6 +1,6 @@
 import { Flex } from 'antd'
 import LayoutSidebar from '@/components/layout/layout-sidebar'
-import { Outlet } from 'react-router'
+import { Outlet } from 'react-router-dom'
 import useDialogHistory from '@/hooks/useDialogHistory'
 
 const Dashboard = () => {

@@ -1,6 +1,6 @@
 import useCommonStore from '@/stores/common'
 import { useEffect } from 'react'
-import { useParams, useLocation } from 'react-router'
+import { useParams, useLocation } from 'react-router-dom'
 
 function useDialogHistory() {
     const params = useParams()

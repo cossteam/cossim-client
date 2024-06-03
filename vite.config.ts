@@ -14,7 +14,7 @@ export default defineConfig({
     plugins: [
         react(),
         pages()
-        // visualizer({ open: false })
+        // visualizer({ open: true })
     ],
     resolve: {
         alias: {
@@ -31,25 +31,24 @@ export default defineConfig({
         'process.env': {}
     },
     build: {
-        minify: 'terser',
-        cssCodeSplit: true,
-        terserOptions: {
-            compress: {
-                drop_console: false,
-                drop_debugger: true
-            }
-        },
+        // minify: 'terser',
+        // cssCodeSplit: true,
+        // terserOptions: {
+        //     compress: {
+        //         drop_console: false,
+        //         drop_debugger: true
+        //     }
+        // },
         chunkSizeWarningLimit: 1000,
         rollupOptions: {
             output: {
-                // manualChunks(id) {
-                //     if (id.includes('node_modules')) {
-                //         return id.toString().split('node_modules/')[1].split('/')[0].toString()
-                //     }
-                // }
-                chunkFileNames: 'js/[name]-[hash].js',
-                entryFileNames: 'js/[name]-[hash].js',
-                assetFileNames: '[ext]/[name]-[hash].[ext]'
+                manualChunks: {
+                    openpgp: ['openpgp'],
+                    i18next: ['i18next']
+                }
+                // chunkFileNames: 'js/[name]-[hash].js',
+                // entryFileNames: 'js/[name]-[hash].js',
+                // assetFileNames: '[ext]/[name]-[hash].[ext]'
             }
         }
     }

@@ -1,6 +1,5 @@
 import axios from 'axios'
 import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
-// import { getCookie, removeAllCookie } from './cookie'
 import useUserStore from '@/stores/user'
 import { RESPONSE_CODE } from '@/utils/enum'
 import PGPUtils from '@/utils/pgp'
@@ -66,8 +65,6 @@ const getClientKeys = async () => {
     try {
         const clientKey = JSON.parse(window.localStorage.getItem('PGPKEYSCLIENT')!)
         if (!clientKey) {
-            // f7.dialog.close()
-            // f7.dialog.alert('数据丢失，请找回账号...')
             return null
         }
         return clientKey
@@ -137,11 +134,7 @@ service.interceptors.response.use(
             // 获取客户端密钥
             const clientKey = await getClientKeys()
             if (!clientKey) return responseData
-            const aesKey = await PGPUtils.rsaDecrypt(
-                clientKey.privateKey,
-                pgpEnv.passphrase,
-                responseData.secret
-            )
+            const aesKey = await PGPUtils.rsaDecrypt(clientKey.privateKey, pgpEnv.passphrase, responseData.secret)
             const decryptedData = await PGPUtils.aes256Decrypt(responseData.message, aesKey)
             response.data = decryptedData
         } catch (error) {
@@ -155,13 +148,6 @@ service.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response) {
             if (error.response.status === 401) {
-                // f7.dialog.close()
-                // f7.dialog.alert('登录已过期，请重新登录', '登录过期', () => {
-                // 	// 清除 token 及 用户信息
-                // 	removeAllCookie()
-                // 	location.reload()
-                // 	return false
-                // })
                 useUserStore().update({
                     userId: '',
                     userInfo: '',

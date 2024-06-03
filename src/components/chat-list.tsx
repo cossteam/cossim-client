@@ -2,7 +2,7 @@ import { Avatar, Flex, Badge, List, Typography } from 'antd'
 import React, { useCallback } from 'react'
 import { formatTime } from '@/utils/format-time'
 import { headerHeight } from '@/components/layout/layout-header'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router-dom'
 import clsx from 'clsx'
 import VirtualizerList from '@/components/virtualizer-list'
 import useMobile from '@/hooks/useMobile'
@@ -43,11 +43,7 @@ const ChatList: React.FC<ChatListProps> = (props) => {
 
     return (
         <List>
-            <VirtualizerList
-                listHeight={height - headerHeight}
-                count={props.data.length}
-                renderItem={renderItem}
-            />
+            <VirtualizerList listHeight={height - headerHeight} count={props.data.length} renderItem={renderItem} />
         </List>
     )
 }
@@ -71,16 +67,11 @@ const ChatListItemTitle: React.FC<{ chat: ChatData }> = ({ chat }) => {
     )
 }
 
-const ChatListItemAvatar: React.FC<{ chat: ChatData }> = ({ chat }) => (
-    <Avatar src={chat.dialog_avatar} size={48} />
-)
+const ChatListItemAvatar: React.FC<{ chat: ChatData }> = ({ chat }) => <Avatar src={chat.dialog_avatar} size={48} />
 
 const ChatListItemDescription: React.FC<{ chat: ChatData }> = ({ chat }) => {
     return (
-        <Typography.Paragraph
-            className="text-gray-500 !mb-0 -mt-[4px] text-base"
-            ellipsis={{ rows: 1 }}
-        >
+        <Typography.Paragraph className="text-gray-500 !mb-0 -mt-[4px] text-base" ellipsis={{ rows: 1 }}>
             {chat.last_message.sender_info.name}:&nbsp;{chat.last_message.content}
         </Typography.Paragraph>
     )

@@ -3,7 +3,7 @@ import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Avatar, Flex, message } from 'antd'
 import { $t } from '@/i18n'
 import clsx from 'clsx'
-import { NavigateOptions, useNavigate } from 'react-router'
+import { NavigateOptions, useNavigate } from 'react-router-dom'
 import { registerApi } from '@/api/user'
 import useUserStore from '@/stores/user'
 
@@ -59,9 +59,7 @@ const Register: React.FC = () => {
             {contextHolder}
             <Avatar
                 size={120}
-                src={
-                    'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp'
-                }
+                src={'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp'}
             />
             <Form
                 className={clsx('w-2/3 mobile:min-w-[350px] mobile:w-1/6')}
@@ -81,11 +79,7 @@ const Register: React.FC = () => {
                                 if (!value) {
                                     return Promise.reject($t('请输入邮箱'))
                                 }
-                                if (
-                                    !/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(
-                                        value
-                                    )
-                                ) {
+                                if (!/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value)) {
                                     return Promise.reject($t('邮箱格式不正确'))
                                 }
                                 return Promise.resolve()
@@ -109,12 +103,7 @@ const Register: React.FC = () => {
                         })
                     ]}
                 >
-                    <Input
-                        size="large"
-                        prefix={<LockOutlined />}
-                        type="password"
-                        placeholder={$t('密码')}
-                    />
+                    <Input size="large" prefix={<LockOutlined />} type="password" placeholder={$t('密码')} />
                 </Form.Item>
                 <Form.Item
                     label={$t('确认密码')}
@@ -133,13 +122,7 @@ const Register: React.FC = () => {
                     <Input prefix={<LockOutlined />} type="password" placeholder={$t('确认密码')} />
                 </Form.Item>
                 <Form.Item>
-                    <Button
-                        size="large"
-                        type="primary"
-                        htmlType="submit"
-                        className="w-full"
-                        loading={loading}
-                    >
+                    <Button size="large" type="primary" htmlType="submit" className="w-full" loading={loading}>
                         {$t('注册')}
                     </Button>
                 </Form.Item>

@@ -6,10 +6,7 @@ interface LongPressOptions {
     data: any
 }
 
-export default function useLongPress(
-    el: React.MutableRefObject<HTMLElement | null>,
-    options?: LongPressOptions
-) {
+function useLongPress(el: React.MutableRefObject<HTMLElement | null>, options?: LongPressOptions) {
     const timerRef = useRef<NodeJS.Timeout | null>(null)
     const scrollingRef = useRef<boolean>(false)
 
@@ -54,3 +51,5 @@ export default function useLongPress(
         }
     }, [])
 }
+
+export default useLongPress

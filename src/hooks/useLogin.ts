@@ -1,6 +1,6 @@
 import useUserStore from '@/stores/user'
 import { useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 function useAuth() {
     const userStore = useUserStore()

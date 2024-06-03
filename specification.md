@@ -34,3 +34,17 @@
 -   build: 构建
 -   ci: 持续集成
 -   chore: 其他修改
+
+# 五、其他规范
+
+1.所有需要多语言化的文字都应该使用 `$t('xxx')` 包裹，这样可以自动根据当前语言切换显示。
+
+```ts
+import { $t } from '@/i18n'
+
+const Component = () => {
+    return <div>{$t('这是中文')}</div>
+}
+
+return Component
+```

@@ -2,7 +2,7 @@ import { ConfigProvider } from 'antd'
 import { Suspense, useEffect, useState } from 'react'
 import useCommonStore from '@/stores/common'
 import Loading from '@/components/loading'
-import { useRoutes } from 'react-router'
+import { useRoutes } from 'react-router-dom'
 import routes from '~react-pages'
 import { App as AppComponent } from 'antd'
 import useAuth from '@/hooks/useLogin'
@@ -13,6 +13,9 @@ import { Locale } from 'antd/es/locale'
 import Call from '@/components/call'
 
 const App = () => {
+    // 鉴权
+    useAuth()
+
     const commonStore = useCommonStore()
 
     const [locale, setLocal] = useState<Locale>(enUS)
@@ -27,9 +30,6 @@ const App = () => {
         }
     }, [])
 
-    // 鉴权
-    useAuth()
-
     return (
         <ConfigProvider
             theme={{
@@ -37,7 +37,6 @@ const App = () => {
                     colorPrimary: commonStore.themeColor,
                     borderRadius: 4,
                     fontSize: 16
-                    // colorBgElevated: 'transparent'
                 }
             }}
             locale={locale}

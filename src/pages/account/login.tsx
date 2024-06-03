@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Avatar, Flex, Checkbox, message } from 'antd'
 import { $t } from '@/i18n'
 import clsx from 'clsx'
-import { NavigateOptions, useLocation, useNavigate } from 'react-router'
+import { NavigateOptions, useLocation, useNavigate } from 'react-router-dom'
 import useUserStore from '@/stores/user'
 import { createFingerprint } from '@/utils/fingerprint'
 
@@ -67,18 +67,10 @@ const Login: React.FC = () => {
     return (
         <>
             {contextHolder}
-            <Flex
-                className="w-screen h-screen"
-                vertical
-                justify="center"
-                align="center"
-                gap="large"
-            >
+            <Flex className="w-screen h-screen" vertical justify="center" align="center" gap="large">
                 <Avatar
                     size={120}
-                    src={
-                        'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp'
-                    }
+                    src={'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp'}
                 />
                 <Form
                     form={form}
@@ -96,11 +88,7 @@ const Login: React.FC = () => {
                                     if (!value) {
                                         return Promise.reject($t('请输入邮箱'))
                                     }
-                                    if (
-                                        !/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(
-                                            value
-                                        )
-                                    ) {
+                                    if (!/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value)) {
                                         return Promise.reject($t('邮箱格式不正确'))
                                     }
                                     return Promise.resolve()
@@ -124,12 +112,7 @@ const Login: React.FC = () => {
                             })
                         ]}
                     >
-                        <Input
-                            size="large"
-                            prefix={<LockOutlined />}
-                            type="password"
-                            placeholder={$t('密码')}
-                        />
+                        <Input size="large" prefix={<LockOutlined />} type="password" placeholder={$t('密码')} />
                     </Form.Item>
                     <Form.Item>
                         <Flex justify="space-between">
@@ -143,28 +126,16 @@ const Login: React.FC = () => {
                         </Flex>
                     </Form.Item>
                     <Form.Item>
-                        <Button
-                            size="large"
-                            type="primary"
-                            htmlType="submit"
-                            className="w-full"
-                            loading={loading}
-                        >
+                        <Button size="large" type="primary" htmlType="submit" className="w-full" loading={loading}>
                             {$t('登陆')}
                         </Button>
                     </Form.Item>
                     <Form.Item>
                         <Flex justify="space-between">
-                            <span
-                                className="text-primary"
-                                onClick={() => toQRCode({ replace: true })}
-                            >
+                            <span className="text-primary" onClick={() => toQRCode({ replace: true })}>
                                 {$t('扫码登陆')}
                             </span>
-                            <span
-                                className="text-primary"
-                                onClick={() => toRegister({ replace: true })}
-                            >
+                            <span className="text-primary" onClick={() => toRegister({ replace: true })}>
                                 {$t('注册')}
                             </span>
                         </Flex>

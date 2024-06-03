@@ -15,6 +15,7 @@ interface VirtualListProps<T = any> {
     children: (index: number) => React.ReactNode
 }
 
+// TODO: modify all the code to use Virtual
 const VirtualList: React.FC<VirtualListProps> = ({ data, itemHeight, height, children }) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const [visibleData, setVisibleData] = useState<DataItem[]>([])

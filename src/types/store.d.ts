@@ -1,4 +1,5 @@
 import { LoginParams, LogoutParams } from './api'
+import { GroupData, RequestData, ContactData } from './storage'
 
 export interface CommonOptions {
     /**
@@ -81,9 +82,33 @@ export interface CallStoreMethods {
     hangup: () => Promise<ResponseData<any>>
 }
 
+/** @description 缓存聊天记录 */
+// cacheChatRecord: ChatRecordData[]
+/** @description 缓存消息列表, 包括未读消息 */
+// cacheMessageList: Message[]
+export interface CacheOptions {
+    /** @description 缓存会话列表 */
+    cacheChatList: ChatData[]
+    /** @description 缓存联系人列表 */
+    cacheContactList: ContactData[]
+    /** @description 缓存群组列表 */
+    cacheGroupList: GroupData[]
+    /** @description 缓存消息未读数 */
+    cacheMessageUnread: number
+    /** @description 缓存申请列表 */
+    cacheRequestList: RequestData[]
+}
+
+export interface CacheStoreMethods {
+    /** @description 更新某个值 */
+    update: (options: Partial<StorageOptions>) => Promise<void>
+}
+
 // 通用仓库
 export type CommonStore = CommonOptions & CommonStoreMethods
 // 用户仓库
 export type UserStore = UserOptions & UserStoreMethods
 // 通话仓库
 export type CallStore = CallOptions & CallStoreMethods
+// 本地存储仓库
+export type CacheStore = CacheOptions & CacheStoreMethods

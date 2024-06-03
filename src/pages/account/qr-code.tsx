@@ -2,7 +2,7 @@
 import { $t } from '@/i18n'
 import { Button, Flex, Form, QRCode } from 'antd'
 import clsx from 'clsx'
-import { NavigateOptions, useNavigate } from 'react-router'
+import { NavigateOptions, useNavigate } from 'react-router-dom'
 // import QRCodeImg from '@/assets/qrcode.png'
 import { useEffect, useState } from 'react'
 
@@ -37,13 +37,7 @@ const QRCodePage: React.FC = () => {
 
     return (
         <>
-            <Flex
-                className="w-screen h-screen"
-                vertical
-                justify="center"
-                align="center"
-                gap="large"
-            >
+            <Flex className="w-screen h-screen" vertical justify="center" align="center" gap="large">
                 <div className="relative rounded-sm overflow-hidden">
                     {/* <Image width={250} height={250} preview={false} src={QRCodeImg} />
 					{isExpire && (

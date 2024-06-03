@@ -1,5 +1,5 @@
 export interface RequestData {}
 
-export interface FriendData {}
+export interface ContactData {}
 
 export interface GroupData {}

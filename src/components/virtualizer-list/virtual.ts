@@ -6,6 +6,8 @@ export interface VirtualProps<T> {
     renderItem: (item: T, index: number) => JSX.Element
     onResize?: (height: number) => void
 }
+
+// TODO: implement Virtual class
 class Virtual<T> {
     data: T[]
     visibleData: T[]

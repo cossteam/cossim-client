@@ -1,7 +1,7 @@
 import useCommonStore from '@/stores/common'
 import { Avatar, Flex } from 'antd'
 import { memo } from 'react'
-import { Navigate } from 'react-router'
+import { Navigate } from 'react-router-dom'
 
 const Dashboard = memo(() => {
     const commonStore = useCommonStore()

@@ -15,7 +15,7 @@ import GroupCreate from '@/components/group/group-create'
 import SettingList from '@/components/setting-list'
 import useMobile from '@/hooks/useMobile'
 import useUserStore from '@/stores/user'
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { createFingerprint } from '@/utils/fingerprint'
 import { getUserInfoApi } from '@/api/user'
 
@@ -130,11 +130,7 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
                 {...props}
             >
                 <Flex className="mobile:px-5 px-3" align="center">
-                    <Avatar
-                        className="mr-4 min-w-[64px] min-h-[64px]"
-                        src={userInfo.avatar}
-                        size={64}
-                    />
+                    <Avatar className="mr-4 min-w-[64px] min-h-[64px]" src={userInfo.avatar} size={64} />
                     <Flex vertical>
                         <Typography.Text className="!mb-1 font-bold mobile:text-xl text-lg">
                             {userInfo.nickname}
@@ -155,22 +151,15 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
                             gap="middle"
                             onClick={() => handlerMenusClick(item, index)}
                         >
-                            <CustomIcon
-                                className="mobile:text-2xl text-xl text-gray-500"
-                                component={item.icon}
-                            />
-                            <Typography.Text className="mobile:text-lg text-base">
-                                {item.title}
-                            </Typography.Text>
+                            <CustomIcon className="mobile:text-2xl text-xl text-gray-500" component={item.icon} />
+                            <Typography.Text className="mobile:text-lg text-base">{item.title}</Typography.Text>
                         </Flex>
                     ))}
                     <Flex
                         className="mobile:py-3 py-2 mobile:px-5 px-4 select-none hover:bg-background-hover cursor-pointer rounded"
                         gap="middle"
                         justify="space-between"
-                        onClick={() =>
-                            commonStore.update({ theme: isLight ? THEME.DARK : THEME.LIGHT })
-                        }
+                        onClick={() => commonStore.update({ theme: isLight ? THEME.DARK : THEME.LIGHT })}
                     >
                         <Flex gap="middle">
                             <CustomIcon
@@ -196,12 +185,7 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
                 </Flex>
             </Drawer>
 
-            <Modal
-                open={modalOpen}
-                title={modalTitle}
-                onCancel={() => setModalOpen(false)}
-                footer={null}
-            >
+            <Modal open={modalOpen} title={modalTitle} onCancel={() => setModalOpen(false)} footer={null}>
                 {Component}
             </Modal>
 
