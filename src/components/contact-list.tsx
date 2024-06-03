@@ -1,18 +1,19 @@
-import { useState, useEffect } from 'react'
-import { Avatar, List, Divider, Skeleton } from 'antd'
+import { useState, useEffect, useCallback } from 'react'
+import { Avatar, List, Divider, Skeleton, Input } from 'antd'
 import { Contact, ContactList, generateContactList } from '@/mock/data'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { SearchOutlined } from '@ant-design/icons'
 
 const ContactListPage = () => {
     const [loading, setLoading] = useState(false)
     const [contactList, setContactList] = useState<ContactList>({ list: {}, total: 0 })
+    const [originalContactList, setOriginalContactList] = useState<ContactList>({ list: {}, total: 0 })
     const [data, setData] = useState<{ key: string; list: Contact[] }[]>([])
 
     const loadMoreData = () => {
         if (loading) {
             return
         }
-        // console.log('加载更多数据');
         setLoading(true)
         // 模拟加载更多数据的逻辑
         const moreContacts = generateContactList(10) // 加载更多联系人
@@ -20,15 +21,17 @@ const ContactListPage = () => {
             list: { ...prevState.list, ...moreContacts.list },
             total: prevState.total + moreContacts.total
         }))
-        // console.log('contactList2', contactList.total);
+        setOriginalContactList((prevState) => ({
+            list: { ...prevState.list, ...moreContacts.list },
+            total: prevState.total + moreContacts.total
+        }))
         setLoading(false)
     }
 
-    // 使用 useEffect 获取数据并设置状态
     useEffect(() => {
         const contacts = generateContactList(10) // 假设我们需要 10 个联系人
         setContactList(contacts)
-        // console.log('contactList1', contactList.total);
+        setOriginalContactList(contacts)
     }, [])
 
     useEffect(() => {
@@ -44,16 +47,71 @@ const ContactListPage = () => {
         setData(arr.sort((a, b) => a.key.localeCompare(b.key)))
     }, [contactList])
 
+    const handleSearch = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = e.target.value.toLowerCase()
+
+            if (!value) {
+                setContactList(originalContactList)
+                return
+            }
+
+            const filteredList = { list: {}, total: 0 }
+
+            for (const key in originalContactList.list) {
+                if (Object.prototype.hasOwnProperty.call(originalContactList.list, key)) {
+                    const filteredContacts = originalContactList.list[key].filter(
+                        (contact) =>
+                            contact.nickname.toLowerCase().includes(value) ||
+                            contact.email.toLowerCase().includes(value) ||
+                            contact.signature.toLowerCase().includes(value)
+                    )
+
+                    if (filteredContacts.length > 0) {
+                        // @ts-ignore
+                        filteredList.list[key] = filteredContacts
+                        filteredList.total += filteredContacts.length
+                    }
+                }
+            }
+            setContactList(filteredList)
+        },
+        [originalContactList]
+    )
+
     return (
         <div
             id="scrollableDiv"
             style={{
                 height: 600,
                 width: '100%',
-                overflow: 'auto',
-                padding: '0 16px'
+                overflow: 'auto'
+                // padding: '0 16px'
             }}
         >
+            <Input
+                status="warning"
+                onChange={handleSearch}
+                prefix={
+                    <SearchOutlined
+                        style={{
+                            color: 'rgba(0,0,0,.25)',
+                            paddingRight: '10px'
+                        }}
+                    />
+                }
+                placeholder="搜索"
+                allowClear
+                variant="borderless"
+            />
+            <Divider
+                style={{
+                    marginTop: '10px',
+                    marginBottom: '0px'
+                }}
+                type="horizontal"
+            ></Divider>
+
             <InfiniteScroll
                 dataLength={contactList.total}
                 next={loadMoreData}
@@ -74,7 +132,6 @@ const ContactListPage = () => {
                                         title={c.nickname}
                                         description={c.signature}
                                     />
-                                    {/* <div>Content</div> */}
                                 </List.Item>
                             )}
                         />
