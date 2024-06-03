@@ -1,6 +1,11 @@
 import useUserStore from '@/stores/user'
 import Dexie, { Table } from 'dexie'
-import { injectable } from 'inversify'
+import { injectable, Container } from 'inversify'
+import GroupMessagesService from './services/group-messages'
+
+export const TYPES = {
+    Storage: Symbol.for('Storage')
+}
 
 @injectable()
 class Storage extends Dexie {
@@ -24,4 +29,13 @@ export function createStorage(name: string = 'coss-storage', version: number = 1
     return new Storage(`${name}-${userId}`, version)
 }
 
+const container = new Container()
+
+container.bind<Storage>(TYPES.Storage).to(Storage).inSingletonScope()
+
+container.bind<GroupMessagesService>(GroupMessagesService).toSelf().inSingletonScope()
+
+const groupMessagesService = container.get<GroupMessagesService>(GroupMessagesService)
+
+export { groupMessagesService }
 export default Storage
