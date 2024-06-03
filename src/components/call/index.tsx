@@ -28,9 +28,7 @@ const Call: React.FC<CallProps> = memo(() => {
     const [avatar, setAvatar] = useState('')
 
     useEffect(() => {
-        setAvatar(
-            'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp'
-        )
+        setAvatar('https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp')
         return () => {
             setAvatar('')
         }
@@ -96,12 +94,7 @@ const Call: React.FC<CallProps> = memo(() => {
                             {/* 圆形按钮 */}
                             {connected ? (
                                 <>
-                                    <Flex
-                                        className="gap-2"
-                                        vertical
-                                        align="center"
-                                        onClick={() => {}}
-                                    >
+                                    <Flex className="gap-2" vertical align="center" onClick={() => {}}>
                                         <Flex
                                             className="size-16 text-2xl bg-white rounded-full rotate-[0deg]"
                                             justify="center"
@@ -111,12 +104,7 @@ const Call: React.FC<CallProps> = memo(() => {
                                         </Flex>
                                         <span className="text-sm">{$t('静音')}</span>
                                     </Flex>
-                                    <Flex
-                                        className="gap-2"
-                                        vertical
-                                        align="center"
-                                        onClick={() => callStore.hangup()}
-                                    >
+                                    <Flex className="gap-2" vertical align="center" onClick={() => callStore.hangup()}>
                                         <Flex
                                             className="size-16 text-2xl bg-red-500 rounded-full rotate-[-135deg]"
                                             justify="center"
@@ -125,12 +113,7 @@ const Call: React.FC<CallProps> = memo(() => {
                                         </Flex>
                                         <span className="text-sm">{$t('挂断')}</span>
                                     </Flex>
-                                    <Flex
-                                        className="gap-2"
-                                        vertical
-                                        align="center"
-                                        onClick={() => {}}
-                                    >
+                                    <Flex className="gap-2" vertical align="center" onClick={() => {}}>
                                         <Flex
                                             className="size-16 text-2xl bg-white rounded-full rotate-[0deg]"
                                             justify="center"
@@ -143,12 +126,7 @@ const Call: React.FC<CallProps> = memo(() => {
                                 </>
                             ) : (
                                 <>
-                                    <Flex
-                                        className="gap-2"
-                                        vertical
-                                        align="center"
-                                        onClick={() => callStore.hangup()}
-                                    >
+                                    <Flex className="gap-2" vertical align="center" onClick={() => callStore.hangup()}>
                                         <Flex
                                             className="size-16 text-2xl bg-red-500 rounded-full rotate-[-135deg]"
                                             justify="center"
@@ -171,10 +149,7 @@ const Call: React.FC<CallProps> = memo(() => {
                                             )
                                         }
                                     >
-                                        <Flex
-                                            className="size-16 text-2xl bg-green-500 rounded-full"
-                                            justify="center"
-                                        >
+                                        <Flex className="size-16 text-2xl bg-green-500 rounded-full" justify="center">
                                             <PhoneFilled />
                                         </Flex>
                                         <span className="text-sm">{$t('接通')}</span>

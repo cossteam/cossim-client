@@ -12,6 +12,7 @@ interface ChatListProps {
     height?: number
 }
 
+// TODO: 1、时间、置顶排序 2、删除列表项  3、聊天列表项右侧功能按钮（待定）
 const ChatList: React.FC<ChatListProps> = (props) => {
     const { height } = useMobile()
     const navigate = useNavigate()
