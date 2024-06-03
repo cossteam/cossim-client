@@ -16,18 +16,18 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
         signingConfigs {
-            // release {
-            //     storeFile file('release.keystore')
-            //     storePassword 'release'
-            //     keyAlias 'release'
-            //     keyPassword 'release'
-            // }
              debug {
                 storeFile file('COSS_KEYS')
                 storePassword 'hitosea.coss'
                 keyPassword 'hitosea.coss'
                 keyAlias 'hitosea_coss'
              }
+             release {
+                storeFile file('release.keystore')
+                storePassword 'release'
+                keyAlias 'release'
+                keyPassword 'release'
+            }
         }
     }
     buildTypes {
@@ -35,9 +35,7 @@ android {
             minifyEnabled false
              proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             //警告！在生产中，您需要生成自己的密钥库文件。
-            // signingConfig signingConfigs.release
-            // shrinkResources false
-            // proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
 
