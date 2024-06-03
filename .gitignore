@@ -27,3 +27,7 @@ release
 *.njsproj
 *.sln
 *.sw?
+
+#build-android
+release.jks
+release.jks.base64
