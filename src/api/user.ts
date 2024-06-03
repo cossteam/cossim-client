@@ -29,6 +29,11 @@ export function loginApi(data: LoginParams): Promise<ResponseData> {
 /**
  * 注册接口
  * @param data
+ * @param data.nickname - 用户名
+ * @param data.email - 邮箱
+ * @param data.password - 密码
+ * @param data.confirm_password - 确认密码
+ * @param data.public_key - 公钥
  * @returns
  */
 export function registerApi(data: RegisterParams): Promise<ResponseData> {
