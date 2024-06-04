@@ -13,6 +13,7 @@ const tailLayout = {
     wrapperCol: { offset: 8, span: 16 }
 }
 
+// TODO: 优化代码结构以及样式
 const GroupCreate = () => {
     const [form] = Form.useForm()
     const [showContacts, setShowContacts] = useState(false)
@@ -64,9 +65,7 @@ const GroupCreate = () => {
     }
 
     const handleAvatarClick = (userId: string) => {
-        setSelectedContacts((prevSelected) =>
-            prevSelected.filter((contact) => contact.user_id !== userId)
-        )
+        setSelectedContacts((prevSelected) => prevSelected.filter((contact) => contact.user_id !== userId))
     }
 
     return (
@@ -115,12 +114,7 @@ const GroupCreate = () => {
             </Form.Item>
             <Divider />
             {showContacts && (
-                <Form.Item
-                    name="contact"
-                    label={$t('联系人')}
-                    className="text-nowrap"
-                    wrapperCol={{ span: 25 }}
-                >
+                <Form.Item name="contact" label={$t('联系人')} className="text-nowrap" wrapperCol={{ span: 25 }}>
                     <List
                         itemLayout="horizontal"
                         dataSource={data}
@@ -139,10 +133,7 @@ const GroupCreate = () => {
                                                     (contact) => contact.user_id === c.user_id
                                                 )}
                                             ></Checkbox>
-                                            <List.Item.Meta
-                                                avatar={<Avatar src={c.avatar} />}
-                                                title={c.nickname}
-                                            />
+                                            <List.Item.Meta avatar={<Avatar src={c.avatar} />} title={c.nickname} />
                                         </List.Item>
                                     )}
                                 />

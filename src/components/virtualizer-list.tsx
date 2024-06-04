@@ -1,11 +1,6 @@
 import { Flex, Typography } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
-import {
-    VirtualItem,
-    Virtualizer,
-    VirtualizerOptions,
-    useWindowVirtualizer
-} from '@tanstack/react-virtual'
+import { VirtualItem, Virtualizer, VirtualizerOptions, useWindowVirtualizer } from '@tanstack/react-virtual'
 import { useElementSize } from '@reactuses/core'
 import useDefer from '@/hooks/useDefer'
 import clsx from 'clsx'
@@ -157,11 +152,7 @@ const VirtualizerList: React.ForwardRefRenderFunction<
                     align="center"
                     justify="center"
                 >
-                    {loadingComponent ? (
-                        loadingComponent
-                    ) : (
-                        <Typography.Text>loading...</Typography.Text>
-                    )}
+                    {loadingComponent ? loadingComponent : <Typography.Text>loading...</Typography.Text>}
                 </Flex>
             )}
             <Flex

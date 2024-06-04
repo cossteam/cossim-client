@@ -14,10 +14,8 @@ interface InfiniteScrollProps {
 
 export interface InfiniteScrollPropsHandle {}
 
-const InfiniteScroll: React.ForwardRefRenderFunction<
-    InfiniteScrollPropsHandle,
-    InfiniteScrollProps
-> = (props, ref) => {
+// TODO: 优化 loading 效果
+const InfiniteScroll: React.ForwardRefRenderFunction<InfiniteScrollPropsHandle, InfiniteScrollProps> = (props, ref) => {
     const infiniteRef = useRef<InfiniteScrollComponent>(null)
     const parentRef = useRef<HTMLDivElement>(null)
 

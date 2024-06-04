@@ -12,7 +12,7 @@ interface MessageContentProps {
     messages: Message[]
 }
 
-// TODO: 优化虚拟列表
+// TODO: 优化虚拟列表，自己编写一个虚拟列表组件（待定 /components/virtualizer-list/virtual-list）
 const MessageContent: React.FC<MessageContentProps> = ({ messages }) => {
     const parentRef = useRef<HTMLDivElement>(null)
     const [, height] = useElementSize(parentRef)

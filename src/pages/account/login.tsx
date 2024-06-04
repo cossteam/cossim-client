@@ -7,6 +7,7 @@ import { NavigateOptions, useLocation, useNavigate } from 'react-router-dom'
 import useUserStore from '@/stores/user'
 import { createFingerprint } from '@/utils/fingerprint'
 
+// TODO: 优化手机端样式（mo）
 const Login: React.FC = () => {
     const userStore = useUserStore()
     const navigate = useNavigate()
