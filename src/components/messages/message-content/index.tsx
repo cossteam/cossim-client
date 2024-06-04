@@ -2,7 +2,6 @@ import { useElementSize } from '@reactuses/core'
 import { Flex } from 'antd'
 import { useCallback, useRef } from 'react'
 import MessageItem from './message-item'
-import '@/styles/message.scss'
 import VirtualList from '@/components/virtualizer-list/virtual-list'
 
 interface MessageContentProps {
@@ -28,13 +27,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ messages, start = 0 }) 
             ref={parentRef}
             vertical
         >
-            <VirtualList
-                data={messages.slice(-20).reverse()}
-                reverse
-                start={start}
-                height={height}
-                renderItem={renderItem}
-            />
+            <VirtualList data={messages.reverse()} reverse start={start} height={height} renderItem={renderItem} />
         </Flex>
     )
 }

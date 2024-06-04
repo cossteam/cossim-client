@@ -38,10 +38,6 @@ const Messages = () => {
         })
     }, [id])
 
-    useEffect(() => {
-        console.log('messageList', messageList)
-    }, [messageList])
-
     return (
         <Flex className="container--background bg-background3 flex-1" style={{ height }} vertical align="stretch">
             <MessageHeader />

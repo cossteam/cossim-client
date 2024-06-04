@@ -8,7 +8,10 @@ export interface VirtualProps<T> {
     buffer?: number
 }
 
-// TODO: implement Virtual class
+/**
+ * TODO: implement Virtual class
+ * @deprecated 可能需要修改，先暂时不使用
+ */
 class Virtual<T> {
     data: T[]
     visibleData: T[]

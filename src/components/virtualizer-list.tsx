@@ -73,6 +73,10 @@ export interface VirtualizerListHandle {
     virtualizer: Virtualizer<Window, Element>
 }
 
+/**
+ *
+ * @deprecated 可能会在下个版本移除，请使用 "/src/components/virtual-list/virtual-list.tsx" 代替
+ */
 const VirtualizerList: React.ForwardRefRenderFunction<
     VirtualizerListHandle,
     VirtualizerListProps & React.HTMLAttributes<HTMLDivElement>

@@ -81,7 +81,7 @@ const ChatListItemDescription: React.FC<{ chat: ChatData }> = ({ chat }) => {
         return `${chat?.last_message?.sender_info?.name}：${chat.last_message?.content}`
     }, [])
     return (
-        <Typography.Paragraph className="text-gray-500 !mb-0 -mt-[4px] text-base" ellipsis={{ rows: 1 }}>
+        <Typography.Paragraph className="text-gray-500 !mb-0 -mt-[4px] text-sm" ellipsis={{ rows: 1 }}>
             {content}
         </Typography.Paragraph>
     )

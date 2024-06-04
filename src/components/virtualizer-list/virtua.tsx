@@ -8,6 +8,10 @@ interface VirtuaProps {
     count?: number
 }
 
+/**
+ *
+ * @deprecated 可能需要修改，先暂时不使用
+ */
 const Virtua: React.FC<VirtuaProps> = ({ height, children, reverse = false, count }) => {
     const ref = useRef<VListHandle>(null)
 

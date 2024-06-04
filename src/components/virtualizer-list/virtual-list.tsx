@@ -80,7 +80,6 @@ const VirtualList: React.FC<VirtualListProps & Partial<VirtuosoProps<any, any>>>
     const [loadingHistory, setLoadingHistory] = useState<boolean>(false)
 
     useEffect(() => {
-        if (loadData.length >= data.length) return
         setLoadData(data.slice(start, start + loadCount))
     }, [data, loadCount, start])
 
@@ -97,7 +96,7 @@ const VirtualList: React.FC<VirtualListProps & Partial<VirtuosoProps<any, any>>>
             }
             setLoadingHistory(false)
         },
-        [loadCount, loadingHistory, virtuosoRef]
+        [loadCount, loadingHistory, virtuosoRef, data]
     )
 
     // TODO: 往下加载历史消息, 单 start 不能为 0 时触发
@@ -110,7 +109,7 @@ const VirtualList: React.FC<VirtualListProps & Partial<VirtuosoProps<any, any>>>
                 return
             }
         },
-        [loadCount, loadingHistory, virtuosoRef, start]
+        [loadCount, loadingHistory, virtuosoRef, start, data]
     )
 
     // =================== 新消息到达处理 ===================
