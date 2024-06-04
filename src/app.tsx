@@ -1,24 +1,24 @@
 import { ConfigProvider } from 'antd'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, memo, useEffect, useMemo, useState } from 'react'
 import useCommonStore from '@/stores/common'
 import Loading from '@/components/loading'
-import { useRoutes } from 'react-router-dom'
-import routes from '~react-pages'
 import { App as AppComponent } from 'antd'
-import useAuth from '@/hooks/useLogin'
 import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import { locale as dayjsLocale } from 'dayjs'
 import { Locale } from 'antd/es/locale'
 import Call from '@/components/call'
+import BeforeRouter from './permission'
+import useUserStore from '@/stores/user'
+import Cache from './cache'
 
 const App = () => {
-    // 鉴权
-    useAuth()
-
     const commonStore = useCommonStore()
+    const userStore = useUserStore()
 
     const [locale, setLocal] = useState<Locale>(enUS)
+
+    const isLogin = useMemo(() => !!userStore.token, [userStore.token])
 
     useEffect(() => {
         if (localStorage.getItem('locale') !== 'zh-CN') {
@@ -42,11 +42,14 @@ const App = () => {
             locale={locale}
         >
             <AppComponent>
-                <Suspense fallback={<Loading />}>{useRoutes(routes)}</Suspense>
+                <Suspense fallback={<Loading />}>
+                    <BeforeRouter isLogin={isLogin} />
+                </Suspense>
                 <Call />
+                {isLogin && <Cache />}
             </AppComponent>
         </ConfigProvider>
     )
 }
 
-export default App
+export default memo(App)

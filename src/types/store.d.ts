@@ -93,7 +93,7 @@ export interface CacheOptions {
     /** @description 缓存联系人列表 */
     cacheContactList: ContactData[]
     /** @description 缓存群组列表 */
-    cacheGroupList: GroupData[]
+    cacheGroupsList: GroupData[]
     /** @description 缓存消息未读数 */
     cacheMessageUnread: number
     /** @description 缓存申请列表 */
