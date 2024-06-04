@@ -9,7 +9,7 @@ const ToLogin = () => {
         navigate('/account/login')
     }, [])
 
-    return <></>
+    return null
 }
 
 const ToPages = () => {
@@ -19,7 +19,7 @@ const ToPages = () => {
         navigate('/')
     }, [])
 
-    return <></>
+    return null
 }
 
 interface BeforeRouterProps {

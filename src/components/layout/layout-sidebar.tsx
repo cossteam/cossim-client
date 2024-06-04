@@ -1,11 +1,13 @@
 import clsx from 'clsx'
 import ChatList from '@/components/chat-list'
-import { generateChatList } from '@/mock/data'
 import LayoutHeader from './layout-header'
 import { Flex } from 'antd'
 import { memo } from 'react'
+import useCacheStore from '@/stores/cache'
 
-const LayoutSidebar = memo(() => {
+const LayoutSidebar = () => {
+    const cacheStore = useCacheStore()
+
     return (
         <Flex
             className={clsx(
@@ -15,9 +17,9 @@ const LayoutSidebar = memo(() => {
             vertical
         >
             <LayoutHeader />
-            <ChatList data={generateChatList(30)} />
+            <ChatList data={cacheStore.cacheChatList} />
         </Flex>
     )
-})
+}
 
-export default LayoutSidebar
+export default memo(LayoutSidebar)

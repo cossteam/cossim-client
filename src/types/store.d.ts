@@ -105,6 +105,22 @@ export interface CacheStoreMethods {
     update: (options: Partial<StorageOptions>) => Promise<void>
 }
 
+export interface MessagesOptions {
+    /** @description 是否是群聊 */
+    isGroup: boolean
+    /** @description 会话信息 */
+    chatInfo: ChatData | null
+    /** @description 接收者 id */
+    receiverId: string | number
+    /** @description 草稿 */
+    draft: string
+}
+
+export interface MessagesStoreMethods {
+    /** @description 更新某个值 */
+    update: (options: Partial<MessagesOptions>) => Promise<void>
+}
+
 // 通用仓库
 export type CommonStore = CommonOptions & CommonStoreMethods
 // 用户仓库
@@ -113,3 +129,5 @@ export type UserStore = UserOptions & UserStoreMethods
 export type CallStore = CallOptions & CallStoreMethods
 // 本地存储仓库
 export type CacheStore = CacheOptions & CacheStoreMethods
+// 消息仓库
+export type MessagesStore = MessagesOptions & MessagesStoreMethods

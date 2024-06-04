@@ -2,6 +2,8 @@ import { memo, useEffect } from 'react'
 import useCacheStore from '@/stores/cache'
 import { useLiveQuery } from 'dexie-react-hooks'
 import storage from '@/storage'
+import synchronize from '@/background/synchronize'
+import { useAsyncEffect } from '@reactuses/core'
 
 const Cache = () => {
     const cacheStore = useCacheStore()
@@ -22,26 +24,13 @@ const Cache = () => {
         }
     }, [cacheChatList, cacheContactList, cacheGroupsList, cacheRequestList])
 
-    // useEffect(() => {
-    //     cacheStore.update({ cacheContactList })
-    //     return () => {
-    //         cacheStore.update({ cacheContactList: [] })
-    //     }
-    // }, [cacheContactList])
-
-    // useEffect(() => {
-    //     cacheStore.update({ cacheGroupsList })
-    //     return () => {
-    //         cacheStore.update({ cacheGroupsList: [] })
-    //     }
-    // }, [cacheGroupsList])
-
-    // useEffect(() => {
-    //     cacheStore.update({ cacheRequestList })
-    //     return () => {
-    //         cacheStore.update({ cacheRequestList: [] })
-    //     }
-    // }, [cacheRequestList])
+    useAsyncEffect(
+        async () => {
+            synchronize.synchronize()
+        },
+        () => {},
+        []
+    )
 
     return null
 }

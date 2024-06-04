@@ -1,11 +1,12 @@
 import { Avatar, Flex, Badge, List, Typography } from 'antd'
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { formatTime } from '@/utils/format-time'
 import { headerHeight } from '@/components/layout/layout-header'
 import { useNavigate, useParams } from 'react-router-dom'
 import clsx from 'clsx'
 import VirtualizerList from '@/components/virtualizer-list'
 import useMobile from '@/hooks/useMobile'
+import { $t } from '@/i18n'
 
 interface ChatListProps {
     data: ChatData[]
@@ -53,7 +54,7 @@ const ChatListItemExtra: React.FC<{ chat: ChatData }> = ({ chat }) => {
     return (
         <Flex vertical align="flex-end">
             <Typography.Text className="text-gray-500 text-xs mb-2">
-                {formatTime(chat.last_message.send_time)}
+                {formatTime(chat.last_message.send_at)}
             </Typography.Text>
             <Badge className="badge" count={chat.dialog_unread_count} />
         </Flex>
@@ -71,9 +72,13 @@ const ChatListItemTitle: React.FC<{ chat: ChatData }> = ({ chat }) => {
 const ChatListItemAvatar: React.FC<{ chat: ChatData }> = ({ chat }) => <Avatar src={chat.dialog_avatar} size={48} />
 
 const ChatListItemDescription: React.FC<{ chat: ChatData }> = ({ chat }) => {
+    const content = useMemo(() => {
+        if (!chat.last_message?.content) return $t('[无消息内容]')
+        return `${chat?.last_message?.sender_info?.name}：${chat.last_message?.content}`
+    }, [])
     return (
         <Typography.Paragraph className="text-gray-500 !mb-0 -mt-[4px] text-base" ellipsis={{ rows: 1 }}>
-            {chat.last_message.sender_info.name}:&nbsp;{chat.last_message.content}
+            {content}
         </Typography.Paragraph>
     )
 }

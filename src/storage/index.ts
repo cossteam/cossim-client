@@ -1,5 +1,5 @@
 import useUserStore from '@/stores/user'
-import type { ContactData, GroupData, RequestData } from '@/types/storage'
+import type { ContactData, GroupData, GroupMemberData, RequestData } from '@/types/storage'
 import Dexie, { Table } from 'dexie'
 
 class Storage extends Dexie {
@@ -9,16 +9,18 @@ class Storage extends Dexie {
     request_list!: Table<RequestData>
     contact_list!: Table<ContactData>
     groups_list!: Table<GroupData>
+    gropus_members!: Table<GroupMemberData>
 
     constructor(name: string, version: number = 1) {
         super(name)
         this.version(version).stores({
-            private_messages: '++id, msg_id, dialog_id, content, type, sender_id, receiver_id',
-            group_messages: '++id, msg_id, dialog_id, content, type, sender_id, receiver_id, group_id',
-            chat_list: '++id, dialog_id, dialog_name, dialog_avatar, top_at, last_message',
-            request_list: '++id, request_id, dialog_id', // TODO: add more fields
-            contact_list: '++id, user_id', // TODO: add more fields
-            groups_list: '++id, group_id' // TODO: add more fields
+            private_messages: '&msg_id, dialog_id, content, type, sender_id, receiver_id',
+            group_messages: '&msg_id, dialog_id, content, type, sender_id, receiver_id, group_id',
+            chat_list: '&dialog_id, dialog_name, dialog_avatar, top_at, last_message',
+            request_list: '&request_id, dialog_id', // TODO: add more fields
+            contact_list: '&user_id', // TODO: add more fields
+            groups_list: '&group_id', // TODO: add more fields
+            gropus_members: '++id, group_id, user_id' // TODO: add more fields
         })
     }
 }

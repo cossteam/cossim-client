@@ -43,6 +43,7 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
     const userStore = useUserStore()
     const navigate = useNavigate()
     const commonStore = useCommonStore()
+
     const { width } = useMobile()
 
     useEffect(() => {

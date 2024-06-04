@@ -23,7 +23,7 @@ export declare global {
             is_label: boolean
             msg_id: number
             msg_type: number
-            send_time: number
+            send_at: number
             sender_id: string
             sender_info: {
                 user_id: string
@@ -37,6 +37,7 @@ export declare global {
                 user_id: string
             }
         }
+        draft?: string
     }
 
     interface Message {

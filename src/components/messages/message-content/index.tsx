@@ -1,40 +1,46 @@
 import { useElementSize } from '@reactuses/core'
 import { Flex } from 'antd'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { generateMessageList } from '@/mock/data'
+// import { generateMessageList } from '@/mock/data'
 import MessageItem from './message-item'
 import InfiniteScroll from '@/components/infinite-scroll'
+// import { useLiveQuery } from 'dexie-react-hooks'
+// import storage from '@/storage'
 // import VirtualList from '@/components/virtualizer-list/virtual-list'
 
+interface MessageContentProps {
+    messages: Message[]
+}
+
 // TODO: 优化虚拟列表
-const MessageContent = () => {
+const MessageContent: React.FC<MessageContentProps> = ({ messages }) => {
     const parentRef = useRef<HTMLDivElement>(null)
     const [, height] = useElementSize(parentRef)
 
-    const [data, setData] = useState<Message[]>([])
-    const [, setLoading] = useState<boolean>(false)
+    // const [data, setData] = useState<Message[]>([])
+    // const [, setLoading] = useState<boolean>(false)
     const [isFetchingNextPage, setIsFetchingNextPage] = useState<boolean>(false)
 
-    const count = useMemo(() => data.length, [data])
+    const count = useMemo(() => messages.length, [messages])
 
     // 异步加载数据，防止阻塞渲染
     const loadData = async () => {
-        setLoading(true)
-        const newData = await new Promise<Message[]>((resolve) => {
-            resolve(generateMessageList(50))
-        })
-        setData(newData)
+        // setLoading(true)
+        // const newData = await new Promise<Message[]>((resolve) => {
+        //     resolve(generateMessageList(50))
+        // })
+        // setData(newData)
     }
 
     const loadMoreData = async () => {
         if (isFetchingNextPage) return
         setIsFetchingNextPage(true)
-        const newData = await new Promise<Message[]>((resolve) => {
-            setTimeout(() => {
-                resolve(generateMessageList(50))
-            }, 0)
-        })
-        setData((prevData) => [...newData, ...prevData])
+        // const newData = await new Promise<Message[]>((resolve) => {
+        //     setTimeout(() => {
+        //         resolve(generateMessageList(50))
+        //     }, 0)
+        // })
+        // setData((prevData) => [...newData, ...prevData])
         setIsFetchingNextPage(false)
     }
 
@@ -49,13 +55,13 @@ const MessageContent = () => {
         (index: number) => {
             return (
                 <MessageItem
-                    message={data[index]}
+                    message={messages[index]}
                     ref={(ref) => ref && (messageItemRefs.current[index] = ref)}
                     key={index}
                 />
             )
         },
-        [data]
+        [messages]
     )
 
     // 计算元素高度，是否需要翻转消息列表
@@ -82,9 +88,14 @@ const MessageContent = () => {
 				isScrollToEnd
 			/> */}
 
-            <InfiniteScroll dataLength={count} next={loadMoreData} height={height} reverse={reverse}>
-                {data.reverse().map((_, index) => renderItem(index))}
-            </InfiniteScroll>
+            {count ? (
+                <InfiniteScroll dataLength={count} next={loadMoreData} height={height} reverse={reverse}>
+                    {messages.reverse().map((_, index) => renderItem(index))}
+                </InfiniteScroll>
+            ) : (
+                <>&nbsp;</>
+            )}
+
             {/* <VirtualList data={data} itemHeight={50} height={height} children={renderItem} /> */}
         </Flex>
     )
