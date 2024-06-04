@@ -45,7 +45,11 @@ const ChatList: React.FC<ChatListProps> = (props) => {
 
     return (
         <List>
-            <VirtualizerList listHeight={height - headerHeight} count={props.data.length} renderItem={renderItem} />
+            <VirtualizerList
+                listHeight={height - headerHeight}
+                count={props.data?.length || 0}
+                renderItem={renderItem}
+            />
         </List>
     )
 }

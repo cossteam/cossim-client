@@ -16,7 +16,8 @@ const Messages = () => {
     const messages = useMessagesStore()
     const cacheStore = useCacheStore()
 
-    const isGroup = useMemo(() => !messages.chatInfo?.user_id, [messages.chatInfo])
+    // TODO: 判断正确的 group_id 和 user_id
+    const isGroup = useMemo(() => messages.chatInfo?.user_id, [messages.chatInfo])
 
     const messageList =
         useLiveQuery(() => {
@@ -31,19 +32,18 @@ const Messages = () => {
         const chatInfo = cacheStore.cacheChatList.find((item) => item.dialog_id === Number(id))
         messages.update({
             chatInfo,
-            isGroup,
+            // isGroup,
             receiverId: isGroup ? chatInfo?.group_id : chatInfo?.user_id,
             draft: chatInfo?.draft || ''
         })
     }, [id])
 
+    useEffect(() => {
+        console.log('messageList', messageList)
+    }, [messageList])
+
     return (
-        <Flex
-            className="container--background bg-background3 flex-1 h-screen"
-            style={{ height }}
-            vertical
-            align="stretch"
-        >
+        <Flex className="container--background bg-background3 flex-1" style={{ height }} vertical align="stretch">
             <MessageHeader />
             <MessageContent messages={messageList} />
             <MessageFooter />

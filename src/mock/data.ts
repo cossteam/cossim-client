@@ -17,9 +17,7 @@ export const generateChatList = (count: number = 10) => {
             dialog_type: 0,
             dialog_unread_count: faker.number.int({ max: 30 }),
             top_at: faker.number.int({ min: 0, max: 1 }),
-            [isGroup ? 'group_id' : 'user_id']: isGroup
-                ? faker.number.int({ min: 0, max: 1000 })
-                : faker.string.uuid(),
+            [isGroup ? 'group_id' : 'user_id']: isGroup ? faker.number.int({ min: 0, max: 1000 }) : faker.string.uuid(),
             last_message: {
                 content: faker.lorem.sentence(),
                 is_burn_after_reading: faker.datatype.boolean(),
@@ -67,7 +65,7 @@ export const generateMessageList = (count: number = 10): Message[] => {
             at_all_user: faker.datatype.boolean(),
             content: faker.lorem.sentence({ min: 3, max: 20 }),
             create_at: new Date(faker.date.recent()).getTime(),
-            id: faker.number.int(),
+            dialog_id: 1,
             is_brun_after_reading: faker.datatype.boolean(),
             is_label: faker.datatype.boolean(),
             msg_id: faker.number.int(),

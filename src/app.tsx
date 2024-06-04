@@ -32,7 +32,6 @@ const App = () => {
     }, [])
 
     useEffect(() => {
-        // console.log('isLogin', storage)
         if (isLogin && !storage) createStorage()
     }, [isLogin])
 

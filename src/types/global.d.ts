@@ -42,6 +42,7 @@ export declare global {
     }
 
     interface Message {
+        dialog_id: number
         at_all_user: boolean
         content: string
         is_brun_after_reading: boolean
@@ -103,5 +104,5 @@ export declare global {
         storage: Storage | undefined
     }
 
-    declare const storage: window.storage
+    declare const storage: Storage
 }

@@ -4,18 +4,24 @@
     overflow-y: auto;
     border: 1px solid #ccc;
     position: relative;
-  }
-  
-  .virtual-content {
+}
+
+.virtual-content {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-  }
-  
-  .virtual-item {
+}
+
+.virtual-item {
     padding: 10px;
     border-bottom: 1px solid #eee;
     box-sizing: border-box;
-  }
-  
+}
+
+.virtuoso-list {
+    & [data-testid='virtuoso-item-list'] {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+}

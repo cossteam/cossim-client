@@ -32,6 +32,10 @@ body {
     //     box-sizing: border-box;
     //     padding-top: var(--safe-area-inset-top);
     //     padding-bottom: var(--safe-area-inset-bottom);
+
+    &::-webkit-scrollbar {
+       display: none;
+    }
 }
 
 ::-webkit-scrollbar {

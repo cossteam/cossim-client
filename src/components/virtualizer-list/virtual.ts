@@ -5,6 +5,7 @@ export interface VirtualProps<T> {
     onScroll?: (startIndex: number, endIndex: number) => void
     renderItem: (item: T, index: number) => JSX.Element
     onResize?: (height: number) => void
+    buffer?: number
 }
 
 // TODO: implement Virtual class
@@ -15,12 +16,14 @@ class Virtual<T> {
     height: number
     container: HTMLDivElement
     options: VirtualProps<T>
+    buffer: number
 
     constructor(el: HTMLDivElement, options: VirtualProps<T>) {
         this.data = options.data
         this.itemHeight = options.itemHeight ?? 50
         this.visibleData = []
         this.height = options.height
+        this.buffer = options.buffer ?? 10
         this.container = el
         this.options = options
         this.container.addEventListener('scroll', this.handlerScroll.bind(this))

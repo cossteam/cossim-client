@@ -7,31 +7,19 @@ interface MessageItemProps {
     message: Message
 }
 
-const MessageItem: React.ForwardRefRenderFunction<HTMLDivElement, MessageItemProps> = (
-    { message },
-    ref
-) => {
-    // console.log('message', message)
-
+const MessageItem: React.ForwardRefRenderFunction<HTMLDivElement, MessageItemProps> = ({ message }, ref) => {
     const isMe = useMemo(() => isSelf(message.sender_id), [message.sender_id])
 
     return (
-        <Flex className="px-5 mb-6" ref={ref} justify={isMe ? 'end' : 'start'}>
+        <Flex className="px-5 py-2" ref={ref} justify={isMe ? 'end' : 'start'}>
             <Flex className={clsx('max-w-[80%]')} justify={isMe ? 'end' : 'start'}>
                 <Flex className="" gap={8}>
                     <Flex className={isMe ? 'order-last' : 'order-first'}>
                         <Avatar
-                            className={clsx(
-                                'w-[30px] h-[30px]',
-                                isMe ? 'order-last' : 'order-first'
-                            )}
+                            className={clsx('w-[30px] h-[30px]', isMe ? 'order-last' : 'order-first')}
                             src={
                                 <img
-                                    src={
-                                        isMe
-                                            ? message.sender_info.avatar
-                                            : message.receiver_info.avatar
-                                    }
+                                    src={isMe ? message.sender_info.avatar : message.receiver_info.avatar}
                                     alt="avatar"
                                     loading="lazy"
                                 />
