@@ -38,6 +38,7 @@ export interface UserStoreMethods {
     update: (options: Partial<UserOptions>) => Promise<void>
     login: (params: LoginParams) => Promise<ResponseData<any>>
     logout: (params: LogoutParams) => Promise<ResponseData<any>>
+    clear: () => Promise<void>
 }
 
 export interface CallOptions {

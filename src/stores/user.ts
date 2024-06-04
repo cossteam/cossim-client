@@ -42,13 +42,10 @@ const actions = (set: any): UserStoreMethods => ({
             console.log('错误', error)
             return Promise.reject(error)
         } finally {
-            set({
-                userId: '',
-                userInfo: null,
-                token: ''
-            })
+            set(states)
         }
-    }
+    },
+    clear: () => set(states)
 })
 
 const commonStore = (set: any): UserStore => ({

@@ -116,3 +116,54 @@ export interface UserPublicKeyQueryParams {
      */
     user_id: string
 }
+
+export interface AddFriendParams {
+    /**
+     * 用户端加密公钥
+     */
+    e2e_public_key?: string
+    /**
+     * 发送好友申请备注
+     */
+    remark?: string
+    /**
+     * 要添加的好友的ID
+     */
+    user_id: string
+}
+
+export interface QueryParams {
+    /**
+     * 页码
+     */
+    page_num?: number
+    /**
+     * 页大小
+     */
+    page_size?: number
+}
+
+export interface ManageFriendRequestParams {
+    /**
+     * 操作类型 0=拒绝好友请求 1=接受好友请求
+     */
+    action: number
+    /**
+     * 公钥
+     */
+    e2e_public_key?: string
+}
+
+export interface TopDialogParams {
+    /**
+     * 是否置顶
+     */
+    top: boolean
+}
+
+export interface ShowDialogParams {
+    /**
+     * 是否显示
+     */
+    show: boolean
+}

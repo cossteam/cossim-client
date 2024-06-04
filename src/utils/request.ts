@@ -115,10 +115,12 @@ service.interceptors.response.use(
     async (response: AxiosResponse) => {
         // 获取错误码
         const code = response.data.code || 200
+        const userStore = useUserStore.getState()
         // code 的取值根据后台返回为准
         switch (code) {
             case RESPONSE_CODE.Unauthorized:
                 console.log('登录过期')
+                userStore.clear()
                 break
         }
         /////////////////////////////////////////////////////////////////////////////////////////////
