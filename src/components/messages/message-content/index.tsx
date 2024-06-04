@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MessageItem from './message-item'
 import InfiniteScroll from '@/components/infinite-scroll'
 // import { useLiveQuery } from 'dexie-react-hooks'
-// import storage from '@/storage'
 // import VirtualList from '@/components/virtualizer-list/virtual-list'
 
 interface MessageContentProps {

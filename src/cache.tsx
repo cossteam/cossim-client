@@ -1,7 +1,6 @@
 import { memo, useEffect } from 'react'
 import useCacheStore from '@/stores/cache'
 import { useLiveQuery } from 'dexie-react-hooks'
-import storage from '@/storage'
 import { synchronize } from '@/background/synchronize'
 import { useAsyncEffect } from '@reactuses/core'
 

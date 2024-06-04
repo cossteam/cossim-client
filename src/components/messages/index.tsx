@@ -8,7 +8,6 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useMemo } from 'react'
 import useCacheStore from '@/stores/cache'
 import { useLiveQuery } from 'dexie-react-hooks'
-import storage from '@/storage'
 
 const Messages = () => {
     const { height } = useMobile()

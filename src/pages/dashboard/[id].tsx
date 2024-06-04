@@ -1,8 +1,7 @@
 import Message from '@/components/messages'
-import { memo } from 'react'
 
-const Dialog = memo(() => {
+const Dialog = () => {
     return <Message />
-})
+}
 
 export default Dialog

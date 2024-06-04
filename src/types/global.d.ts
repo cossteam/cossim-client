@@ -1,4 +1,5 @@
 import { MESSAGE_SEND_STATE, MESSAGE_TYPE } from '@/utils/enum'
+import { Storage } from '@/storage'
 
 export declare global {
     interface ResponseData<T = any> {
@@ -97,4 +98,10 @@ export declare global {
     }
 
     declare function io(url?: string, SocketOptions?: SocketOptions): Socket
+
+    interface Window {
+        storage: Storage | undefined
+    }
+
+    declare const storage: window.storage
 }

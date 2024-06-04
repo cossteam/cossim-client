@@ -5,6 +5,8 @@ import '@/i18n'
 import '@/styles/base.scss'
 import App from './app'
 
+window.storage = undefined
+
 const Router = __IS_ELECTRON__ ? HashRouter : BrowserRouter
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

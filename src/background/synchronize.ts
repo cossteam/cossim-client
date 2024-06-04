@@ -1,7 +1,6 @@
 import { getDialogListApi } from '@/api/msg'
 import { getFriendListApi } from '@/api/relation'
 import { QueryParams } from '@/types/api'
-import storage from '@/storage'
 
 export async function getDialogList(params: Required<QueryParams>) {
     const res = await getDialogListApi(params)

@@ -2,7 +2,7 @@ import useUserStore from '@/stores/user'
 import type { ContactData, GroupData, GroupMemberData, RequestData } from '@/types/storage'
 import Dexie, { Table } from 'dexie'
 
-class Storage extends Dexie {
+export class Storage extends Dexie {
     private_messages!: Table<Message>
     group_messages!: Table<Message>
     chat_list!: Table<ChatData>
@@ -25,12 +25,10 @@ class Storage extends Dexie {
     }
 }
 
-export function createStorage(name: string = 'coss-storage', version: number = 1): Storage {
+export function createStorage(name: string = 'coss-storage', version: number = 1): Storage | undefined {
     const userId = useUserStore.getState().userId
-    if (!userId) throw new Error('User id is not set')
-    return new Storage(`${name}-${userId}`, version)
+    if (!userId) return
+    const storage = new Storage(`${name}-${userId}`, version)
+    window.storage = storage
+    return storage
 }
-
-const storage = createStorage()
-
-export default storage

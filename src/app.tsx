@@ -11,6 +11,7 @@ import Call from '@/components/call'
 import BeforeRouter from './permission'
 import useUserStore from '@/stores/user'
 import Cache from './cache'
+import { createStorage } from '@/storage'
 
 const App = () => {
     const commonStore = useCommonStore()
@@ -30,6 +31,11 @@ const App = () => {
         }
     }, [])
 
+    useEffect(() => {
+        // console.log('isLogin', storage)
+        if (isLogin && !storage) createStorage()
+    }, [isLogin])
+
     return (
         <ConfigProvider
             theme={{
@@ -46,7 +52,7 @@ const App = () => {
                     <BeforeRouter isLogin={isLogin} />
                 </Suspense>
                 <Call />
-                {isLogin && <Cache />}
+                {isLogin && storage && <Cache />}
             </AppComponent>
         </ConfigProvider>
     )
