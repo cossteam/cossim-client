@@ -1,20 +1,26 @@
 import { useEffect, useState } from 'react'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Avatar, Flex, Checkbox, message } from 'antd'
+import { Button, Form, Input, Avatar, Flex, Checkbox } from 'antd'
 import { $t } from '@/i18n'
 import clsx from 'clsx'
 import { NavigateOptions, useLocation, useNavigate } from 'react-router-dom'
 import useUserStore from '@/stores/user'
 import { createFingerprint } from '@/utils/fingerprint'
 
-// TODO: 优化手机端样式（mo）
+/**
+ * TODO: 优化手机端样式（mo）
+ * @description 修改提示，全局使用 showToast ，不要使用 ant-design 的 message
+ * @updateTime 2024-06-05 13:39:30
+ * @author YuHong
+ * @returns
+ */
 const Login: React.FC = () => {
     const userStore = useUserStore()
     const navigate = useNavigate()
     const location = useLocation()
     const [form] = Form.useForm()
 
-    const [messageApi, contextHolder] = message.useMessage()
+    // const [messageApi, contextHolder] = message.useMessage()
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
@@ -26,6 +32,12 @@ const Login: React.FC = () => {
 
     const onFinish = async (values: any) => {
         console.log('Received values of form: ', values)
+        showNotification({
+            avatar: 'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp',
+            title: '登录成功',
+            content: '欢迎回来，这里是热海供水管理系统'
+        })
+        return
         setLoading(true)
         try {
             const res = await userStore.login({
@@ -35,23 +47,16 @@ const Login: React.FC = () => {
                 password: values.password,
                 platform: 'android'
             })
-            if (res.code !== 200) {
-                messageApi.open({
-                    type: 'error',
-                    content: res.msg
-                })
-                return
-            }
+            if (res.code !== 200) throw new Error(res.msg)
             // 暂时注释
             // 跳转在 src/hooks/useLogin.ts 做处理了
             // navigate('/dashboard', {
             //     replace: true
             // })
         } catch (error: any) {
-            messageApi.open({
-                type: 'error',
-                content: error
-            })
+            console.log('error ->', error)
+
+            showToast(error, { type: 'error' })
         } finally {
             setLoading(false)
         }
@@ -67,7 +72,7 @@ const Login: React.FC = () => {
 
     return (
         <>
-            {contextHolder}
+            {/* {contextHolder} */}
             <Flex className="w-screen h-screen" vertical justify="center" align="center" gap="large">
                 <Avatar
                     size={120}

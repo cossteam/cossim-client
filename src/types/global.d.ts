@@ -1,13 +1,17 @@
 import { MESSAGE_SEND_STATE, MESSAGE_TYPE } from '@/utils/enum'
 import { Storage } from '@/storage'
+import { Toast } from 'react-hot-toast'
+import { NotificationProps } from '@/components/notification'
 
 export declare global {
+    type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
     interface ResponseData<T = any> {
         code: number
         data: T
         msg: string
     }
 
+    /** 会话 */
     interface ChatData {
         dialog_avatar: string
         dialog_name: string
@@ -41,6 +45,7 @@ export declare global {
         draft?: string
     }
 
+    /** 消息 */
     interface Message {
         dialog_id: number
         at_all_user: boolean
@@ -76,7 +81,6 @@ export declare global {
     /** 原生平台环境 */
     declare const __IS_NATIVE__: boolean
 
-    /** sokcet.io-client */
     interface SocketOptions {
         query?: string | { [key: string]: string }
         transports?: string[]
@@ -97,12 +101,24 @@ export declare global {
         id: string
         connected: boolean
     }
-
+    /** sokcet.io */
     declare function io(url?: string, SocketOptions?: SocketOptions): Socket
 
-    interface Window {
-        storage: Storage | undefined
-    }
-
+    /** 本地存储 */
     declare const storage: Storage
+    /** 提示 */
+    declare function showToast(message: string, options?: Partial<Toast>): void
+    /** 通知 */
+    declare function showNotification(
+        notificationOptions: Optional<NotificationProps, 't'>,
+        options?: Partial<Toast>
+    ): void
+    interface Window {
+        /** 本地存储 */
+        storage: storage
+        /** 提示 */
+        showToast: showToast
+        /** 通知 */
+        showNotification: showNotification
+    }
 }

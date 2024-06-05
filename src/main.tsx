@@ -4,18 +4,30 @@ import { BrowserRouter, HashRouter } from 'react-router-dom'
 import '@/i18n'
 import '@/styles/base.scss'
 import App from './app'
+import { showToast, showNotification } from '@/utils/prompt'
 
-window.storage = undefined
+/**
+ * mounted window
+ */
+const mountedWindow = () => {
+    window.storage = undefined
+    window.showToast = showToast
+    window.showNotification = showNotification
+}
 
-const Router = __IS_ELECTRON__ ? HashRouter : BrowserRouter
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-        <Router>
-            <App />
-        </Router>
-    </StrictMode>
-)
+/**
+ * create DOM element
+ */
+const createDOMElement = () => {
+    const Router = __IS_ELECTRON__ ? HashRouter : BrowserRouter
+    ReactDOM.createRoot(document.getElementById('root')!).render(
+        <StrictMode>
+            <Router>
+                <App />
+            </Router>
+        </StrictMode>
+    )
+}
 
 /**
  * SafeArea Plugin
@@ -36,4 +48,6 @@ const safeAreaInitialization = async () => {
     }
 }
 
+mountedWindow()
+createDOMElement()
 safeAreaInitialization()

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Avatar, Flex, message } from 'antd'
+import { Button, Form, Input, Avatar, Flex } from 'antd'
 import { $t } from '@/i18n'
 import clsx from 'clsx'
 import { NavigateOptions, useNavigate } from 'react-router-dom'
@@ -10,7 +10,6 @@ import useUserStore from '@/stores/user'
 const Register: React.FC = () => {
     const navigate = useNavigate()
     const userStore = useUserStore()
-    const [messageApi, contextHolder] = message.useMessage()
     const [loading, setLoading] = useState(false)
 
     const onFinish = async (values: any) => {
@@ -23,24 +22,19 @@ const Register: React.FC = () => {
                 confirm_password: values.confirm_password
                 // public_key: values.public_key
             })
-            if (code !== 200) {
-                messageApi.open({
-                    type: 'error',
-                    content: msg
-                })
-                return
-            }
+            if (code !== 200) throw new Error(msg)
             userStore.update({ userId: data?.user_id })
             // await cretaeIdentity(data.user_id, fromData.email)
             toLogin({
                 replace: true,
                 state: { email: values.email, password: values.password }
             })
-        } catch {
-            messageApi.open({
-                type: 'error',
-                content: '注册失败，请稍后重试'
-            })
+        } catch (message: any) {
+            showToast(message, { type: 'error' })
+            // messageApi.open({
+            //     type: 'error',
+            //     content: '注册失败，请稍后重试'
+            // })
         } finally {
             setLoading(false)
         }
@@ -56,7 +50,6 @@ const Register: React.FC = () => {
 
     return (
         <Flex className="w-screen h-screen" vertical justify="center" align="center" gap="large">
-            {contextHolder}
             <Avatar
                 size={120}
                 src={'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp'}
