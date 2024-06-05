@@ -50,7 +50,6 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
         if (userStore.userId) {
             getUserInfoApi({ id: userStore.userId })
                 .then((res) => {
-                    console.log('获取用户信息成功: ', res)
                     userStore.update({
                         userInfo: res.data
                     })
