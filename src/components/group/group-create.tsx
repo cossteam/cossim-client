@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { Button, Form, Input, Tooltip, Space, Divider, Avatar, List, Checkbox, Radio } from 'antd'
 import { $t } from '@/i18n'
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
-import { Contact, generateContactList, createGroup } from '@/mock/data'
+import { Contact, createGroup } from '@/mock/data'
+import { getFriendListApi } from '@/api/relation'
+import { CreateGroupData } from '@/types/group'
 
 const layout = {
     labelCol: { span: 10 },
@@ -13,39 +15,54 @@ const tailLayout = {
     wrapperCol: { offset: 8, span: 16 }
 }
 
+export async function getFriendList() {
+    const res = await getFriendListApi()
+    if (res.code !== 200) return []
+    return res.data.list || {}
+}
+
 // TODO: 优化代码结构以及样式
 const GroupCreate = () => {
     const [form] = Form.useForm()
     const [showContacts, setShowContacts] = useState(false)
-    const [groupType, setGroupType] = useState('public')
+    const [groupType, setGroupType] = useState(0)
     const [data, setData] = useState<{ key: string; list: Contact[] }[]>([])
     const [selectedContacts, setSelectedContacts] = useState<Contact[]>([])
-
+    const [groupData, setGroupData] = useState<CreateGroupData>({
+        name: '',
+        encrypt: false,
+        type: groupType,
+        member: [],
+        avatar: '',
+        join_approve: false
+    })
     //完成创建群组
     const onFinish = (values: any) => {
-        createGroup(values)
-        // console.log(values);
-        // console.log('Selected Contacts:', selectedContacts);
+        // createGroup(values)
+        console.log(values)
     }
 
     useEffect(() => {
-        const arr = []
-        const contactList = generateContactList(100)
-        for (const key in contactList.list) {
-            if (Object.prototype.hasOwnProperty.call(contactList.list, key)) {
-                arr.push({
-                    list: contactList.list[key],
-                    key
-                })
+        const fetchContacts = async () => {
+            const contactList = await getFriendList()
+            const arr = []
+            for (const key in contactList) {
+                if (Object.prototype.hasOwnProperty.call(contactList, key)) {
+                    arr.push({
+                        list: contactList[key],
+                        key
+                    })
+                }
             }
+            setData(arr.sort((a, b) => a.key.localeCompare(b.key)))
         }
-        setData(arr.sort((a, b) => a.key.localeCompare(b.key)))
+        fetchContacts()
     }, [])
 
     const onReset = () => {
         form.resetFields()
         setShowContacts(false)
-        setGroupType('public')
+        setGroupType(0)
         setSelectedContacts([])
     }
 
@@ -80,12 +97,28 @@ const GroupCreate = () => {
             <Form.Item name="name" label={$t('名称')} rules={[{ required: true }]}>
                 <Input />
             </Form.Item>
-            <Form.Item name="type" label={$t('类型')} initialValue={'public'}>
-                <Radio.Group value={groupType}>
-                    <Radio.Button value="public">{$t('公开群')}</Radio.Button>
-                    <Radio.Button value="private">{$t('私密群')}</Radio.Button>
+            <Form.Item<CreateGroupData['join_approve']>
+                name="join_approve"
+                valuePropName="join_approve"
+                style={{ display: 'inline-block', whiteSpace: 'nowrap' }}
+            >
+                <Checkbox>开启入群申请</Checkbox>
+            </Form.Item>
+            <Form.Item name="type" label={$t('类型')} initialValue={0}>
+                <Radio.Group value={groupType} onChange={(e) => setGroupType(e.target.value)}>
+                    <Radio.Button value={0}>{$t('公开群')}</Radio.Button>
+                    <Radio.Button value={1}>{$t('私密群')}</Radio.Button>
                 </Radio.Group>
             </Form.Item>
+            {groupType === 1 && (
+                <Form.Item<CreateGroupData['encrypt']>
+                    name="encrypt"
+                    valuePropName="encrypt"
+                    style={{ display: 'inline-block', whiteSpace: 'nowrap' }}
+                >
+                    <Checkbox>是否开启加密</Checkbox>
+                </Form.Item>
+            )}
             <Form.Item>
                 <Button type="dashed" onClick={handleShowContacts}>
                     {$t('选择联系人')}
