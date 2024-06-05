@@ -1,6 +1,10 @@
 export interface RequestData {}
 
 export interface ContactData {
+    [key: string]: Contact[]
+}
+
+export interface Contact {
     avatar: string
     coss_id: string
     dialog_id: number

@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Avatar, List, Divider, Skeleton, Input } from 'antd'
-import { Contact, ContactList, generateContactList } from '@/mock/data'
+import { Avatar, List, Divider, Skeleton, Input, Layout } from 'antd'
+import { Contact, ContactList } from '@/mock/data'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { SearchOutlined } from '@ant-design/icons'
 import useCacheStore from '@/stores/cache'
+import { Button } from 'antd'
+import { arrayToGroups } from '@/utils/utils'
+import { Header, Content, Footer } from 'antd/es/layout/layout'
 
 // mock数据
 // useEffect(() => {
@@ -23,37 +26,35 @@ const ContactListPage = () => {
     const cacheStore = useCacheStore()
 
     const loadMoreData = () => {
-        if (loading) return
-
-        setLoading(true)
-        // 模拟加载更多数据的逻辑
-        const moreContacts = generateContactList(10) // 加载更多联系人
-        setContactList((prevState) => ({
-            list: { ...prevState.list, ...moreContacts.list },
-            total: prevState.total + moreContacts.total
-        }))
-        setOriginalContactList((prevState) => ({
-            list: { ...prevState.list, ...moreContacts.list },
-            total: prevState.total + moreContacts.total
-        }))
-        setLoading(false)
+        // if (loading) return
+        // setLoading(true)
+        // // 模拟加载更多数据的逻辑
+        // const moreContacts = generateContactList(10) // 加载更多联系人
+        // setContactList((prevState) => ({
+        //     list: { ...prevState.list, ...moreContacts.list },
+        //     total: prevState.total + moreContacts.total
+        // }))
+        // setOriginalContactList((prevState) => ({
+        //     list: { ...prevState.list, ...moreContacts.list },
+        //     total: prevState.total + moreContacts.total
+        // }))
+        // setLoading(false)
     }
 
     useEffect(() => {
         const fetchContactsFromCache = async () => {
             try {
-                const cachedContacts = cacheStore.cacheContactList
-                if (cachedContacts && cachedContacts.length > 0) {
-                    const formattedContactList: ContactList = {
-                        list: {},
-                        total: cachedContacts.length
-                    }
+                const cachedContacts = arrayToGroups(cacheStore.cacheContactList)
 
-                    cachedContacts.forEach((contact) => {
-                        const firstLetter = contact.nickname.charAt(0).toUpperCase()
-                        formattedContactList.list[firstLetter] = formattedContactList.list[firstLetter] || []
-                        formattedContactList.list[firstLetter].push(contact)
-                    })
+                if (cachedContacts && Object.keys(cachedContacts).length > 0) {
+                    const formattedContactList: ContactList = Object.keys(cachedContacts).reduce(
+                        (acc, group) => {
+                            acc.list[group] = cachedContacts[group]
+                            acc.total += cachedContacts[group].length
+                            return acc
+                        },
+                        { list: {}, total: 0 } as ContactList
+                    )
 
                     setContactList(formattedContactList)
                     setOriginalContactList(formattedContactList)
@@ -117,40 +118,42 @@ const ContactListPage = () => {
     )
 
     return (
-        <div
-            id="scrollableDiv"
+        <Layout
             style={{
-                height: 600,
-                width: '100%',
-                overflow: 'auto'
+                backgroundColor: 'white'
             }}
         >
-            <Input
-                status="warning"
-                onChange={handleSearch}
-                prefix={
-                    <SearchOutlined
-                        style={{
-                            color: 'rgba(0,0,0,.25)',
-                            paddingRight: '10px'
-                        }}
-                    />
-                }
-                placeholder="搜索"
-                allowClear
-                variant="borderless"
-            />
-            <Divider
+            <Header
                 style={{
-                    marginTop: '10px',
-                    marginBottom: '0px'
+                    padding: '0 0px',
+                    backgroundColor: 'white'
                 }}
-                type="horizontal"
-            ></Divider>
-
-            {data.length === 0 && !searchLoading ? (
-                <div style={{ textAlign: 'center', marginTop: '20px' }}>无结果</div>
-            ) : (
+            >
+                <Input
+                    status="warning"
+                    onChange={handleSearch}
+                    prefix={
+                        <SearchOutlined
+                            style={{
+                                color: 'rgba(0,0,0,.25)',
+                                paddingRight: '10px'
+                            }}
+                        />
+                    }
+                    placeholder="搜索"
+                    allowClear
+                    variant="borderless"
+                />
+            </Header>
+            <Content
+                id="scrollableDiv"
+                style={{
+                    height: 500,
+                    width: '100%',
+                    overflow: 'auto',
+                    marginBottom: '10px'
+                }}
+            >
                 <InfiniteScroll
                     dataLength={contactList.total}
                     next={loadMoreData}
@@ -168,17 +171,101 @@ const ContactListPage = () => {
                                     <List.Item key={c.email}>
                                         <List.Item.Meta
                                             avatar={<Avatar size={40} src={c.avatar} />}
-                                            title={c.nickname}
+                                            title={c.preferences.remark || c.nickname}
                                             description={c.signature}
                                         />
                                     </List.Item>
                                 )}
                             />
+                            {/* TODO: 分组之间应该要有一个更长的分隔符 */}
+                            {/* {index !== data.length - 1 && <Divider />} */}
                         </div>
                     ))}
                 </InfiniteScroll>
-            )}
-        </div>
+            </Content>
+            <Footer
+                style={{
+                    padding: '0 0px',
+                    backgroundColor: 'white',
+                    textAlign: 'left'
+                }}
+            >
+                <Button type="text">添加</Button>
+            </Footer>
+        </Layout>
+
+        // TODO: 上面是antd布局，下面是原生布局
+
+        // <div>
+        //     {/* 头部：联系人搜索框 */}
+        //     <div style={{ marginBottom: '10px' }}>
+        //         <Input
+        //             status="warning"
+        //             onChange={handleSearch}
+        //             prefix={
+        //                 <SearchOutlined
+        //                     style={{
+        //                         color: 'rgba(0,0,0,.25)',
+        //                         paddingRight: '10px'
+        //                     }}
+        //                 />
+        //             }
+        //             placeholder="搜索"
+        //             allowClear
+        //             variant="borderless"
+        //         />
+        //     </div>
+
+        //     {/* 中部：联系人列表 */}
+        //     <div
+        //         id="scrollableDiv"
+        //         style={{
+        //             height: 500,
+        //             width: '100%',
+        //             overflow: 'auto',
+        //             marginBottom: '10px'
+        //         }}
+        //     >
+        //         {data.length === 0 && !searchLoading ? (
+        //             <div style={{ textAlign: 'center', marginTop: '20px' }}>无结果</div>
+        //         ) : (
+        //             <InfiniteScroll
+        //                 dataLength={contactList.total}
+        //                 next={loadMoreData}
+        //                 loader={searchLoading && <Skeleton avatar paragraph={{ rows: 1 }} active />}
+        //                 hasMore={contactList.total < 50}
+        //                 endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+        //                 scrollableTarget="scrollableDiv"
+        //             >
+        //                 {data.map((item, index) => (
+        //                     <div className="my-3" key={index}>
+        //                         {item.key}
+        //                         <List
+        //                             dataSource={item.list}
+        //                             renderItem={(c) => (
+        //                                 <List.Item key={c.email}>
+        //                                     <List.Item.Meta
+        //                                         avatar={<Avatar size={40} src={c.avatar} />}
+        //                                         title={c.preferences.remark || c.nickname}
+        //                                         description={c.signature}
+        //                                     />
+        //                                 </List.Item>
+        //                             )}
+        //                         />
+        //                         {/* {index !== data.length - 1 && <Divider />} */}
+        //                     </div>
+        //                 ))}
+        //             </InfiniteScroll>
+        //         )}
+        //     </div>
+
+        //     {/* 底部按钮 */}
+        //     <div style={{ textAlign: 'left' }}>
+        //         <Button type="text" onClick={() => {}}>
+        //             添加
+        //         </Button>
+        //     </div>
+        // </div>
     )
 }
 
