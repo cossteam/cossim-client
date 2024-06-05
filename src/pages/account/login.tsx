@@ -31,13 +31,6 @@ const Login: React.FC = () => {
     }, [location.state, form])
 
     const onFinish = async (values: any) => {
-        console.log('Received values of form: ', values)
-        showNotification({
-            avatar: 'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp',
-            title: '登录成功',
-            content: '欢迎回来，这里是热海供水管理系统'
-        })
-        return
         setLoading(true)
         try {
             const res = await userStore.login({
