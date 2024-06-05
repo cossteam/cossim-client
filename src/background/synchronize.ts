@@ -1,6 +1,7 @@
 import { getDialogListApi } from '@/api/msg'
 import { getFriendListApi } from '@/api/relation'
 import { QueryParams } from '@/types/api'
+import { ContactData } from '@/types/storage'
 
 export async function getDialogList(params: Required<QueryParams>) {
     const res = await getDialogListApi(params)
@@ -13,6 +14,7 @@ export async function getDialogList(params: Required<QueryParams>) {
 export async function getFriendList() {
     const res = await getFriendListApi()
     if (res.code !== 200) return
+    storage.contact_list.bulkPut(Object.values(res.data.list).flat() as ContactData[])
     return res.data
 }
 
