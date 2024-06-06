@@ -33,22 +33,14 @@ const Login: React.FC = () => {
     const onFinish = async (values: any) => {
         setLoading(true)
         try {
-            const res = await userStore.login({
+            await userStore.login({
                 driver_id: createFingerprint(),
                 driver_token: 'ff1005',
                 email: values.email,
                 password: values.password,
                 platform: 'android'
             })
-            if (res.code !== 200) throw new Error(res.msg)
-            // 暂时注释
-            // 跳转在 src/hooks/useLogin.ts 做处理了
-            // navigate('/dashboard', {
-            //     replace: true
-            // })
         } catch (error: any) {
-            console.log('error ->', error)
-
             showToast(error, { type: 'error' })
         } finally {
             setLoading(false)

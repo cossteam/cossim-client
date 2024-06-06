@@ -13,7 +13,6 @@ const MessageContent: React.FC<MessageContentProps> = ({ messages, start = 0 }) 
     const parentRef = useRef<HTMLDivElement>(null)
     const [, height] = useElementSize(parentRef)
 
-    // =================== 渲染消息列表（判断是否翻转消息列表） ===================
     const renderItem = useCallback(
         (item: Message) => {
             return <MessageItem message={item} key={item.msg_id} item-key={item.msg_id} />

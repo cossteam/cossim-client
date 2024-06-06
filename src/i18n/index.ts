@@ -12,29 +12,22 @@ export const langs = [
 export const languages = langs.map((lang) => lang.code)
 export const defaultLanguage = 'zh'
 
-export default (async () => {
-    const locales = await Promise.all(
-        languages.map(async (key) => {
-            const translationModule = await import(`./locales/${key}.json`)
-            return {
-                [key]: {
-                    translation: translationModule.default
-                }
-            }
-        })
-    ).then((translations) => translations.reduce((acc, cur) => Object.assign(acc, cur), {}))
-
+export const languageInit = async () => {
     i18next.use(LanguageDetector).init({
         detection: {
             lookupLocalStorage: LANG
         },
-        resources: locales,
+        // resources: locales,
         fallbackLng: defaultLanguage,
         // debug: false,
         interpolation: {
             escapeValue: false
         }
     })
-})()
+    for (const key of languages) {
+        const translationModule = await import(`./locales/${key}.json`)
+        i18next.addResourceBundle(key, 'translation', translationModule.default, true, true)
+    }
+}
 
 export const $t = i18next.t

@@ -94,5 +94,6 @@
     "请求": "ask",
     "登录过期": "Login expired",
     "响应": "response",
-    "取消重复请求": "Cancel duplicate request"
+    "取消重复请求": "Cancel duplicate request",
+    "聊天": "chat"
 }

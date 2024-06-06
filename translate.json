@@ -3,11 +3,7 @@
     "strict": false,
     "filePath": "./",
     "targetPath": "/src/i18n/locales",
-    "languageList": [
-        "ZH",
-        "EN",
-        "TC"
-    ],
+    "languageList": ["ZH", "EN", "TC"],
     "channel": "google",
     "appKey": "",
     "secretKey": "",
@@ -25,13 +21,5 @@
         "i18n",
         "locales"
     ],
-    "fileSuffix": [
-        ".vue",
-        ".html",
-        ".js",
-        ".ts",
-        ".php",
-        "jsx",
-        "tsx"
-    ]
+    "fileSuffix": [".vue", ".html", ".js", ".ts", ".php", "jsx", "tsx"]
 }

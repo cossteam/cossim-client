@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client'
 import { StrictMode } from 'react'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
-import '@/i18n'
+import { languageInit } from '@/i18n'
 import '@/styles/base.scss'
 import App from './app'
 import { showToast, showNotification } from '@/utils/prompt'
@@ -9,7 +9,7 @@ import { showToast, showNotification } from '@/utils/prompt'
 /**
  * mounted window
  */
-const mountedWindow = () => {
+const mountedWindow = async () => {
     window.storage = undefined
     window.showToast = showToast
     window.showNotification = showNotification
@@ -18,7 +18,7 @@ const mountedWindow = () => {
 /**
  * create DOM element
  */
-const createDOMElement = () => {
+const createDOMElement = async () => {
     const Router = __IS_ELECTRON__ ? HashRouter : BrowserRouter
     ReactDOM.createRoot(document.getElementById('root')!).render(
         <StrictMode>
@@ -48,6 +48,7 @@ const safeAreaInitialization = async () => {
     }
 }
 
+languageInit()
 mountedWindow()
 createDOMElement()
 safeAreaInitialization()

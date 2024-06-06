@@ -15,7 +15,6 @@ const actions = (set: any): UserStoreMethods => ({
     login: async (params: LoginParams) => {
         try {
             const { code, data, msg } = await loginApi(params)
-            console.log(code, data)
             if (code === 200) {
                 set({
                     userId: data.user_info.user_id,
@@ -26,7 +25,6 @@ const actions = (set: any): UserStoreMethods => ({
             }
             return Promise.reject(msg)
         } catch (error) {
-            console.log('错误', error)
             return Promise.reject(error)
         }
     },

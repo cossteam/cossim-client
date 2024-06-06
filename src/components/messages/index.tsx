@@ -29,14 +29,15 @@ const Messages = () => {
 
     useEffect(() => {
         if (!id) return
-        const chatInfo = cacheStore.cacheChatList.find((item) => item.dialog_id === Number(id))
+        if (!cacheStore.cacheChatList) return
+        const chatInfo = cacheStore.cacheChatList?.find((item) => item?.dialog_id === Number(id))
         messages.update({
             chatInfo,
             // isGroup,
             receiverId: isGroup ? chatInfo?.group_id : chatInfo?.user_id,
             draft: chatInfo?.draft || ''
         })
-    }, [id])
+    }, [id, cacheStore.cacheChatList])
 
     return (
         <Flex className="container--background bg-background3 flex-1" style={{ height }} vertical align="stretch">

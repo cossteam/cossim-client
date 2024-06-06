@@ -61,3 +61,19 @@ export enum LANGUAGE_TYPE {
     /** 繁体中文 */
     TC = 'tc'
 }
+
+/** 组件切换状态 */
+export enum COMPONENT_SWITCH_STATE {
+    /** 聊天 */
+    CHAT = 0,
+    /** 联系人 */
+    CONTACT = 1
+}
+
+/** 路由 */
+export enum ROUTE {
+    /** 消息 */
+    MESSAGE = 'message',
+    /** 联系人 */
+    CONTACT = 'contact'
+}

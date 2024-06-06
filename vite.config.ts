@@ -10,14 +10,15 @@ const __IS_ANDROID__ = Capacitor.getPlatform() === 'android'
 const __IS_IOS__ = Capacitor.getPlatform() === 'ios'
 const __IS_NATIVE__ = JSON.stringify(Capacitor.isNativePlatform())
 
-const syncRoutes = ['/', '/dashboard']
-
 export default defineConfig({
     plugins: [
         react(),
         pages({
             importMode(filepath) {
-                return syncRoutes.includes(filepath) ? 'sync' : 'async'
+                if (filepath.includes('dashboard')) {
+                    return 'sync'
+                }
+                return 'async'
             }
         })
         // visualizer({ open: true })

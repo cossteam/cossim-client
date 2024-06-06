@@ -2,7 +2,6 @@ import { ConfigProvider } from 'antd'
 import { Suspense, memo, useEffect, useMemo, useState } from 'react'
 import useCommonStore from '@/stores/common'
 import Loading from '@/components/loading'
-// import { App as AppComponent } from 'antd'
 import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import { locale as dayjsLocale } from 'dayjs'
@@ -13,13 +12,13 @@ import useUserStore from '@/stores/user'
 import Cache from './cache'
 import { createStorage } from '@/storage'
 import { Toaster } from 'react-hot-toast'
+import i18next from 'i18next'
 
 const App = () => {
     const commonStore = useCommonStore()
     const userStore = useUserStore()
 
     const [locale, setLocal] = useState<Locale>(enUS)
-
     const isLogin = useMemo(() => !!userStore.token, [userStore.token])
 
     useEffect(() => {
@@ -35,6 +34,15 @@ const App = () => {
     useEffect(() => {
         if (isLogin && !storage) createStorage()
     }, [isLogin])
+
+    const [loaded, setLoaded] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (loaded) {
+            i18next.changeLanguage(commonStore.lang)
+        }
+        i18next.on('initialized', () => setLoaded(true))
+    }, [commonStore.lang, loaded])
 
     return (
         <ConfigProvider

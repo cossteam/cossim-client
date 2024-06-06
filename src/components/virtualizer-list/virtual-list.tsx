@@ -28,7 +28,7 @@ interface VirtualListProps<T = any> {
      * }
      * ```
      */
-    renderItem: (item: Message) => React.ReactNode
+    renderItem: (item: T) => React.ReactNode
     /**
      * 每次加载的条数
      * @default 20

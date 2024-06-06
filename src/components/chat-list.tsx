@@ -1,27 +1,24 @@
-import { Avatar, Flex, Badge, List, Typography } from 'antd'
-import React, { useCallback, useMemo } from 'react'
+import { Avatar, Flex, Badge, List, Typography, Skeleton } from 'antd'
+import { useCallback, useMemo, useRef } from 'react'
 import { formatTime } from '@/utils/format-time'
-import { headerHeight } from '@/components/layout/layout-header'
 import { useNavigate, useParams } from 'react-router-dom'
 import clsx from 'clsx'
-import VirtualizerList from '@/components/virtualizer-list'
-import useMobile from '@/hooks/useMobile'
 import { $t } from '@/i18n'
-
-interface ChatListProps {
-    data: ChatData[]
-    height?: number
-}
+import { useElementSize } from '@reactuses/core'
+import useCacheStore from '@/stores/cache'
+// import { Virtuoso } from 'react-virtuoso'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 // TODO: 1、时间、置顶排序 2、删除列表项  3、聊天列表项右侧功能按钮（待定）
-const ChatList: React.FC<ChatListProps> = (props) => {
-    const { height } = useMobile()
+const ChatList = () => {
     const navigate = useNavigate()
     const params = useParams()
+    const listRef = useRef<HTMLDivElement>(null)
+    const [width] = useElementSize(listRef)
+    const cacheStore = useCacheStore()
 
     const renderItem = useCallback(
-        (index: number) => {
-            const chat = props.data[index]
+        (chat: ChatData) => {
             return (
                 <List.Item
                     className={clsx(
@@ -30,7 +27,7 @@ const ChatList: React.FC<ChatListProps> = (props) => {
                     )}
                     key={chat.dialog_id}
                     extra={<ChatListItemExtra chat={chat} />}
-                    onClick={() => navigate(`/dashboard/${chat.dialog_id}`)}
+                    onClick={() => navigate(`/dashboard/message/${chat.dialog_id}`)}
                 >
                     <List.Item.Meta
                         avatar={<ChatListItemAvatar chat={chat} />}
@@ -40,17 +37,37 @@ const ChatList: React.FC<ChatListProps> = (props) => {
                 </List.Item>
             )
         },
-        [params.id, props.data]
+        [params.id, cacheStore.cacheChatList]
     )
 
+    const count = useMemo(() => cacheStore.cacheChatList?.length || 0, [cacheStore.cacheChatList])
+
+    const loadMoreData = () => {}
+
     return (
-        <List>
-            <VirtualizerList
-                listHeight={height - headerHeight}
-                count={props.data?.length || 0}
-                renderItem={renderItem}
-            />
-        </List>
+        <Flex className="flex-1 overflow-y-auto w-full" id="scrollableDiv" ref={listRef}>
+            <InfiniteScroll
+                style={{ width }}
+                dataLength={count}
+                next={loadMoreData}
+                hasMore={false}
+                loader={<Skeleton className="px-3" avatar paragraph={{ rows: 1 }} active />}
+                scrollableTarget="scrollableDiv"
+            >
+                <List className="w-full" dataSource={cacheStore.cacheChatList} renderItem={renderItem} />
+            </InfiniteScroll>
+        </Flex>
+        // // <Flex className="flex-1" ref={listRef} vertical>
+        //     {/* <List className="w-full h-full flex-1">
+        //         <Virtuoso
+        //             className="w-full h-full"
+        //             style={{ height }}
+        //             height={height}
+        //             data={cacheStore.cacheChatList}
+        //             itemContent={(_, item) => renderItem(item)}
+        //         />
+        //     </List> */}
+        // // </Flex>
     )
 }
 

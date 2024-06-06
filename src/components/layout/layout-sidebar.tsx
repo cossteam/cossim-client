@@ -3,10 +3,13 @@ import ChatList from '@/components/chat-list'
 import LayoutHeader from './layout-header'
 import { Flex } from 'antd'
 import { memo } from 'react'
-import useCacheStore from '@/stores/cache'
+import LayoutFooter from './layout-footer'
+import { ROUTE } from '@/utils/enum'
+import ContactList from '@/components/contact-list'
+import { useParams } from 'react-router-dom'
 
 const LayoutSidebar = () => {
-    const cacheStore = useCacheStore()
+    const params = useParams()
 
     return (
         <Flex
@@ -17,7 +20,8 @@ const LayoutSidebar = () => {
             vertical
         >
             <LayoutHeader />
-            <ChatList data={cacheStore.cacheChatList} />
+            {params.type === ROUTE.MESSAGE ? <ChatList /> : <ContactList />}
+            <LayoutFooter />
         </Flex>
     )
 }

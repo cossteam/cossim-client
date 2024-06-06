@@ -1,7 +1,7 @@
 import { isSelf } from '@/utils/message'
 import { Avatar, Flex } from 'antd'
 import clsx from 'clsx'
-import { forwardRef, useMemo } from 'react'
+import { forwardRef, memo, useMemo } from 'react'
 
 interface MessageItemProps {
     message: Message
@@ -45,4 +45,4 @@ const MessageItem: React.ForwardRefRenderFunction<HTMLDivElement, MessageItemPro
 
 MessageItem.displayName = 'MessageItem'
 
-export default forwardRef(MessageItem)
+export default memo(forwardRef(MessageItem))

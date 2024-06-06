@@ -31,3 +31,5 @@ release
 #build-android
 release.jks
 release.jks.base64
+
+translate.local.json
