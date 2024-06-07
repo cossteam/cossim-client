@@ -115,12 +115,13 @@ const ContactListPage = () => {
         [originalContactList]
     )
 
-    const handleAddClick = () => {
-        console.log('handleAddClick')
+    const handleClick = (item: any) => {
+        console.log('item', item)
     }
+
     return (
         <Layout className="h-[600px] bg-white">
-            <Header className="p-0 bg-white">
+            {/* <Header className="p-0 bg-white">
                 <Input
                     className="p-0"
                     status="warning"
@@ -130,8 +131,8 @@ const ContactListPage = () => {
                     allowClear
                     variant="borderless"
                 />
-            </Header>
-            <Content id="scrollableDiv" className="flex-1 overflow-auto mb-2">
+            </Header> */}
+            <Content id="scrollableDiv" className="flex-1 overflow-auto px-5">
                 <InfiniteScroll
                     dataLength={contactList.total}
                     next={loadMoreData}
@@ -146,7 +147,12 @@ const ContactListPage = () => {
                             <List
                                 dataSource={item.list}
                                 renderItem={(c) => (
-                                    <List.Item key={c.email}>
+                                    <List.Item
+                                        key={c.email}
+                                        onClick={() => {
+                                            handleClick(c)
+                                        }}
+                                    >
                                         <List.Item.Meta
                                             avatar={<Avatar size={40} src={c.avatar} />}
                                             title={c.preferences?.remark || c.nickname}
@@ -161,11 +167,6 @@ const ContactListPage = () => {
                     ))}
                 </InfiniteScroll>
             </Content>
-            <Footer className="p-0 bg-white">
-                <Button type="text" onClick={handleAddClick}>
-                    添加
-                </Button>
-            </Footer>
         </Layout>
 
         // TODO: 上面是antd布局，下面是原生布局
