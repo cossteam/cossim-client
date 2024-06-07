@@ -112,14 +112,14 @@ export interface Preferences {
 export interface Contact {
     avatar: string
     coss_id: string
-    dialog_id: number
+    dialog_id?: number
     email: string
     nickname: string
-    preferences: Preferences
-    relation_status: number
+    preferences?: Preferences
+    relation_status?: number
     signature: string
-    status: number
-    tel: string
+    status?: number
+    tel?: string
     user_id: string
 }
 
