@@ -18,6 +18,8 @@ import useUserStore from '@/stores/user'
 import { useNavigate } from 'react-router-dom'
 import { createFingerprint } from '@/utils/fingerprint'
 import { getUserInfoApi } from '@/api/user'
+import AddContact from '@/components/add-contact'
+import { tr } from '@faker-js/faker'
 
 interface Menus {
     icon: React.ForwardRefExoticComponent<any>
@@ -81,13 +83,46 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
                 component: <ContactList />
             },
             {
+                icon: UserOutlined,
+                title: $t('添加联系人'),
+                component: (
+                    <AddContact
+                        onClick={(item: any) => {
+                            console.log('添加联系人', item)
+                            // setIs(true)
+                        }}
+                    />
+                )
+            },
+            {
                 icon: SettingOutlined,
                 title: $t('设置'),
                 component: <SettingList />
+            },
+            {
+                icon: SettingOutlined,
+                title: $t('好友信息'),
+                component: <s />
             }
         ],
         []
     )
+
+    const [is, setIs] = useState(false)
+
+    const s = () => {
+        return (
+            <Modal
+                wrapClassName="ant-modal-content-p-0"
+                open={modalOpen}
+                title={<div className="text-center pt-4">ss</div>}
+                onCancel={() => setModalOpen(false)}
+                footer={null}
+            >
+                <div>wbnj</div>
+            </Modal>
+        )
+    }
 
     const [activeIndex, setActiveIndex] = useState<number>(0)
     const handlerMenusClick = (item: Menus, index: number) => {
@@ -185,7 +220,13 @@ const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
                 </Flex>
             </Drawer>
 
-            <Modal open={modalOpen} title={modalTitle} onCancel={() => setModalOpen(false)} footer={null}>
+            <Modal
+                wrapClassName="ant-modal-content-p-0"
+                open={modalOpen}
+                title={<div className="text-center pt-4">{modalTitle}</div>}
+                onCancel={() => setModalOpen(false)}
+                footer={null}
+            >
                 {Component}
             </Modal>
 
