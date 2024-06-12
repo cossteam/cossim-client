@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useMemo } from 'react'
 import useCacheStore from '@/stores/cache'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { isGroupDialog } from '@/utils/message'
 
 const Messages = () => {
     const { height } = useMobile()
@@ -17,7 +18,7 @@ const Messages = () => {
     const cacheStore = useCacheStore()
 
     // TODO: 判断正确的 group_id 和 user_id
-    const isGroup = useMemo(() => messages.chatInfo?.user_id, [messages.chatInfo])
+    const isGroup = useMemo(() => messages.chatInfo && isGroupDialog(messages.chatInfo), [messages.chatInfo])
 
     const messageList =
         useLiveQuery(() => {
@@ -26,6 +27,10 @@ const Messages = () => {
                 ? storage.group_messages.where('dialog_id').equals(Number(id)).toArray()
                 : storage.private_messages.where('dialog_id').equals(Number(id)).toArray()
         }, [isGroup, id]) ?? []
+
+    useEffect(() => {
+        console.log('messageList', messageList)
+    }, [messageList])
 
     useEffect(() => {
         if (!id) return

@@ -167,3 +167,11 @@ export interface ShowDialogParams {
      */
     show: boolean
 }
+
+/**
+ * model.AfterMsg
+ */
+export interface GetBehindMessagesParams {
+    dialog_id?: number
+    msg_id?: number
+}

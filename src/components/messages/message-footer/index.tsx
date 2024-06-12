@@ -6,7 +6,6 @@ import { useState } from 'react'
 import MessageEmojis from './message-emojis'
 import useMobile from '@/hooks/useMobile'
 import MessageInput from './message-input'
-import { $t } from '@/i18n'
 
 const MessageFooter = () => {
     const [open, setOpen] = useState<boolean>(false)
@@ -15,22 +14,12 @@ const MessageFooter = () => {
 
     return (
         <Flex className="bg-background px-3 max-h-[300px] py-3" align="end">
-            <IconButton
-                className="text-2xl text-gray-500"
-                component={PaperClipOutlined}
-                hover={false}
-                active={false}
-            />
+            <IconButton className="text-2xl text-gray-500" component={PaperClipOutlined} hover={false} active={false} />
 
-            <MessageInput placeholder={$t('输入消息...')} />
+            <MessageInput />
 
             {isMobile ? (
-                <IconButton
-                    className="text-2xl text-gray-500"
-                    component={MehOutlined}
-                    hover={false}
-                    active={false}
-                />
+                <IconButton className="text-2xl text-gray-500" component={MehOutlined} hover={false} active={false} />
             ) : (
                 <Popover
                     content={<MessageEmojis />}
@@ -53,18 +42,8 @@ const MessageFooter = () => {
                     </a>
                 </Popover>
             )}
-            <IconButton
-                className="text-2xl text-gray-500"
-                component={PlusOutlined}
-                hover={false}
-                active={false}
-            />
-            <IconButton
-                className="text-2xl text-primary"
-                component={SendIcon}
-                hover={false}
-                active={false}
-            />
+            <IconButton className="text-2xl text-gray-500" component={PlusOutlined} hover={false} active={false} />
+            <IconButton className="text-2xl text-primary" component={SendIcon} hover={false} active={false} />
             {/* <IconButton className="text-2xl text-primary" component={AudioIcon} hover={false} active={false} /> */}
         </Flex>
     )

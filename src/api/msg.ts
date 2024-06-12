@@ -1,6 +1,6 @@
 // TODO: 从 master-bak 分支对照修改接口
 import request from '@/utils/request'
-import { QueryParams } from '@/types/api'
+import { GetBehindMessagesParams, QueryParams } from '@/types/api'
 
 const baseUrl = '/msg'
 
@@ -148,20 +148,20 @@ export function getDialogListApi(params: Required<QueryParams>): Promise<Respons
 //     })
 // }
 
-// /**
-//  * 获取指定对话落后的消息
-//  *
-//  * @param {*} data
-//  * @param {*} data.dialog_id
-//  * @param {*} data.msg_id
-//  */
-// export function getBehindMessageApi(data: GetBehindMessage[]): Promise<ResponseData> {
-//     return request({
-//         url: `${baseUrl}/dialog/after`,
-//         method: 'POST',
-//         data
-//     })
-// }
+/**
+ * 获取指定对话落后的消息
+ *
+ * @param {*} data
+ * @param {*} data.dialog_id
+ * @param {*} data.msg_id
+ */
+export function getBehindMessageApi(data: GetBehindMessagesParams[]): Promise<ResponseData> {
+    return request({
+        url: `${baseUrl}/dialog/after`,
+        method: 'POST',
+        data
+    })
+}
 
 // /**
 //  * 获取私聊消息

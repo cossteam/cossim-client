@@ -4,21 +4,17 @@ import { useEffect, useMemo } from 'react'
 
 const ToLogin = () => {
     const navigate = useNavigate()
-
     useEffect(() => {
         navigate('/account/login')
     }, [])
-
     return null
 }
 
 const ToPages = () => {
     const navigate = useNavigate()
-
     useEffect(() => {
         navigate('/')
     }, [])
-
     return null
 }
 
