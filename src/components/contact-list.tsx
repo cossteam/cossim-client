@@ -90,8 +90,6 @@ const ContactListPage = () => {
                 return
             }
 
-            setSearchLoading(true) // 开始搜索，显示Skeleton
-
             const filteredList = { list: {}, total: 0 }
 
             for (const key in originalContactList.list) {
@@ -117,43 +115,24 @@ const ContactListPage = () => {
         [originalContactList]
     )
 
+    const handleClick = (item: any) => {
+        console.log('item', item)
+    }
+
     return (
-        <Layout
-            style={{
-                backgroundColor: 'white'
-            }}
-        >
-            <Header
-                style={{
-                    padding: '0 0px',
-                    backgroundColor: 'white'
-                }}
-            >
+        <Layout className="h-[600px] bg-white">
+            {/* <Header className="p-0 bg-white">
                 <Input
+                    className="p-0"
                     status="warning"
                     onChange={handleSearch}
-                    prefix={
-                        <SearchOutlined
-                            style={{
-                                color: 'rgba(0,0,0,.25)',
-                                paddingRight: '10px'
-                            }}
-                        />
-                    }
+                    prefix={<SearchOutlined className="text-gray-400 pr-2" />}
                     placeholder="搜索"
                     allowClear
                     variant="borderless"
                 />
-            </Header>
-            <Content
-                id="scrollableDiv"
-                style={{
-                    height: 500,
-                    width: '100%',
-                    overflow: 'auto',
-                    marginBottom: '10px'
-                }}
-            >
+            </Header> */}
+            <Content id="scrollableDiv" className="flex-1 overflow-auto px-5">
                 <InfiniteScroll
                     dataLength={contactList.total}
                     next={loadMoreData}
@@ -168,10 +147,15 @@ const ContactListPage = () => {
                             <List
                                 dataSource={item.list}
                                 renderItem={(c) => (
-                                    <List.Item key={c.email}>
+                                    <List.Item
+                                        key={c.email}
+                                        onClick={() => {
+                                            handleClick(c)
+                                        }}
+                                    >
                                         <List.Item.Meta
                                             avatar={<Avatar size={40} src={c.avatar} />}
-                                            title={c.preferences.remark || c.nickname}
+                                            title={c.preferences?.remark || c.nickname}
                                             description={c.signature}
                                         />
                                     </List.Item>
@@ -183,15 +167,6 @@ const ContactListPage = () => {
                     ))}
                 </InfiniteScroll>
             </Content>
-            <Footer
-                style={{
-                    padding: '0 0px',
-                    backgroundColor: 'white',
-                    textAlign: 'left'
-                }}
-            >
-                <Button type="text">添加</Button>
-            </Footer>
         </Layout>
 
         // TODO: 上面是antd布局，下面是原生布局
