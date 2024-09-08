@@ -15,7 +15,7 @@ const initialState: UserState = {
     driverId: ''
 }
 
-export const useUserStore = createPersistStore(
+export const useAuthStore = createPersistStore(
     initialState,
     (set, get) => ({
         // async logout(driverId: string): Promise<ResponseData> {

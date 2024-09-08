@@ -1,17 +1,17 @@
 import { Suspense } from 'react'
-import Loading from '@/components/loading'
+import { Loading } from '@/ui/loading'
 import { Toaster } from 'react-hot-toast'
-import Router from './router'
 import withAuth from './components/with-auth'
+import { useRoutes } from 'react-router-dom'
+import routes from '~react-pages'
 
 const App = () => {
+    const router = useRoutes(routes)
     return (
-        <>
-            <Suspense fallback={<Loading />}>
-                <Router />
-            </Suspense>
+        <Suspense fallback={<Loading />}>
+            {router}
             <Toaster />
-        </>
+        </Suspense>
     )
 }
 
