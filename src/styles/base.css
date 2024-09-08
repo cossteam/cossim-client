@@ -1,3 +1,4 @@
+@import url('../assets/font/font.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -45,4 +46,19 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 142.4 71.8% 29.2%;
+}
+
+@layer base {
+    body {
+        @apply bg-background text-foreground;
+        font-family:
+            '思源宋体-medium',
+            '方正仿宋',
+            '微软雅黑',
+            '方正书宋简体',
+            '站酷快乐体',
+            '手书体',
+            system-ui,
+            -apple-system;
+    }
 }

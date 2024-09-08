@@ -1,5 +1,7 @@
 import { cn } from '@/lib/utils'
 import style from '@/styles/form-background.module.css'
+import { buttonVariants } from '@/ui/button'
+import { Link } from 'react-router-dom'
 
 export interface FormBackgroundProps {
     children: React.ReactNode
@@ -50,11 +52,33 @@ export const FormBackground: React.FC<FormBackgroundProps> = ({ children, type =
                         <div className="mt-5 text-sm text-gray-500">
                             {type === 'sign-in' ? (
                                 <div className="flex justify-between">
-                                    <p>没有账号？注册</p>
+                                    <p>
+                                        没有账号？
+                                        <Link
+                                            className={buttonVariants({
+                                                variant: 'link',
+                                                size: 'link'
+                                            })}
+                                            to="/sign-up"
+                                        >
+                                            注册
+                                        </Link>
+                                    </p>
                                     <p>找回密码</p>
                                 </div>
                             ) : (
-                                <div>已有账号？ 登录</div>
+                                <div>
+                                    已有账号？
+                                    <Link
+                                        className={buttonVariants({
+                                            variant: 'link',
+                                            size: 'link'
+                                        })}
+                                        to="/sign-in"
+                                    >
+                                        登录
+                                    </Link>{' '}
+                                </div>
                             )}
                         </div>
                     </div>

@@ -9,6 +9,8 @@ import { useCallback, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { cn, createFingerprint } from '@/lib/utils'
 import { loginApi } from '@/api/user'
+import { useAuthStore } from '@/stores/auth'
+import { useNavigate } from 'react-router-dom'
 
 const Validator = z.object({
     email: z
@@ -42,10 +44,17 @@ function SignInPage() {
         [errors]
     )
 
+    const update = useAuthStore((state) => state.update)
+    const navigate = useNavigate()
+
     const [loading, setLoading] = useState<boolean>(false)
     const onSubmit = async (values: TValidator) => {
         console.log('login', values)
         setLoading(true)
+        // 假登录
+        update({ token: 'token123' })
+        navigate('/')
+        return
         try {
             const driverId = createFingerprint()
             const { code, data, msg } = await loginApi({
