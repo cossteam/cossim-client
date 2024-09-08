@@ -5,7 +5,7 @@ const config = {
     darkMode: ['class'],
     theme: {
     	container: {
-    		center: 'true',
+    		center: true,
     		padding: '2rem',
     		screens: {}
     	},
