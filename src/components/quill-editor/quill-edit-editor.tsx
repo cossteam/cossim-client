@@ -1,7 +1,7 @@
 import Quill from 'quill'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import 'quill/dist/quill.core.css'
-import '@/styles/quill.scss'
+// import '@/styles/quill.scss'
 import { $t } from '@/i18n'
 
 interface QuillEditEditorProps {
