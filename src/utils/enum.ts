@@ -75,5 +75,7 @@ export enum ROUTE {
     /** 消息 */
     MESSAGE = 'message',
     /** 联系人 */
-    CONTACT = 'contact'
+    CONTACT = 'contact',
+    /** 设置 **/
+    SETTING = 'setting',
 }
