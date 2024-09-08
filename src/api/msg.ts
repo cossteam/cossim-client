@@ -1,5 +1,5 @@
 // TODO: 从 master-bak 分支对照修改接口
-import request from '@/utils/request'
+import request from '@/lib/request'
 import { GetBehindMessagesParams, QueryParams } from '@/types/api'
 
 const baseUrl = '/msg'

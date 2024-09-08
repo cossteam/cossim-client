@@ -1,7 +1,7 @@
 // import { Navigate } from 'react-router-dom'
 
-const Home = () => {
+const HomePage = () => {
     return 'Home'
 }
 
-export default Home
+export default HomePage

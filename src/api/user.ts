@@ -9,7 +9,7 @@ import type {
     UserInfoQueryParams,
     UserPublicKeyQueryParams
 } from '@/types/api'
-import request from '@/utils/request'
+import request from '@/lib/request'
 
 const baseUrl: string = '/user'
 

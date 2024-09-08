@@ -26,7 +26,7 @@ const Validator = z.object({
 
 export type TValidator = z.infer<typeof Validator>
 
-function SignIn() {
+function SignInPage() {
     const {
         register,
         handleSubmit,
@@ -114,4 +114,4 @@ function SignIn() {
     )
 }
 
-export default SignIn
+export default SignInPage

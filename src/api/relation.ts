@@ -1,7 +1,7 @@
 // TODO: 从 master-bak 分支对照修改接口
 
 import { AddFriendParams, ManageFriendRequestParams, QueryParams, ShowDialogParams, TopDialogParams } from '@/types/api'
-import request from '@/utils/request'
+import request from '@/lib/request'
 
 const baseUrl = '/relation/user'
 const relationDialog = '/relation/dialog'
