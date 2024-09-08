@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
-import useUserStore from '@/stores/user'
+// import useUserStore from '@/stores/user'
 import { RESPONSE_CODE } from '@/utils/enum'
 import PGPUtils from '@/utils/pgp'
 import useRequestStore from '@/stores/request'
@@ -79,8 +79,8 @@ service.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
         const requestStore = useRequestStore.getState()
         config.baseURL = requestStore.config.baseUrl
-        const token = useUserStore.getState().token
-        if (token) config.headers['Authorization'] = 'Bearer ' + token
+        // const token = useUserStore.getState().token
+        // if (token) config.headers['Authorization'] = 'Bearer ' + token
         /////////////////////////////////////////////////////////////////////////////////////////////
         // PGP 加密 Start
         /////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,12 +115,12 @@ service.interceptors.response.use(
     async (response: AxiosResponse) => {
         // 获取错误码
         const code = response.data.code || 200
-        const userStore = useUserStore.getState()
+        // const userStore = useUserStore.getState()
         // code 的取值根据后台返回为准
         switch (code) {
             case RESPONSE_CODE.Unauthorized:
                 console.log('登录过期')
-                userStore.clear()
+                // userStore.clear()
                 break
         }
         /////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,12 +150,12 @@ service.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response) {
             if (error.response.status === 401) {
-                useUserStore().update({
-                    userId: '',
-                    userInfo: '',
-                    token: ''
-                })
-                location.reload()
+                // useUserStore().update({
+                //     userId: '',
+                //     userInfo: '',
+                //     token: ''
+                // })
+                // location.reload()
                 return Promise.reject(error)
             }
         }

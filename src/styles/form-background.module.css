@@ -1,0 +1,25 @@
+.form-background {
+    background: linear-gradient(to bottom, #f1f4f9, #dff1ff);
+}
+
+.form-color {
+    @apply absolute blur-[200px] rounded-full;
+}
+
+.form-circle {
+    @apply absolute bg-black/10 backdrop-blur-sm border border-white/50 border-r-white/20 border-b-white/20 rounded-full;
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+    filter: hue-rotate(calc(var(--x) * 70deg));
+    animation: animate 10s linear infinite;
+    animation-delay: calc(var(--x) * -1s);
+}
+
+@keyframes animate {
+    0%,
+    100% {
+        transform: translateY(-50px);
+    }
+    50% {
+        transform: translateY(50px);
+    }
+}

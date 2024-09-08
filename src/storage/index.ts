@@ -1,4 +1,4 @@
-import useUserStore from '@/stores/user'
+// import useUserStore from '@/stores/user'
 import type { ContactData, GroupData, GroupMemberData, RequestData } from '@/types/storage'
 import Dexie, { Table } from 'dexie'
 
@@ -25,10 +25,10 @@ export class Storage extends Dexie {
     }
 }
 
-export function createStorage(name: string = 'coss-storage', version: number = 1): Storage | undefined {
-    const userId = useUserStore.getState().userId
-    if (!userId) return
-    const storage = new Storage(`${name}-${userId}`, version)
-    window.storage = storage
-    return storage
-}
+// export function createStorage(name: string = 'coss-storage', version: number = 1): Storage | undefined {
+//     // const userId = useUserStore.getState().userId
+//     if (!userId) return
+//     const storage = new Storage(`${name}-${userId}`, version)
+//     window.storage = storage
+//     return storage
+// }

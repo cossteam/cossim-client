@@ -1,5 +1,7 @@
-import { Navigate } from 'react-router-dom'
+// import { Navigate } from 'react-router-dom'
 
-const Home = () => <Navigate to="/dashboard" replace />
+const Home = () => {
+    return 'Home'
+}
 
 export default Home
