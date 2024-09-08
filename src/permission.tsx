@@ -32,7 +32,7 @@ const BeforeRouter: React.FC<BeforeRouterProps> = ({ isLogin }) => {
     // 已经登录，访问登录页面，跳转到主页
     if (isAccountpage && isLogin) return <ToPages />
     // 未登录，访问非登录页面，跳转到登录页面
-    if (!isAccountpage && !isLogin) return <ToLogin />
+    // if (!isAccountpage && !isLogin) return <ToLogin />
 
     return routerView
 }

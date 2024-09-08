@@ -16,11 +16,13 @@ const Dialog = () => {
             case ROUTE.MESSAGE:
                 return <Message />
             case ROUTE.CONTACT:
+                console.log('params.type',params.type)
                 return <TestContact />
             default:
+                console.log('params.type',params.type)
                 return <Navigate to="/" />
         }
-    }, [params.type, params.id])
+    }, [params.type])
 
     useEffect(() => {
         if (params.type === ROUTE.MESSAGE && params.id) {

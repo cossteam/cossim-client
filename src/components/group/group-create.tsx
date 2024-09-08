@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button, Form, Input, Tooltip, Space, Divider, Avatar, List, Checkbox, Radio } from 'antd'
 import { $t } from '@/i18n'
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
-import { Contact, createGroup } from '@/mock/data'
+import { Contact } from '@/mock/data'
 import { getFriendListApi } from '@/api/relation'
 import { CreateGroupData } from '@/types/group'
 
