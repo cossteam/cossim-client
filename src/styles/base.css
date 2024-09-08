@@ -1,4 +1,5 @@
 @import url('../assets/font/font.css');
+@import url('./modal.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

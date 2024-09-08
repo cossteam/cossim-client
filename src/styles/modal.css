@@ -1,0 +1,22 @@
+.ant-modal-content-p-0 .ant-modal-content  {
+    padding: 0;
+}
+
+.ant-card-body-p-0 .ant-card-body {
+    padding: 0;
+}
+
+.ant-modal-content-pb-0 .ant-modal-content {
+    padding-bottom: 0;
+}
+
+.ant-modal-content-pt0 .ant-modal-content {
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+.ant-modal-content-prl0 .ant-modal-content {
+    padding-right: 0;
+    padding-left: 0;
+}
