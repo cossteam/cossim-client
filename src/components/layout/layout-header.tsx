@@ -7,6 +7,7 @@ import AddContact from '../add-contact';
 import ContactList from '../contact-list';
 import GroupCreate from '../group/group-create';
 
+// 定义头部高度常量
 export const headerHeight = 64
 
 interface MenuItem {
@@ -24,6 +25,7 @@ const LayoutHeader = () => {
     const [activeComponent, setActiveComponent] = useState<JSX.Element | null>(null);
     const [modalTitle, setModalTitle] = useState('');
 
+    // 使用 useMemo 优化菜单项，避免不必要的重渲染
     const menuItems: MenuItem[] = useMemo(() => [
         {
             key: '1',
@@ -36,7 +38,7 @@ const LayoutHeader = () => {
             key: '2',
             label: '新建群组',
             icon: <UsergroupAddOutlined style={{ fontSize: '20px' }} />,
-            component: <ContactList />,
+            component: <GroupCreate />,
             title: '新建群组'
         },
         {
@@ -57,6 +59,7 @@ const LayoutHeader = () => {
         },
     ], []);
 
+    // 处理菜单点击事件
     const handleMenuClick: MenuProps['onClick'] = (e) => {
         message.info('点击了菜单项。');
         const selectedMenu = menuItems.find(menu => menu.key === e.key);
@@ -67,6 +70,7 @@ const LayoutHeader = () => {
         }
     };
 
+    // 处理模态框关闭事件
     const handleModalClose = () => {
         setIsModalVisible(false);
         setActiveComponent(null);
@@ -74,21 +78,26 @@ const LayoutHeader = () => {
 
     return (
         <>
+            {/* 头部布局 */}
             <Flex className="sticky top-0 z-10 bg-background pl-3" style={{ height: headerHeight }} align="center">
+                {/* 搜索框 */}
                 <Flex className="flex-1 bg-background2 h-8 rounded-lg px-5 cursor-pointer" align="center">
                     <div className="m-auto">
-                        <SearchOutlined className="mr-2 text-gray-500 text-base" />
-                        <Typography.Text className="text-gray-500 text-sm">{$t('搜索')}</Typography.Text>
+                        <SearchOutlined className="text-gray-500 text-base" />
+                        <Typography.Text className="text-gray-500 text-sm ">{$t('搜索')}</Typography.Text>
                     </div>
                 </Flex>
 
-                <Dropdown menu={{ items: menuItems, onClick: handleMenuClick }} trigger={['click']} placement="bottomRight" arrow={{ pointAtCenter: true }} className="text-gray-500 mr-5">
-                    <PlusOutlined style={{ fontSize: '24px' }} />
+                {/* 下拉菜单 */}
+                <Dropdown menu={{ items: menuItems, onClick: handleMenuClick }} trigger={['click']} placement="bottomRight" arrow={{ pointAtCenter: true }} className="text-gray-500 px-3">
+                    <PlusOutlined className='' style={{ fontSize: '20px' }} />
                 </Dropdown>
             </Flex>
             <Divider className="m-0" />
+            {/* 模态框 */}
             <Modal
-                title={modalTitle}
+                wrapClassName="ant-modal-content-prl0"
+                title={<div className="text-center">{modalTitle}</div>}
                 open={isModalVisible}
                 onCancel={handleModalClose}
                 footer={null}

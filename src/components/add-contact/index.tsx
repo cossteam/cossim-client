@@ -152,7 +152,7 @@ const AddContact: React.FC<AddContactProps> = ({ onClick }) => {
                 />
             </div>
             <Divider className="m-0 mt-4 w-full" />
-            <div style={{height: resultHeight, overflowY: 'auto'}} id="scrollableDiv">
+            <div className='px-5' style={{height: resultHeight, overflowY: 'auto'}} id="scrollableDiv">
                 {!searchText ? (
                     <Empty className='pt-5' description="请输入搜索内容" />
                 ) : filteredData.length === 0 ? (

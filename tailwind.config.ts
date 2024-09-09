@@ -9,12 +9,20 @@ const config = {
     		padding: '2rem',
     		screens: {}
     	},
+		screens: {
+			// mobile
+			w750: '750px',
+			mobile: '769px'
+		},
     	extend: {
     		colors: {
-    			border: 'hsl(var(--border))',
+				border: 'hsl(var(--border))',
     			input: 'hsl(var(--input))',
     			ring: 'hsl(var(--ring))',
     			background: 'hsl(var(--background))',
+				background2: 'hsl(var(--background2))',
+				background3: 'var(--background3)',
+				gradient: 'var(--gradient)',
     			foreground: 'hsl(var(--foreground))',
     			primary: {
     				DEFAULT: 'hsl(var(--primary))',
@@ -52,11 +60,14 @@ const config = {
     				'5': 'hsl(var(--chart-5))'
     			}
     		},
-    		borderRadius: {
-    			lg: 'var(--radius)',
-    			md: 'calc(var(--radius) - 2px)',
-    			sm: 'calc(var(--radius) - 4px)'
-    		},
+			borderRadius: {
+				lg: 'var(--radius)',
+				md: 'calc(var(--radius) - 2px)',
+				sm: 'calc(var(--radius) - 4px)'
+			},
+			boxShadow: {
+				custom: '0px 5px 20px 0px rgba(0, 0, 0, 0.1)'
+			},
     		keyframes: {
     			'accordion-down': {
     				from: {
