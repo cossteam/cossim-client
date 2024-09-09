@@ -65,7 +65,7 @@
     }
 
     body {
-        @apply bg-background text-foreground text-sm;
+        @apply bg-background text-foreground text-sm h-screen min-h-[450px] overflow-hidden;
         font-family:
             '思源宋体-medium',
             '方正仿宋',
@@ -75,5 +75,19 @@
             '手书体',
             system-ui,
             -apple-system;
+    }
+
+    .scroll {
+        --scroll-color: rgba(204, 204, 204, 0.5);
+        scrollbar-width: thin;
+        scrollbar-color: var(--scroll-color, #ccc);
+    }
+
+    .scroll::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .scroll::-webkit-scrollbar-thumb {
+        background-color: var(--scroll-color, #ccc);
     }
 }

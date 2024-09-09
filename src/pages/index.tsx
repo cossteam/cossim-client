@@ -49,7 +49,7 @@ const toolbarMenus = [
 const HomePage = () => {
     const location = useLocation()
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen min-h-[450px] overflow-hidden">
             <div className="bg-foreground/10 w-14 py-4 flex flex-col items-center">
                 <div className="inline-block size-8 rounded-full bg-primary relative mb-10">
                     <img className="object-cover w-full h-full rounded-full " src="https://picsum.photos/40" alt="" />

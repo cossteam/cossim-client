@@ -7,7 +7,7 @@ interface FlexboardCommonProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const FlexboardSidebar: React.FC<FlexboardCommonProps> = ({ children, className, ...props }) => (
-    <div className={cn('flex-1 h-full overflow-auto py-3', className)} {...props}>
+    <div className={cn('flex-1 h-full overflow-hidden relative', className)} {...props}>
         {children}
     </div>
 )
@@ -74,12 +74,12 @@ export const Flexboard: React.FC<FlexboardProps> = ({ children, minWidth = 200, 
         <div className="h-screen flex flex-row">
             <div
                 ref={sidebarRef}
-                className="flex-grow-0 flex-shrink-0 flex h-full border-r border-gray-200"
+                className="flex-grow-0 flex-shrink-0 flex h-full border-r border-gray-200 relative"
                 style={{ width: sidebarWidth, minWidth, maxWidth }}
             >
                 {sidebarContent}
                 <div
-                    className="flex-grow-0 flex-shrink-0 cursor-ew-resize basis-1.5 resize-x"
+                    className="flex-grow-0 flex-shrink-0 cursor-ew-resize basis-1.5 resize-x absolute -right-1 top-0 bottom-0 w-2 h-full"
                     onMouseDown={(e) => {
                         e.preventDefault()
                         startResizing()
