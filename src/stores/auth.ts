@@ -1,5 +1,5 @@
-// import { logoutApi } from '@/api/user'
 import { createPersistStore } from '@/lib/store'
+import { generateUserInfo } from '@/mock/data'
 
 interface UserState {
     userId: string
@@ -8,34 +8,19 @@ interface UserState {
     driverId: string
 }
 
+const userInfo = generateUserInfo()
+
 const initialState: UserState = {
-    userId: '',
+    userId: userInfo.user_id,
     token: '',
-    userInfo: {},
-    driverId: ''
+    userInfo,
+    driverId: '123'
 }
 
-export const useAuthStore = createPersistStore(
-    initialState,
-    (set, get) => ({
-        // async logout(driverId: string): Promise<ResponseData> {
-        //     return new Promise((resolve, reject) => {
-        //         logoutApi({ driver_id: driverId })
-        //             .then((res) => {
-        //                 set(initialState)
-        //                 resolve(res)
-        //             })
-        //             .catch((err) => {
-        //                 reject(err)
-        //             })
-        //     })
-        // }
-    }),
-    {
-        name: 'coss-user',
-        version: 1
-        // migrate(state, version) {
-        // return newState as any
-        // }
-    }
-)
+export const useAuthStore = createPersistStore(initialState, (set, get) => ({}), {
+    name: 'coss-auth',
+    version: 1
+    // migrate(state, version) {
+    // return newState as any
+    // }
+})

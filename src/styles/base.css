@@ -1,5 +1,4 @@
 @import url('../assets/font/font.css');
-@import url('./modal.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -66,7 +65,7 @@
     }
 
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground text-sm;
         font-family:
             '思源宋体-medium',
             '方正仿宋',

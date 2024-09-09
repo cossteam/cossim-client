@@ -15,9 +15,9 @@ export default defineConfig({
         react(),
         pages({
             importMode(filepath) {
-                // if (filepath.includes('dashboard')) {
-                //     return 'sync'
-                // }
+                if (filepath.includes('index')) {
+                    return 'sync'
+                }
                 return 'async'
             }
         })

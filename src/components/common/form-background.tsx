@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import style from '@/styles/form-background.module.css'
+import style from '@/styles/module/form-background.module.css'
 import { buttonVariants } from '@/ui/button'
 import { Link } from 'react-router-dom'
 

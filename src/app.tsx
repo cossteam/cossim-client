@@ -1,14 +1,14 @@
 import { Suspense } from 'react'
-import { Loading } from '@/ui/loading'
 import { Toaster } from 'react-hot-toast'
-import withAuth from './components/with-auth'
+import withAuth from './components/common/with-auth'
 import { useRoutes } from 'react-router-dom'
 import routes from '~react-pages'
+import GlobalLoading from './components/common/global-loading'
 
 const App = () => {
     const router = useRoutes(routes)
     return (
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<GlobalLoading />}>
             {router}
             <Toaster />
         </Suspense>

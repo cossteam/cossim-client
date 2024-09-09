@@ -1,4 +1,4 @@
-import { FormBackground } from '@/components/form-background'
+import { FormBackground } from '@/components/common/form-background'
 import { Button } from '@/ui/button'
 import { FieldInput } from '@/ui/field-input'
 
