@@ -39,6 +39,7 @@ const GroupCreate: React.FC = () => {
     const [alignValue, setAlignValue] = useState<'近期访问' | '联系人' | '管理的群'>('近期访问');
     const [data, setData] = useState<UserItem[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<UserItem[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>('');
 
     const ContainerHeight = 400;
     const fakeDataUrl = 'https://randomuser.me/api/?results=20&inc=name,gender,email,nat,picture&noinfo';
@@ -140,6 +141,16 @@ const GroupCreate: React.FC = () => {
         }
     }, [groupInfo, selectedUsers]);
 
+    const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+    }, []);
+
+    const filteredData = data.filter(user => 
+        user.name.first.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.name.last.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     const renderMemberModal = useCallback(() => (
         <Modal
             title={
@@ -169,6 +180,8 @@ const GroupCreate: React.FC = () => {
                 variant="filled"
                 placeholder="搜索用户"
                 prefix={<SearchOutlined />}
+                value={searchTerm}
+                onChange={handleSearch}
             />
             {/* 分段控制器：近期访问、联系人、管理的群 */}
             <div className="mt-2 mb-2">
@@ -186,7 +199,7 @@ const GroupCreate: React.FC = () => {
             {/* 用户列表 */}
             <List>
                 <VirtualList
-                    data={data}
+                    data={filteredData}
                     height={ContainerHeight}
                     itemHeight={47}
                     itemKey="email"
@@ -211,7 +224,7 @@ const GroupCreate: React.FC = () => {
                 </VirtualList>
             </List>
         </Modal>
-    ), [isModalVisible, handleModalClose, selectedUsers, alignValue, data, handleUserSelect, handleNextStep]);
+    ), [isModalVisible, handleModalClose, selectedUsers, alignValue, filteredData, handleUserSelect, handleNextStep, searchTerm, handleSearch]);
 
     // 渲染群组创建页面
     return (
