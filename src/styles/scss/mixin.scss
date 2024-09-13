@@ -1,0 +1,13 @@
+$breakpoins: (
+    xs: 320px,
+    sm: 481px,
+    md: 769px,
+    lg: 1025px
+);
+
+@mixin respond-to($breakname) {
+    $bp: map-get($breakpoins, $breakname);
+    @media (max-width: $bp) {
+        @content;
+    }
+}

@@ -58,5 +58,12 @@ export default defineConfig({
                 // assetFileNames: '[ext]/[name]-[hash].[ext]'
             }
         }
+    },
+    css: {
+        preprocessorOptions: {
+            scss: {
+                additionalData: `@import "./src/styles/scss/mixin.scss";`
+            }
+        }
     }
 })

@@ -1,6 +1,7 @@
 import { Flexboard, FlexboardSidebar, FlexboardContent } from '@/components//common/flex-board'
 import SidebarSearch from '@/components/common/sidebar-search'
-import ChatList from '@/components/messages/chat-list'
+import Chat from '@/components/chat/chat'
+import ChatList from '@/components/chat/chat-list'
 
 const ChatPage = () => {
     return (
@@ -9,7 +10,9 @@ const ChatPage = () => {
                 <SidebarSearch />
                 <ChatList />
             </FlexboardSidebar>
-            <FlexboardContent>2</FlexboardContent>
+            <FlexboardContent>
+                <Chat />
+            </FlexboardContent>
         </Flexboard>
     )
 }

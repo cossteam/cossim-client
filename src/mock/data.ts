@@ -3,9 +3,10 @@
  * 后续接入接口后删除并移除 @faker-js/faker 依赖
  * @author YuHong
  */
+import { DialogInterface } from '@/types/common'
 import { faker } from '@faker-js/faker'
 
-export const generateChatList = (count: number = 10) => {
+export const generateChatList = (count: number = 10): DialogInterface[] => {
     return Array.from({ length: count }, (_, index) => {
         const isGroup = faker.datatype.boolean()
         return {
@@ -25,6 +26,7 @@ export const generateChatList = (count: number = 10) => {
                 msg_id: faker.number.int(),
                 msg_type: faker.number.int({ min: 0, max: 10 }),
                 send_time: new Date(faker.date.recent()).getTime(),
+                send_at: new Date(faker.date.recent()).getTime(),
                 sender_id: faker.string.uuid(),
                 sender_info: {
                     user_id: faker.string.uuid(),

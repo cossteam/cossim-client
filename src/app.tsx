@@ -7,6 +7,7 @@ import GlobalLoading from './components/common/global-loading'
 
 const App = () => {
     const router = useRoutes(routes)
+
     return (
         <Suspense fallback={<GlobalLoading />}>
             {router}

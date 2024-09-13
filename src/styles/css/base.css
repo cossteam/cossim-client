@@ -1,4 +1,4 @@
-@import url('../assets/font/font.css');
+@import url('../../assets/font/font.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -67,14 +67,15 @@
     body {
         @apply bg-background text-foreground text-sm h-screen min-h-[450px] overflow-hidden;
         font-family:
+            system-ui,
+            -apple-system,
             '思源宋体-medium',
             '方正仿宋',
             '微软雅黑',
             '方正书宋简体',
             '站酷快乐体',
-            '手书体',
-            system-ui,
-            -apple-system;
+            '手书体';
+        font-weight: 400;
     }
 
     .scroll {
@@ -90,4 +91,10 @@
     .scroll::-webkit-scrollbar-thumb {
         background-color: var(--scroll-color, #ccc);
     }
+
+    .ellipsis {
+        @apply overflow-hidden whitespace-nowrap text-ellipsis;
+    }
 }
+
+

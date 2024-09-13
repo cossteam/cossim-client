@@ -86,3 +86,21 @@ export function createFingerprint() {
     canvas.remove()
     return md5(data)
 }
+
+/**
+ * 传入时间戳，返回格式化后的时间字符串
+ * @param timestamp 时间戳
+ */
+export function formatDate(timestamp: number) {
+    const date = new Date(timestamp)
+    return `${date.getHours()}:${date.getMinutes()}`
+}
+
+/**
+ * 通过浏览器内核判断是否为移动端
+ * @returns {boolean}
+ */
+export function isMobile() {
+    const ua = navigator.userAgent
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)
+}

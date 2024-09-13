@@ -33,7 +33,7 @@ const SidebarSearch = () => {
             })}
             ref={sidebarRef}
         >
-            <div className="flex w-full gap-x-2 sticky top-0 z-50 h-16 items-start">
+            <div className="flex w-full gap-x-2 sticky top-0 z-50 items-start pb-2">
                 <div className="border border-gray-300 rounded-md flex items-center px-2 gap-x-1 flex-1">
                     <Search className="size-4 text-gray-300" />
                     <Input
@@ -71,9 +71,9 @@ const SidebarSearch = () => {
             </div>
 
             {contentShow && (
-                <div className="scroll bg-background w-full h-[calc(100%-64px)] absolute top-16 z-50 left-0 px-2 overflow-x-hidden overflow-y-auto">
+                <div className="scroll bg-background w-full absolute top-16 z-50 left-0 px-2 overflow-x-hidden overflow-y-auto">
                     {!ketword && (
-                        <div className="flex items-center gap-x-2 cursor-pointer hover:bg-muted-foreground/10 p-2 rounded-md duration-300">
+                        <div className="flex items-center gap-x-2 cursor-pointer hover:bg-muted-foreground/10 active:bg-muted-foreground/10 p-2 rounded-md duration-300">
                             <div className="bg-primary/50 size-10 rounded-full flex items-center justify-center">
                                 <Search className="size-6 text-white" />
                             </div>
@@ -88,7 +88,7 @@ const SidebarSearch = () => {
                     {ketword &&
                         Array.from({ length: 20 }).map((_, index) => (
                             <div className="flex flex-col gap-y-2" key={index}>
-                                <div className="flex items-center gap-x-2 cursor-pointer hover:bg-muted-foreground/10 p-2 rounded-md duration-300">
+                                <div className="flex items-center gap-x-2 cursor-pointer hover:bg-muted-foreground/10 active:bg-muted-foreground/10 p-2 rounded-md duration-300">
                                     <div className="bg-primary/50 size-10 rounded-full flex items-center justify-center">
                                         <Search className="size-6 text-white" />
                                     </div>
