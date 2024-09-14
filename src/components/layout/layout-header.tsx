@@ -9,7 +9,7 @@ import GroupCreate from '../group/group-create';
 import { Plus, Scan, UserPlus, UsersThree, VideoCamera } from '@phosphor-icons/react';
 
 // 定义头部高度常量
-export const headerHeight = 64
+export const headerHeight = 50
 
 interface MenuItem {
     key: string;
