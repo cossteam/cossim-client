@@ -19,12 +19,16 @@ interface MenuItem {
     icon: JSX.Element;
     danger?: boolean;
     disabled?: boolean;
+    modalWidth?: number; // 新增：Modal 宽度
+    modalHeight?: number; // 新增：Modal 高度
 }
 
 const LayoutHeader = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [activeComponent, setActiveComponent] = useState<JSX.Element | null>(null);
     const [modalTitle, setModalTitle] = useState('');
+    const [modalWidth, setModalWidth] = useState(400);
+    const [modalHeight, setModalHeight] = useState<number | undefined>(undefined);
 
     // 使用 useMemo 优化菜单项，避免不必要的重渲染
     const menuItems: MenuItem[] = useMemo(() => [
@@ -33,14 +37,18 @@ const LayoutHeader = () => {
             label: '添加联系人',
             icon: <UserPlus size={24} weight="light"  />,
             component: <AddContact onClick={(item: any) => console.log('添加联系人', item)} />,
-            title: '添加联系人'
+            title: '添加联系人',
+            modalWidth: 320,
+            modalHeight: 180
         },
         {
             key: '2',
             label: '新建群组',
             icon: <UsersThree size={24} weight="light"  />,
             component: <GroupCreate />,
-            title: '新建群组'
+            title: '新建群组',
+            modalWidth: 500,
+            modalHeight: 700
         },
         {
             key: '3',
@@ -49,14 +57,17 @@ const LayoutHeader = () => {
             component: <GroupCreate />,
             title: '新建通话',
             danger: true,
-            disabled: true
+            disabled: true,
+            modalWidth: 600
         },
         {
             key: '4',
             label: '扫一扫',
             icon: <Scan size={24} weight="light"  />,
             component: <ContactList />,
-            title: '扫一扫'
+            title: '扫一扫',
+            modalWidth: 350,
+            modalHeight: 450
         },
     ], []);
 
@@ -67,6 +78,8 @@ const LayoutHeader = () => {
         if (selectedMenu) {
             setActiveComponent(selectedMenu.component);
             setModalTitle(selectedMenu.title);
+            setModalWidth(selectedMenu.modalWidth || 400);
+            setModalHeight(selectedMenu.modalHeight);
             setIsModalVisible(true);
         }
     };
@@ -102,7 +115,9 @@ const LayoutHeader = () => {
                 open={isModalVisible}
                 onCancel={handleModalClose}
                 footer={null}
-                width={400}
+                width={modalWidth}
+                height={modalHeight}
+                // style={{ height: modalHeight }}
             >
                 {activeComponent}
             </Modal>
