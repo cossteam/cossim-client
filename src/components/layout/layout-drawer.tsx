@@ -18,7 +18,7 @@ import useUserStore from '@/stores/user'
 import { useNavigate } from 'react-router-dom'
 import { createFingerprint } from '@/utils/fingerprint'
 import { getUserInfoApi } from '@/api/user'
-import AddContact from '@/components/add-contact'
+import AddContact from '@/components/contact/add-contact'
 import { tr } from '@faker-js/faker'
 
 interface Menus {
@@ -42,25 +42,25 @@ const drawerStyles: DrawerStyles = {
 }
 
 const LayoutDrawer: React.FC<Partial<LayoutDrawerProps>> = (props) => {
-    const userStore = useUserStore()
+    // const userStore = useUserStore()
     const navigate = useNavigate()
     const commonStore = useCommonStore()
 
     const { width } = useMobile()
 
-    useEffect(() => {
-        if (userStore.userId) {
-            getUserInfoApi({ id: userStore.userId })
-                .then((res) => {
-                    userStore.update({
-                        userInfo: res.data
-                    })
-                })
-                .catch((error) => {
-                    console.log('获取用户信息失败: ', error)
-                })
-        }
-    }, [userStore.userId])
+    // useEffect(() => {
+    //     if (userStore.userId) {
+    //         getUserInfoApi({ id: userStore.userId })
+    //             .then((res) => {
+    //                 userStore.update({
+    //                     userInfo: res.data
+    //                 })
+    //             })
+    //             .catch((error) => {
+    //                 console.log('获取用户信息失败: ', error)
+    //             })
+    //     }
+    // }, [userStore.userId])
 
     const userInfo = {
         avatar: userStore.userInfo?.avatar || mockUserInfo.avatar,

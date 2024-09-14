@@ -8,9 +8,13 @@ import { z } from 'zod'
 import { useCallback, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { cn, createFingerprint } from '@/lib/utils'
-import { loginApi } from '@/api/user'
+import { getUserInfoApi, loginApi } from '@/api/user'
 import { useAuthStore } from '@/stores/auth'
 import { useNavigate } from 'react-router-dom'
+import useUserStore from '@/stores/user'
+import { $t } from '@/i18n'
+import Login from '@/components/login.tsx'
+import { message } from 'antd'
 
 const Validator = z.object({
     email: z
@@ -47,14 +51,17 @@ function SignInPage() {
     const update = useAuthStore((state) => state.update)
     const navigate = useNavigate()
 
+        // const userStore = useUserStore()
+
+
     const [loading, setLoading] = useState<boolean>(false)
     const onSubmit = async (values: TValidator) => {
         console.log('login', values)
         setLoading(true)
         // 假登录
-        update({ token: 'token123' })
-        navigate('/')
-        return
+        // update({ token: 'token123' })
+        // navigate('/')
+        // return
         try {
             const driverId = createFingerprint()
             const { code, data, msg } = await loginApi({
@@ -66,21 +73,34 @@ function SignInPage() {
             })
             if (code !== 200) {
                 // showToast(msg, { type: 'error' })
+                message.error('登录失败: ' + msg);
                 return
             }
             console.log('data', data)
 
-            // userStore.update({
-            //     driverId,
-            //     userId: data?.user_info?.user_id,
-            //     token: data?.token,
-            //     userInfo: data?.user_info
-            // })
-            // localSet(TOKEN, data?.token)
-            // router.replace('/')
-        } catch {
-            console.log('登录失败')
+            update({
+                driverId,
+                userId: data?.user_info?.user_id,
+                token: data?.token,
+                userInfo: data?.user_info
+            })
 
+            // 异步获取用户信息
+            Promise.resolve().then(async () => {
+                try {
+                    const userInfoResponse = await getUserInfoApi({ id: data?.user_info?.user_id });
+                    console.log('userInfoResponse', userInfoResponse)
+                    const mergedUserInfo = { ...data?.user_info, ...userInfoResponse.data };
+                update({ userInfo: mergedUserInfo });
+                } catch (error) {
+                    console.error('获取用户信息失败:', error);
+                }
+            });
+
+            navigate('/dashboard')
+        } catch(e) {
+            console.error('登录失败', e)
+            message.error('登录失败, 请稍后再试');
             // showToast($t('登录失败, 请稍后再试'), { type: 'error' })
         } finally {
             setLoading(false)
@@ -88,6 +108,7 @@ function SignInPage() {
     }
 
     return (
+        // <Login></Login>
         <FormBackground>
             <form className="mt-8 grid grid-cols-6 gap-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <div className="col-span-6">
