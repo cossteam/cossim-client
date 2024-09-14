@@ -32,7 +32,7 @@ const LayoutFooter = () => {
     return (
         <>
             <Divider className="m-0" />
-            <Flex className="h-12 bg-background" justify="center" align="center">
+            <Flex className="h-10 bg-background" justify="center" align="center">
                 {menus.map((menu, index) => {
                     // 判断当前菜单项是否激活
                     const isActive = location.pathname.includes(menu.path)

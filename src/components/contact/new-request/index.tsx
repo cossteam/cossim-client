@@ -41,7 +41,7 @@ const NewRequest: React.FC = () => {
 
     return (
         <Flex className="flex-1 container--background" style={{ height }} vertical>
-            <Text className="h-16 flex items-center justify-center bg-white border-b">新的请求</Text>
+            <Text className="h-[51px] flex items-center justify-center bg-white border-b">新的请求</Text>
             <div className='h-[70px] w-full bg-white flex items-center justify-center'>
                 <Segmented
                     className="w-[70%] flex justify-center"
@@ -53,18 +53,20 @@ const NewRequest: React.FC = () => {
                     onChange={(value) => setCurrentTab(value.toString())}
                 />
             </div>
-            <div className='flex-1 m-5 bg-white'>
+            <div className='flex-1 m-5 bg-white rounded-lg'>
                 <List
                     itemLayout="horizontal"
                     dataSource={mockRequests}
                     renderItem={item => (
                         <List.Item
                             actions={[
-                                <Button key="reject" style={{ borderColor: '#d9d9d9', color: 'rgba(0, 0, 0, 0.65)', borderRadius: '20px' }}>拒绝</Button>,
-                                <Button key="accept" type="primary" style={{ borderRadius: '20px' }}>接受</Button>
-                            //     <ThemeButton key="accept" shape="round" >
-                            //     接受
-                            // </ThemeButton>
+                                <Button type='text' key="reject" style={{ borderColor: '#d9d9d9', color: 'rgba(0, 0, 0, 0.65)', borderRadius: '20px' }}>拒绝</Button>,
+                                
+                                <Button type='text' key="accept" style={{ 
+                                    borderRadius: '20px' ,
+                                    backgroundColor: '#01B468',
+                                    color: '#fff'
+                                }}>接受</Button>
                             ]}
                             style={{ 
                                 padding: '10px 0px',
