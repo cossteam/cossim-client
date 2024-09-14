@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/auth'
 import { useServerStore } from '@/stores/server'
 import axios from 'axios'
 import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
@@ -14,8 +15,8 @@ service.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
         const baseUrl = useServerStore.getState().baseUrl
         config.baseURL = baseUrl
-        // const token = useUserStore.getState().token
-        // if (token) config.headers['Authorization'] = 'Bearer ' + token
+        const token = useAuthStore.getState().token
+        if (token) config.headers['Authorization'] = 'Bearer ' + token
         return config
     },
     (error: AxiosError) => Promise.reject(error)

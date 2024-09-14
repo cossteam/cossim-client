@@ -10,7 +10,6 @@ import { useMemo } from 'react'
 import IconButton from '@/components/icon/icon-button'
 import { $t } from '@/i18n'
 import useCallStore from '@/stores/call'
-import { DotsThree, MagnifyingGlass, Phone, VideoCamera } from '@phosphor-icons/react'
 
 const MessageHeader = () => {
     const callStore = useCallStore()
@@ -32,15 +31,15 @@ const MessageHeader = () => {
                     <Typography.Text className="text-gray-500 text-sm">664位成员</Typography.Text>
                 </Flex>
                 <Flex align="center" gap={10}>
-                    <IconButton className="text-xl text-gray-500" component={MagnifyingGlass} />
+                    <IconButton className="text-xl text-gray-500" component={SearchOutlined} />
                     <IconButton
                         className="text-xl text-gray-500"
-                        component={Phone}
+                        component={PhoneOutlined}
                         onClick={() => call(true)}
                     />
                     <IconButton
                         className="text-xl text-gray-500"
-                        component={VideoCamera}
+                        component={VideoCameraOutlined}
                         onClick={() => call(false)}
                     />
                     <Dropdown
@@ -51,7 +50,7 @@ const MessageHeader = () => {
                         <a onClick={(e) => e.preventDefault()}>
                             <IconButton
                                 className="text-xl text-gray-500"
-                                component={DotsThree}
+                                component={MoreOutlined}
                             />
                         </a>
                     </Dropdown>

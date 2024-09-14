@@ -1,11 +1,12 @@
 import { $t } from '@/i18n'
-import { SearchOutlined, ScanOutlined, PlusOutlined, UserAddOutlined, UsergroupAddOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import { Divider, Flex, Typography, Modal, Dropdown, message } from 'antd'
 import type { MenuProps } from 'antd';
 import { useMemo, useState } from 'react';
-import AddContact from '../add-contact';
+import AddContact from '../contact/add-contact';
 import ContactList from '../contact-list';
 import GroupCreate from '../group/group-create';
+import { Plus, Scan, UserPlus, UsersThree, VideoCamera } from '@phosphor-icons/react';
 
 // 定义头部高度常量
 export const headerHeight = 64
@@ -30,21 +31,21 @@ const LayoutHeader = () => {
         {
             key: '1',
             label: '添加联系人',
-            icon: <UserAddOutlined style={{ fontSize: '20px' }} />,
+            icon: <UserPlus size={24} weight="light"  />,
             component: <AddContact onClick={(item: any) => console.log('添加联系人', item)} />,
             title: '添加联系人'
         },
         {
             key: '2',
             label: '新建群组',
-            icon: <UsergroupAddOutlined style={{ fontSize: '20px' }} />,
+            icon: <UsersThree size={24} weight="light"  />,
             component: <GroupCreate />,
             title: '新建群组'
         },
         {
             key: '3',
             label: '新建通话',
-            icon: <VideoCameraAddOutlined style={{ fontSize: '20px' }} />,
+            icon: <VideoCamera size={24} weight="light"  />,
             component: <GroupCreate />,
             title: '新建通话',
             danger: true,
@@ -53,7 +54,7 @@ const LayoutHeader = () => {
         {
             key: '4',
             label: '扫一扫',
-            icon: <ScanOutlined style={{ fontSize: '20px' }} />,
+            icon: <Scan size={24} weight="light"  />,
             component: <ContactList />,
             title: '扫一扫'
         },
@@ -90,7 +91,7 @@ const LayoutHeader = () => {
 
                 {/* 下拉菜单 */}
                 <Dropdown menu={{ items: menuItems, onClick: handleMenuClick }} trigger={['click']} placement="bottomRight" arrow={{ pointAtCenter: true }} className="text-gray-500 px-3">
-                    <PlusOutlined className='' style={{ fontSize: '20px' }} />
+                    <Plus  size={48} weight="light"/>
                 </Dropdown>
             </Flex>
             <Divider className="m-0" />

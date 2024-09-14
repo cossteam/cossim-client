@@ -2,10 +2,9 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Avatar, List, Divider, Skeleton, Layout, Flex, Typography } from 'antd'
 import { Contact, ContactList, generateContactList } from '@/mock/data'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { TagsOutlined, UserAddOutlined, UsergroupDeleteOutlined } from '@ant-design/icons'
 import { Content } from 'antd/es/layout/layout'
-import CustomIcon from '@/components/icon'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { Tag, UserPlus, Users } from '@phosphor-icons/react'
 
 // 联系人列表页面组件
 const ContactListPage = () => {
@@ -13,6 +12,7 @@ const ContactListPage = () => {
     const [loading, setLoading] = useState(false)
     const [contactList, setContactList] = useState<ContactList>({ list: {}, total: 0 })
     const navigate = useNavigate()
+    const location = useLocation()
 
     // 处理联系人点击事件
     const handleClick = useCallback((item: Contact) => {
@@ -38,9 +38,9 @@ const ContactListPage = () => {
 
     // 定义菜单项
     const menus = useMemo(() => [
-        { icon: UserAddOutlined, title: '新的请求', path: '/dashboard/contact/request' },
-        { icon: UsergroupDeleteOutlined, title: '群组', path: '/dashboard/contact/group' },
-        { icon: TagsOutlined, title: '标签', path: '/dashboard/contact/tag' }
+        { icon: <UserPlus weight="thin" />, title: '新的请求', path: '/dashboard/contact/request' },
+        { icon: <Users weight="thin" />, title: '群组', path: '/dashboard/contact/group' },
+        { icon: <Tag weight="thin" />, title: '标签', path: '/dashboard/contact/tag' }
     ], [])
 
     // 处理菜单项点击事件
@@ -51,15 +51,15 @@ const ContactListPage = () => {
     // 渲染菜单项
     const renderMenuItem = useCallback((item: typeof menus[0], index: number) => (
         <Flex
-            className="mobile:py-3 py-2 pl-5 select-none hover:bg-background-hover cursor-pointer rounded"
+            className={`mobile:py-3 py-2 pl-5 select-none hover:bg-background-hover cursor-pointer rounded ${location.pathname === item.path ? 'w750:!bg-[#C9ECDA]' : ''}`}
             key={index}
             gap="middle"
             onClick={() => handlerMenusClick(item.path)}
         >
-            <CustomIcon className="mobile:text-2xl text-xl text-gray-500" component={item.icon} />
+            <div className="mobile:text-2xl text-xl">{item.icon}</div>
             <Typography.Text>{item.title}</Typography.Text>
         </Flex>
-    ), [handlerMenusClick])
+    ), [handlerMenusClick, location.pathname])
 
     // 渲染联系人列表项
     const renderContactItem = useCallback((c: Contact) => (

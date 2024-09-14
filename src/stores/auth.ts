@@ -32,10 +32,11 @@ export const useAuthStore = createPersistStore(
         // }
     }),
     {
-        name: 'coss-user',
+        name: 'COSS_USER_STORE',
         version: 1
         // migrate(state, version) {
         // return newState as any
         // }
-    }
+    },
+
 )

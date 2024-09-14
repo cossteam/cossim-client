@@ -42,7 +42,7 @@ export function createPersistStore<T extends object, M>(
                     } as M & MakeUpdater<T>
                 }
             ),
-            persistOptions as any
+            persistOptions as any,
         )
     )
 }
