@@ -79,3 +79,17 @@ export enum ROUTE {
     /** 设置 **/
     PROFILE = 'profile',
 }
+
+/** 申请列表状态管理 */
+export enum ApplyStatus {
+	/** 申请中 */
+	PENDING = 0,
+	/** 已同意 */
+	ACCEPT = 1,
+	/** 已拒绝 */
+	REFUSE = 2,
+	/** 邀请发送者 */
+	INVITE_SENDER = 3,
+	/** 被邀请者 */
+	INVITE_RECEIVER = 4
+}
