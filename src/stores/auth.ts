@@ -1,4 +1,5 @@
 // import { logoutApi } from '@/api/user'
+import { logoutApi } from '@/api/user'
 import { createPersistStore } from '@/lib/store'
 
 interface UserState {
@@ -18,18 +19,18 @@ const initialState: UserState = {
 export const useAuthStore = createPersistStore(
     initialState,
     (set, get) => ({
-        // async logout(driverId: string): Promise<ResponseData> {
-        //     return new Promise((resolve, reject) => {
-        //         logoutApi({ driver_id: driverId })
-        //             .then((res) => {
-        //                 set(initialState)
-        //                 resolve(res)
-        //             })
-        //             .catch((err) => {
-        //                 reject(err)
-        //             })
-        //     })
-        // }
+        async logout(driverId: string): Promise<ResponseData> {
+            return new Promise((resolve, reject) => {
+                logoutApi({ driver_id: driverId })
+                    .then((res) => {
+                        set(initialState)
+                        resolve(res)
+                    })
+                    .catch((err) => {
+                        reject(err)
+                    })
+            })
+        }
     }),
     {
         name: 'COSS_USER_STORE',

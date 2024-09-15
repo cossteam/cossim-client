@@ -50,7 +50,7 @@ const LayoutFooter = () => {
                         >
                             <menu.icon
                                 size={30}
-                                color={isActive ? "#28B36F" : undefined}
+                                color={isActive ? "#26B36D" : undefined}
                                 weight={isActive ? "fill" : "thin"}
                             />
                             <Typography.Text className="text-[10px]">{menu.title}</Typography.Text>

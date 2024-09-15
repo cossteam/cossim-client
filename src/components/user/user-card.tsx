@@ -99,6 +99,7 @@ const UserCard: React.FC<UserCardProps> = ({ avatar, nickname, signature = '', u
                 </div>
                 <Divider className="m-0" />
             </div>
+            <div className="h-2 bg-gray-100"></div>
 
             {/* 添加联系人对话框 */}
             <Modal

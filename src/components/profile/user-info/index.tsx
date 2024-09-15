@@ -1,8 +1,11 @@
 import useMobile from "@/hooks/useMobile";
+import { useAuthStore } from "@/stores/auth";
 import { QrcodeOutlined, CameraOutlined } from "@ant-design/icons";
 import { DotsThree, ArrowLineDown, ShareFat } from "@phosphor-icons/react";
 import { Avatar, Flex, List, Typography, Upload, message, Modal, Input, Space, Dropdown } from "antd";
 import { useState, useCallback } from "react";
+import { createFingerprint } from '@/utils/fingerprint'
+import { useNavigate } from "react-router-dom";
 
 const { Text } = Typography;
 
@@ -25,6 +28,8 @@ const UserInfo: React.FC<UserInfoProps> = ({ avatarUrl: initialAvatarUrl, nickna
     const [isEditing, setIsEditing] = useState(false);
     const [nickname, setNickname] = useState(initialNickname);
     const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
+
+    const navigate = useNavigate()
 
     // 用户信息列表数据
     const userInfoItems = [
@@ -87,9 +92,18 @@ const UserInfo: React.FC<UserInfoProps> = ({ avatarUrl: initialAvatarUrl, nickna
 
     // 处理登出相关函数
     const handleLogoutClick = useCallback(() => setIsLogoutModalVisible(true), []);
-    const handleLogoutConfirm = useCallback(() => {
-        // TODO: 实现登出逻辑
-        message.success('已成功登出');
+    const handleLogoutConfirm = useCallback(async () => {
+        try {
+            const data = await useAuthStore.getState().logout(createFingerprint())
+            // console.log($t('退出登录'), data)
+            console.log('退出登录', data)
+        } catch (error) {
+            console.log(error)
+        } finally {
+            navigate('/sign-in', {
+                replace: true
+            })
+        }
         setIsLogoutModalVisible(false);
     }, []);
     const handleLogoutCancel = useCallback(() => setIsLogoutModalVisible(false), []);
@@ -155,12 +169,12 @@ const UserInfo: React.FC<UserInfoProps> = ({ avatarUrl: initialAvatarUrl, nickna
                     <List
                         split={false}
                         size="small"
-                        dataSource={userInfoItems}
+                        dataSource={userInfoItems.filter(item => item.content)}
                         renderItem={(item) => (
                             <List.Item
                                 key={item.title}
                                 className="p-2 flex items-center justify-between"
-                                onClick={() => !isEditing && handleCopyContent(item.content?? '')}
+                                onClick={() => !isEditing && handleCopyContent(item.content ?? '')}
                                 tabIndex={0}
                             >
                                 <List.Item.Meta
@@ -294,7 +308,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ avatarUrl: initialAvatarUrl, nickna
             {/* 登出确认模态框 */}
             <Modal
                 width={320}
-                title={<div className="text-center">确认登出</div>}
+                title={<div className="text-center">登出</div>}
                 open={isLogoutModalVisible}
                 onOk={handleLogoutConfirm}
                 onCancel={handleLogoutCancel}
