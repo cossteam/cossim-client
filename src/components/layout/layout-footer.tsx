@@ -40,7 +40,7 @@ const LayoutFooter = () => {
                         <Flex
                             key={index}
                             className={clsx(
-                                'text-gray-500 px-3 cursor-pointer flex-1',
+                                'text-gray-500 px-3 flex-1',
                                 isActive && 'text-primary'
                             )}
                             justify="center"

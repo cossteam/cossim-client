@@ -261,7 +261,6 @@ const GroupCreate: React.FC = () => {
         <div className="group-create bg-gray-100">
             {/* 群组基本信息卡片 */}
             <Card bordered={false} className="text-center flex flex-col h-full ant-card-body-p-0 pt-5 pb-3" style={{ borderRadius: 0 }}>
-                {/* 群组头像 */}
                 <Avatar
                     src={groupInfo.avatarUrl}
                     size={96}
@@ -269,7 +268,6 @@ const GroupCreate: React.FC = () => {
                     icon={<CameraOutlined />}
                     onClick={handleUploadAvatar}
                 />
-                {/* 群组名称输入框 */}
                 <Input
                     placeholder="请输入群组名称"
                     variant="borderless"

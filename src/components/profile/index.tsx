@@ -50,7 +50,7 @@ const Profile: React.FC = () => {
         <Layout className="h-[600px] bg-white">
             {/* 头部用户信息 */}
             <Header 
-                className={`h-[80px] flex items-center justify-between px-4 bg-white cursor-pointer transition-colors duration-300 ease-in-out ${activeItem === 0 ? 'w750:!bg-[#C9ECDA]' : ''}`}
+                className={`h-[80px] flex items-center justify-between px-4 bg-white transition-colors duration-300 ease-in-out ${activeItem === 0 ? 'w750:!bg-[#C9ECDA]' : ''}`}
                 onClick={handleHeaderClick}
             >
                 <Avatar size={64} icon={<UserOutlined />} />
@@ -69,7 +69,7 @@ const Profile: React.FC = () => {
                     dataSource={settingOptions.slice(1)}
                     renderItem={(item, index) => (
                         <List.Item 
-                            className={`cursor-pointer rounded-md transition-colors duration-300 ease-in-out ${activeItem === index + 1 ? 'w750:!bg-[#C9ECDA]' : ''}`}
+                            className={`rounded-md transition-colors duration-300 ease-in-out ${activeItem === index + 1 ? 'w750:!bg-[#C9ECDA]' : ''}`}
                             onClick={() => handleItemClick(index + 1)}
                         >
                             <List.Item.Meta

@@ -51,7 +51,7 @@ const ContactListPage = () => {
     // 渲染菜单项
     const renderMenuItem = useCallback((item: typeof menus[0], index: number) => (
         <Flex
-            className={`mobile:py-3 py-2 pl-5 select-none hover:bg-background-hover cursor-pointer rounded ${location.pathname === item.path ? 'w750:!bg-[#C9ECDA]' : ''}`}
+            className={`mobile:py-3 py-2 pl-5 select-none hover:bg-background-hover rounded ${location.pathname === item.path ? 'w750:!bg-[#C9ECDA]' : ''}`}
             key={index}
             gap="middle"
             onClick={() => handlerMenusClick(item.path)}
