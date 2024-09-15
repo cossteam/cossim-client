@@ -55,12 +55,12 @@ export function groupRuestListApi(params: QueryParams): Promise<ResponseData> {
 }
 
 /**
- * 删除好友
+ * 删除好友请求
  *
- * @param {string} id
+ * @param {number} id
  * @returns
  */
-export function deleteFriendRequestApi(id: string): Promise<ResponseData> {
+export function deleteFriendRequestApi(id: number): Promise<ResponseData> {
     return request({
         url: `${baseUrl}/friend_request/${id}`,
         method: 'DELETE'
@@ -82,10 +82,10 @@ export function deleteGroupApplyApi(id: string): Promise<ResponseData> {
 /**
  * 管理好友请求
  *
- * @param {string} id
+ * @param {number} id
  * @param {ManageFriendRequestParams} data
  */
-export function manageFriendApplyApi(id: string, data: ManageFriendRequestParams): Promise<ResponseData> {
+export function manageFriendApplyApi(id: number, data: ManageFriendRequestParams): Promise<ResponseData> {
     return request({
         url: `${baseUrl}/friend_request/${id}`,
         method: 'PUT',

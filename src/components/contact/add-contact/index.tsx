@@ -288,6 +288,7 @@ const AddContact: React.FC<AddContactProps> = ({ onClick }) => {
             >
                 {selectedUser && (
                     <UserCard
+                        userId={selectedUser.user_id}
                         avatar={selectedUser.avatar}
                         nickname={selectedUser.nickname}
                         signature={selectedUser.signature}
