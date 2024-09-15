@@ -5,6 +5,7 @@ import { ROUTE } from '@/utils/enum'
 import useCommonStore from '@/stores/common'
 import NewRequest from '@/components/contact/new-request'
 import UserInfo from '@/components/profile/user-info'
+import { useAuthStore } from '@/stores/auth'
 // import { useAuthStore } from '@/stores/auth'
 
 // TODO: 添加个人信息页
@@ -22,7 +23,7 @@ const fakeUser = {
 const Dialog = () => {
     const params = useParams()
     const commonStore = useCommonStore()
-    // const userinfo = useMemo(() => useAuthStore.getState().userInfo, [])
+    const userinfo = useMemo(() => useAuthStore.getState().userInfo, [])
 
     const renderComponent = useCallback(() => {
         switch (params.type) {
@@ -33,11 +34,11 @@ const Dialog = () => {
             case ROUTE.PROFILE:
                 return params.id === 'user-info' ? (
                     <UserInfo 
-                        avatarUrl={fakeUser.avatar}
-                        nickname={fakeUser.nickname}
-                        userId={fakeUser.id}
-                        email={fakeUser.email}
-                        bio={fakeUser.bio}
+                        avatarUrl={userinfo.avatar}
+                        nickname={userinfo.nickname}
+                        userId={userinfo.coss_id}
+                        email={userinfo.email}
+                        bio={userinfo.signature}
                     />
                 ) : <TestContact />
             default:

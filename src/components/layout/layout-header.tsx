@@ -73,7 +73,6 @@ const LayoutHeader = () => {
 
     // 处理菜单点击事件
     const handleMenuClick: MenuProps['onClick'] = (e) => {
-        message.info('点击了菜单项。');
         const selectedMenu = menuItems.find(menu => menu.key === e.key);
         if (selectedMenu) {
             setActiveComponent(selectedMenu.component);

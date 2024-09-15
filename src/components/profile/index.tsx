@@ -5,6 +5,7 @@ import { UserOutlined } from '@ant-design/icons';
 import { Header, Content } from 'antd/es/layout/layout';
 import { Bell, GearSix, Globe } from '@phosphor-icons/react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthStore } from '@/stores/auth';
 
 const { Text } = Typography;
 
@@ -13,6 +14,9 @@ const Profile: React.FC = () => {
     const [activeItem, setActiveItem] = useState<number | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
+
+    const userinfo = useMemo(() => useAuthStore.getState().userInfo, [])
+
 
     // 设置选项列表
     const settingOptions = useMemo(() => [
@@ -51,8 +55,8 @@ const Profile: React.FC = () => {
             >
                 <Avatar size={64} icon={<UserOutlined />} />
                 <Flex vertical justify="center" align="flex-start" className="flex-grow ml-4">
-                    <Text className="text-sm leading-tight mb-2">user@example.com</Text>
-                    <Text className="text-sm leading-tight">coss_nps2jclaa</Text>
+                    <Text className="text-sm leading-tight mb-2">{userinfo.email}</Text>
+                    <Text className="text-sm leading-tight">{userinfo.coss_id}</Text>
                 </Flex>
             </Header>
 

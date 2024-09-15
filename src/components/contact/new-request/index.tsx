@@ -64,7 +64,7 @@ const NewRequest: React.FC = () => {
                                 
                                 <Button type='text' key="accept" style={{ 
                                     borderRadius: '20px' ,
-                                    backgroundColor: '#01B468',
+                                    backgroundColor: '#26B36D',
                                     color: '#fff'
                                 }}>接受</Button>
                             ]}
