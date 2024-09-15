@@ -54,7 +54,7 @@ const commonStore = (set: any): UserStore => ({
 const useUserStore = create(
     devtools(
         persist(commonStore, {
-            name: 'COSS_USER_STORE',
+            name: 'coss_user',
             storage: createJSONStorage(() => localStorage)
         })
     )
