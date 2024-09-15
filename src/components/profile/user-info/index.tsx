@@ -246,14 +246,14 @@ const UserInfo: React.FC<UserInfoProps> = ({ avatarUrl: initialAvatarUrl, nickna
                 {!isEditing && (
                     <>
                         {/* 更改密码按钮 */}
-                        <div className="bg-white rounded-lg p-4 cursor-pointer" onClick={handleChangePassword}>
+                        <div className="bg-white rounded-lg p-4" onClick={handleChangePassword}>
                             <Flex align="center">
                                 <Text>更改密码</Text>
                             </Flex>
                         </div>
 
                         {/* 登出按钮 */}
-                        <div className="bg-white rounded-lg p-4 cursor-pointer" onClick={handleLogoutClick}>
+                        <div className="bg-white rounded-lg p-4" onClick={handleLogoutClick}>
                             <Text className="text-red-500">登出</Text>
                         </div>
                     </>

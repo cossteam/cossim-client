@@ -74,7 +74,7 @@ const ChatList = () => {
                     //     Number(params.id) === chat.dialog_id && 'w750:!bg-primary'
                     // )}
                     className={clsx(
-                        '!px-3 select-none w750:hover:bg-background-hover cursor-pointer w-full',
+                        '!px-3 select-none w750:hover:bg-background-hover w-full',
                         Number(params.id) === chat.dialog_id && 'w750:!bg-[#C9ECDA]'
                     )}
                     key={chat.dialog_id}

@@ -35,7 +35,7 @@ const LayoutHeader = () => {
         {
             key: '1',
             label: '添加联系人',
-            icon: <UserPlus size={24} weight="light"  />,
+            icon: <UserPlus size={24} weight="light" />,
             component: <AddContact onClick={(item: any) => console.log('添加联系人', item)} />,
             title: '添加联系人',
             modalWidth: 320,
@@ -44,7 +44,7 @@ const LayoutHeader = () => {
         {
             key: '2',
             label: '新建群组',
-            icon: <UsersThree size={24} weight="light"  />,
+            icon: <UsersThree size={24} weight="light" />,
             component: <GroupCreate />,
             title: '新建群组',
             modalWidth: 500,
@@ -53,17 +53,17 @@ const LayoutHeader = () => {
         {
             key: '3',
             label: '新建通话',
-            icon: <VideoCamera size={24} weight="light"  />,
+            icon: <VideoCamera size={24} weight="light" />,
             component: <GroupCreate />,
             title: '新建通话',
             danger: true,
             disabled: true,
-            modalWidth: 600
+            modalWidth: 500
         },
         {
             key: '4',
             label: '扫一扫',
-            icon: <Scan size={24} weight="light"  />,
+            icon: <Scan size={24} weight="light" />,
             component: <ContactList />,
             title: '扫一扫',
             modalWidth: 350,
@@ -103,7 +103,7 @@ const LayoutHeader = () => {
 
                 {/* 下拉菜单 */}
                 <Dropdown menu={{ items: menuItems, onClick: handleMenuClick }} trigger={['click']} placement="bottomRight" arrow={{ pointAtCenter: true }} className="text-gray-500 px-3">
-                    <Plus  size={48} weight="light"/>
+                    <Plus className='cursor-pointer' size={48} weight="light" />
                 </Dropdown>
             </Flex>
             <Divider className="m-0" />
@@ -116,7 +116,6 @@ const LayoutHeader = () => {
                 footer={null}
                 width={modalWidth}
                 height={modalHeight}
-                // style={{ height: modalHeight }}
             >
                 {activeComponent}
             </Modal>

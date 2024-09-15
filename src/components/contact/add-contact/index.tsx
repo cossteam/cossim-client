@@ -223,7 +223,7 @@ const AddContact: React.FC<AddContactProps> = ({ onClick }) => {
                             renderItem={(user) => (
                                 <List.Item
                                     key={user.email}
-                                    className="flex items-center p-0 hover:bg-[#F5F5F5] cursor-pointer"
+                                    className="flex items-center p-0 hover:bg-[#F5F5F5]"
                                     onClick={() => handleClick(user)}
                                 >
                                     <div className="flex items-center px-5 w-full">
