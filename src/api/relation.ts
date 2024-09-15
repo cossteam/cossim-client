@@ -49,7 +49,7 @@ export function friendRequestListApi(params: QueryParams): Promise<ResponseData>
  */
 export function groupRuestListApi(params: QueryParams): Promise<ResponseData> {
     return request({
-        url: `${baseUrl}/group_request_list`,
+        url: `${relationGroup}/request`,
         params
     })
 }

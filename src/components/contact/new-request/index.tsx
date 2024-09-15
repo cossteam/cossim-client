@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Segmented, Typography, Flex, List, Avatar, message, Modal, Dropdown } from 'antd';
 import useMobile from '@/hooks/useMobile';
-import { friendRequestListApi, manageFriendApplyApi, deleteFriendRequestApi } from '@/api/relation';
+import { friendRequestListApi, manageFriendApplyApi, deleteFriendRequestApi, groupRuestListApi } from '@/api/relation';
 import { QueryParams, ManageFriendRequestParams } from '@/types/api';
 import { formatTime } from '@/utils/format-time';
 import { ApplyStatus } from '@/utils/enum';
@@ -28,36 +28,58 @@ const NewRequest: React.FC = () => {
 
     const uid = useAuthStore(state => state.userId);
 
-    // 分段选项
+     // 分段选项
+    // const segmentOptions = useMemo(() => [
+    //     { label: '所有', value: '所有' },
+    //     { label: '未处理', value: '未处理' },
+    //     { label: '已处理', value: '已处理' }
+    // ], []);
+
     const segmentOptions = useMemo(() => [
         { label: '所有', value: '所有' },
-        { label: '未处理', value: '未处理' },
-        { label: '已处理', value: '已处理' }
+        { label: '联系人', value: '联系人' },
+        { label: '群组', value: '群组' }
     ], []);
 
-    // 获取好友请求列表
-    const fetchFriendRequests = useCallback(async () => {
+    // 获取请求列表
+    const fetchRequests = useCallback(async () => {
         setLoading(true);
         try {
             const params: QueryParams = { page_num: 1, page_size: 10 };
-            const response = await friendRequestListApi(params);
+            let response;
+            if (currentTab === '联系人') {
+                response = await friendRequestListApi(params);
+            } else if (currentTab === '群组') {
+                response = await groupRuestListApi(params);
+            } else {
+                const [friendResponse, groupResponse] = await Promise.all([
+                    friendRequestListApi(params),
+                    groupRuestListApi(params)
+                ]);
+                response = {
+                    code: 200,
+                    data: {
+                        list: [...(friendResponse.data.list || []), ...(groupResponse.data.list || [])]
+                    }
+                };
+            }
             if (response.code === 200) {
                 setRequests(response.data.list || []);
             } else {
-                message.error('获取好友请求列表失败');
+                message.error('获取请求列表失败');
             }
         } catch (error) {
-            console.error('获取好友请求列表出错:', error);
-            message.error('获取好友请求列表出错');
+            console.error('获取请求列表出错:', error);
+            message.error('获取请求列表出错');
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [currentTab]);
 
     // 当前标签页变化时重新获取请求列表
     useEffect(() => {
-        fetchFriendRequests();
-    }, [currentTab, fetchFriendRequests]);
+        fetchRequests();
+    }, [currentTab, fetchRequests]);
 
     // 处理好友请求
     const handleFriendRequest = useCallback(async (id: number, action: number) => {
@@ -66,7 +88,7 @@ const NewRequest: React.FC = () => {
             const response = await manageFriendApplyApi(id, data);
             if (response.code === 200) {
                 message.success(action === 1 ? '已接受好友请求' : '已拒绝好友请求');
-                fetchFriendRequests();
+                fetchRequests();
                 setIsModalVisible(false);
             } else {
                 message.error('处理好友请求失败');
@@ -75,19 +97,19 @@ const NewRequest: React.FC = () => {
             console.error('处理好友请求出错:', error);
             message.error('处理好友请求出错');
         }
-    }, [fetchFriendRequests]);
+    }, [fetchRequests]);
 
     // 删除单个请求
     const handleDeleteSingleRequest = useCallback(async (id: number) => {
         try {
             await deleteFriendRequestApi(id);
             message.success('请求已删除');
-            fetchFriendRequests();
+            fetchRequests();
         } catch (error) {
             console.error('删除请求出错:', error);
             message.error('删除请求失败');
         }
-    }, [fetchFriendRequests]);
+    }, [fetchRequests]);
 
     // 渲染操作按钮
     const renderActions = useCallback((item: any) => {
@@ -160,7 +182,7 @@ const NewRequest: React.FC = () => {
         try {
             await Promise.all(requests.map(request => deleteFriendRequestApi(request.id)));
             message.success('所有请求已删除');
-            fetchFriendRequests();
+            fetchRequests();
         } catch (error) {
             console.error('删除所有请求出错:', error);
             message.error('删除所有请求出错');
@@ -168,7 +190,7 @@ const NewRequest: React.FC = () => {
             setIsDeleting(false);
             setIsDialogOpen(false);
         }
-    }, [requests, fetchFriendRequests]);
+    }, [requests, fetchRequests]);
 
     // 渲染列表项
     const renderListItem = useCallback((item: any) => (
@@ -193,16 +215,29 @@ const NewRequest: React.FC = () => {
                 onClick={() => showUserCard(item)}
             >
                 <List.Item.Meta
-                    avatar={<Avatar className='ml-4' src={item.sender_info.avatar} size={48} onClick={(e) => { e.stopPropagation(); setIsFullUserCard(true);showUserCard(item); }} />}
+                    avatar={<Avatar 
+                        className='ml-4' 
+                        src={item.sender_info.avatar} 
+                        size={48} 
+                        onClick={(e?: React.MouseEvent) => { 
+                            e?.stopPropagation(); 
+                            setIsFullUserCard(true); 
+                            showUserCard(item); 
+                        }} 
+                    />}
                     title={<span className="text-sm font-bold">{item.sender_info.nickname}</span>}
                     description={
                         <Flex vertical>
                             <Text type="secondary" className="text-xs text-gray-400">
                                 {formatTime(item.create_at)} <span className="mx-1 border-l border-gray-200"></span> {item.source || '未知'}
                             </Text>
-                            <Text type="secondary" className="text-xs text-gray-600 mt-1">
-                                {item.remark || '无'}
-                            </Text>
+                            {item.remark ? (
+                                <Text type="secondary" className="text-xs text-gray-600">
+                                    {item.remark}
+                                </Text>
+                            ) : (
+                                <div className="h-[1em]"></div>
+                            )}
                         </Flex>
                     }
                     className="flex items-center"
