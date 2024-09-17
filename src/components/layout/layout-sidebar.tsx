@@ -5,7 +5,7 @@ import { Flex } from 'antd'
 import { memo, useMemo } from 'react'
 import LayoutFooter from './layout-footer'
 import { ROUTE } from '@/utils/enum'
-import ContactList from '@/components/contact-list'
+import ContactList from '@/components/contact'
 import { useParams } from 'react-router-dom'
 import Profile from '@/components/profile'
 

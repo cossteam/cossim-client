@@ -2,7 +2,6 @@ import React, { useState, useCallback } from "react";
 import { Avatar, Card, Divider, Input, Typography, Dropdown, Modal, message, Segmented, List, Spin } from "antd";
 import { PlusCircleOutlined, SearchOutlined, ArrowLeftOutlined, CameraOutlined, CheckOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import ThemeButton from "../common/theme-button";
-import VirtualList from 'rc-virtual-list';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 const { Text } = Typography;

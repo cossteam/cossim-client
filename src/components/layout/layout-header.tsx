@@ -4,7 +4,7 @@ import { Divider, Flex, Typography, Modal, Dropdown, message } from 'antd'
 import type { MenuProps } from 'antd';
 import { useMemo, useState } from 'react';
 import AddContact from '../contact/add-contact';
-import ContactList from '../contact-list';
+import ContactList from '@/components/contact';
 import GroupCreate from '../group/group-create';
 import { Plus, Scan, UserPlus, UsersThree, VideoCamera } from '@phosphor-icons/react';
 
@@ -109,13 +109,15 @@ const LayoutHeader = () => {
             <Divider className="m-0" />
             {/* 模态框 */}
             <Modal
+                
                 wrapClassName="ant-modal-content-prl0"
                 title={<div className="text-center">{modalTitle}</div>}
                 open={isModalVisible}
                 onCancel={handleModalClose}
                 footer={null}
                 width={modalWidth}
-                height={modalHeight}
+                // height={modalHeight}
+                centered
             >
                 {activeComponent}
             </Modal>
