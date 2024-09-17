@@ -2,11 +2,11 @@ import { SearchOutlined } from '@ant-design/icons'
 import { Avatar, Input, List, Modal, Spin, ConfigProvider, Typography } from 'antd'
 import { Divider } from 'antd'
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import UserCard from '@/components/user/user-card'
 import useMobile from '@/hooks/useMobile'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { searchUserApi } from '@/api/user'
 import { debounce } from 'lodash'
+import NotContactCard from '@/components/user/not-contact-card'
 
 interface AddContactProps {
     onClick?: (item: User) => void
@@ -28,67 +28,8 @@ const mockData: User[] = [
         avatar: 'https://xsgames.co/randomusers/avatar.php?g=male',
         signature: '生活就像一盒巧克力'
     },
-    // {
-    //     email: 'lisi@example.com',
-    //     nickname: '李四',
-    //     avatar: 'https://xsgames.co/randomusers/avatar.php?g=female',
-    //     signature: '每一天都是新的开始'
-    // },
-    // {
-    //     email: 'wangwu@example.com',
-    //     nickname: '王五',
-    //     avatar: 'https://xsgames.co/randomusers/avatar.php?g=male',
-    //     signature: '保持积极乐观的态度'
-    // },
-    // {
-    //     email: 'zhaoliu@example.com',
-    //     nickname: '赵六',
-    //     avatar: 'https://xsgames.co/randomusers/avatar.php?g=female',
-    //     signature: '努力工作，快乐生活'
-    // },
-    // {
-    //     email: 'qianqi@example.com',
-    //     nickname: '钱七',
-    //     avatar: 'https://xsgames.co/randomusers/avatar.php?g=male',
-    //     signature: '学无止境'
-    // },
-    // {
-    //     email: 'sunba@example.com',
-    //     nickname: '孙八',
-    //     avatar: 'https://xsgames.co/randomusers/avatar.php?g=female',
-    //     signature: '享受当下，珍惜眼前'
-    // },
-    // {
-    //     email: 'zhoujiu@example.com',
-    //     nickname: '周九',
-    //     avatar: 'https://xsgames.co/randomusers/avatar.php?g=male',
-    //     signature: '勇往直前，永不言弃'
-    // },
-    // {
-    //     email: 'wushi@example.com',
-    //     nickname: '吴十',
-    //     avatar: 'https://xsgames.co/randomusers/avatar.php?g=female',
-    //     signature: '微笑面对每一天'
-    // },
-    // {
-    //     email: 'zhengyi@example.com',
-    //     nickname: '郑一',
-    //     avatar: 'https://xsgames.co/randomusers/avatar.php?g=male',
-    //     signature: '保持好奇心，永远年轻'
-    // },
-    // {
-    //     email: 'wanger@example.com',
-    //     nickname: '王二',
-    //     avatar: 'https://xsgames.co/randomusers/avatar.php?g=female',
-    //     signature: '做最好的自己'
-    // }
+    // ...
 ]
-
-// const userInfoItem = [
-//     { title: '用户ID', content: '1', action: true },
-//     { title: '昵称', content: 't' },
-//     { title: '来源', content: '搜索' }
-// ]
 
 const AddContact: React.FC<AddContactProps> = ({ onClick }) => {
     // 状态管理
@@ -191,11 +132,11 @@ const AddContact: React.FC<AddContactProps> = ({ onClick }) => {
     }, [debouncedSearchUser]);
 
 
-    const getUserInfoItems = (user: User) => [
-        { title: '用户ID', content: user.user_id, action: true },
-        { title: '昵称', content: user.nickname },
-        { title: '邮箱', content: user.email }
-    ];
+    // const getUserInfoItems = (user: User) => [
+    //     { title: '用户ID', content: user.user_id, action: true },
+    //     { title: '昵称', content: user.nickname },
+    //     { title: '邮箱', content: user.email }
+    // ];
 
     // 渲染搜索结果列表
     const renderSearchResults = () => {
@@ -287,16 +228,16 @@ const AddContact: React.FC<AddContactProps> = ({ onClick }) => {
                 footer={null}
             >
                 {selectedUser && (
-                    <UserCard
+                    <NotContactCard
                         userId={selectedUser.user_id}
+                        email={selectedUser.email}
                         avatar={selectedUser.avatar}
                         nickname={selectedUser.nickname}
                         signature={selectedUser.signature}
-                        userInfoItem={getUserInfoItems(selectedUser)}
-                        groupCount={5}
                     />
                 )}
             </Modal>
+
         </div>
     );
 };

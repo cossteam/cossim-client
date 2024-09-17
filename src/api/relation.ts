@@ -2,15 +2,22 @@
 
 import { AddFriendParams, ManageFriendRequestParams, QueryParams, ShowDialogParams, TopDialogParams } from '@/types/api'
 import request from '@/lib/request'
+import { Contact } from '@/types/storage'
 
 const baseUrl = '/relation/user'
 const relationDialog = '/relation/dialog'
 const relationGroup = '/relation/group'
 
+
+export interface FriendListData {
+    list: { [key: string]: Contact[] };
+    total: number;
+}
+
 /**
  * 获取好友列表
  */
-export function getFriendListApi(): Promise<ResponseData> {
+export function getFriendListApi(): Promise<ResponseData<FriendListData>> {
     return request({
         url: `${baseUrl}/friend`
     })

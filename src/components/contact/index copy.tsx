@@ -7,7 +7,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { Tag, UserPlus, Users } from '@phosphor-icons/react'
 
 // 联系人列表页面组件
-const ContactListPage = () => {
+const ContactListPageInfiniteScroll = () => {
     // 定义状态和钩子
     const [loading, setLoading] = useState(false)
     const [contactList, setContactList] = useState<ContactList>({ list: {}, total: 0 })
@@ -106,4 +106,4 @@ const ContactListPage = () => {
     )
 }
 
-export default ContactListPage
+export default ContactListPageInfiniteScroll

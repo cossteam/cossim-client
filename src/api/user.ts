@@ -10,6 +10,7 @@ import type {
     UserPublicKeyQueryParams
 } from '@/types/api'
 import request from '@/lib/request'
+import { Contact } from '@/types/storage'
 
 const baseUrl: string = '/user'
 
@@ -70,12 +71,16 @@ export function searchUserApi(params: SearchUserParams): Promise<ResponseData> {
     })
 }
 
+export interface GetUserInfoData extends Contact {
+
+}
+
 /**
  * 查询用户信息
  * @param params
  * @returns
  */
-export function getUserInfoApi(params: UserInfoQueryParams): Promise<ResponseData> {
+export function getUserInfoApi(params: UserInfoQueryParams): Promise<ResponseData<GetUserInfoData>> {
     return request({
         url: `${baseUrl}/${params.id}`,
         method: 'GET',

@@ -6,6 +6,7 @@ import useCommonStore from '@/stores/common'
 import NewRequest from '@/components/contact/new-request'
 import UserInfo from '@/components/profile/user-info'
 import { useAuthStore } from '@/stores/auth'
+import ContactUserInfo from '@/components/contact/user-info'
 // import { useAuthStore } from '@/stores/auth'
 
 // TODO: 添加个人信息页
@@ -30,7 +31,7 @@ const Dialog = () => {
             case ROUTE.MESSAGE:
                 return <Message />
             case ROUTE.CONTACT:
-                return params.id === 'request' ? <NewRequest /> : <TestContact />
+                return params.id === 'request' ? <NewRequest /> : <ContactUserInfo userId={params.id as string} />
             case ROUTE.PROFILE:
                 return params.id === 'user-info' ? (
                     <UserInfo 

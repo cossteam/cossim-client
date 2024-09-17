@@ -10,8 +10,9 @@ import { Trash } from '@phosphor-icons/react';
 import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from "@/components/ui/button"
-import RequestInfoCard from './request-info-card';
-import UserCard from '@/components/user/user-card';
+import RequestInfoCard from '@/components/contact/new-request/request-info-card';
+import UserInfoCard from '../user-info/card';
+import UserCard from '../user-info/card';
 
 const { Text } = Typography;
 
@@ -28,7 +29,7 @@ const NewRequest: React.FC = () => {
 
     const uid = useAuthStore(state => state.userId);
 
-     // 分段选项
+    // 分段选项
     // const segmentOptions = useMemo(() => [
     //     { label: '所有', value: '所有' },
     //     { label: '未处理', value: '未处理' },
@@ -215,15 +216,15 @@ const NewRequest: React.FC = () => {
                 onClick={() => showUserCard(item)}
             >
                 <List.Item.Meta
-                    avatar={<Avatar 
-                        className='ml-4' 
-                        src={item.sender_info.avatar} 
-                        size={48} 
-                        onClick={(e?: React.MouseEvent) => { 
-                            e?.stopPropagation(); 
-                            setIsFullUserCard(true); 
-                            showUserCard(item); 
-                        }} 
+                    avatar={<Avatar
+                        className='ml-4'
+                        src={item.sender_info.avatar}
+                        size={48}
+                        onClick={(e?: React.MouseEvent) => {
+                            e?.stopPropagation();
+                            setIsFullUserCard(true);
+                            showUserCard(item);
+                        }}
                     />}
                     title={<span className="text-sm font-bold">{item.sender_info.nickname}</span>}
                     description={
@@ -307,7 +308,7 @@ const NewRequest: React.FC = () => {
                 title={<div className="text-center pt-4">{selectedUser?.status === ApplyStatus.PENDING ? '请求信息' : '用户信息'}</div>}
                 wrapClassName="ant-modal-content-p-0"
                 style={{
-                    maxWidth: isFullUserCard ? 450 : (selectedUser?.status === ApplyStatus.PENDING ? 320 : 450),
+                    maxWidth: isFullUserCard ? 480 : (selectedUser?.status === ApplyStatus.PENDING ? 320 : 480),
                 }}
                 centered
                 open={isModalVisible}
@@ -323,29 +324,26 @@ const NewRequest: React.FC = () => {
                     </div>
                 ) : <div className="flex justify-between w-full"></div>}
             >
-
-                {selectedUser && (
-                    <React.Fragment>
-                        {isFullUserCard || selectedUser.status !== ApplyStatus.PENDING ? (
-                            <UserCard
-                                userId={selectedUser.sender_info.coss_id}
-                                avatar={selectedUser.sender_info.avatar}
-                                nickname={selectedUser.sender_info.nickname}
-                                signature={selectedUser.sender_info.signature}
-                                userInfoItem={getUserInfoItems(selectedUser)}
-                            />
-                        ) : (
-                            <RequestInfoCard
-                                requestId={selectedUser.id}
-                                userId={selectedUser.sender_info.coss_id}
-                                avatar={selectedUser.sender_info.avatar}
-                                nickname={selectedUser.sender_info.nickname}
-                                signature={selectedUser.sender_info.signature}
-                                userInfoItem={getRequestInfoItems(selectedUser)}
-                            />
-                        )}
-                    </React.Fragment>
-                )}
+                <div className="overflow-y-auto" style={{
+                    height: isFullUserCard ? 470 : (selectedUser?.status === ApplyStatus.PENDING ? 400 : 470)
+                }}>
+                    {selectedUser && (
+                        <React.Fragment>
+                            {isFullUserCard || selectedUser.status !== ApplyStatus.PENDING ? (
+                                <UserCard isContact={selectedUser.status !== ApplyStatus.PENDING} userId={selectedUser.sender_info.user_id} />
+                            ) : (
+                                <RequestInfoCard
+                                    requestId={selectedUser.id}
+                                    userId={selectedUser.sender_info.coss_id}
+                                    avatar={selectedUser.sender_info.avatar}
+                                    nickname={selectedUser.sender_info.nickname}
+                                    signature={selectedUser.sender_info.signature}
+                                    userInfoItem={getRequestInfoItems(selectedUser)}
+                                />
+                            )}
+                        </React.Fragment>
+                    )}
+                </div>
             </Modal>
         </Flex>
     );
