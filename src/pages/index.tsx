@@ -4,6 +4,7 @@ import { CircleHelp, LogOut, Menu, MessageSquare, Settings, ShieldAlert, SquareA
 import { useLocation } from 'react-router-dom'
 import { Outlet, Link } from 'react-router-dom'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/dropdown-menu'
+import Test from '@/components/test'
 
 const sideRoutes = [
     {
@@ -50,7 +51,7 @@ const HomePage = () => {
     const location = useLocation()
     return (
         <div className="flex h-screen min-h-[450px] overflow-hidden">
-            <div className="bg-foreground/10 w-14 py-4 flex flex-col items-center">
+            <div className="bg-background w-14 py-4 flex flex-col items-center border-r">
                 <div className="inline-block size-8 rounded-full bg-primary relative mb-10">
                     <img className="object-cover w-full h-full rounded-full " src="https://picsum.photos/40" alt="" />
                     <div className="absolute bottom-0 right-0 size-3 rounded-full bg-primary z-10 border-2 border-white"></div>

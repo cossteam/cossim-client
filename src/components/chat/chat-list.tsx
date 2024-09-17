@@ -1,7 +1,9 @@
 import { formatDate } from '@/lib/utils'
 import { generateChatList } from '@/mock/data'
+import { useConfigStore } from '@/stores/config'
 import { DialogInterface } from '@/types/common'
 import { Badge } from '@/ui/badge'
+import { ScrollArea } from '@/ui/scroll-area'
 import { useMemo } from 'react'
 
 const ChatItem: React.FC<{ chat: DialogInterface }> = ({ chat }) => {
@@ -42,13 +44,16 @@ const ChatListEmpty = () => {
 
 const ChatList = () => {
     const chats = useMemo(() => generateChatList(15), [])
+    const sidebarWidth = useConfigStore((state) => state.sidebarWidth)
     // TODO: 添加虚拟滚动
     return (
-        <div className="scroll w-full h-full overflow-y-auto">
-            {chats.map((chat, index) => (
-                <ChatItem key={index} chat={chat} />
-            ))}
-        </div>
+        <ScrollArea className="w-full h-full">
+            <div style={{ width: sidebarWidth }}>
+                {chats.map((chat, index) => (
+                    <ChatItem key={index} chat={chat} />
+                ))}
+            </div>
+        </ScrollArea>
     )
 }
 

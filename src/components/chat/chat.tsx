@@ -1,41 +1,61 @@
-import { Ellipsis } from 'lucide-react'
+import { Ellipsis, Link, Image, Send, ArrowUp } from 'lucide-react'
 import ChatProvider from '@/components/provider/chat-provider'
-import { useContext } from 'react'
-import { ChatContext } from '@/context/chat-context'
-import Drawer from './drawer'
-import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover'
+import { useCallback, useMemo } from 'react'
+import { cn } from '@/lib/utils'
+import { generateMessageList } from '@/mock/data'
+import { ScrollArea } from '@/ui/scroll-area'
+import { Button } from '@/ui/button'
 
 const ChatHeader = () => {
-    const { isDrawerOpen, update } = useContext(ChatContext)
-
     return (
-        <div className="h-14 border-b border-muted-foreground/30 flex items-center px-4 justify-between">
-            <Popover>
-                <PopoverTrigger>
-                    <h1 className="ellipsis flex-1 select-none">Next 老司机交流群（400）</h1>
-                </PopoverTrigger>
-                <PopoverContent>群信息/个人信息</PopoverContent>
-            </Popover>
-            <Ellipsis
-                className="size-5 cursor-pointer hover:text-primary active:text-primary text-muted-foreground"
-                onClick={() => update({ isDrawerOpen: !isDrawerOpen })}
-            />
+        <div className="h-16 border-b flex justify-between items-center w-full px-5 py-2 shadow-sm flex-shrink-0">
+            <div className="flex items-center">
+                <p className="">Mircel Jones</p>
+            </div>
+            <div className="flex items-center space-x-5">
+                <Ellipsis className="size-5 cursor-pointer hover:text-primary active:text-primary text-muted-foreground" />
+            </div>
         </div>
     )
 }
 
+const meessage = generateMessageList(10)
+
 const ChatContent = () => {
-    const { isDrawerOpen } = useContext(ChatContext)
     return (
-        <div className="scroll flex-1 overflow-y-auto px-4 relative">
-            <ChatListItem />
-            {isDrawerOpen && <Drawer />}
-        </div>
+        <ScrollArea className="flex-1 md:px-5 px-4 relative">
+            {meessage.map((item, index) => (
+                <ChatListItem key={item.msg_id} item={item} aligin={index % 2 === 0 ? 'left' : 'right'} />
+            ))}
+        </ScrollArea>
     )
 }
 
 const ChatFooter = () => {
-    return <div className="h-16 border-t border-muted-foreground/30 flex items-center px-4 justify-between">Footer</div>
+    return (
+        <div className="py-3 flex items-center px-4 justify-between w-full shadow-sm flex-shrink-0">
+            <div className="group w-full min-h-12 flex justify-between px-3 items-center border border-transparent bg-slate-50 focus-within:border-slate-300 rounded-lg">
+                {/* <div className="flex items-center space-x-4">
+                    <Link className="text-muted-foreground/50 group-focus-within:text-muted-foreground" size={20} />
+                    <Image className="text-muted-foreground/50 group-focus-within:text-muted-foreground" size={20} />
+                </div> */}
+
+                <ScrollArea className="flex-1 relative max-h-[150px]">
+                    <div
+                        className="w-full px-3 bg-transparent outline-none placeholder:text-slate-400"
+                        contentEditable
+                    />
+                </ScrollArea>
+
+                <div className="flex-shrink-0">
+                    {/* <Send className="text-muted-foreground/50 group-focus-within:text-muted-foreground" size={20} /> */}
+                    <div className="bg-muted-foreground/50 rounded-full p-1.5">
+                        <ArrowUp className="text-white" size={20} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
 const Chat = () => {
@@ -51,20 +71,58 @@ const Chat = () => {
 }
 
 interface ChatListItemProps {
-    aligin: 'left' | 'right' | 'center'
+    aligin?: 'left' | 'right'
+    item: Message
 }
 
-const ChatListItem = () => {
+const ChatListItem: React.FC<ChatListItemProps> = ({ aligin = 'left', item }) => {
+    // const isSelf = useMemo(() => item.sender_id, [item.sender_id])
+
+    const baseLayout = useMemo(
+        () => ({
+            'justify-start': aligin === 'left',
+            'justify-end': aligin === 'right'
+        }),
+        [aligin]
+    )
+
+    const renderContent = useCallback(() => {
+        return (
+            <div
+                className={cn('mt-2 w-auto max-w-full p-4 rounded-b-xl', {
+                    'rounded-tr-xl bg-muted-foreground/10': aligin === 'left',
+                    'rounded-tl-xl bg-primary/10': aligin === 'right'
+                })}
+            >
+                <p className="text-sm break-before-auto break-all">{item.content}</p>
+            </div>
+        )
+    }, [])
+
     return (
-        <div className="flex w-full py-3">
-            <div className="flex max-w-[80%] overflow-hidden gap-x-2">
-                <img className="size-8 rounded-full flex-shrink-0" src="https://picsum.photos/48" alt="" />
-                <div className="flex flex-col gap-y-0.5">
-                    <h3 className="text-xs text-muted-foreground/80 select-none">小明</h3>
-                    <div className="bg-primary px-2 py-1 rounded text-background text-sm leading-6 break-all">
-                        hello
-                        world！我来自中国，很开心人事你都是废话九二万吨和复活节很热的风格化何让个3会跟2会跟2和哥哥换个地方换个和
-                    </div>
+        <div className={cn('w-full flex py-3', baseLayout)}>
+            <div
+                className={cn('w-4/5 flex flex-col', {
+                    'items-start': aligin === 'left',
+                    'items-end': aligin === 'right'
+                })}
+            >
+                <div className="flex items-center gap-x-2">
+                    <img
+                        className={cn('size-5 overflow-hidden rounded-full', {
+                            'order-first': aligin === 'left',
+                            'order-last': aligin === 'right'
+                        })}
+                        src="https://picsum.photos/48"
+                        alt=""
+                    />
+                    <span className="text-xs text-foreground/80">{item?.sender_info?.name}</span>
+                </div>
+
+                {renderContent()}
+
+                <div className={cn('flex mt-1 px-1', baseLayout)}>
+                    <span className="text-slate-400 text-xs">12:30</span>
                 </div>
             </div>
         </div>

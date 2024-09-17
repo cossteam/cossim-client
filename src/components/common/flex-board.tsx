@@ -12,7 +12,7 @@ export const FlexboardSidebar: React.FC<FlexboardCommonProps> = ({ children, cla
     </div>
 )
 export const FlexboardContent: React.FC<FlexboardCommonProps> = ({ children, className, ...props }) => (
-    <div className={cn('flex-1 h-full overflow-auto bg-secondary', className)} {...props}>
+    <div className={cn('flex-1 h-full overflow-hidden', className)} {...props}>
         {children}
     </div>
 )

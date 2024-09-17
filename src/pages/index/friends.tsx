@@ -1,10 +1,11 @@
 import { Flexboard, FlexboardSidebar, FlexboardContent } from '@/components//common/flex-board'
+import SidebarSearch from '@/components/common/sidebar-search'
 
 const FriendsPage = () => {
     return (
         <Flexboard>
-            <FlexboardSidebar className="flex">
-                <div>FriendsPage</div>
+            <FlexboardSidebar>
+                <SidebarSearch />
             </FlexboardSidebar>
             <FlexboardContent>2</FlexboardContent>
         </Flexboard>
