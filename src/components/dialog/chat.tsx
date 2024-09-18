@@ -1,10 +1,10 @@
-import { Ellipsis, Link, Image, Send, ArrowUp } from 'lucide-react'
+import { Ellipsis, ArrowUp } from 'lucide-react'
 import ChatProvider from '@/components/provider/chat-provider'
 import { useCallback, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { generateMessageList } from '@/mock/data'
 import { ScrollArea } from '@/ui/scroll-area'
-import { Button } from '@/ui/button'
+import { Message } from '@/interface/model/dialog'
 
 const ChatHeader = () => {
     return (
@@ -34,7 +34,7 @@ const ChatContent = () => {
 const ChatFooter = () => {
     return (
         <div className="py-3 flex items-center px-4 justify-between w-full shadow-sm flex-shrink-0">
-            <div className="group w-full min-h-12 flex justify-between px-3 items-center border border-transparent bg-slate-50 focus-within:border-slate-300 rounded-lg">
+            <div className="group bg-foreground/10 w-full min-h-12 flex justify-between px-3 items-center border border-transparent bg-slate-50 focus-within:border-slate-300 rounded-lg">
                 {/* <div className="flex items-center space-x-4">
                     <Link className="text-muted-foreground/50 group-focus-within:text-muted-foreground" size={20} />
                     <Image className="text-muted-foreground/50 group-focus-within:text-muted-foreground" size={20} />

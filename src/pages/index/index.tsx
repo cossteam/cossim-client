@@ -1,14 +1,14 @@
 import { Flexboard, FlexboardSidebar, FlexboardContent } from '@/components//common/flex-board'
 import SidebarSearch from '@/components/common/sidebar-search'
-import Chat from '@/components/chat/chat'
-import ChatList from '@/components/chat/chat-list'
+import Chat from '@/components/dialog/chat'
+import DialogList from '@/components/dialog/dialog-list'
 
-const ChatPage = () => {
+const DialogPage = () => {
     return (
         <Flexboard>
             <FlexboardSidebar>
                 <SidebarSearch />
-                <ChatList />
+                <DialogList />
             </FlexboardSidebar>
             <FlexboardContent>
                 <Chat />
@@ -17,4 +17,4 @@ const ChatPage = () => {
     )
 }
 
-export default ChatPage
+export default DialogPage

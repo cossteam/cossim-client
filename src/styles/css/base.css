@@ -65,7 +65,7 @@
     }
 
     body {
-        @apply bg-background text-foreground text-sm h-screen min-h-[450px] overflow-hidden select-none;
+        @apply bg-background text-foreground text-sm h-screen min-h-[500px] overflow-hidden select-none;
         font-family:
             system-ui,
             -apple-system,

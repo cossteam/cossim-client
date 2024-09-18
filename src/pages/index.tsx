@@ -4,51 +4,55 @@ import { CircleHelp, LogOut, Menu, MessageSquare, Settings, ShieldAlert, SquareA
 import { useLocation } from 'react-router-dom'
 import { Outlet, Link } from 'react-router-dom'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/dropdown-menu'
-import Test from '@/components/test'
+import { useTranslation } from 'react-i18next'
+import { useMemo } from 'react'
 
 const sideRoutes = [
     {
         path: '/',
-        name: 'Home',
         icon: MessageSquare
     },
     {
-        path: '/friends',
-        name: 'Friends',
+        path: '/contacts',
         icon: Users
-    }
-]
-
-const toolbarMenus = [
-    {
-        name: '检查更新',
-        icon: SquareArrowUp,
-        hanlder: () => {}
-    },
-    {
-        name: '帮助',
-        icon: CircleHelp,
-        hanlder: () => {}
-    },
-    {
-        name: '设置',
-        icon: Settings,
-        hanlder: () => {}
-    },
-    {
-        name: '关于',
-        icon: ShieldAlert,
-        hanlder: () => {}
-    },
-    {
-        name: '退出登录',
-        icon: LogOut,
-        hanlder: () => {}
     }
 ]
 
 const HomePage = () => {
     const location = useLocation()
+    const { t } = useTranslation()
+
+    const toolbarMenus = useMemo(
+        () => [
+            {
+                name: t('检查更新'),
+                icon: SquareArrowUp,
+                hanlder: () => {}
+            },
+            {
+                name: t('帮助'),
+                icon: CircleHelp,
+                hanlder: () => {}
+            },
+            {
+                name: t('设置'),
+                icon: Settings,
+                hanlder: () => {}
+            },
+            {
+                name: t('关于'),
+                icon: ShieldAlert,
+                hanlder: () => {}
+            },
+            {
+                name: t('退出登录'),
+                icon: LogOut,
+                hanlder: () => {}
+            }
+        ],
+        [t]
+    )
+
     return (
         <div className="flex h-screen min-h-[450px] overflow-hidden">
             <div className="bg-background w-14 py-4 flex flex-col items-center border-r">
@@ -106,6 +110,7 @@ const HomePage = () => {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
+
             <div className="flex-1 h-full">
                 <Outlet />
             </div>

@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { useCallback, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { registerApi } from '@/api/user'
+import { registerApi } from '@/http/user'
 
 const Validator = z.object({
     nickname: z.string(),

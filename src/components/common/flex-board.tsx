@@ -7,7 +7,7 @@ interface FlexboardCommonProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const FlexboardSidebar: React.FC<FlexboardCommonProps> = ({ children, className, ...props }) => (
-    <div className={cn('flex-1 h-full overflow-hidden relative', className)} {...props}>
+    <div className={cn('flex-1 h-full overflow-hidden relative flex flex-col w-full', className)} {...props}>
         {children}
     </div>
 )

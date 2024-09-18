@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { useCallback, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { cn, createFingerprint } from '@/lib/utils'
-import { loginApi } from '@/api/user'
+import { loginApi } from '@/http/user'
 import { useAuthStore } from '@/stores/auth'
 import { useNavigate } from 'react-router-dom'
 

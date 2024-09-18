@@ -3,10 +3,11 @@
  * 后续接入接口后删除并移除 @faker-js/faker 依赖
  * @author YuHong
  */
-import { DialogInterface } from '@/types/common'
+import { Contact } from '@/interface/model/contact'
+import { DialogListItem, Message } from '@/interface/model/dialog'
 import { faker } from '@faker-js/faker'
 
-export const generateChatList = (count: number = 10): DialogInterface[] => {
+export const generateChatList = (count: number = 10): DialogListItem[] => {
     return Array.from({ length: count }, (_, index) => {
         const isGroup = faker.datatype.boolean()
         return {
@@ -44,19 +45,29 @@ export const generateChatList = (count: number = 10): DialogInterface[] => {
     })
 }
 
-export const generateFriendList = (count: number = 10) => {
+export const generateFriendList = (count: number = 10): Contact[] => {
     return Array.from({ length: count }, () => {
+        const nickname = faker.person.firstName()
         return {
             avatar: faker.image.avatar(),
             dialog_id: faker.number.int(),
             email: faker.internet.email(),
             id: faker.string.uuid(),
-            nickname: faker.person.firstName(),
+            nickname,
             remark: faker.lorem.sentence(4),
             signature: faker.lorem.sentence(4),
             status: faker.number.int({ min: 0, max: 1 }),
             tel: faker.phone.number(),
-            user_id: faker.string.uuid()
+            user_id: faker.string.uuid(),
+            coss_id: faker.string.uuid(),
+            preferences: {
+                open_burn_after_reading: false,
+                open_burn_after_reading_time_out: 10,
+                remark: '',
+                silent_notification: false
+            },
+            relation_status: 1,
+            group: nickname[0]
         }
     })
 }
@@ -85,7 +96,14 @@ export const generateMessageList = (count: number = 10): Message[] => {
                 user_id: faker.string.uuid()
             },
             type: faker.number.int({ min: 0, max: 10 }),
-            sender_id: faker.number.int({ min: 0, max: 1 }) ? '1' : '2'
+            sender_id: faker.number.int({ min: 0, max: 1 }) ? '1' : '2',
+            is_burn_after_reading: faker.datatype.boolean(),
+            is_at_all: faker.datatype.boolean(),
+            is_reply: faker.datatype.boolean(),
+            reply_id: faker.number.int(),
+            msg_type: faker.number.int({ min: 0, max: 10 }),
+            send_at: new Date(faker.date.recent()).getTime(),
+            reply: 0
         }
     })
 }
@@ -104,26 +122,26 @@ export const generateGroupInfo = () => {
     return {}
 }
 
-export interface Preferences {
-    open_burn_after_reading: boolean
-    open_burn_after_reading_time_out: number
-    remark: string
-    silent_notification: boolean
-}
+// export interface Preferences {
+//     open_burn_after_reading: boolean
+//     open_burn_after_reading_time_out: number
+//     remark: string
+//     silent_notification: boolean
+// }
 
-export interface Contact {
-    avatar: string
-    coss_id: string
-    dialog_id?: number
-    email: string
-    nickname: string
-    preferences?: Preferences
-    relation_status?: number
-    signature: string
-    status?: number
-    tel?: string
-    user_id: string
-}
+// export interface Contact {
+//     avatar: string
+//     coss_id: string
+//     dialog_id?: number
+//     email: string
+//     nickname: string
+//     preferences?: Preferences
+//     relation_status?: number
+//     signature: string
+//     status?: number
+//     tel?: string
+//     user_id: string
+// }
 
 export interface ContactList {
     list: Record<string, Contact[]>
