@@ -2,15 +2,16 @@ import { Badge } from '@/ui/badge'
 
 interface ListItemProps {
     src: string
-    name: string
+    name: string | React.ReactNode
     description?: string
     right?: {
         date: string
         unreadCount: number
     }
+    reightContent?: React.ReactNode
 }
 
-const ListItem: React.FC<ListItemProps> = ({ src, name, description, right }) => {
+const ListItem: React.FC<ListItemProps> = ({ src, name, description, right, reightContent }) => {
     return (
         <div className="w-full hover:bg-muted-foreground/10 p-2 cursor-pointer duration-300 flex gap-x-1.5 items-center">
             <div className="flex items-center size-14 justify-center flex-shrink-0">
@@ -26,7 +27,7 @@ const ListItem: React.FC<ListItemProps> = ({ src, name, description, right }) =>
                 )}
             </div>
 
-            {right && (
+            {!reightContent && right && (
                 <div className="w-12 flex-shrink-0 flex flex-col items-end gap-y-1.5">
                     <div className="text-xs text-gray-700 whitespace-nowrap">{right?.date}</div>
                     <Badge className="px-1.5 py-0 rounded-full bg-red-500" variant="destructive">
@@ -34,6 +35,8 @@ const ListItem: React.FC<ListItemProps> = ({ src, name, description, right }) =>
                     </Badge>
                 </div>
             )}
+
+            {reightContent}
         </div>
     )
 }

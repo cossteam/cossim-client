@@ -3,7 +3,7 @@ import { useConfigStore } from '@/stores/config'
 import { Children, isValidElement, useCallback, useEffect, useRef, useState } from 'react'
 
 interface FlexboardCommonProps extends React.HTMLAttributes<HTMLDivElement> {
-    children: React.ReactNode
+    children?: React.ReactNode
 }
 
 export const FlexboardSidebar: React.FC<FlexboardCommonProps> = ({ children, className, ...props }) => (
