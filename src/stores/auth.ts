@@ -1,3 +1,4 @@
+import { clearLocal } from '@/lib/local'
 import { createPersistStore } from '@/lib/store'
 import { generateUserInfo } from '@/mock/data'
 
@@ -17,10 +18,19 @@ const initialState: UserState = {
     driverId: '123'
 }
 
-export const useAuthStore = createPersistStore(initialState, (set, get) => ({}), {
-    name: 'coss-auth',
-    version: 1
-    // migrate(state, version) {
-    // return newState as any
-    // }
-})
+export const useAuthStore = createPersistStore(
+    initialState,
+    (set) => ({
+        lgout() {
+            set(initialState)
+            clearLocal()
+        }
+    }),
+    {
+        name: 'coss-auth',
+        version: 1
+        // migrate(state, version) {
+        // return newState as any
+        // }
+    }
+)

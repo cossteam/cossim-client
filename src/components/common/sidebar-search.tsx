@@ -1,21 +1,11 @@
 import { buttonVariants } from '@/ui/button'
 import { Input } from '@/ui/input'
 import { MessageSquarePlus, Plus, Search, UserRoundPlus } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { useClickOutside } from '@reactuses/core'
-
-const menus = [
-    {
-        name: '发起群聊',
-        icon: MessageSquarePlus
-    },
-    {
-        name: '加好友/群',
-        icon: UserRoundPlus
-    }
-]
+import { useTranslation } from 'react-i18next'
 
 const SidebarSearch = () => {
     const [ketword, setKeyword] = useState('')
@@ -25,6 +15,22 @@ const SidebarSearch = () => {
     useClickOutside(sidebarRef, () => {
         setContentShow(false)
     })
+
+    const { t } = useTranslation()
+
+    const menus = useMemo(
+        () => [
+            {
+                name: t('groupCreate'),
+                icon: MessageSquarePlus
+            },
+            {
+                name: t('grouporUserAdd'),
+                icon: UserRoundPlus
+            }
+        ],
+        []
+    )
 
     return (
         <div
@@ -39,7 +45,7 @@ const SidebarSearch = () => {
                     <Input
                         className="flex-1 focus-within:border-transparent"
                         type="text"
-                        placeholder="搜索"
+                        placeholder={t('search')}
                         variant="ghost"
                         value={ketword}
                         onChange={(e) => setKeyword(e.target.value)}
@@ -78,8 +84,8 @@ const SidebarSearch = () => {
                                 <Search className="size-6 text-white" />
                             </div>
                             <div className="flex flex-col">
-                                <h2 className="text-sm">进入全网搜索</h2>
-                                <p className="text-xs text-gray-500">搜索用户、群聊等</p>
+                                <h2 className="text-sm">{t('globalSearch')}</h2>
+                                <p className="text-xs text-gray-500">{t('globalSearchDesc')}</p>
                             </div>
                         </div>
                     )}
@@ -93,8 +99,8 @@ const SidebarSearch = () => {
                                         <Search className="size-6 text-white" />
                                     </div>
                                     <div className="flex flex-col">
-                                        <h2 className="text-sm">搜索结果</h2>
-                                        <p className="text-xs text-gray-500">共找到 {10} 个结果</p>
+                                        <h2 className="text-sm">{t('searchResult')}</h2>
+                                        <p className="text-xs text-gray-500">{t('searchResultDesc', { count: 10 })}</p>
                                     </div>
                                 </div>
                             </div>

@@ -34,7 +34,11 @@ function SignInPage() {
         handleSubmit,
         formState: { errors }
     } = useForm<TValidator>({
-        resolver: zodResolver(Validator)
+        resolver: zodResolver(Validator),
+        defaultValues: {
+            email: '123@123.com',
+            password: '123456'
+        }
     })
 
     const variant = useCallback(

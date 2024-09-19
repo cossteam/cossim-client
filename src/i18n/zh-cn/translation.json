@@ -1,0 +1,21 @@
+{
+  "checkUpdate": "检查更新",
+  "help": "帮助",
+  "setting": "设置",
+  "about": "关于",
+  "quit": "退出",
+  "notFound": "未找到页面",
+  "groupCreate": "创建群聊",
+  "grouporUserAdd": "添加好友/群",
+  "globalSearch": "全网搜索",
+  "globalSearchDesc": "搜索用户、群聊等",
+  "searchResult": "搜索结果",
+  "searchResultDesc": "共找到 {{count}} 个结果",
+  "friends": "好友",
+  "groups": "群组",
+  "blacklist": "黑名单",
+  "requestFormFriend": "好友通知",
+  "requestFormGroup": "群组通知",
+  "unblaclist": "移出黑名单",
+  "search": "搜索"
+}

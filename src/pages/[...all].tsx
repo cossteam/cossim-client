@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 const NotFound = () => {
+    const { t } = useTranslation()
     return (
-        <div>
-            <h1>Page Not Found</h1>
-            <Link to="/">Go to Homepage</Link>
+        <div className="flex m-auto">
+            <h1>{t('notFound')}</h1>
         </div>
     )
 }

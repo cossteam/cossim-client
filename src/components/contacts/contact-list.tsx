@@ -51,11 +51,11 @@ const ContactTabs = () => {
 
     const tabs = useMemo(
         () => [
-            { key: Tabs.Contact, name: t('好友') },
-            { key: Tabs.Group, name: t('群组') },
+            { key: Tabs.Contact, name: t('friends') },
+            { key: Tabs.Group, name: t('groups') },
             {
                 key: Tabs.BlackList,
-                name: t('黑名单')
+                name: t('blacklist')
             }
         ],
         []
@@ -91,11 +91,11 @@ const ContactHeader = () => {
         () => [
             {
                 path: `request?type=${RequestType.RequestContact}`,
-                name: t('好友申请通知')
+                name: t('requestFormFriend')
             },
             {
                 path: `request?type=${RequestType.RequestGroup}`,
-                name: t('群聊申请通知')
+                name: t('requestFormGroup')
             }
         ],
         [t]
@@ -146,7 +146,7 @@ const ContactBlackList = () => {
     const { t } = useTranslation()
 
     const renderButton = useCallback(() => {
-        return <Button size="sm">{t('移出黑名单')}</Button>
+        return <Button size="sm">{t('unblaclist')}</Button>
     }, [])
 
     return Array.from({ length: 6 }).map((_, index) => (

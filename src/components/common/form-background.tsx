@@ -8,6 +8,7 @@ export interface FormBackgroundProps {
     type?: 'sign-in' | 'sign-up'
 }
 
+// TODO: 更新布局
 export const FormBackground: React.FC<FormBackgroundProps> = ({ children, type = 'sign-in' }) => {
     return (
         <section className={cn('relative overflow-hidden w-full min-h-screen', style['form-background'])}>

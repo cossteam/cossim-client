@@ -1,56 +1,75 @@
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/ui/button'
 import { CircleHelp, LogOut, Menu, MessageSquare, Settings, ShieldAlert, SquareArrowUp, Users } from 'lucide-react'
-import { useLocation } from 'react-router-dom'
-import { Outlet, Link } from 'react-router-dom'
+import { Outlet, Link, useLocation } from 'react-router-dom'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/dropdown-menu'
 import { useTranslation } from 'react-i18next'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
+import { useAuthStore } from '@/stores/auth'
+
+enum RouteNames {
+    Home = 'home',
+    Contacts = 'contacts'
+}
 
 const sideRoutes = [
     {
         path: '/',
+        name: RouteNames.Home,
         icon: MessageSquare
     },
     {
         path: '/contacts',
+        name: RouteNames.Contacts,
         icon: Users
     }
 ]
 
 const HomePage = () => {
     const location = useLocation()
+
+    const lgout = useAuthStore((state) => state.lgout)
+
     const { t } = useTranslation()
 
     const toolbarMenus = useMemo(
         () => [
             {
-                name: t('检查更新'),
+                name: t('checkUpdate'),
                 icon: SquareArrowUp,
                 hanlder: () => {}
             },
             {
-                name: t('帮助'),
+                name: t('help'),
                 icon: CircleHelp,
                 hanlder: () => {}
             },
             {
-                name: t('设置'),
+                name: t('setting'),
                 icon: Settings,
                 hanlder: () => {}
             },
             {
-                name: t('关于'),
+                name: t('about'),
                 icon: ShieldAlert,
                 hanlder: () => {}
             },
             {
-                name: t('退出登录'),
+                name: t('quit'),
                 icon: LogOut,
-                hanlder: () => {}
+                hanlder: lgout
             }
         ],
-        [t]
+        []
+    )
+
+    const isActive = useCallback(
+        (path: string) => {
+            const pathname = location.pathname
+            if (path === '/') return pathname === path
+            return pathname.includes(path)
+        },
+        [location]
     )
 
     return (
@@ -63,7 +82,6 @@ const HomePage = () => {
 
                 <div className="flex-1 flex flex-col items-center gap-y-3">
                     {sideRoutes.map((route, index) => {
-                        const isActive = location.pathname === route.path
                         return (
                             <Link
                                 className={cn(
@@ -72,7 +90,7 @@ const HomePage = () => {
                                     }),
                                     'px-2 select-none',
                                     {
-                                        'bg-muted-foreground/10': isActive
+                                        'bg-muted-foreground/10': isActive(route.path)
                                     }
                                 )}
                                 key={index}
@@ -80,7 +98,7 @@ const HomePage = () => {
                             >
                                 <route.icon
                                     className={cn('size-5', {
-                                        'text-primary fill-primary': isActive
+                                        'text-primary fill-primary': isActive(route.path)
                                     })}
                                 />
                             </Link>

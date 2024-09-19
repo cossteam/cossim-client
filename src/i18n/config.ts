@@ -4,20 +4,23 @@ import { useConfigStore } from '@/stores/config'
 
 import { Language } from '@/lib/enum'
 
-import translationCN from './locales/zh-cn/translation.json'
-import translationEN from './locales/en/translation.json'
+import translationCN from './zh-cn/translation.json'
+import translationEN from './en/translation.json'
 
 i18next.use(initReactI18next).init(
     {
         lng: useConfigStore.getState().language || Language.ZH_CN,
-        debug: false,
+        debug: true,
         resources: {
             en: {
                 translation: translationEN
             },
-            zhCN: {
+            zh_CN: {
                 translation: translationCN
             }
+        },
+        missingKeyHandler: (lng, ns, key) => {
+            console.log('Missing key: ', lng, ns, key)
         }
     },
     (err) => {

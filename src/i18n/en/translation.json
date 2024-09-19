@@ -1,0 +1,21 @@
+{
+    "checkUpdate": "Update Check",
+    "help": "Help",
+    "setting": "Setting",
+    "about": "About",
+    "quit": "Quit",
+    "notFound": "NotFound Page",
+    "groupCreate": "Create Group",
+    "grouporUserAdd": "Add Firends/Group",
+    "globalSearch": "Global Search",
+    "globalSearchDesc": "Search for users, group chats, etc",
+    "searchResult": "Search Result ",
+    "searchResultDesc": "Found a total of {{count}} results",
+    "friends": "Firends",
+    "groups": "Groups",
+    "blacklist": "black list",
+    "requestFormFriend": "griend notification",
+    "requestFormGroup": "group notification",
+    "unblaclist": "remove from blacklist",
+    "search": "search"
+}
