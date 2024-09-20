@@ -138,3 +138,25 @@ export const groupsToArray = (groups: any): any[] => {
         return result.concat(list)
     }, [])
 }
+
+/**
+ * 防抖函数
+ * @param func 要执行的函数
+ * @param wait 延迟时间
+ */
+export function debounce<T extends (...args: any[]) => void>(
+    func: T,
+    delay: number = 500
+): (...args: Parameters<T>) => void {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+    return (...args: Parameters<T>): void => {
+        if (timeoutId) {
+            clearTimeout(timeoutId)
+        }
+
+        timeoutId = setTimeout(() => {
+            func(...args)
+        }, delay)
+    }
+}

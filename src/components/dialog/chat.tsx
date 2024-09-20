@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { generateMessageList } from '@/mock/data'
 import { ScrollArea } from '@/ui/scroll-area'
 import { Message } from '@/interface/model/dialog'
+import Example from '@/components/virtual-list/example'
 
 const ChatHeader = () => {
     return (
@@ -63,7 +64,8 @@ const Chat = () => {
         <ChatProvider>
             <div className="h-full flex flex-col">
                 <ChatHeader />
-                <ChatContent />
+                {/* <ChatContent /> */}
+                <Example />
                 <ChatFooter />
             </div>
         </ChatProvider>
