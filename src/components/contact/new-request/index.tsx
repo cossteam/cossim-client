@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Segmented, Typography, Flex, List, Avatar, message, Modal, Dropdown } from 'antd';
+import { Segmented, Typography, Flex, List, Avatar, message, Modal, Dropdown, ConfigProvider } from 'antd';
 import useMobile from '@/hooks/useMobile';
 import { friendRequestListApi, manageFriendApplyApi, deleteFriendRequestApi, groupRuestListApi } from '@/api/relation';
 import { QueryParams, ManageFriendRequestParams } from '@/types/api';
@@ -11,8 +11,8 @@ import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from "@/components/ui/button"
 import RequestInfoCard from '@/components/contact/new-request/request-info-card';
-import UserInfoCard from '../user-info/card';
 import UserCard from '../user-info/card';
+import useCacheStore from '@/stores/cache';
 
 const { Text } = Typography;
 
@@ -91,6 +91,11 @@ const NewRequest: React.FC = () => {
                 message.success(action === 1 ? '已接受好友请求' : '已拒绝好友请求');
                 fetchRequests();
                 setIsModalVisible(false);
+                
+                if (action === 1) {
+                    const updatedContact = response.data.contact;
+                    useCacheStore.getState().addContact(updatedContact);
+                }
             } else {
                 message.error('处理好友请求失败');
             }
@@ -159,12 +164,12 @@ const NewRequest: React.FC = () => {
     }, []);
 
     // 获取用户信息项
-    const getUserInfoItems = useCallback((user: any) => [
-        { title: '用户ID', content: user.sender_info.coss_id, action: true },
-        { title: '昵称', content: user.sender_info.nickname },
-        { title: '邮箱', content: user.sender_info.email },
-        { title: '来源', content: user.source ?? '未知' }
-    ], []);
+    // const getUserInfoItems = useCallback((user: any) => [
+    //     { title: '用户ID', content: user.sender_info.coss_id, action: true },
+    //     { title: '昵称', content: user.sender_info.nickname },
+    //     { title: '邮箱', content: user.sender_info.email },
+    //     { title: '来源', content: user.source ?? '未知' }
+    // ], []);
 
     // 获取请求信息项
     const getRequestInfoItems = useCallback((user: any) => [
@@ -303,6 +308,8 @@ const NewRequest: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
+
+
             {/* 用户信息模态框 */}
             <Modal
                 title={<div className="text-center pt-4">{selectedUser?.status === ApplyStatus.PENDING ? '请求信息' : '用户信息'}</div>}
@@ -313,31 +320,37 @@ const NewRequest: React.FC = () => {
                 centered
                 open={isModalVisible}
                 onCancel={handleModalClose}
-                footer={selectedUser?.status === ApplyStatus.PENDING ? (
-                    <div className="flex justify-between w-full">
-                        <Button variant="text" size="lg" className="flex-1 mr-2 text-gray-500 hover:text-gray-500" onClick={() => handleFriendRequest(selectedUser.id, 0)}>
-                            拒绝
-                        </Button>
-                        <Button variant="text" size="lg" className="flex-1 ml-2 text-[#26B36D] hover:text-[#26B36D]" onClick={() => handleFriendRequest(selectedUser.id, 1)}>
-                            接受
-                        </Button>
-                    </div>
-                ) : <div className="flex justify-between w-full"></div>}
+                footer={null}
+                // footer={[
+                //     selectedUser?.status === ApplyStatus.PENDING ? (
+                //         <div className="flex justify-between w-full">
+                //             <Button variant="text" size="lg" className="flex-1 mr-2 text-gray-500 hover:text-gray-500" onClick={() => handleFriendRequest(selectedUser.id, 0)}>
+                //                 拒绝
+                //             </Button>
+                //             <Button variant="text" size="lg" className="flex-1 ml-2 text-[#26B36D] hover:text-[#26B36D]" onClick={() => handleFriendRequest(selectedUser.id, 1)}>
+                //                 接受
+                //             </Button>
+                //         </div>
+                //     ) : null
+                // ]}
             >
                 <div className="overflow-y-auto" style={{
-                    height: isFullUserCard ? 470 : (selectedUser?.status === ApplyStatus.PENDING ? 400 : 470)
+                    // height: isFullUserCard ? 470 : (selectedUser?.status === ApplyStatus.PENDING ? 400 : 470)
+                    // height: selectedUser?.status === ApplyStatus.PENDING ? 450 : 'auto'
                 }}>
                     {selectedUser && (
                         <React.Fragment>
                             {isFullUserCard || selectedUser.status !== ApplyStatus.PENDING ? (
-                                <UserCard isContact={selectedUser.status !== ApplyStatus.PENDING} userId={selectedUser.sender_info.user_id} />
+                                <UserCard userId={selectedUser.sender_info.user_id} />
                             ) : (
                                 <RequestInfoCard
+                                    onClose={() => setIsModalVisible(false)}
                                     requestId={selectedUser.id}
                                     userId={selectedUser.sender_info.coss_id}
                                     avatar={selectedUser.sender_info.avatar}
                                     nickname={selectedUser.sender_info.nickname}
                                     signature={selectedUser.sender_info.signature}
+                                    remark={selectedUser.remark}
                                     userInfoItem={getRequestInfoItems(selectedUser)}
                                 />
                             )}
@@ -345,6 +358,7 @@ const NewRequest: React.FC = () => {
                     )}
                 </div>
             </Modal>
+        
         </Flex>
     );
 };

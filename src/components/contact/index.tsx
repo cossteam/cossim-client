@@ -1,52 +1,55 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Avatar, List, Divider, Layout, Flex, Typography } from 'antd'
-import { Contact } from '@/types/storage'
+import { Avatar, List, Divider, Layout, Flex, Typography, message } from 'antd'
+import { Contact, ContactData } from '@/types/storage'
 import { Content } from 'antd/es/layout/layout'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Tag, UserPlus, Users } from '@phosphor-icons/react'
-import { getFriendListApi, FriendListData } from '@/api/relation'
+import { getFriendListApi } from '@/api/relation'
+import useCacheStore from '@/stores/cache'
 
 // 联系人列表页面组件
 const ContactListPage = () => {
-    // 定义状态和钩子
     const [loading, setLoading] = useState(false)
-    const [contactList, setContactList] = useState<FriendListData>({ list: {}, total: 0 })
-    const [hasMore, setHasMore] = useState(true)
+    const [contactList, setContactList] = useState<ContactData[]>([])
     const navigate = useNavigate()
     const location = useLocation()
+    const { cacheContactList, update } = useCacheStore()
 
     // 加载联系人数据
     const loadContactData = useCallback(async () => {
-        if (loading || !hasMore) return
+        if (loading) return
         setLoading(true)
         try {
-            const response = await getFriendListApi()
-            if (response.code === 200) {
-                setContactList(prevList => ({
-                    list: { ...prevList.list, ...response.data.list },
-                    total: response.data.total
-                }))
-                setHasMore(Object.keys(response.data.list).length > 0)
+            if (cacheContactList.length > 0) {
+                setContactList(cacheContactList)
             } else {
-                console.error('获取联系人列表失败:', response.msg)
-                setHasMore(false)
+                const response = await getFriendListApi()
+                if (response.code === 200) {
+                    const convertedData: ContactData[] = Object.entries(response.data.list).map(([key, value]) => ({
+                        [key]: value as Contact[]
+                    }))
+                    setContactList(convertedData)
+                    update({ cacheContactList: convertedData })
+                } else {
+                    message.error('获取联系人列表失败: ' + response.msg)
+                }
             }
         } catch (error) {
             console.error('获取联系人列表出错:', error)
-            setHasMore(false)
+            message.error('获取联系人列表出错')
         } finally {
             setLoading(false)
         }
-    }, [loading, hasMore])
+    }, [loading, cacheContactList, update])
 
     useEffect(() => {
         loadContactData()
     }, [])
 
-    // 处理联系人点击事件
-    const handleClick = useCallback((item: Contact) => {
-        navigate(`/dashboard/contact/${item.user_id}`)
-    }, [navigate])
+    // 监听 cacheContactList 的变化
+    useEffect(() => {
+        setContactList(cacheContactList)
+    }, [cacheContactList])
 
     // 定义菜单项
     const menus = useMemo(() => [
@@ -56,7 +59,7 @@ const ContactListPage = () => {
     ], [])
 
     // 处理菜单项点击事件
-    const handlerMenusClick = useCallback((path: string) => {
+    const handleMenuClick = useCallback((path: string) => {
         navigate(path)
     }, [navigate])
 
@@ -66,18 +69,18 @@ const ContactListPage = () => {
             className={`mobile:py-3 py-2 pl-5 select-none hover:bg-background-hover rounded ${location.pathname === item.path ? 'bg-[#C9ECDA]' : ''}`}
             key={index}
             gap="middle"
-            onClick={() => handlerMenusClick(item.path)}
+            onClick={() => handleMenuClick(item.path)}
         >
             <div className="mobile:text-2xl text-xl">{item.icon}</div>
             <Typography.Text>{item.title}</Typography.Text>
         </Flex>
-    ), [handlerMenusClick, location.pathname])
+    ), [handleMenuClick, location.pathname])
 
     // 渲染联系人列表项
     const renderContactItem = useCallback((c: Contact) => (
         <List.Item 
             key={c.user_id} 
-            onClick={() => handleClick(c)}
+            onClick={() => navigate(`/dashboard/contact/${c.user_id}`)}
             className={`px-5 ${location.pathname === `/dashboard/contact/${c.user_id}` ? 'bg-[#C9ECDA]' : ''}`}
         >
             <List.Item.Meta
@@ -91,37 +94,31 @@ const ContactListPage = () => {
                 description={<span className="text-xs text-gray-400">最后上线于</span>}
             />
         </List.Item>
-    ), [handleClick, location.pathname])
+    ), [navigate, location.pathname])
 
-    // 将联系人列表转换为扁平数组
-    const flattenedContactList = useMemo(() => {
-        return Object.entries(contactList.list).flatMap(([letter, contacts]) => {
-            return [
-                { type: 'letter', value: letter },
-                ...contacts.map(contact => ({ type: 'contact', value: contact }))
-            ];
-        });
-    }, [contactList.list]);
-
-    // TODO 使用VirtualList优化
     return (
         <Layout className="h-[600px] bg-white">
             <Content id="scrollableDiv" className="flex-1 overflow-auto">
-                {/* 渲染菜单项 */}
                 {menus.map(renderMenuItem)}
-
                 <Divider className="m-0" />
-
-                {/* 渲染联系人列表 */}
-                {Object.entries(contactList.list).map(([key, contacts]) => (
-                    <div key={key}>
-                        <h3 className="px-5 my-3">{key}</h3>
-                        <List
-                            dataSource={contacts}
-                            renderItem={renderContactItem}
-                        />
+                {contactList.length === 0 || contactList.every(contactData => Object.values(contactData)[0].length === 0) ? (
+                    <div className="flex justify-center items-center h-full">
+                        <Typography.Text className="text-gray-400">暂无联系人</Typography.Text>
                     </div>
-                ))}
+                ) : (
+                    contactList.map((contactData) => {
+                        const [key, contacts] = Object.entries(contactData)[0]
+                        return contacts && contacts.length > 0 ? (
+                            <div key={key}>
+                                <h3 className="px-5 my-3">{key}</h3>
+                                <List
+                                    dataSource={contacts}
+                                    renderItem={renderContactItem}
+                                />
+                            </div>
+                        ) : null
+                    })
+                )}
             </Content>
         </Layout>
     )

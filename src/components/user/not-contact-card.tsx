@@ -4,37 +4,34 @@ import { Prohibit, UserPlus } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button';
 import { addFriendApi } from '@/api/relation'
 import UserCard from "@/components/user/user-card";
+import useCacheStore from "@/stores/cache";
 
 const { Text } = Typography;
 
 interface NotContactCardProps {
-    userId: string
+    user_id: string
     avatar?: string
     nickname?: string
     signature?: string
     email?: string
 }
 
-const NotContactCard: React.FC<NotContactCardProps> = ({ userId, avatar, nickname, signature, email }) => {
+const NotContactCard: React.FC<NotContactCardProps> = ({ user_id, avatar, nickname, signature, email }) => {
     const [openRequest, setOpenRequest] = useState(false);
     const [openBlacklist, setOpenBlacklist] = useState(false);
     const [remark, setRemark] = useState('');
 
-    const renderActionButton = (icon: React.ReactNode, text: string, onClick: () => void) => (
-        <div className="flex-1 flex flex-col items-center justify-center text-green-500 hover:text-green-600 cursor-pointer" onClick={onClick}>
-            {icon}
-            <span className="mt-1">{text}</span>
-        </div>
-    );
+    const isInBlacklist = useCacheStore(state => state.isInBlacklist);
+    const removeFromBlacklist = useCacheStore(state => state.removeFromBlacklist);
 
     const handleSendRequest = useCallback(async () => {
-        if (!userId) {
+        if (!user_id) {
             return message.error('用户ID不存在');
         }
 
         try {
             const response = await addFriendApi({
-                user_id: userId,
+                user_id: user_id,
                 remark: remark,
             });
 
@@ -48,7 +45,7 @@ const NotContactCard: React.FC<NotContactCardProps> = ({ userId, avatar, nicknam
             console.error('发送好友请求时出错:', error);
             message.error('发送请求失败，请稍后重试');
         }
-    }, [userId, remark]);
+    }, [user_id, remark]);
 
 
     function handleAddContact(): void {
@@ -72,25 +69,52 @@ const NotContactCard: React.FC<NotContactCardProps> = ({ userId, avatar, nicknam
         setRemark('');
     };
 
+    const handleRemoveFromBlacklist = () => {
+        removeFromBlacklist(user_id);
+        message.success('已从黑名单中移除');
+    };
+
     const getUserInfoItems = useMemo(() => [
-        { title: '用户ID', content: userId, action: true },
+        { title: '用户ID', content: user_id, action: true },
         { title: '昵称', content: nickname || '未设置' },
         { title: '邮箱', content: email || '未设置' }
-    ], [userId, nickname, email]);
+    ], [user_id, nickname, email]);
+
+    const renderActionButton = (icon: React.ReactNode, text: string, onClick: () => void) => (
+        <div className="flex-1 flex flex-col items-center justify-center text-green-500 hover:text-green-600 cursor-pointer" onClick={onClick}>
+            {icon}
+            <span className="mt-1">{text}</span>
+        </div>
+    );
 
     return (
-        <Flex className="flex-1 container--background flex flex-col" vertical>
+        <div className='bg-gray-100 rounded-lg'>
             <UserCard
-                userId={userId}
+                userId={user_id}
                 avatar={avatar}
                 nickname={nickname as string}
                 signature={signature}
                 userInfoItem={getUserInfoItems}
                 actions={
-                    <div className="flex justify-between w-full flex-grow">
-                        {renderActionButton(<UserPlus weight='bold' className="text-2xl" />, "添加", handleAddContact)}
-                        {renderActionButton(<Prohibit weight="bold" className="text-2xl" />, "加入黑名单", handleAddToBlacklist)}
-                    </div>
+                    !isInBlacklist(user_id) ? (
+                        <div className="flex justify-between w-full flex-grow">
+                            {renderActionButton(<UserPlus weight='bold' className="text-2xl" />, "添加", handleAddContact)}
+                            {renderActionButton(<Prohibit weight="bold" className="text-2xl" />, "加入黑名单", handleAddToBlacklist)}
+                        </div>
+                    ) : undefined
+                }
+                additionalInfoSlot={
+                    isInBlacklist(user_id) ? (
+                        <div key="footer" className="h-[50px] flex justify-center items-center w-full">
+                            <Button 
+                                variant='text'
+                                className="text-red-500" 
+                                onClick={handleRemoveFromBlacklist}
+                            >
+                                移除黑名单
+                            </Button>
+                        </div> 
+                    ) : <div></div>
                 }
             />
 
@@ -155,7 +179,7 @@ const NotContactCard: React.FC<NotContactCardProps> = ({ userId, avatar, nicknam
                 </div>
                 <Divider className='p-0 m-0'></Divider>
             </Modal>
-        </Flex>
+        </div>
     )
 }
 

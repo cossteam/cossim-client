@@ -30,14 +30,23 @@ export function formatTime(timestamp: number): string {
     }
 
     const getWeekDay = (d: Date) => {
+        // const days = [
+        //     $t('星期日'),
+        //     $t('星期一'),
+        //     $t('星期二'),
+        //     $t('星期三'),
+        //     $t('星期四'),
+        //     $t('星期五'),
+        //     $t('星期六')
+        // ]
         const days = [
-            $t('星期日'),
-            $t('星期一'),
-            $t('星期二'),
-            $t('星期三'),
-            $t('星期四'),
-            $t('星期五'),
-            $t('星期六')
+            '星期日',
+            '星期一',
+            '星期二',
+            '星期三',
+            '星期四',
+            '星期五',
+            '星期六'
         ]
         return days[d.getDay()]
     }

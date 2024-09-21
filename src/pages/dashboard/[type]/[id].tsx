@@ -1,62 +1,54 @@
-import Message from '@/components/messages'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import { ROUTE } from '@/utils/enum'
 import useCommonStore from '@/stores/common'
+import { useAuthStore } from '@/stores/auth'
+import Message from '@/components/messages'
 import NewRequest from '@/components/contact/new-request'
 import UserInfo from '@/components/profile/user-info'
-import { useAuthStore } from '@/stores/auth'
 import ContactUserInfo from '@/components/contact/user-info'
-// import { useAuthStore } from '@/stores/auth'
 
-// TODO: 添加个人信息页
 const TestContact = () => <div>TestContactInfo</div>
 
-// 生成假的用户数据
-const fakeUser = {
-    avatar: 'https://randomuser.me/api/portraits/men/75.jpg',
-    nickname: '张三',
-    id: 'user123',
-    email: 'zhangsan@example.com',
-    bio: '这是一个测试用户的个人简介'
-}
-
 const Dialog = () => {
-    const params = useParams()
-    const commonStore = useCommonStore()
-    const userinfo = useMemo(() => useAuthStore.getState().userInfo, [])
+    const { type, id } = useParams()
+    const { update } = useCommonStore()
+    const userInfo = useAuthStore(state => state.userInfo)
 
     const renderComponent = useCallback(() => {
-        switch (params.type) {
+        switch (type) {
             case ROUTE.MESSAGE:
                 return <Message />
             case ROUTE.CONTACT:
-                return params.id === 'request' ? <NewRequest /> : <ContactUserInfo userId={params.id as string} />
+                switch (id) {
+                    case 'request': return <NewRequest />
+                    case 'group': return <div>群组页面</div>
+                    case 'tag': return <div>标签页面</div>
+                    default: return <ContactUserInfo userId={id as string} />
+                }
             case ROUTE.PROFILE:
-                return params.id === 'user-info' ? (
+                return id === 'user-info' ? (
                     <UserInfo 
-                        avatarUrl={userinfo.avatar}
-                        nickname={userinfo.nickname}
-                        userId={userinfo.coss_id}
-                        email={userinfo.email}
-                        bio={userinfo.signature}
+                        avatarUrl={userInfo.avatar}
+                        nickname={userInfo.nickname}
+                        userId={userInfo.user_id}
+                        email={userInfo.email}
+                        bio={userInfo.signature}
                     />
                 ) : <TestContact />
             default:
-                console.log('无效的路由类型:', params.type)
+                console.log('无效的路由类型:', type)
                 return <Navigate to="/" />
         }
-    }, [params.type, params.id])
-
-    const comp = useMemo(() => renderComponent(), [renderComponent])
+    }, [type, id, userInfo])
 
     useEffect(() => {
-        if (params.type === ROUTE.MESSAGE && params.id) {
-            commonStore.update({ lastDialogId: Number(params.id) })
+        if (type === ROUTE.MESSAGE && id) {
+            update({ lastDialogId: Number(id) })
         }
-    }, [params.type, params.id, commonStore])
+    }, [type, id, update])
 
-    return comp
+    return useMemo(() => renderComponent(), [renderComponent])
 }
 
 export default Dialog

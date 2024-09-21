@@ -1,51 +1,33 @@
-import { GetUserInfoData, getUserInfoApi } from "@/api/user"
+import { GetUserInfoData } from "@/api/user"
 import UserCard from "@/components/user/user-card"
-import useMobile from "@/hooks/useMobile"
-import { ChatCircleDots, BellSlash, DotsThreeOutline, Phone } from "@phosphor-icons/react"
-import { ConfigProvider, Divider, Dropdown, Flex, List, message, Modal, Switch, Typography } from "antd"
-import React, { useEffect } from "react"
-import { useState, useCallback } from "react"
+import { ChatCircleDots, BellSlash, DotsThreeOutline, Phone, ShareNetwork, Trash, Broom, Prohibit } from "@phosphor-icons/react"
+import { ConfigProvider, Divider, Dropdown, List, message, Modal, Switch, Typography, Avatar, Button } from "antd"
+import React from "react"
+import { useState, useCallback, useEffect } from "react"
 
 const { Text } = Typography;
 
-interface ContactCardProps {
-    userId: string
-}
+import { Contact } from '@/types/storage';
+import { deleteFriendApi } from "@/api/relation"
+import useCacheStore from "@/stores/cache"
+import { useNavigate } from "react-router-dom"
+import { tr } from "@faker-js/faker"
 
-const ContactCard: React.FC<ContactCardProps> = ({ userId }) => {
-    const { height } = useMobile();
+interface ContactCardProps extends Contact { }
 
-    const [userInfo, setUserInfo] = useState<GetUserInfoData | null>(null);
+const ContactCard: React.FC<ContactCardProps> = (props) => {
+
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isBlacklisted, setIsBlacklisted] = useState(false);
     const [isPinned, setIsPinned] = useState(false);
     const [burnAfterReadValue, setBurnAfterReadValue] = useState('关闭');
+    const [openMore, setOpenMore] = useState(false);
 
-    const fetchUserInfo = useCallback(async () => {
-        try {
-            const response = await getUserInfoApi({ id: userId });
-            if (response.code === 200) {
-                setUserInfo(response.data);
-            } else {
-                message.error('获取用户信息失败: ' + response.msg);
-            }
-        } catch (error) {
-            console.error('获取用户信息出错:', error);
-            message.error('获取用户信息失败，请稍后重试');
-        }
-    }, [userId]);
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-    useEffect(() => {
-        fetchUserInfo();
-    }, [fetchUserInfo]);
-
-    const handleBlacklistToggle = useCallback(() => {
-        if (isBlacklisted) {
-            setIsBlacklisted(false);
-        } else {
-            setIsModalVisible(true);
-        }
-    }, [isBlacklisted]);
+    const handleBlacklist = useCallback(() => {
+        setIsModalVisible(true)
+    }, [props.user_id]);
 
     const handlePinToggle = useCallback((checked: boolean) => {
         setIsPinned(checked);
@@ -56,23 +38,85 @@ const ContactCard: React.FC<ContactCardProps> = ({ userId }) => {
     }, []);
 
     const handleBlacklistConfirm = useCallback(() => {
-        setIsBlacklisted(true);
+        // TODO 发送请求真实的添加黑名单
+        useCacheStore.getState().addToBlacklist(props.user_id);
         setIsModalVisible(false);
+        navigate('/dashboard/contact');
+        message.success('已添加到黑名单');
+    }, [props.user_id]);
+
+    const navigate = useNavigate();
+    const moreMenuItems = [
+        {
+            key: 'share',
+            label: '分享联系人',
+            icon: <ShareNetwork size={20} />,
+            onClick: () => handleAction('分享联系人')
+        },
+        {
+            key: 'deleteHistory',
+            label: '删除历史记录',
+            icon: <Broom size={20} />,
+            onClick: () => handleAction('删除历史记录')
+        },
+        {
+            key: 'delete',
+            label: '删除联系人',
+            icon: <Trash size={20} />,
+            onClick: () => setIsDeleteModalVisible(true)
+        },
+        {
+            key: 'blacklist',
+            label: '加入黑名单',
+            icon: <Prohibit size={20} />,
+            onClick: () => handleBlacklist()
+        }
+    ];
+
+    const handleDeleteContact = async () => {
+        setIsDeleting(true);
+        try {
+            const resp = await deleteFriendApi(props.user_id);
+            if (resp.code === 200) {
+                useCacheStore.getState().deleteContact(props.user_id);
+                navigate('/dashboard/contact');
+            } else {
+                message.error('删除联系人失败: ' + resp.msg);
+            }
+        } catch (error) {
+            console.error('删除联系人失败:', error);
+            message.error('删除联系人失败，请稍后重试');
+        } finally {
+            setIsDeleting(false);
+            setIsDeleteModalVisible(false);
+        }
+    };
+
+    const handleOpenMore = useCallback(() => {
+        setOpenMore(!openMore);
+    }, [openMore]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest('.more-dropdown')) {
+                setOpenMore(false);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
     }, []);
 
-    const renderActionButton = useCallback((icon: React.ReactNode, text: string, onClick: () => void) => (
-        <div className="flex-1 flex flex-col items-center justify-center text-[#26B36D] hover:text-[#1a8f56] cursor-pointer" onClick={onClick}>
-            {icon}
-            <span className="mt-1">{text}</span>
-        </div>
-    ), []);
-
-    const getUserInfoItems = useCallback((user: GetUserInfoData) => [
-        { title: '用户ID', content: user.coss_id, action: true },
+    const getUserInfoItems = (user: GetUserInfoData) => [
+        { title: '用户ID', content: user.user_id, action: true },
         { title: '昵称', content: user.nickname },
         { title: '邮箱', content: user.email },
         { title: '来源', content: '未知' }
-    ], []);
+    ];
 
     const additionalItems = [
         { title: '置顶聊天', content: isPinned ? "开启" : "关闭", type: 'switch', action: handlePinToggle },
@@ -82,8 +126,14 @@ const ContactCard: React.FC<ContactCardProps> = ({ userId }) => {
             options: ['关闭', '5秒', '10秒', '30秒'],
             action: (value: string) => setBurnAfterReadValue(value)
         },
-        { title: '加入黑名单', content: isBlacklisted ? '是' : '否', type: 'switch', action: handleBlacklistToggle },
     ];
+    
+    const renderActionButton = useCallback((icon: React.ReactNode, text: string, onClick: () => void) => (
+        <div className="flex-1 flex flex-col items-center justify-center text-[#26B36D] hover:text-[#1a8f56] cursor-pointer" onClick={onClick}>
+            {icon}
+            <span className="mt-1">{text}</span>
+        </div>
+    ), []);
 
     const renderAdditionalInfoSlot = useCallback(() => (
         <div className="bg-white rounded-lg">
@@ -102,7 +152,7 @@ const ContactCard: React.FC<ContactCardProps> = ({ userId }) => {
                                             <ConfigProvider theme={{ token: { colorPrimary: '#26b36d' } }}>
                                                 <Switch
                                                     size="small"
-                                                    checked={item.title === '加入黑名单' ? isBlacklisted : item.content === '开启'}
+                                                    checked={item.content === '开启'}
                                                     onChange={item.action as (checked: boolean) => void}
                                                 />
                                             </ConfigProvider>
@@ -140,26 +190,38 @@ const ContactCard: React.FC<ContactCardProps> = ({ userId }) => {
                 )}
             />
         </div>
-    ), [additionalItems, isBlacklisted]);
+    ), [additionalItems]);
 
     return (
-        // <Flex className="flex-1 container--background flex flex-col" vertical>
         <>
             <div className='flex-1 overflow-y-auto'>
                 <div className='bg-gray-100 rounded-lg'>
-                    {userInfo && (
+                    {props && (
                         <UserCard
-                            userId={userId}
-                            avatar={userInfo.avatar}
-                            nickname={userInfo.nickname}
-                            signature={userInfo.signature}
-                            userInfoItem={getUserInfoItems(userInfo)}
+                            userId={props.user_id}
+                            avatar={props.avatar}
+                            nickname={props.nickname}
+                            signature={props.signature}
+                            userInfoItem={getUserInfoItems(props)}
                             actions={
                                 <div className="flex justify-between w-full flex-grow">
                                     {renderActionButton(<ChatCircleDots weight="fill" className="text-2xl" />, "聊天", () => handleAction("聊天"))}
                                     {renderActionButton(<Phone weight="fill" className="text-2xl" />, "通话", () => handleAction("通话"))}
                                     {renderActionButton(<BellSlash weight="fill" className="text-2xl" />, "关闭通知", () => handleAction("关闭通知"))}
-                                    {renderActionButton(<DotsThreeOutline weight="fill" className="text-2xl" />, "更多", () => handleAction("更多"))}
+                                    <div onClick={handleOpenMore} className="flex-1 flex flex-col items-center justify-center text-[#26B36D] hover:text-[#1a8f56] cursor-pointer more-dropdown">
+                                        <div className="flex flex-col items-center">
+                                            <DotsThreeOutline weight="fill" className="text-2xl" />
+                                        </div>
+                                        <Dropdown
+                                            open={openMore}
+                                            menu={{ items: moreMenuItems }}
+                                            trigger={['click']}
+                                            placement="bottom"
+                                            arrow={{ pointAtCenter: true }}
+                                        >
+                                            <span className="mt-1">更多</span>
+                                        </Dropdown>
+                                    </div>
                                 </div>
                             }
                             additionalInfoSlot={renderAdditionalInfoSlot()}
@@ -191,9 +253,31 @@ const ContactCard: React.FC<ContactCardProps> = ({ userId }) => {
                     </Text>
                 </div>
             </Modal>
-        </>
 
-        // </Flex>
+            <Modal
+                title={null}
+                open={isDeleteModalVisible}
+                onCancel={() => setIsDeleteModalVisible(false)}
+                footer={null}
+                width={320}
+                centered
+                wrapClassName="ant-modal-content-p-0"
+            >
+                <div className="flex flex-col items-center pt-4">
+                    <Avatar size={64} src={props.avatar} className="mb-4" />
+                    <Text strong className="mb-2">删除联系人</Text>
+                    <Text type="secondary" className="text-center mb-4">
+                        是否确认删除联系人 {props.nickname}？
+                    </Text>
+                    <div className="flex justify-between w-full">
+                        <Button type="text" className="flex-1 mr-2" onClick={() => setIsDeleteModalVisible(false)}>取消</Button>
+                        <Button type="text" className="flex-1" danger loading={isDeleting} onClick={handleDeleteContact}>
+                            删除
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
+        </>
     )
 }
 
