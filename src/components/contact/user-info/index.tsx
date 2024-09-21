@@ -18,8 +18,8 @@ const ContactUserInfo: React.FC<ContactUserInfoProps> = ({ userId }) => {
                 <Text className="flex-1 text-center">用户信息</Text>
             </div>
 
-            <div className="flex-1 overflow-y-auto m-5">
-                <UserInfoCard isContact userId={userId} />
+            <div className="flex-1 overflow-y-auto p-5">
+                <UserInfoCard userId={userId} />
             </div>
         </Flex>
     )

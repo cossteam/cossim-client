@@ -1,10 +1,14 @@
-.ant-modal-content-p-0 .ant-modal-content  {
-    padding: 0;
+.ant-modal-content-p-0 .ant-modal-content {
+    padding: 0 !important;
 }
 
 .ant-modal-content-p10 .ant-modal-content  {
     padding: 10px;
 }
+
+.ant-modal-footer {
+    // margin-top: 0 !important;
+  }
 
 .ant-card-body-p-0 .ant-card-body {
     padding: 0;

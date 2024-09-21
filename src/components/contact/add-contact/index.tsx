@@ -6,7 +6,11 @@ import useMobile from '@/hooks/useMobile'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { searchUserApi } from '@/api/user'
 import { debounce } from 'lodash'
-import NotContactCard from '@/components/user/not-contact-card'
+import UserCard from '../user-info/card'
+import { Button } from '@/components/ui/button'
+
+const { Text } = Typography;
+
 
 interface AddContactProps {
     onClick?: (item: User) => void
@@ -216,26 +220,27 @@ const AddContact: React.FC<AddContactProps> = ({ onClick }) => {
 
             <Modal
                 style={{
-                    maxHeight: height / 1.1,
-                    overflowY: 'auto',
                     maxWidth: 400,
-                    minHeight: 520,
                 }}
-                centered
-                wrapClassName="ant-modal-content-prl0"
+                title={null}
                 open={modalOpen}
+                centered
+                wrapClassName="ant-modal-content-p-0"
                 onCancel={() => setModalOpen(false)}
                 footer={null}
             >
-                {selectedUser && (
-                    <NotContactCard
-                        userId={selectedUser.user_id}
-                        email={selectedUser.email}
-                        avatar={selectedUser.avatar}
-                        nickname={selectedUser.nickname}
-                        signature={selectedUser.signature}
-                    />
-                )}
+                <div className="items-center py-4">
+                    {selectedUser && (
+                        <UserCard
+                            userId={selectedUser.user_id}
+                        // email={selectedUser.email}
+                        // avatar={selectedUser.avatar}
+                        // nickname={selectedUser.nickname}
+                        // signature={selectedUser.signature}
+                        />
+                    )}
+                </div>
+
             </Modal>
 
         </div>

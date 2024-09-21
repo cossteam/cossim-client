@@ -98,12 +98,50 @@ export interface CacheOptions {
     cacheMessageUnread: number
     /** @description 缓存申请列表 */
     cacheRequestList: RequestData[]
+    /** @description 缓存用户信息映射  */
+    // cacheUserMap: { [userId: string]: Contact };  // 键为用户 ID，值为 Contact 对象
+    /** @description 缓存黑名单列表 */
+    cacheBlacklist: Contact[];  // 存储被加入黑名单的用户ID列表
 }
 
-export interface CacheStoreMethods {
+// 基础缓存方法
+export interface BaseCacheStoreMethods {
     /** @description 更新某个值 */
     update: (options: Partial<StorageOptions>) => Promise<void>
 }
+
+// 用户相关方法
+export interface UserCacheStoreMethods {
+    /** @description 获取用户信息 */
+    getUserInfo: (userId: string) => Promise<Contact>
+}
+
+// 联系人相关方法
+export interface ContactCacheStoreMethods {
+    /** @description 添加联系人 */
+    addContact: (contact: Contact) => void
+
+    /** @description 删除联系人 */
+    deleteContact: (userId: string) => void;
+
+    /** @description 判断是不是联系人 */
+    isContact(userId: string): boolean;
+}
+
+// 黑名单相关方法
+export interface BlacklistCacheStoreMethods {
+    /** @description 将用户加入黑名单 */
+    addToBlacklist: (userId: string) => void;
+
+    /** @description 将用户从黑名单中移除 */
+    removeFromBlacklist: (userId: string) => void;
+
+    /** @description 判断用户是否在黑名单中 */
+    isInBlacklist: (userId: string) => boolean;
+}
+
+// 组合所有方法
+export interface CacheStoreMethods extends BaseCacheStoreMethods, UserCacheStoreMethods, ContactCacheStoreMethods, BlacklistCacheStoreMethods { }
 
 export interface MessagesOptions {
     /** @description 是否是群聊 */
