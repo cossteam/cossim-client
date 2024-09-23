@@ -1,7 +1,7 @@
 import { RefObject, useEffect, useState } from 'react'
 
 export function useScrollBottom(scrollRef: RefObject<HTMLDivElement>, detach: boolean = false) {
-    const [autoScroll, setAutoScroll] = useState(true)
+    const [autoScroll, setAutoScroll] = useState(detach)
 
     const scrollDomToBottom = () => {
         const dom = scrollRef.current
@@ -14,10 +14,10 @@ export function useScrollBottom(scrollRef: RefObject<HTMLDivElement>, detach: bo
     }
 
     useEffect(() => {
-        if (autoScroll && detach) {
+        if (autoScroll) {
             scrollDomToBottom()
         }
-    })
+    }, [autoScroll])
 
     return {
         scrollRef,

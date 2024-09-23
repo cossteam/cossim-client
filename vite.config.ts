@@ -21,6 +21,7 @@ export default defineConfig({
                 return 'async'
             }
         })
+
         // visualizer({ open: true })
     ],
     resolve: {

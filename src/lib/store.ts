@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
-import { deepClone } from './utils'
+import { cloneDeep } from 'es-toolkit/object'
 
 type Updater<T> = (arg: Partial<T>) => void
 
@@ -32,7 +32,7 @@ export function createPersistStore<T extends object, M>(
                     return {
                         ...methods(set, get as any),
                         update(options) {
-                            const state = deepClone(get())
+                            const state = cloneDeep(get())
                             set({
                                 ...state,
                                 ...options,

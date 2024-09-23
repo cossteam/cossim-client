@@ -33,3 +33,5 @@ release.jks
 release.jks.base64
 
 translate.local.json
+# Million Lint
+.million

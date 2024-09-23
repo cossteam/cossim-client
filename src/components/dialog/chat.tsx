@@ -1,11 +1,17 @@
 import { Ellipsis, ArrowUp } from 'lucide-react'
 import ChatProvider from '@/components/provider/chat-provider'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { generateMessageList } from '@/mock/data'
 import { ScrollArea } from '@/ui/scroll-area'
 import { Message } from '@/interface/model/dialog'
-import Example from '@/components/virtual-list/example'
+// import VirtualizedList from '../virtual-list/virtual-list'
+import Example from '../virtual-list/example'
+import Example2 from '../virtual-list/virtual-list'
+import Example3 from '../virtual-list/vir'
+// import VirtualListWrapper from '../virtual-list/virtual'
+// import { VirtualizedList } from '@/components/virtual-list/chat-list'
+// import Example from '@/components/virtual-list/virtual'
 
 const ChatHeader = () => {
     return (
@@ -20,15 +26,27 @@ const ChatHeader = () => {
     )
 }
 
-const meessage = generateMessageList(10)
+const meessage = generateMessageList(1000)
 
 const ChatContent = () => {
+    const renderItem = useCallback((item: Message) => {
+        return <ChatListItem key={item.msg_id} item={item} aligin={Math.random() < 0.5 ? 'left' : 'right'} />
+    }, [])
+
     return (
-        <ScrollArea className="flex-1 md:px-5 px-4 relative">
-            {meessage.map((item, index) => (
-                <ChatListItem key={item.msg_id} item={item} aligin={index % 2 === 0 ? 'left' : 'right'} />
-            ))}
-        </ScrollArea>
+        <div className="flex-1 relative flex-shrink-0 overflow-hidden">
+            {/* <VirtualizedList height={300} data={meessage} inverse={true} dataLength={meessage.length}>
+                {renderItem}
+            </VirtualizedList> */}
+            {/* <Example /> */}
+            <Example3 />
+            {/* <VirtualListWrapper /> */}
+            {/* <Example data={meessage} renderItem={renderItem} /> */}
+            {/* <ScrollArea> */}
+            {/* <VirtualizedList data={meessage} inverse={true} renderItem={renderItem} /> */}
+            {/* </ScrollArea> */}
+            {/* <VirtualizedList data={meessage} inverse={true} renderItem={renderItem} /> */}
+        </div>
     )
 }
 
@@ -64,8 +82,8 @@ const Chat = () => {
         <ChatProvider>
             <div className="h-full flex flex-col">
                 <ChatHeader />
-                {/* <ChatContent /> */}
-                <Example />
+                <ChatContent />
+
                 <ChatFooter />
             </div>
         </ChatProvider>
@@ -102,7 +120,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({ aligin = 'left', item }) =>
     }, [])
 
     return (
-        <div className={cn('w-full flex py-3', baseLayout)}>
+        <div className={cn('w-full flex py-3 px-4', baseLayout)}>
             <div
                 className={cn('w-4/5 flex flex-col', {
                     'items-start': aligin === 'left',

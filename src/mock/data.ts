@@ -73,10 +73,11 @@ export const generateFriendList = (count: number = 10): Contact[] => {
 }
 
 export const generateMessageList = (count: number = 10): Message[] => {
-    return Array.from({ length: count }, () => {
+    return Array.from({ length: count }, (_, index) => {
         return {
             at_all_user: faker.datatype.boolean(),
-            content: faker.lorem.sentence({ min: 3, max: 20 }),
+            // content: faker.lorem.sentence({ min: 3, max: 20 }),
+            content: `内容 ${index}`,
             create_at: new Date(faker.date.recent()).getTime(),
             dialog_id: 1,
             is_brun_after_reading: faker.datatype.boolean(),

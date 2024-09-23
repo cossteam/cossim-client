@@ -62,7 +62,7 @@ function VirtualizedList<T>({ data, pageSize = 15, inverse = false, renderItem }
     }
 
     const visibleData = useMemo(() => {
-        const endRenderIndex = Math.min(renderIndex + 3 * pageSize, dataLength)
+        const endRenderIndex = Math.min(renderIndex + pageSize, dataLength)
         return data.slice(renderIndex, endRenderIndex)
     }, [renderIndex, data, dataLength])
 
@@ -75,15 +75,36 @@ function VirtualizedList<T>({ data, pageSize = 15, inverse = false, renderItem }
                 setAutoScroll(false)
             }}
         >
-            {visibleData.map((item, index) => {
-                return (
-                    <div className="w-full relative" key={index}>
-                        {renderItem(item, renderIndex)}
-                    </div>
-                )
-            })}
+            <div className="absolute top-0 left-0 right-0">
+                {visibleData.map((item, index) => {
+                    return (
+                        <div className="w-full relative" key={index}>
+                            {renderItem(item, renderIndex)}
+                        </div>
+                    )
+                })}
+            </div>
         </ScrollArea>
     )
 }
 
-export default VirtualizedList
+const initialData = Array.from({ length: 100 }, (_, i) => ({
+    id: i,
+    name: `name${i}`,
+    age: i % 10
+}))
+
+const Example: React.FC = () => {
+    const renderItem = (item: any) => (
+        <div className="flex items-center" style={{ height: [50, 100, 150, 200][item.age % 4] }}>
+            <div className="w-12">{item.id}</div>
+        </div>
+    )
+    return (
+        <div className="h-96">
+            <VirtualizedList data={initialData} renderItem={renderItem} />
+        </div>
+    )
+}
+
+export default Example
