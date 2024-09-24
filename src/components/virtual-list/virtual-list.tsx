@@ -1,108 +1,88 @@
 import { useScrollBottom } from '@/hooks/use-scroll-bottom'
 // import { debounce } from '@/lib/utils'
 import { ScrollArea } from '@/ui/scroll-area'
-import { useMemo, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Virtuoso, VirtuosoProps, VirtuosoHandle } from 'react-virtuoso'
 
-interface VirtualizedListProps<T> {
-    data: T[]
+interface VirtualizedListProps<T = any> extends Partial<VirtuosoProps<T, any>> {
     inverse?: boolean
-    pageSize?: number
     height?: number | string
-    renderItem: (item: T, index: number) => JSX.Element
+    renderItem: (index: number, data: T) => JSX.Element
+    loadMore?: () => void
 }
 
-function VirtualizedList<T>({ data, pageSize = 15, inverse = false, renderItem }: VirtualizedListProps<T>) {
-    const scrollContainerRef = useRef<HTMLDivElement>(null)
+const Scroller = forwardRef<HTMLDivElement, any>(({ style, ...props }, ref) => {
+    // ScrollArea
+    return <ScrollArea className="h-full overflow-auto" style={{ ...style }} ref={ref} {...props} />
+})
 
-    const dataLength = useMemo(() => data.length, [data])
-    const startIndex = useMemo(() => {
-        return inverse ? Math.max(0, dataLength - pageSize) : 0
-    }, [dataLength, inverse])
+const VirtualizedList: React.FC<VirtualizedListProps> = ({
+    height,
+    inverse = false,
+    renderItem,
+    increaseViewportBy = 200,
+    loadMore,
+    ...props
+}) => {
+    const virtuoso = useRef<VirtuosoHandle>(null)
 
-    // 渲染索引
-    const [hitBottom, setHitBottom] = useState(true)
-
-    const [renderIndex, _setRenderIndex] = useState(startIndex)
-    const setRenderIndex = (index: number) => {
-        index = Math.min(dataLength - pageSize, index)
-        index = Math.max(0, index)
-        _setRenderIndex(index)
-    }
-
-    // 判断是否滚动到底部
-    const isScrolledToBottom = useMemo(() => {
-        const el = scrollContainerRef.current
-        if (el && inverse) {
-            return Math.abs(el.scrollHeight - (el.scrollTop + el.clientHeight)) <= 1
+    useEffect(() => {
+        if (virtuoso.current && inverse) {
+            virtuoso.current.scrollToIndex({
+                index: 99,
+                behavior: 'auto'
+            })
         }
-        return inverse
-    }, [scrollContainerRef, inverse])
-    const { setAutoScroll } = useScrollBottom(scrollContainerRef, isScrolledToBottom)
-
-    const isMobileScreen = window.innerWidth <= 768
-    const onChatBodyScroll = (e: HTMLElement) => {
-        const bottomHeight = e.scrollTop + e.clientHeight
-        const edgeThreshold = e.clientHeight
-
-        const isTouchTopEdge = e.scrollTop <= edgeThreshold
-        const isTouchBottomEdge = bottomHeight >= e.scrollHeight - edgeThreshold
-        const isHitBottom = bottomHeight >= e.scrollHeight - (isMobileScreen ? 4 : 10)
-
-        const prevPageMsgIndex = renderIndex - pageSize
-        const nextPageMsgIndex = renderIndex + pageSize
-
-        if (isTouchTopEdge && !isTouchBottomEdge) {
-            setRenderIndex(prevPageMsgIndex)
-        } else if (isTouchBottomEdge) {
-            setRenderIndex(nextPageMsgIndex)
-        }
-
-        setHitBottom(isHitBottom)
-        setAutoScroll(isHitBottom)
-    }
-
-    const visibleData = useMemo(() => {
-        const endRenderIndex = Math.min(renderIndex + pageSize, dataLength)
-        return data.slice(renderIndex, endRenderIndex)
-    }, [renderIndex, data, dataLength])
+    }, [inverse])
 
     return (
-        <ScrollArea
-            ref={scrollContainerRef}
-            className="h-full overscroll-none relative"
-            viewportScroll={onChatBodyScroll}
-            onTouchStart={() => {
-                setAutoScroll(false)
-            }}
-        >
-            <div className="absolute top-0 left-0 right-0">
-                {visibleData.map((item, index) => {
-                    return (
-                        <div className="w-full relative" key={index}>
-                            {renderItem(item, renderIndex)}
-                        </div>
-                    )
-                })}
-            </div>
-        </ScrollArea>
+        <Virtuoso
+            ref={virtuoso}
+            style={{ height }}
+            itemContent={renderItem}
+            components={{ Scroller }}
+            increaseViewportBy={increaseViewportBy}
+            endReached={!inverse ? loadMore : undefined}
+            startReached={inverse ? loadMore : undefined}
+            {...props}
+        />
     )
 }
 
-const initialData = Array.from({ length: 100 }, (_, i) => ({
+const initialData = Array.from({ length: 20 }, (_, i) => ({
     id: i,
     name: `name${i}`,
     age: i % 10
 }))
 
 const Example: React.FC = () => {
-    const renderItem = (item: any) => (
-        <div className="flex items-center" style={{ height: [50, 100, 150, 200][item.age % 4] }}>
-            <div className="w-12">{item.id}</div>
-        </div>
+    const [data, setData] = useState(initialData)
+
+    const renderItem = useCallback(
+        (index: number, item: any) => (
+            <div className="flex items-center border" style={{ height: [50, 100, 150, 200][item.age % 4] }}>
+                <div className="w-12">{item.id}</div>
+            </div>
+        ),
+        []
     )
+
+    const loadMore = useCallback(() => {
+        console.log('load more')
+
+        const newData = data.concat(
+            Array.from({ length: 20 }, (_, i) => ({
+                id: data.length + i,
+                name: `name${data.length + i}`,
+                age: (data.length + i) % 10
+            }))
+        )
+        setData(newData)
+    }, [data])
+
     return (
         <div className="h-96">
-            <VirtualizedList data={initialData} renderItem={renderItem} />
+            <VirtualizedList data={data} renderItem={renderItem} loadMore={loadMore} inverse={true} />
         </div>
     )
 }

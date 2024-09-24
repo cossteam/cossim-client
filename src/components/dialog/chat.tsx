@@ -1,6 +1,6 @@
 import { Ellipsis, ArrowUp } from 'lucide-react'
 import ChatProvider from '@/components/provider/chat-provider'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { generateMessageList } from '@/mock/data'
 import { ScrollArea } from '@/ui/scroll-area'
@@ -12,6 +12,9 @@ import Example3 from '../virtual-list/vir'
 // import VirtualListWrapper from '../virtual-list/virtual'
 // import { VirtualizedList } from '@/components/virtual-list/chat-list'
 // import Example from '@/components/virtual-list/virtual'
+
+// 异步加载组件
+const VirtualizedList = lazy(() => import('../virtual-list/virtual-list'))
 
 const ChatHeader = () => {
     return (
@@ -35,17 +38,7 @@ const ChatContent = () => {
 
     return (
         <div className="flex-1 relative flex-shrink-0 overflow-hidden">
-            {/* <VirtualizedList height={300} data={meessage} inverse={true} dataLength={meessage.length}>
-                {renderItem}
-            </VirtualizedList> */}
-            {/* <Example /> */}
-            <Example3 />
-            {/* <VirtualListWrapper /> */}
-            {/* <Example data={meessage} renderItem={renderItem} /> */}
-            {/* <ScrollArea> */}
-            {/* <VirtualizedList data={meessage} inverse={true} renderItem={renderItem} /> */}
-            {/* </ScrollArea> */}
-            {/* <VirtualizedList data={meessage} inverse={true} renderItem={renderItem} /> */}
+            <VirtualizedList />
         </div>
     )
 }
@@ -82,8 +75,9 @@ const Chat = () => {
         <ChatProvider>
             <div className="h-full flex flex-col">
                 <ChatHeader />
-                <ChatContent />
-
+                <Suspense fallback={<div>Loading...</div>}>
+                    <ChatContent />
+                </Suspense>
                 <ChatFooter />
             </div>
         </ChatProvider>

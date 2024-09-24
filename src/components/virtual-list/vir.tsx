@@ -1,136 +1,188 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
+import { debounce } from 'es-toolkit/function'
 
-export enum ScrollDirection {
-    Up = 'up',
-    Down = 'down'
+// Content item and its position in the DOM
+interface ContentType {
+    id: number
+    title: string
+    content: string
+    arrPos: number
 }
 
-export interface VirtualListProps<T = any> {
-    itemSize?: number
-    inverse?: boolean
-    data: T[]
-    pageSize?: number
-    cacheCount?: number
-    threshold?: number
-    estimatedHeight?: number
+interface ContentPosition {
+    arrPos: number
+    startPos: number
+    endPos: number
+    height: number
 }
 
-const initData = Array.from({ length: 100 }, (_, index) => index)
+// Constants for initial heights
+const maybeHeight = 100
 
-const VirtualList: React.FC<VirtualListProps> = ({
-    data = initData,
-    inverse = false,
-    pageSize = 15,
-    threshold = 50,
-    cacheCount = 5,
-    estimatedHeight = 80
-}) => {
-    const scrollContainerRef = useRef<HTMLDivElement>(null)
-    const scrollHeightRefs = useRef<HTMLDivElement[]>([])
+const DynItemHeightVersion09: React.FC<{ cacheCount?: number }> = ({ cacheCount = 5 }) => {
+    const [allData, setAllData] = useState<ContentType[]>([])
+    const [positionDataArr, setPositionDataArr] = useState<ContentPosition[]>([])
+    const [pillarDomHeight, setPillarDomHeight] = useState(0)
+    const [start, setStart] = useState(0)
+    const [contentListOffset, setContentListOffset] = useState(0)
+    const [hasMoreData, setHasMoreData] = useState(true)
+    const [dataLoading, setDataLoading] = useState(false)
 
-    const [offset, setOffset] = useState<number>(0)
-    const [sizes, setSizes] = useState<Record<number, number>>(
-        data.reduce((acc, _cur, index) => ({ ...acc, [index]: estimatedHeight }), {})
-    )
-    const [point, setPoint] = useState<number[]>([
-        inverse ? data.length - pageSize : 0,
-        inverse ? data.length - 1 : pageSize
-    ])
+    const scrollerContainerRef = useRef<HTMLDivElement>(null)
+    const contentListRef = useRef<HTMLDivElement>(null)
 
-    const scrollHeight = useMemo(() => {
-        return Object.values(sizes).reduce((acc, cur) => acc + cur, 0)
-    }, [sizes])
+    // Mock data generator
+    const loadData = async (count = 100): Promise<ContentType[]> => {
+        const totalCount = allData.length
+        if (totalCount >= 500) return []
 
-    const viewportData = useMemo(() => {
-        return data.slice(point[0], point[1])
-    }, [point, data])
-
-    const styleTransform = useMemo(() => {
-        return {
-            transform: `translateY(${offset}px)`
-        }
-    }, [offset])
-
-    let lastScrollTop = 0
-    const handleScroll = () => {
-        const container = scrollContainerRef.current
-        if (!container) return
-
-        const scrollTop = container.scrollTop
-        const scrollHeight = container.scrollHeight
-        const clientHeight = container.clientHeight
-
-        let prevIndex = point[0]
-        let nextIndex = point[1]
-
-        if (lastScrollTop === 0 && inverse) lastScrollTop = scrollTop
-        const direction = scrollTop > lastScrollTop ? ScrollDirection.Down : ScrollDirection.Up
-
-        // && scrollTop + clientHeight >= scrollHeight - threshold
-        if (direction === ScrollDirection.Down) {
-            prevIndex = Math.min(point[0] + cacheCount, data.length - pageSize)
-            nextIndex = Math.min(point[1] + cacheCount, data.length)
-        }
-
-        if (direction === ScrollDirection.Up) {
-            prevIndex = Math.max(point[0] - cacheCount, 0)
-            nextIndex = Math.min(point[1] - cacheCount, data.length)
-        }
-
-        // console.log('sizes', sizes)
-        setPoint([prevIndex, nextIndex])
-        // 修正 offset
-        // const newOffset = Object.values(sizes)
-        //     .slice(0, prevIndex)
-        //     .reduce((acc, cur) => acc + cur, 0)
-        // setOffset(newOffset)
-
-        lastScrollTop = scrollTop
+        return Array.from({ length: count }, (_, idx) => ({
+            id: totalCount + idx,
+            title: `Title ${idx}`,
+            content: `Content ${idx}`,
+            arrPos: totalCount + idx
+        }))
     }
 
-    const [allData, setAllData] = useState<VitrualItem<any>[]>([])
-    useEffect(() => {
-        const all = data.map<VitrualItem<ContentType>>((item, idx) => ({
-            data: item,
+    // Initializing data
+    const init = async () => {
+        const newData = await loadData()
+        setAllData(newData)
+        const newPositionData = newData.map((_, idx) => ({
             arrPos: idx,
-            startPos: estimatedHeight * idx,
-            endPos: estimatedHeight * idx + estimatedHeight,
-            height: estimatedHeight
+            startPos: maybeHeight * idx,
+            endPos: maybeHeight * idx + maybeHeight,
+            height: maybeHeight
         }))
-    }, [data])
+        setPositionDataArr(newPositionData)
+    }
 
-    // 缓存元素高度
     useEffect(() => {
-        if (scrollHeightRefs.current.length === 0) return
-        scrollHeightRefs.current.forEach((el) => {
-            const height = el.offsetHeight
-            const dataIndex = parseInt(el.getAttribute('data-index') || '0')
-            if (sizes[dataIndex] && sizes[dataIndex] === height) return
-            setSizes((prev) => ({
-                ...prev,
-                [dataIndex]: height
-            }))
+        init()
+    }, [])
+
+    // Update positions and heights
+    const updateHeightAndPos = () => {
+        const contentListDom = contentListRef.current
+        if (!contentListDom) return
+
+        const childrenElements = Array.from(contentListDom.children) as HTMLElement[]
+
+        childrenElements.forEach((child) => {
+            const dataIndex = parseInt(child.dataset.index || '0', 10)
+            const dataItem = positionDataArr[dataIndex]
+            if (!dataItem) return
+
+            const height = child.offsetHeight
+            const diff = dataItem.height - height
+
+            if (diff !== 0) {
+                dataItem.height -= diff
+                dataItem.endPos -= diff
+
+                for (let j = dataIndex + 1; j < positionDataArr.length; j++) {
+                    const nextItem = positionDataArr[j]
+                    const prevItem = positionDataArr[j - 1]
+
+                    nextItem.startPos = prevItem.endPos
+                    nextItem.endPos = nextItem.startPos + nextItem.height
+                }
+
+                setPositionDataArr([...positionDataArr])
+            }
         })
-    }, [point])
+
+        const lastPosition = positionDataArr[positionDataArr.length - 1]
+        setPillarDomHeight(lastPosition ? lastPosition.endPos : 0)
+    }
+
+    useEffect(() => {
+        updateHeightAndPos()
+    }, [])
+
+    // Scroll event handler
+    const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const scroller = e.target as HTMLDivElement
+        const scrollTop = scroller.scrollTop
+        const scrollHeight = scroller.scrollHeight
+        const clientHeight = scroller.clientHeight
+
+        const newStart = findStartByBinarySearch(positionDataArr, scrollTop)
+        setStart(newStart)
+
+        const realStart = Math.max(0, newStart - cacheCount)
+        setContentListOffset(positionDataArr[realStart]?.startPos || 0)
+
+        // Load more data if near the bottom
+        if (scrollHeight - clientHeight - scrollTop < 1000 && !dataLoading && hasMoreData) {
+            appendData()
+        }
+    }
+
+    // Find new start index using binary search
+    const findStartByBinarySearch = (arr: ContentPosition[], scrollPos: number) => {
+        let low = 0
+        let high = arr.length - 1
+
+        while (low <= high) {
+            const mid = Math.floor((low + high) / 2)
+            if (arr[mid].endPos < scrollPos) {
+                low = mid + 1
+            } else {
+                high = mid - 1
+            }
+        }
+
+        return low
+    }
+
+    const appendData = async () => {
+        setDataLoading(true)
+        const newData = await loadData()
+        if (newData.length === 0) {
+            setHasMoreData(false)
+        } else {
+            const newStartPos = positionDataArr[positionDataArr.length - 1]?.endPos || 0
+            const newPositions = newData.map((_, idx) => ({
+                arrPos: allData.length + idx,
+                startPos: newStartPos + maybeHeight * idx,
+                endPos: newStartPos + maybeHeight * (idx + 1),
+                height: maybeHeight
+            }))
+
+            setAllData([...allData, ...newData])
+            setPositionDataArr([...positionDataArr, ...newPositions])
+        }
+
+        setDataLoading(false)
+    }
+
+    // Render data
+    const renderData = useMemo(() => {
+        const realStart = Math.max(0, start - cacheCount)
+        const realEnd = Math.min(start + cacheCount + 10, allData.length)
+        return allData.slice(realStart, realEnd)
+    }, [start, cacheCount, allData])
 
     return (
-        <div className="h-96">
-            <div className="h-full w-full overflow-auto relative" ref={scrollContainerRef} onScroll={handleScroll}>
-                <div className="absolute top-0 right-0 left-0" style={{ height: scrollHeight }} />
-                <div className="absolute top-0 left-0 w-full h-full" style={styleTransform}>
-                    {viewportData.map((item, index) => (
+        <div
+            ref={scrollerContainerRef}
+            onScroll={debounce(onScroll, 100)}
+            className="h-96 overflow-y-auto border border-gray-300"
+        >
+            <div className="relative" style={{ height: `${pillarDomHeight}px` }}>
+                <div ref={contentListRef} style={{ transform: `translateY(${contentListOffset}px)` }}>
+                    {renderData.map((item) => (
                         <div
-                            key={index}
-                            className="p-2 border"
-                            data-index={point[0] + index}
-                            style={{ height: [50, 60, 70, 80, 90, 100, 150, 200][(Math.random() * 8) | 0] }}
-                            ref={(el) => {
-                                if (el) {
-                                    scrollHeightRefs.current[point[0] + index] = el
-                                }
+                            key={item.id}
+                            data-index={item.arrPos}
+                            className="border"
+                            style={{
+                                height: [80, 160, 240, 320, 400][Math.floor(Math.random() * 5)]
                             }}
                         >
-                            {item}
+                            <h2 className="text-lg font-bold">{item.title}</h2>
+                            <p>{item.content}</p>
                         </div>
                     ))}
                 </div>
@@ -139,4 +191,4 @@ const VirtualList: React.FC<VirtualListProps> = ({
     )
 }
 
-export default VirtualList
+export default DynItemHeightVersion09
