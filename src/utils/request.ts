@@ -120,7 +120,7 @@ service.interceptors.response.use(
         switch (code) {
             case RESPONSE_CODE.Unauthorized:
                 console.log('登录过期')
-                // userStore.clear()
+                userStore.clear()
                 break
         }
         /////////////////////////////////////////////////////////////////////////////////////////////

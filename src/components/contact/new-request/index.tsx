@@ -317,6 +317,7 @@ const NewRequest: React.FC = () => {
                 style={{
                     maxWidth: isFullUserCard ? 480 : (selectedUser?.status === ApplyStatus.PENDING ? 320 : 480),
                 }}
+                className='max-h-[450px] overflow-y-auto rounded-lg'
                 centered
                 open={isModalVisible}
                 onCancel={handleModalClose}

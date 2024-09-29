@@ -11,9 +11,10 @@ import { Contact } from '@/types/storage';
 import { deleteFriendApi } from "@/api/relation"
 import useCacheStore from "@/stores/cache"
 import { useNavigate } from "react-router-dom"
-import { tr } from "@faker-js/faker"
 
-interface ContactCardProps extends Contact { }
+interface ContactCardProps extends Contact { 
+    height?: string;
+}
 
 const ContactCard: React.FC<ContactCardProps> = (props) => {
 
@@ -194,7 +195,7 @@ const ContactCard: React.FC<ContactCardProps> = (props) => {
 
     return (
         <>
-            <div className='flex-1 overflow-y-auto'>
+            <div className='flex-1 overflow-y-auto' style={{ height: props.height }}>
                 <div className='bg-gray-100 rounded-lg'>
                     {props && (
                         <UserCard
@@ -237,7 +238,6 @@ const ContactCard: React.FC<ContactCardProps> = (props) => {
                 onOk={handleBlacklistConfirm}
                 onCancel={() => setIsModalVisible(false)}
                 width={320}
-                height={190}
                 closable={false}
                 centered
                 footer={[
@@ -259,7 +259,7 @@ const ContactCard: React.FC<ContactCardProps> = (props) => {
                 open={isDeleteModalVisible}
                 onCancel={() => setIsDeleteModalVisible(false)}
                 footer={null}
-                width={320}
+                width={330}
                 centered
                 wrapClassName="ant-modal-content-p-0"
             >
