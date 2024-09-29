@@ -80,6 +80,7 @@ const VirtualList: React.FC<VirtualListProps & Partial<VirtuosoProps<any, any>>>
     const [loadingHistory, setLoadingHistory] = useState<boolean>(false)
 
     useEffect(() => {
+        // 优化：使用 slice 方法加载数据，避免每次都重新计算
         setLoadData(data.slice(start, start + loadCount))
     }, [data, loadCount, start])
 
@@ -89,7 +90,8 @@ const VirtualList: React.FC<VirtualListProps & Partial<VirtuosoProps<any, any>>>
             if (loadData.length >= data.length) return
             if (isAtTop) {
                 setLoadingHistory(true)
-                setLoadCount(loadCount + defaultLoadCount)
+                // 优化：避免每次加载时都增加 loadCount，导致数据加载过多
+                setLoadCount(prevLoadCount => prevLoadCount + defaultLoadCount)
                 virtuosoRef.current?.scrollToIndex(defaultLoadCount)
                 loadPrevious?.()
                 return

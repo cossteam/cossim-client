@@ -19,6 +19,7 @@ interface UserCardProps {
     userInfoSlot?: React.ReactNode;
     additionalInfoSlot?: React.ReactNode;
     userInfoItem?: UserInfoItem[];
+    width?: string; // 添加宽度props
 }
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -28,7 +29,8 @@ const UserCard: React.FC<UserCardProps> = ({
     userId,
     actions: actionSlot,
     userInfoItem,
-    additionalInfoSlot
+    additionalInfoSlot,
+    width = 'auto', // 设置默认宽度为auto
 }) => {
 
     const handleCopyContent = useCallback((content: string) => {
@@ -38,7 +40,7 @@ const UserCard: React.FC<UserCardProps> = ({
     }, []);
 
     return (
-        <div className="flex flex-col space-y-2 rounded-lg">
+        <div className="flex flex-col space-y-2 rounded-lg" style={{ width }}>
             {/* 用户卡片 */}
             <Card bordered={false} className="text-center flex flex-col h-full ant-card-body-p-0 pt-5 pb-3">
                 <Avatar size={96} src={avatar} className="mb-2" />

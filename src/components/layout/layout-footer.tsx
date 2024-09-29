@@ -6,6 +6,8 @@ import useCommonStore from '@/stores/common'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { User, Users, ChatCircleDots } from "@phosphor-icons/react";
 
+const height = 50
+
 const LayoutFooter = () => {
     const commonStore = useCommonStore()
     const location = useLocation()
@@ -32,7 +34,7 @@ const LayoutFooter = () => {
     return (
         <>
             <Divider className="m-0" />
-            <Flex className="h-10 bg-background" justify="center" align="center">
+            <Flex className={`h-[${height}px] bg-background`} justify="center" align="center">
                 {menus.map((menu, index) => {
                     // 判断当前菜单项是否激活
                     const isActive = location.pathname.includes(menu.path)

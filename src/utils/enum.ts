@@ -80,6 +80,18 @@ export enum ROUTE {
     PROFILE = 'profile',
 }
 
+/** 用户关系状态 */
+export enum RELATION_STATUS {
+    /** 陌生人 */
+    STRANGER = 0,
+    /** 好友 */
+    FRIEND = 1,
+    /** 拉黑 */
+    BLOCKED = 2,
+    /** 删除 */
+    DELETED = 3
+}
+
 /** 申请列表状态管理 */
 export enum ApplyStatus {
 	/** 申请中 */

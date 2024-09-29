@@ -1,10 +1,10 @@
-import { Modal, Input, message, Typography, Flex, Divider } from "antd"
+import { Modal, Input, message, Typography, Divider } from "antd"
 import { useCallback, useMemo, useState } from "react";
 import { Prohibit, UserPlus } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button';
 import { addFriendApi } from '@/api/relation'
-import UserCard from "@/components/user/user-card";
-import useCacheStore from "@/stores/cache";
+import UserCard from "@/components/user-card";
+import useContactStore from "@/stores/contact";
 
 const { Text } = Typography;
 
@@ -21,8 +21,8 @@ const NotContactCard: React.FC<NotContactCardProps> = ({ user_id, avatar, nickna
     const [openBlacklist, setOpenBlacklist] = useState(false);
     const [remark, setRemark] = useState('');
 
-    const isInBlacklist = useCacheStore(state => state.isInBlacklist);
-    const removeFromBlacklist = useCacheStore(state => state.removeFromBlacklist);
+    const isInBlacklist = useContactStore(state => state.isInBlacklist);
+    const removeFromBlacklist = useContactStore(state => state.removeFromBlacklist);
 
     const handleSendRequest = useCallback(async () => {
         if (!user_id) {

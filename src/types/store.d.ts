@@ -100,8 +100,6 @@ export interface CacheOptions {
     cacheRequestList: RequestData[]
     /** @description 缓存用户信息映射  */
     // cacheUserMap: { [userId: string]: Contact };  // 键为用户 ID，值为 Contact 对象
-    /** @description 缓存黑名单列表 */
-    cacheBlacklist: Contact[];  // 存储被加入黑名单的用户ID列表
 }
 
 // 基础缓存方法
@@ -116,32 +114,56 @@ export interface UserCacheStoreMethods {
     getUserInfo: (userId: string) => Promise<Contact>
 }
 
-// 联系人相关方法
-export interface ContactCacheStoreMethods {
-    /** @description 添加联系人 */
-    addContact: (contact: Contact) => void
-
-    /** @description 删除联系人 */
-    deleteContact: (userId: string) => void;
-
-    /** @description 判断是不是联系人 */
-    isContact(userId: string): boolean;
+export interface ContactsOptions {
+    /** @description 缓存联系人列表 */
+    cacheContactList: ContactData[]
+    /** @description 缓存黑名单列表 */
+    // cacheBlacklist: Contact[];  // 存储被加入黑名单的用户ID列表
 }
 
-// 黑名单相关方法
-export interface BlacklistCacheStoreMethods {
-    /** @description 将用户加入黑名单 */
+// 联系人相关方法
+export interface ContactsCacheStoreMethods {
+    /**
+     * @description 添加联系人
+     * @param contact - 要添加的联系人对象
+     */
+    addContact: (contact: Contact) => void;
+
+    /**
+     * @description 删除联系人
+     * @param userId - 要删除的联系人的用户 ID
+     */
+    deleteContact: (userId: string) => void;
+
+    /**
+     * @description 判断是否为联系人
+     * @param userId - 要判断的用户 ID
+     * @returns 是否为联系人
+     */
+    isContact: (userId: string) => boolean;
+
+    /**
+     * @description 将用户加入黑名单
+     * @param userId - 要加入黑名单的用户 ID
+     */
     addToBlacklist: (userId: string) => void;
 
-    /** @description 将用户从黑名单中移除 */
+    /**
+     * @description 将用户从黑名单中移除
+     * @param userId - 要移除的用户 ID
+     */
     removeFromBlacklist: (userId: string) => void;
 
-    /** @description 判断用户是否在黑名单中 */
+    /**
+     * @description 判断用户是否在黑名单中
+     * @param userId - 要判断的用户 ID
+     * @returns 用户是否在黑名单中
+     */
     isInBlacklist: (userId: string) => boolean;
 }
 
 // 组合所有方法
-export interface CacheStoreMethods extends BaseCacheStoreMethods, UserCacheStoreMethods, ContactCacheStoreMethods, BlacklistCacheStoreMethods { }
+export interface CacheStoreMethods extends BaseCacheStoreMethods { }
 
 export interface MessagesOptions {
     /** @description 是否是群聊 */
@@ -169,3 +191,5 @@ export type CallStore = CallOptions & CallStoreMethods
 export type CacheStore = CacheOptions & CacheStoreMethods
 // 消息仓库
 export type MessagesStore = MessagesOptions & MessagesStoreMethods
+// 联系人仓库
+export type ContactsStore = ContactsOptions & ContactsCacheStoreMethods

@@ -20,6 +20,9 @@ import {
 } from "@/components/ui/dialog"
 import { Loader2 } from "lucide-react";
 
+// 定义头部高度常量
+export const headerHeight = 50
+
 // 用户信息接口
 interface UserInfoProps {
     avatarUrl: string;
@@ -158,7 +161,9 @@ const UserInfo: React.FC<UserInfoProps> = ({ avatarUrl: initialAvatarUrl, nickna
     return (
         <Flex className="flex-1 container--background" style={{ height }} vertical>
             {/* 顶部标题栏 */}
-            <div className="h-16 flex items-center justify-between bg-white border-b px-4">
+            <div style={{
+                height: headerHeight,
+            }} className="flex items-center justify-between bg-white border-b px-4">
                 <Text className="flex-1 text-center">用户信息</Text>
                 <button className="px-4 text-green-500 hover:text-green-600 cursor-pointer text-sm" onClick={toggleEditing}>
                     {isEditing ? "完成" : "编辑"}
