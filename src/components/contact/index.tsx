@@ -97,13 +97,13 @@ const ContactListPage = () => {
     ), [navigate, location.pathname])
 
     return (
-        <Layout className="h-[600px] bg-white">
+        <Layout className="bg-white">
             <Content id="scrollableDiv" className="flex-1 overflow-auto">
                 {menus.map(renderMenuItem)}
                 <Divider className="m-0" />
                 {contactList.length === 0 || contactList.every(contactData => Object.values(contactData)[0].length === 0) ? (
-                    <div className="flex justify-center items-center h-full">
-                        <Typography.Text className="text-gray-400">暂无联系人</Typography.Text>
+                    <div className="flex justify-center items-center" style={{ minHeight: 'calc(70vh - 50px)' }}>
+                    <Typography.Text className="text-gray-400">暂无联系人</Typography.Text>
                     </div>
                 ) : (
                     contactList.map((contactData) => {

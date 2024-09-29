@@ -24,12 +24,17 @@ export const useAuthStore = createPersistStore(
                 logoutApi({ driver_id: driverId })
                     .then((res) => {
                         set(initialState)
+                        localStorage.removeItem('COSS_USER_STORE') // 清理localStorage
                         resolve(res)
                     })
                     .catch((err) => {
                         reject(err)
                     })
             })
+        },
+        clear: () => {
+            set(initialState)
+            localStorage.removeItem('COSS_USER_STORE') // 清理localStorage
         }
     }),
     {

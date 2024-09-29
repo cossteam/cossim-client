@@ -19,12 +19,21 @@ service.interceptors.request.use(
         if (token) config.headers['Authorization'] = 'Bearer ' + token
         return config
     },
-    (error: AxiosError) => Promise.reject(error)
+    (error: AxiosError) => {
+        if (error.response && error.response.status === 401) {
+            useAuthStore.getState().clear()
+            location.reload()
+        }
+        return Promise.reject(error)
+    }
 )
 
 service.interceptors.response.use(
     async (response: AxiosResponse) => {
-        return response.data
+        if (response.data.code === 401) {
+            useAuthStore.getState().clear()
+            location.reload()
+        }        return response.data
     },
     (error: AxiosError) => {
         return Promise.reject(error)
