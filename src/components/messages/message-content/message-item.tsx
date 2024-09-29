@@ -12,6 +12,9 @@ interface MessageItemProps {
 const MessageItem: React.ForwardRefRenderFunction<HTMLDivElement, MessageItemProps> = ({ message }, ref) => {
     const isMe = useMemo(() => isSelf(message?.sender_id), [message?.sender_id])
 
+    // 将isMe的值设置为随机的true或false，用于测试
+    //    const isMe = useMemo(() => Math.random() < 0.5, [])
+
     const renderContent = useCallback(() => {
         switch (message?.type) {
             case MESSAGE_TYPE.AUDIO:

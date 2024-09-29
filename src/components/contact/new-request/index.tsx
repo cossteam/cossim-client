@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Segmented, Typography, Flex, List, Avatar, message, Modal, Dropdown, ConfigProvider } from 'antd';
+import { Segmented, Typography, Flex, List, Avatar, message, Modal, Dropdown } from 'antd';
 import useMobile from '@/hooks/useMobile';
 import { friendRequestListApi, manageFriendApplyApi, deleteFriendRequestApi, groupRuestListApi } from '@/api/relation';
 import { QueryParams, ManageFriendRequestParams } from '@/types/api';
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import RequestInfoCard from '@/components/contact/new-request/request-info-card';
 import UserCard from '../user-info/card';
 import useCacheStore from '@/stores/cache';
+import useContactStore from '@/stores/contact';
 
 const { Text } = Typography;
 
@@ -94,7 +95,7 @@ const NewRequest: React.FC = () => {
                 
                 if (action === 1) {
                     const updatedContact = response.data.contact;
-                    useCacheStore.getState().addContact(updatedContact);
+                    useContactStore.getState().addContact(updatedContact);
                 }
             } else {
                 message.error('处理好友请求失败');

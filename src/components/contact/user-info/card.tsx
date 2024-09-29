@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ContactCard from './contact-card';
-import NotContactCard from '@/components/user/not-contact-card';
-import useCacheStore from '@/stores/cache';
+import NotContactCard from '@/components/user-card/not-contact-card';
 import { Contact } from '@/types/storage';
 import {  getUserInfoApi } from '@/api/user';
 import { message } from 'antd';
+import useContactStore from '@/stores/contact';
 
 interface UserCardProps {
     userId: string;
 }
 
 const UserCard: React.FC<UserCardProps> = ({ userId }) => {
-    const isContact = useCacheStore.getState().isContact(userId);
+    const isContact = useContactStore.getState().isContact(userId);
     const [userInfo, setUserInfo] = useState<Contact | null>(null);
 
     const fetchUserInfo = useCallback(async () => {

@@ -8,88 +8,48 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useMemo } from 'react'
 import useCacheStore from '@/stores/cache'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { fa } from '@faker-js/faker'
+import { faker } from '@faker-js/faker'
 import { MESSAGE_SEND_STATE, MESSAGE_TYPE } from '@/utils/enum'
+// import generateTestMessages from './mock-message'
 // import { isGroupDialog } from '@/utils/message'
 
 const generateTestMessages = (): Message[] => {
-    return [
-        {
-            dialog_id: 1,
-            at_all_user: false,
-            content: "你好，最近怎么样？",
-            is_brun_after_reading: false,
-            is_label: false,
-            msg_id: 1001,
-            msg_send_state: MESSAGE_SEND_STATE.SENDING,
+    const messages = [];
+    for (let i = 0; i < 100; i++) {
+        messages.push({
+            dialog_id: faker.datatype.number(),
+            at_all_user: faker.datatype.boolean(),
+            content: faker.lorem.sentence(),
+            is_brun_after_reading: faker.datatype.boolean(),
+            is_label: faker.datatype.boolean(),
+            msg_id: faker.datatype.number(),
+            msg_send_state: faker.helpers.arrayElement([MESSAGE_SEND_STATE.SENDING, MESSAGE_SEND_STATE.SUCCESS]),
             read_at: Date.now(),
-            receiver_id: "user002",
-            sender_id: "user001",
+            receiver_id: faker.datatype.string(),
+            sender_id: faker.datatype.string(),
             receiver_info: {
-                avatar: "https://example.com/avatar2.jpg",
-                name: "张三",
-                user_id: "user002"
+                avatar: faker.image.avatar(),
+                name: faker.name.firstName() + faker.name.lastName(),
+                user_id: faker.datatype.string()
             },
             sender_info: {
-                avatar: "https://example.com/avatar1.jpg",
-                name: "李四",
-                user_id: "user001"
+                avatar: faker.image.avatar(),
+                name: faker.name.firstName() + faker.name.lastName(),
+                user_id: faker.datatype.string()
             },
-            type: MESSAGE_TYPE.TEXT
-        },
-        {
-            dialog_id: 1,
-            at_all_user: false,
-            content: "我很好，谢谢关心！你呢？",
-            is_brun_after_reading: false,
-            is_label: true,
-            msg_id: 1002,
-            msg_send_state: MESSAGE_SEND_STATE.SUCCESS,
-            read_at: Date.now(),
-            receiver_id: "user001",
-            sender_id: "user002",
-            receiver_info: {
-                avatar: "https://example.com/avatar1.jpg",
-                name: "李四",
-                user_id: "user001"
-            },
-            sender_info: {
-                avatar: "https://example.com/avatar2.jpg",
-                name: "张三",
-                user_id: "user002"
-            },
-            type: MESSAGE_TYPE.TEXT
-        },
-        {
-            dialog_id: 1,
-            at_all_user: true,
-            content: "大家注意，明天有重要会议！",
-            is_brun_after_reading: false,
-            is_label: false,
-            msg_id: 1003,
-            msg_send_state: MESSAGE_SEND_STATE.SUCCESS,
-            read_at: Date.now(),
-            receiver_id: "group001",
-            sender_id: "user003",
-            receiver_info: {
-                avatar: "https://example.com/group_avatar.jpg",
-                name: "项目组",
-                user_id: "group001"
-            },
-            sender_info: {
-                avatar: "https://example.com/avatar3.jpg",
-                name: "王五",
-                user_id: "user003"
-            },
-            type: MESSAGE_TYPE.NOTICE
-        }
-    ];
+            // type: faker.helpers.arrayElement([MESSAGE_TYPE.TEXT, MESSAGE_TYPE.NOTICE])
+            type: faker.helpers.arrayElement([MESSAGE_TYPE.TEXT])
+        });
+    }
+    return messages;
 };
 
 const Messages = () => {
     const { height } = useMobile()
     const { id } = useParams()
 
+    // TODO src/components/messages/message-footer/message-input.tsx 
+    // handleTextChange 每次输入内容都会导致重新渲染
     const messages = useMessagesStore()
     const cacheStore = useCacheStore()
 

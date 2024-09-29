@@ -1,5 +1,5 @@
 import { GetUserInfoData } from "@/api/user"
-import UserCard from "@/components/user/user-card"
+import UserCard from "@/components/user-card"
 import { ChatCircleDots, BellSlash, DotsThreeOutline, Phone, ShareNetwork, Trash, Broom, Prohibit } from "@phosphor-icons/react"
 import { ConfigProvider, Divider, Dropdown, List, message, Modal, Switch, Typography, Avatar, Button } from "antd"
 import React from "react"
@@ -9,11 +9,12 @@ const { Text } = Typography;
 
 import { Contact } from '@/types/storage';
 import { deleteFriendApi } from "@/api/relation"
-import useCacheStore from "@/stores/cache"
 import { useNavigate } from "react-router-dom"
+import useContactStore from "@/stores/contact"
 
 interface ContactCardProps extends Contact { 
     height?: string;
+    width?: string;
 }
 
 const ContactCard: React.FC<ContactCardProps> = (props) => {
@@ -25,6 +26,8 @@ const ContactCard: React.FC<ContactCardProps> = (props) => {
 
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleBlacklist = useCallback(() => {
         setIsModalVisible(true)
@@ -40,13 +43,12 @@ const ContactCard: React.FC<ContactCardProps> = (props) => {
 
     const handleBlacklistConfirm = useCallback(() => {
         // TODO 发送请求真实的添加黑名单
-        useCacheStore.getState().addToBlacklist(props.user_id);
+        useContactStore.getState().addToBlacklist(props.user_id);
         setIsModalVisible(false);
         navigate('/dashboard/contact');
         message.success('已添加到黑名单');
     }, [props.user_id]);
 
-    const navigate = useNavigate();
     const moreMenuItems = [
         {
             key: 'share',
@@ -79,7 +81,7 @@ const ContactCard: React.FC<ContactCardProps> = (props) => {
         try {
             const resp = await deleteFriendApi(props.user_id);
             if (resp.code === 200) {
-                useCacheStore.getState().deleteContact(props.user_id);
+                useContactStore.getState().deleteContact(props.user_id);
                 navigate('/dashboard/contact');
             } else {
                 message.error('删除联系人失败: ' + resp.msg);
@@ -199,6 +201,7 @@ const ContactCard: React.FC<ContactCardProps> = (props) => {
                 <div className='bg-gray-100 rounded-lg'>
                     {props && (
                         <UserCard
+                            width={props.width}
                             userId={props.user_id}
                             avatar={props.avatar}
                             nickname={props.nickname}

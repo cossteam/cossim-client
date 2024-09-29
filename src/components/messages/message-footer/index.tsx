@@ -7,6 +7,8 @@ import MessageInput from './message-input'
 import { Paperclip, PaperPlaneRight, Plus, SmileyMeh } from '@phosphor-icons/react'
 import useMessagesStore from '@/stores/messages'
 
+const height = 50
+
 // 消息页脚组件，包含表情、附件等功能按钮
 const MessageFooter = () => {
     // 控制表情弹出框的开关状态
@@ -63,7 +65,7 @@ const MessageFooter = () => {
 
     return (
         // 消息页脚容器
-        <Flex className="bg-background px-3 max-h-[300px] py-3" align="end">
+        <Flex className={`h-[${height}px] bg-background px-3 max-h-[300px]`} align="center" justify="center">
             {/* 附件按钮 */}
             <IconButton {...iconButtonProps} component={Paperclip} />
             {/* 消息输入框 */}
