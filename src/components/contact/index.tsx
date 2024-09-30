@@ -1,55 +1,16 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Avatar, List, Divider, Layout, Flex, Typography, message } from 'antd'
-import { Contact, ContactData } from '@/types/storage'
+import { useMemo, useCallback } from 'react'
+import { Avatar, List, Divider, Layout, Flex, Typography } from 'antd'
+import { Contact } from '@/types/storage'
 import { Content } from 'antd/es/layout/layout'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Tag, UserPlus, Users } from '@phosphor-icons/react'
-import { getFriendListApi } from '@/api/relation'
-import useCacheStore from '@/stores/cache'
+import useContactStore from '@/stores/contact'
 
 // 联系人列表页面组件
 const ContactListPage = () => {
-    const [loading, setLoading] = useState(false)
-    const [contactList, setContactList] = useState<ContactData[]>([])
     const navigate = useNavigate()
     const location = useLocation()
-    const { cacheContactList, update } = useCacheStore()
-
-    // 加载联系人数据
-    const loadContactData = useCallback(async () => {
-        if (loading) return
-        setLoading(true)
-        try {
-            if (cacheContactList.length > 0) {
-                setContactList(cacheContactList)
-            } else {
-                const response = await getFriendListApi()
-                if (response.code === 200) {
-                    const convertedData: ContactData[] = Object.entries(response.data.list).map(([key, value]) => ({
-                        [key]: value as Contact[]
-                    }))
-                    setContactList(convertedData)
-                    update({ cacheContactList: convertedData })
-                } else {
-                    message.error('获取联系人列表失败: ' + response.msg)
-                }
-            }
-        } catch (error) {
-            console.error('获取联系人列表出错:', error)
-            message.error('获取联系人列表出错')
-        } finally {
-            setLoading(false)
-        }
-    }, [loading, cacheContactList, update])
-
-    useEffect(() => {
-        loadContactData()
-    }, [])
-
-    // 监听 cacheContactList 的变化
-    useEffect(() => {
-        setContactList(cacheContactList)
-    }, [cacheContactList])
+    const { cacheContactList } = useContactStore()
 
     // 定义菜单项
     const menus = useMemo(() => [
@@ -101,12 +62,12 @@ const ContactListPage = () => {
             <Content id="scrollableDiv" className="flex-1 overflow-auto">
                 {menus.map(renderMenuItem)}
                 <Divider className="m-0" />
-                {contactList.length === 0 || contactList.every(contactData => Object.values(contactData)[0].length === 0) ? (
+                {cacheContactList.length === 0 || cacheContactList.every(contactData => Object.values(contactData)[0].length === 0) ? (
                     <div className="flex justify-center items-center" style={{ minHeight: 'calc(70vh - 50px)' }}>
                     <Typography.Text className="text-gray-400">暂无联系人</Typography.Text>
                     </div>
                 ) : (
-                    contactList.map((contactData) => {
+                    cacheContactList.map((contactData) => {
                         const [key, contacts] = Object.entries(contactData)[0]
                         return contacts && contacts.length > 0 ? (
                             <div key={key}>

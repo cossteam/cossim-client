@@ -13,7 +13,7 @@ export const MessageInput: React.FC<MessageInputProps> = () => {
     }
 
     return (
-        <Flex className="h-[30px] flex-1 bg-gray-100 rounded-lg" align="center">
+        <Flex className="p-2 flex-1 bg-gray-100 rounded-lg" align="center">
             {/* <QuillEditEditor placeholder={$t('输入消息...')} textChange={handleTextChange} /> */}
             <QuillEditEditor placeholder='输入消息...' textChange={handleTextChange} />
         </Flex>

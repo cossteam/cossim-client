@@ -91,7 +91,7 @@ export interface CacheOptions {
     /** @description 缓存会话列表 */
     cacheChatList: ChatData[]
     /** @description 缓存联系人列表 */
-    cacheContactList: ContactData[]
+    // cacheContactList: ContactData[]
     /** @description 缓存群组列表 */
     cacheGroupsList: GroupData[]
     /** @description 缓存消息未读数 */
@@ -122,7 +122,7 @@ export interface ContactsOptions {
 }
 
 // 联系人相关方法
-export interface ContactsCacheStoreMethods {
+export interface ContactsCacheStoreMethods extends BaseCacheStoreMethods {
     /**
      * @description 添加联系人
      * @param contact - 要添加的联系人对象

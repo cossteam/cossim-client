@@ -8,13 +8,14 @@ import { useElementSize } from '@reactuses/core'
 import useCacheStore from '@/stores/cache'
 // import { Virtuoso } from 'react-virtuoso'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { Virtuoso } from 'react-virtuoso'
 
 // TODO: 1、时间、置顶排序 2、删除列表项  3、聊天列表项右侧功能按钮（待定）
 const ChatList = () => {
     const navigate = useNavigate()
     const params = useParams()
     const listRef = useRef<HTMLDivElement>(null)
-    const [width] = useElementSize(listRef)
+    const [height, width] = useElementSize(listRef)
     const cacheStore = useCacheStore()
 
     const renderItem = useCallback(
@@ -57,8 +58,8 @@ const ChatList = () => {
                 <List className="w-full" dataSource={cacheStore.cacheChatList} renderItem={renderItem} />
             </InfiniteScroll>
         </Flex>
-        // // <Flex className="flex-1" ref={listRef} vertical>
-        //     {/* <List className="w-full h-full flex-1">
+        // <Flex className="flex-1" ref={listRef} vertical>
+        //     <List className="w-full h-full flex-1">
         //         <Virtuoso
         //             className="w-full h-full"
         //             style={{ height }}
@@ -66,8 +67,8 @@ const ChatList = () => {
         //             data={cacheStore.cacheChatList}
         //             itemContent={(_, item) => renderItem(item)}
         //         />
-        //     </List> */}
-        // // </Flex>
+        //     </List>
+        // </Flex>
     )
 }
 

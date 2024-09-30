@@ -3,6 +3,7 @@ import { Flex } from 'antd'
 import { useCallback, useRef } from 'react'
 import MessageItem from './message-item'
 import VirtualList from '@/components/virtualizer-list/virtual-list'
+import MessageList from './message-list'
 
 interface MessageContentProps {
     messages: Message[]
@@ -11,7 +12,7 @@ interface MessageContentProps {
 
 const MessageContent: React.FC<MessageContentProps> = ({ messages, start = 0 }) => {
     const parentRef = useRef<HTMLDivElement>(null)
-    const [, height] = useElementSize(parentRef)
+    const [height] = useElementSize(parentRef)
 
     const renderItem = useCallback(
         (item: Message) => {
@@ -26,7 +27,8 @@ const MessageContent: React.FC<MessageContentProps> = ({ messages, start = 0 }) 
             ref={parentRef}
             vertical
         >
-            <VirtualList data={messages.reverse()} reverse start={start} height={height} renderItem={renderItem} />
+            {/* <MessageList height={height} messages={messages.reverse()} /> */}
+            <VirtualList height={height} data={messages.reverse()} reverse renderItem={renderItem} />
         </Flex>
     )
 }

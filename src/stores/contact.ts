@@ -10,6 +10,8 @@ const states: ContactsOptions = {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const actions = (set: any, get: any): ContactsCacheStoreMethods => ({
+    update: async (options) => set(options),
+
     addContact: (contact: Contact) => set((state: ContactsOptions) => ({
         cacheContactList: [...state.cacheContactList, contact]
     })),

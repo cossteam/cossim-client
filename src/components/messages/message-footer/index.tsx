@@ -1,10 +1,9 @@
-import IconButton from '@/components/icon/icon-button'
 import { Flex, Popover } from 'antd'
 import { useState, useMemo } from 'react'
 import MessageEmojis from './message-emojis'
 import useMobile from '@/hooks/useMobile'
 import MessageInput from './message-input'
-import { Paperclip, PaperPlaneRight, Plus, SmileyMeh } from '@phosphor-icons/react'
+import { Paperclip, PaperPlaneRight, Plus, Smiley } from '@phosphor-icons/react'
 import useMessagesStore from '@/stores/messages'
 
 const height = 50
@@ -34,10 +33,7 @@ const MessageFooter = () => {
     // 渲染表情按钮
     const renderEmojiButton = () => {
         const emojiButton = (
-            <IconButton
-                {...iconButtonProps}
-                component={SmileyMeh}
-            />
+            <Smiley size={24} {...iconButtonProps} weight="light" className="text-xl text-gray-500 hover:text-gray-700 cursor-pointer" />
         )
 
         // 移动设备直接返回按钮，不使用弹出框
@@ -65,17 +61,23 @@ const MessageFooter = () => {
 
     return (
         // 消息页脚容器
-        <Flex className={`h-[${height}px] bg-background px-3 max-h-[300px]`} align="center" justify="center">
+        <Flex className={`h-[${height}px] bg-background px-3 max-h-[300px]`} align="center">
             {/* 附件按钮 */}
-            <IconButton {...iconButtonProps} component={Paperclip} />
+            <Paperclip size={24} {...iconButtonProps} weight="light" className="text-gray-500 hover:text-gray-700 cursor-pointer" />
+
             {/* 消息输入框 */}
-            <MessageInput />
-            {/* 表情按钮 */}
-            {renderEmojiButton()}
-            {/* 更多功能按钮 */}
-            <IconButton {...iconButtonProps} component={Plus} />
-            {/* 发送按钮 */}
-            <IconButton className={`text-2xl ${sendButtonColor}`} component={PaperPlaneRight} hover={false} active={false} />
+            <div className='w-full px-4'>
+                <MessageInput />
+            </div>
+
+            <Flex align="center" gap={10}>
+                {/* 表情按钮 */}
+                {renderEmojiButton()}
+                {/* 更多功能按钮 */}
+                <Plus size={24} {...iconButtonProps} weight="light" className="text-gray-500 hover:text-gray-700 cursor-pointer" />
+                {/* 发送按钮 */}
+                <PaperPlaneRight size={24} {...iconButtonProps} weight={sendButtonColor === "text-primary" ? "fill" : "light"} className={`text-gray-500 hover:text-gray-700 cursor-pointer ${sendButtonColor}`} />
+            </Flex>
         </Flex>
     )
 }
