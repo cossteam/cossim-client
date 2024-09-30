@@ -17,25 +17,25 @@ const generateTestMessages = (): Message[] => {
     const messages = [];
     for (let i = 0; i < 100; i++) {
         messages.push({
-            dialog_id: faker.datatype.number(),
+            dialog_id: faker.number.int(),
             at_all_user: faker.datatype.boolean(),
             content: faker.lorem.sentence(),
             is_brun_after_reading: faker.datatype.boolean(),
             is_label: faker.datatype.boolean(),
-            msg_id: faker.datatype.number(),
+            msg_id: faker.number.int(),
             msg_send_state: faker.helpers.arrayElement([MESSAGE_SEND_STATE.SENDING, MESSAGE_SEND_STATE.SUCCESS]),
             read_at: Date.now(),
-            receiver_id: faker.datatype.string(),
-            sender_id: faker.datatype.string(),
+            receiver_id: faker.string.sample(),
+            sender_id: faker.string.sample(),
             receiver_info: {
                 avatar: faker.image.avatar(),
-                name: faker.name.firstName() + faker.name.lastName(),
-                user_id: faker.datatype.string()
+                name: faker.person.firstName() + faker.person.lastName(),
+                user_id: faker.string.sample()
             },
             sender_info: {
                 avatar: faker.image.avatar(),
-                name: faker.name.firstName() + faker.name.lastName(),
-                user_id: faker.datatype.string()
+                name: faker.person.firstName() + faker.person.lastName(),
+                user_id: faker.string.sample()
             },
             // type: faker.helpers.arrayElement([MESSAGE_TYPE.TEXT, MESSAGE_TYPE.NOTICE])
             type: faker.helpers.arrayElement([MESSAGE_TYPE.TEXT])
@@ -54,23 +54,23 @@ const Messages = () => {
     const cacheStore = useCacheStore()
 
     function isGroupDialog(chatInfo: ChatData): any {
-        console.log('chatInfo', chatInfo)
+        // console.log('chatInfo', chatInfo)
     }
 
     // TODO: 判断正确的 group_id 和 user_id
     const isGroup = useMemo(() => messages.chatInfo && isGroupDialog(messages.chatInfo), [messages.chatInfo])
 
-    const messageList =
-        useLiveQuery(() => {
-            if (!id) return []
-            return isGroup
-                ? storage.group_messages.where('dialog_id').equals(Number(id)).toArray()
-                : storage.private_messages.where('dialog_id').equals(Number(id)).toArray()
-        }, [isGroup, id]) ?? []
+    // const messageList =
+    //     useLiveQuery(() => {
+    //         if (!id) return []
+    //         return isGroup
+    //             ? storage.group_messages.where('dialog_id').equals(Number(id)).toArray()
+    //             : storage.private_messages.where('dialog_id').equals(Number(id)).toArray()
+    //     }, [isGroup, id]) ?? []
 
-    useEffect(() => {
-        // console.log('messageList', messageList)
-    }, [messageList])
+    // useEffect(() => {
+    //     console.log('messageList', messageList)
+    // }, [messageList])
 
     useEffect(() => {
         if (!id) return

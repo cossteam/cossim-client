@@ -71,6 +71,9 @@ const VirtualList: React.FC<VirtualListProps & Partial<VirtuosoProps<any, any>>>
     const [firstLoad, setFirstLoad] = useState(true)
 
     useEffect(() => {
+        virtuosoRef.current?.scrollToIndex({
+            index: data.length-1,
+          })
         if (firstLoad) setFirstLoad(false)
     }, [])
 
@@ -122,18 +125,21 @@ const VirtualList: React.FC<VirtualListProps & Partial<VirtuosoProps<any, any>>>
         [loadingHistory]
     )
 
+    
+
+
     return (
-        <Virtuoso
-            className="virtuoso-list"
+          <Virtuoso
+            // className="virtuoso-list"
             height={height}
+            ref={virtuosoRef}
             data={loadData}
+            itemContent={(_, item) => renderItem(item)}
             increaseViewportBy={20}
             defaultItemHeight={300}
-            ref={virtuosoRef}
             atTopStateChange={atTopStateChange}
             atBottomStateChange={atBottomStateChange}
             overscan={50}
-            itemContent={(_, item) => renderItem(item)}
             followOutput={!reverse ? false : followOutput}
             {...virtuosoOptiopns}
         />

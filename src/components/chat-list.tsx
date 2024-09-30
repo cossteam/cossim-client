@@ -1,14 +1,15 @@
 import { Avatar, Flex, Badge, List, Typography, Skeleton } from 'antd'
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { formatTime } from '@/utils/format-time'
 import { useNavigate, useParams } from 'react-router-dom'
 import clsx from 'clsx'
 import { $t } from '@/i18n'
 import { useElementSize } from '@reactuses/core'
 import useCacheStore from '@/stores/cache'
-// import { Virtuoso } from 'react-virtuoso'
+import { Virtuoso } from 'react-virtuoso'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { faker } from '@faker-js/faker'
+import { getDialogListApi } from '@/api/msg'
 
 
 const generateMockChatDataArray = (length: number): ChatData[] => {
@@ -17,32 +18,32 @@ const generateMockChatDataArray = (length: number): ChatData[] => {
     for (let i = 0; i < length; i++) {
         const chatData: ChatData = {
             dialog_avatar: faker.image.avatar(),
-            dialog_name: faker.name.fullName(),
+            dialog_name: faker.person.fullName(),
             dialog_create_at: faker.date.past().getTime(),
-            dialog_id: faker.datatype.number({ min: 1, max: 1000 }),
-            dialog_type: faker.datatype.number({ min: 0, max: 1 }), // 0 or 1 for type
-            dialog_unread_count: faker.datatype.number({ min: 0, max: 50 }),
+            dialog_id: faker.number.int({ min: 1, max: 1000 }),
+            dialog_type: faker.number.int({ min: 0, max: 1 }), // 0 or 1 for type
+            dialog_unread_count: faker.number.int({ min: 0, max: 50 }),
             top_at: faker.date.recent().getTime(),
-            group_id: faker.datatype.boolean() ? faker.datatype.number({ min: 1, max: 1000 }) : undefined,
-            user_id: faker.datatype.boolean() ? faker.datatype.number({ min: 1, max: 1000 }) : undefined,
+            group_id: faker.datatype.boolean() ? faker.number.int({ min: 1, max: 1000 }) : undefined,
+            user_id: faker.datatype.boolean() ? faker.number.int({ min: 1, max: 1000 }) : undefined,
             last_message: {
                 content: faker.lorem.sentence(),
                 is_burn_after_reading: faker.datatype.boolean(),
                 is_label: faker.datatype.boolean(),
-                msg_id: faker.datatype.number({ min: 1, max: 10000 }),
-                msg_type: faker.datatype.number({ min: 1, max: 5 }), // Different message types
+                msg_id: faker.number.int({ min: 1, max: 10000 }),
+                msg_type: faker.number.int({ min: 1, max: 5 }), // Different message types
                 send_at: faker.date.recent().getTime(),
-                sender_id: faker.datatype.uuid(),
+                sender_id: faker.string.uuid(),
                 sender_info: {
-                    user_id: faker.datatype.uuid(),
-                    name: faker.name.fullName(),
+                    user_id: faker.string.uuid(),
+                    name: faker.person.fullName(),
                     avatar: faker.image.avatar(),
                 },
-                reply: faker.datatype.number({ min: 0, max: 100 }),
+                reply: faker.number.int({ min: 0, max: 100 }),
                 receiver_info: {
                     avatar: faker.image.avatar(),
-                    name: faker.name.fullName(),
-                    user_id: faker.datatype.uuid(),
+                    name: faker.person.fullName(),
+                    user_id: faker.string.uuid(),
                 }
             },
             draft: faker.datatype.boolean() ? faker.lorem.sentence() : undefined
@@ -63,16 +64,12 @@ const ChatList = () => {
     const [width] = useElementSize(listRef)
     const cacheStore = useCacheStore()
 
-    const chatDataArray = useMemo(() => generateMockChatDataArray(10), [])
+    // const chatDataArray = useMemo(() => generateMockChatDataArray(10), [])
 
     const renderItem = useCallback(
         (chat: ChatData) => {
             return (
                 <List.Item
-                    // className={clsx(
-                    //     '!px-3 select-none w750:hover:bg-background-hover cursor-pointer w-full',
-                    //     Number(params.id) === chat.dialog_id && 'w750:!bg-primary'
-                    // )}
                     className={clsx(
                         '!px-3 select-none w750:hover:bg-background-hover w-full',
                         Number(params.id) === chat.dialog_id && 'w750:!bg-[#C9ECDA]'
@@ -94,7 +91,7 @@ const ChatList = () => {
 
     // const count = useMemo(() => cacheStore.cacheChatList?.length || 0, [cacheStore.cacheChatList])
 
-    const count = useMemo(() => chatDataArray?.length || 0, [chatDataArray])
+    const count = useMemo(() => cacheStore.cacheChatList?.length || 0, [cacheStore.cacheChatList])
 
     const loadMoreData = () => { }
 
@@ -109,11 +106,11 @@ const ChatList = () => {
                 scrollableTarget="scrollableDiv"
             >
                 <List split={false}
-                    className="w-full" dataSource={chatDataArray} renderItem={renderItem} />
+                    className="w-full" dataSource={cacheStore.cacheChatList} renderItem={renderItem} />
             </InfiniteScroll>
         </Flex>
-        // // <Flex className="flex-1" ref={listRef} vertical>
-        //     {/* <List className="w-full h-full flex-1">
+        // <Flex className="flex-1" ref={listRef} vertical>
+        //     <List className="w-full h-full flex-1">
         //         <Virtuoso
         //             className="w-full h-full"
         //             style={{ height }}
@@ -121,8 +118,8 @@ const ChatList = () => {
         //             data={cacheStore.cacheChatList}
         //             itemContent={(_, item) => renderItem(item)}
         //         />
-        //     </List> */}
-        // // </Flex>
+        //     </List>
+        // </Flex>
     )
 }
 
@@ -150,7 +147,8 @@ const ChatListItemAvatar: React.FC<{ chat: ChatData }> = ({ chat }) => <Avatar s
 const ChatListItemDescription: React.FC<{ chat: ChatData }> = ({ chat }) => {
     const content = useMemo(() => {
         if (!chat.last_message?.content) return $t('[无消息内容]')
-        return `${chat?.last_message?.sender_info?.name}：${chat.last_message?.content}`
+        // return `${chat?.last_message?.sender_info?.name}：${chat.last_message?.content}`
+        return `${chat.last_message?.content}`
     }, [])
     return (
         <Typography.Paragraph className="text-gray-500 !mb-0 -mt-[4px] text-xs" ellipsis={{ rows: 1 }}>

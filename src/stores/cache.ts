@@ -3,7 +3,7 @@ import type { CacheOptions, CacheStore, CacheStoreMethods } from '@/types/store'
 
 const states: CacheOptions = {
     cacheChatList: [],
-    cacheContactList: [],
+    // cacheContactList: [],
     cacheGroupsList: [],
     cacheMessageUnread: 0,
     cacheRequestList: []
