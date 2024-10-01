@@ -47,7 +47,7 @@ const NewRequest: React.FC = () => {
     const fetchRequests = useCallback(async () => {
         setLoading(true);
         try {
-            const params: QueryParams = { page_num: 1, page_size: 10 };
+            const params: QueryParams = { page_num: 1, page_size: 100 };
             let response;
             if (currentTab === '联系人') {
                 response = await friendRequestListApi(params);
@@ -98,7 +98,7 @@ const NewRequest: React.FC = () => {
                     useContactStore.getState().addContact(updatedContact);
                 }
             } else {
-                message.error('处理好友请求失败');
+                message.error(`${response.msg}`);
             }
         } catch (error) {
             console.error('处理好友请求出错:', error);
@@ -134,15 +134,14 @@ const NewRequest: React.FC = () => {
         // 获取状态文本
         const getStatusText = (status: ApplyStatus, isSender: boolean) => {
             const statusTexts = {
-                [ApplyStatus.ACCEPT]: '已接受',
+                [ApplyStatus.ACCEPT]: isSender ? '对方已接受' : '已接受',
                 [ApplyStatus.REFUSE]: '已拒绝',
-                [ApplyStatus.INVITE_SENDER]: isSender ? '等待对方验证' : '待验证',
-                [ApplyStatus.INVITE_RECEIVER]: isSender ? '待验证' : '等待您的验证'
+                [ApplyStatus.PENDING]: isSender ? '等待对方验证' : '待验证',
             };
             return statusTexts[status as keyof typeof statusTexts] || '';
         };
 
-        if (item.status === ApplyStatus.PENDING) {
+        if (item.status === ApplyStatus.PENDING && !isSender) {
             return [
                 <Button variant="outline" key="reject" onClick={(e) => { e.stopPropagation(); handleFriendRequest(item.id, 0); }} style={{ ...buttonStyle, borderColor: '#d9d9d9', color: 'rgba(0, 0, 0, 0.65)' }}>拒绝</Button>,
                 <Button variant="default" key="accept" onClick={(e) => { e.stopPropagation(); handleFriendRequest(item.id, 1); }} style={{ ...buttonStyle, backgroundColor: '#26B36D', color: '#fff' }}>接受</Button>
@@ -224,7 +223,7 @@ const NewRequest: React.FC = () => {
                 <List.Item.Meta
                     avatar={<Avatar
                         className='ml-4'
-                        src={item.sender_info.avatar}
+                        src={item.sender_id === uid ? item.receiver_info.avatar : item.sender_info.avatar}
                         size={48}
                         onClick={(e?: React.MouseEvent) => {
                             e?.stopPropagation();
@@ -232,7 +231,7 @@ const NewRequest: React.FC = () => {
                             showUserCard(item);
                         }}
                     />}
-                    title={<span className="text-sm font-bold">{item.sender_info.nickname}</span>}
+                    title={<span className="text-sm font-bold">{item.sender_id === uid ? item.receiver_info.nickname : item.sender_info.nickname}</span>}
                     description={
                         <Flex vertical>
                             <Text type="secondary" className="text-xs text-gray-400">
@@ -343,9 +342,10 @@ const NewRequest: React.FC = () => {
                     {selectedUser && (
                         <React.Fragment>
                             {isFullUserCard || selectedUser.status !== ApplyStatus.PENDING ? (
-                                <UserCard userId={selectedUser.sender_info.user_id} />
+                                <UserCard userId={selectedUser.sender_info.user_id=== uid ? selectedUser.receiver_info.user_id : selectedUser.sender_info.user_id} />
                             ) : (
                                 <RequestInfoCard
+                                    isSender={selectedUser.sender_info.user_id=== uid}
                                     onClose={() => setIsModalVisible(false)}
                                     requestId={selectedUser.id}
                                     userId={selectedUser.sender_info.coss_id}

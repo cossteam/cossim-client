@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from 'react'
 import { Avatar, List, Divider, Layout, Flex, Typography } from 'antd'
-import { Contact } from '@/types/storage'
+import { Contact, LetterContact } from '@/types/storage'
 import { Content } from 'antd/es/layout/layout'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Tag, UserPlus, Users } from '@phosphor-icons/react'
@@ -10,7 +10,7 @@ import useContactStore from '@/stores/contact'
 const ContactListPage = () => {
     const navigate = useNavigate()
     const location = useLocation()
-    const { cacheContactList } = useContactStore()
+    const cacheContactList = useContactStore().getContacts()
 
     // 定义菜单项
     const menus = useMemo(() => [
@@ -59,17 +59,18 @@ const ContactListPage = () => {
 
     return (
         <Layout className="bg-white">
+            <div className="sticky">
+                    {menus.map(renderMenuItem)}
+                    <Divider className="m-0" />
+            </div>
             <Content id="scrollableDiv" className="flex-1 overflow-auto">
-                {menus.map(renderMenuItem)}
-                <Divider className="m-0" />
-                {cacheContactList.length === 0 || cacheContactList.every(contactData => Object.values(contactData)[0].length === 0) ? (
+                {cacheContactList && cacheContactList.every((contactData: LetterContact) => Object.values(contactData).flat().length === 0) ? (
                     <div className="flex justify-center items-center" style={{ minHeight: 'calc(70vh - 50px)' }}>
-                    <Typography.Text className="text-gray-400">暂无联系人</Typography.Text>
+                        <Typography.Text className="text-gray-400">暂无联系人</Typography.Text>
                     </div>
                 ) : (
-                    cacheContactList.map((contactData) => {
-                        const [key, contacts] = Object.entries(contactData)[0]
-                        return contacts && contacts.length > 0 ? (
+                    cacheContactList.map((contactData: LetterContact) => {
+                        return Object.entries(contactData).map(([key, contacts]) => (
                             <div key={key}>
                                 <h3 className="px-5 my-3">{key}</h3>
                                 <List
@@ -77,7 +78,7 @@ const ContactListPage = () => {
                                     renderItem={renderContactItem}
                                 />
                             </div>
-                        ) : null
+                        ))
                     })
                 )}
             </Content>

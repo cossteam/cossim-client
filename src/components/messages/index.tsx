@@ -5,7 +5,7 @@ import MessageFooter from './message-footer'
 import useMobile from '@/hooks/useMobile'
 import useMessagesStore from '@/stores/messages'
 import { useParams } from 'react-router-dom'
-import { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import useCacheStore from '@/stores/cache'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { faker } from '@faker-js/faker'
@@ -44,14 +44,21 @@ const generateTestMessages = (): Message[] => {
     return messages;
 };
 
-const Messages = () => {
+export interface MessagesProps {
+}
+
+const Messages: React.FC<MessagesProps> = ({}) => {
     const { height } = useMobile()
     const { id } = useParams()
+    const [userId, setUserId] = useState<string | null | undefined>('')
 
     // TODO src/components/messages/message-footer/message-input.tsx 
     // handleTextChange 每次输入内容都会导致重新渲染
     const messages = useMessagesStore()
     const cacheStore = useCacheStore()
+
+    // const contactStore = useCacheStore()
+
 
     function isGroupDialog(chatInfo: ChatData): any {
         // console.log('chatInfo', chatInfo)
@@ -73,20 +80,21 @@ const Messages = () => {
     // }, [messageList])
 
     useEffect(() => {
-        if (!id) return
-        if (!cacheStore.cacheChatList) return
+        if (!id || !cacheStore.cacheChatList) return
         const chatInfo = cacheStore.cacheChatList?.find((item) => item?.dialog_id === Number(id))
-        messages.update({
-            chatInfo,
-            // isGroup,
-            receiverId: isGroup ? chatInfo?.group_id : chatInfo?.user_id,
-            draft: chatInfo?.draft || ''
-        })
-    }, [id, cacheStore.cacheChatList])
+        if (chatInfo) {
+            setUserId(chatInfo?.user_id || null)
+            messages.update({
+                chatInfo,
+                receiverId: isGroup ? chatInfo?.group_id : chatInfo?.user_id,
+                draft: chatInfo?.draft || ''
+            })
+        }
+    }, [id, cacheStore.cacheChatList, isGroup])
 
     return (
         <Flex className="container--background bg-background3 flex-1" style={{ height }} vertical align="stretch">
-            <MessageHeader />
+            <MessageHeader userId={userId} />
             <MessageContent messages={generateTestMessages()} />
             <MessageFooter />
         </Flex>

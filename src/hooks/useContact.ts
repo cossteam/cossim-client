@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { getFriendListApi } from '@/api/relation';
 import useContactStore from '@/stores/contact';
 import { message } from 'antd';
-import { ContactData, Contact } from '@/types/storage';
+import { Contact } from '@/types/storage';
 
 const useContact = () => {
     const { cacheContactList, update } = useContactStore();
@@ -11,9 +11,7 @@ const useContact = () => {
         try {
             const response = await getFriendListApi();
             if (response.code === 200) {
-                const convertedData: ContactData[] = Object.entries(response.data.list).map(([key, value]) => ({
-                    [key]: value as Contact[]
-                }));
+                const convertedData: Contact[] = Object.values(response.data.list).flat();
                 update({ cacheContactList: convertedData });
             } else {
                 message.error('获取联系人列表失败: ' + response.msg);

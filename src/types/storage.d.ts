@@ -1,6 +1,6 @@
 export interface RequestData {}
 
-export interface ContactData {
+export interface LetterContact {
     [key: string]: Contact[]
 }
 
@@ -10,6 +10,7 @@ export interface Contact {
     dialog_id: number
     email: string
     nickname: string
+    letter: string
     preferences: {
         open_burn_after_reading: boolean
         open_burn_after_reading_time_out: number

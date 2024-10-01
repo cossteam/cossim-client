@@ -78,6 +78,7 @@ const ContactCard: React.FC<ContactCardProps> = (props) => {
 
     const handleDeleteContact = async () => {
         setIsDeleting(true);
+        
         try {
             const resp = await deleteFriendApi(props.user_id);
             if (resp.code === 200) {
@@ -204,7 +205,7 @@ const ContactCard: React.FC<ContactCardProps> = (props) => {
                             width={props.width}
                             userId={props.user_id}
                             avatar={props.avatar}
-                            nickname={props.nickname}
+                            nickname={props.preferences?.remark || props.nickname}
                             signature={props.signature}
                             userInfoItem={getUserInfoItems(props)}
                             actions={
