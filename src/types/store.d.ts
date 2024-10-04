@@ -116,13 +116,14 @@ export interface UserCacheStoreMethods {
 
 export interface ContactsOptions {
     /** @description 缓存联系人列表 */
-    cacheContactList: ContactData[]
+    cacheContactList: Contact[]
     /** @description 缓存黑名单列表 */
     // cacheBlacklist: Contact[];  // 存储被加入黑名单的用户ID列表
 }
 
 // 联系人相关方法
 export interface ContactsCacheStoreMethods extends BaseCacheStoreMethods {
+    
     /**
      * @description 添加联系人
      * @param contact - 要添加的联系人对象
@@ -160,6 +161,19 @@ export interface ContactsCacheStoreMethods extends BaseCacheStoreMethods {
      * @returns 用户是否在黑名单中
      */
     isInBlacklist: (userId: string) => boolean;
+
+    /**
+     * @description 获取联系人信息
+     * @param userId - 要获取信息的用户 ID
+     * @returns 联系人信息
+     */
+    getContactInfo: (userId: string) => Contact | undefined;
+
+    /**
+     * @description 获取所有联系人列表
+     * @returns 联系人列表
+     */
+    getContacts: () => LetterContact[];
 }
 
 // 组合所有方法

@@ -2,8 +2,8 @@ import React, { useCallback } from 'react';
 import { Avatar, Card, List, message, Typography } from 'antd';
 import { Button } from '@/components/ui/button';
 import { manageFriendApplyApi } from '@/api/relation';
-import useCacheStore from '@/stores/cache';
 import { ManageFriendRequestParams } from '@/types/api';
+import useContactStore from '@/stores/contact';
 
 const { Text } = Typography;
 
@@ -21,12 +21,14 @@ interface RequestInfoCard {
     userInfoItem?: UserInfoItem[];
     userId?: string;
     remark?: string;
+    isSender: boolean
+
     onRequestHandled?: () => void;
 
     onClose?: () => void;
 }
 
-const RequestInfoCard: React.FC<RequestInfoCard> = ({ requestId, avatar, nickname, signature = '', remark, userInfoItem = [], onClose }) => {
+const RequestInfoCard: React.FC<RequestInfoCard> = ({ requestId, avatar, nickname, signature = '', remark, userInfoItem = [], isSender, onClose }) => {
 
     // 处理好友请求
     const handleFriendRequest = useCallback(async (id: number, action: number) => {
@@ -35,17 +37,17 @@ const RequestInfoCard: React.FC<RequestInfoCard> = ({ requestId, avatar, nicknam
             const response = await manageFriendApplyApi(id, data);
             if (response.code === 200) {
                 message.success(action === 1 ? '已接受好友请求' : '已拒绝好友请求');
-                
+
                 if (action === 1) {
                     const updatedContact = response.data.contact;
-                    useCacheStore.getState().addContact(updatedContact);
+                    useContactStore.getState().addContact(updatedContact);
                 }
 
                 if (onClose) {
                     onClose();
                 }
             } else {
-                message.error('处理好友请求失败');
+                message.error(`${response.msg}`);
             }
         } catch (error) {
             console.error('处理好友请求出错:', error);
@@ -103,15 +105,17 @@ const RequestInfoCard: React.FC<RequestInfoCard> = ({ requestId, avatar, nicknam
                     接受
                 </Button>
             </div> */}
-            
-            <div className="flex justify-between w-full">
-                            <Button variant="text" size="lg" className="flex-1 mr-2 text-gray-500 hover:text-gray-500" onClick={() => handleFriendRequest(requestId, 0)}>
-                                拒绝
-                            </Button>
-                            <Button variant="text" size="lg" className="flex-1 ml-2 text-[#26B36D] hover:text-[#26B36D]" onClick={() => handleFriendRequest(requestId, 1)}>
-                                接受
-                            </Button>
-                        </div>
+
+            {!isSender && (<div className="flex justify-between w-full">
+                <Button variant="text" size="lg" className="flex-1 mr-2 text-gray-500 hover:text-gray-500" onClick={() => handleFriendRequest(requestId, 0)}>
+                    拒绝
+                </Button>
+                <Button variant="text" size="lg" className="flex-1 ml-2 text-[#26B36D] hover:text-[#26B36D]" onClick={() => handleFriendRequest(requestId, 1)}>
+                    接受
+                </Button>
+            </div>
+            )}
+
         </div>
     );
 };

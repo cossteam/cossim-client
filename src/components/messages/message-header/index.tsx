@@ -1,48 +1,93 @@
 import { Flex, Typography, Dropdown, Divider, Avatar, Modal } from 'antd'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import useCallStore from '@/stores/call'
+import useContactStore from '@/stores/contact'
 import { Bell, DotsThreeOutline, Fire, ImageSquare, Info, MagnifyingGlass, Phone, Trash, VideoCamera } from '@phosphor-icons/react'
 import ContactCard from '@/components/contact/user-info/contact-card'
+import { getUserInfoApi } from '@/api/user'
+import { Contact } from '@/types/storage'
 
 // 定义头部高度常量
 export const headerHeight = 50
 
-interface MessageHeaderProps {
-    isGroup?: boolean;
+const mockUserInfo = {
+    avatar: "https://example.com/user-avatar.png",
+    coss_id: "123456",
+    dialog_id: 1,
+    email: "user@example.com",
+    nickname: "nickname",
+    preferences: {
+        open_burn_after_reading: false,
+        open_burn_after_reading_time_out: 0,
+        remark: '',
+        silent_notification: false
+    },
+    relation_status: 0,
+    signature: "用户签名",
+    status: 1,
+    tel: "1234567890",
+    user_id: "123456",
 }
 
-const MessageHeader: React.FC<MessageHeaderProps> = ({ isGroup }) => {
+interface MessageHeaderProps {
+    isGroup?: boolean;
+    userId?: string | null | undefined
+}
+
+const MessageHeader: React.FC<MessageHeaderProps> = ({ isGroup, userId  }) => {
     const callStore = useCallStore()
     const [isHovered, setIsHovered] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const contactStore = useContactStore()
 
-    const mockUserInfo = {
-        avatar: "https://example.com/user-avatar.png",
-        coss_id: "123456",
-        dialog_id: 1,
-        email: "user@example.com",
-        nickname: "用户昵称",
-        preferences: {
-            open_burn_after_reading: false,
-            open_burn_after_reading_time_out: 0,
-            remark: '',
-            silent_notification: false
-        },
-        relation_status: 0,
-        signature: "用户签名",
-        status: 1,
-        tel: "1234567890",
-        user_id: "123456",
-    }
+    const [contactInfo, setContactInfo] = useState<Contact>()
 
     const call = (video: boolean) => {
         if (callStore.isAudio || callStore.isVideo) return
         callStore.create(`${Date.now()}`, video ? 'video' : 'audio', video, !video, false)
     }
 
-    const showModal = () => {
+    const fetchContactInfo = () => {
+        if (!userId) return;
+    
+        console.log('userId', userId);
+        const cachedContact = contactStore.getContactInfo(userId);
+
+        console.log('cachedContact', cachedContact)
+        
+        // 如果有缓存，立即展示给用户
+        if (cachedContact) {
+            setContactInfo(cachedContact);
+        }
+    
+        // 异步请求用户信息
+        getUserInfoApi({ id: userId })
+            .then(response => {
+                if (response.data) {
+                    setContactInfo(response.data);
+                    // 更新缓存为最新信息
+                    contactStore.update({
+                        cacheContactList: [response.data]
+                    });
+                    
+                } else {
+                    console.error('Failed to fetch user info, using cached info instead.');
+                }
+            })
+            .catch(error => {
+                console.error('Failed to fetch user info:', error);
+            });
+        };
+    
+
+    const onContactCard = () => {
+        fetchContactInfo()    
         setIsModalVisible(true);
     };
+    
+    useEffect(() => {
+        fetchContactInfo()  
+    }, [userId]);
 
     const handleCancel = () => {
         setIsModalVisible(false);
@@ -54,7 +99,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ isGroup }) => {
 
     const renderUser = () => (
         <Flex align="center">
-            <Avatar src="https://example.com/user-avatar.png" size={30} />
+            <Avatar src={contactInfo?.avatar} size={30} />
             <Flex className="ml-3 flex-col">
                 <Typography.Text className="text-sm">用户昵称</Typography.Text>
                 <Typography.Text className="text-gray-500 text-xs">最后在线于 xxx</Typography.Text>
@@ -146,7 +191,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ isGroup }) => {
                 className={`h-[${headerHeight}px] bg-background pl-5 pr-3`}
                 justify="center"
                 vertical
-                onClick={showModal}
+                onClick={onContactCard}
             >
                 <Flex justify="space-between">
                     <Flex vertical>
@@ -173,6 +218,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ isGroup }) => {
                     </Flex>
                 </Flex>
             </Flex>
+
             <Modal
                 wrapClassName="ant-modal-content-p-0"
                 className='overflow-y-auto rounded-lg'
@@ -186,7 +232,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ isGroup }) => {
 
                 <ContactCard
                     width='480px'
-                    {...mockUserInfo}
+                    {...contactInfo}
                 />
 
             </Modal>

@@ -21,7 +21,7 @@ export declare global {
         dialog_unread_count: number
         top_at: number
         group_id?: number
-        user_id?: number
+        user_id?: string
         last_message: {
             content: string
             is_burn_after_reading: boolean

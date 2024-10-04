@@ -100,8 +100,4 @@ export enum ApplyStatus {
 	ACCEPT = 1,
 	/** 已拒绝 */
 	REFUSE = 2,
-	/** 邀请发送者 */
-	INVITE_SENDER = 3,
-	/** 被邀请者 */
-	INVITE_RECEIVER = 4
 }
