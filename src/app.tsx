@@ -1,5 +1,4 @@
 import { Suspense } from 'react'
-// import { Toaster } from 'react-hot-toast'
 import { useRoutes } from 'react-router-dom'
 import routes from '~react-pages'
 
@@ -9,6 +8,7 @@ import './i18n/config'
 
 const App = () => {
     const router = useRoutes(routes)
+
     return <Suspense fallback={<GlobalLoading />}>{router}</Suspense>
 }
 

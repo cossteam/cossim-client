@@ -3,7 +3,7 @@ import { RefObject, useEffect, useState } from 'react'
 export function useScrollBottom(scrollRef: RefObject<HTMLDivElement>, detach: boolean = false) {
     const [autoScroll, setAutoScroll] = useState(detach)
 
-    const scrollDomToBottom = () => {
+    const scrolToBottom = () => {
         const dom = scrollRef.current
         if (dom) {
             requestAnimationFrame(() => {
@@ -13,9 +13,18 @@ export function useScrollBottom(scrollRef: RefObject<HTMLDivElement>, detach: bo
         }
     }
 
+    const scrollToRange = (top: number) => {
+        const dom = scrollRef.current
+        if (dom) {
+            console.log('top', top)
+
+            dom.scrollTop = top
+        }
+    }
+
     useEffect(() => {
         if (autoScroll) {
-            scrollDomToBottom()
+            scrolToBottom()
         }
     }, [autoScroll])
 
@@ -23,6 +32,7 @@ export function useScrollBottom(scrollRef: RefObject<HTMLDivElement>, detach: bo
         scrollRef,
         autoScroll,
         setAutoScroll,
-        scrollDomToBottom
+        scrolToBottom,
+        scrollToRange
     }
 }

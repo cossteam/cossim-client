@@ -8,9 +8,14 @@ interface ScrollAreaProps extends React.ComponentPropsWithoutRef<typeof ScrollAr
 }
 
 const ScrollArea = React.forwardRef<React.ElementRef<typeof ScrollAreaPrimitive.Root>, ScrollAreaProps>(
-    ({ className, children, ...props }, ref) => (
+    ({ className, children, style, ...props }, ref) => (
         <ScrollAreaPrimitive.Root className={cn('relative overflow-hidden overscroll-none h-full', className)}>
-            <ScrollAreaPrimitive.Viewport ref={ref} className="h-full w-full rounded-[inherit] relative" {...props}>
+            <ScrollAreaPrimitive.Viewport
+                ref={ref}
+                className="h-full w-full rounded-[inherit] relative"
+                style={style}
+                {...props}
+            >
                 {children}
             </ScrollAreaPrimitive.Viewport>
             <ScrollBar />
@@ -29,13 +34,13 @@ const ScrollBar = React.forwardRef<
         orientation={orientation}
         className={cn(
             'flex touch-none select-none transition-colors',
-            orientation === 'vertical' && 'h-full w-1.5 border-l border-l-transparent p-[1px]',
+            orientation === 'vertical' && 'h-full w-2 border-l border-l-transparent p-[1px]',
             orientation === 'horizontal' && 'h-2 flex-col border-t border-t-transparent p-[1px]',
             className
         )}
         {...props}
     >
-        <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-border" />
+        <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-black/30" />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>
 ))
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName

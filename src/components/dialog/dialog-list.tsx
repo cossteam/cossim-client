@@ -1,32 +1,59 @@
 import { formatDate } from '@/lib/utils'
 import { generateChatList } from '@/mock/data'
-import { ScrollArea } from '@/ui/scroll-area'
-import { useMemo } from 'react'
+import { useRef, useState } from 'react'
 import ListItem from '@/components/common/list-item'
 import { useConfigStore } from '@/stores/config'
-
-// TODO: add skeleton loading
-const DialogListSkeleton = () => {
-    return <div className="w-full h-40 bg-gray-200 animate-pulse rounded-md"></div>
-}
-
-// TODO: add empty state
-const DialogListEmpty = () => {
-    return (
-        <div className="w-full h-40 flex justify-center items-center">
-            <p className="text-gray-700">暂无聊天记录</p>
-        </div>
-    )
-}
+// import { VList, VListHandle } from '@/components/virtual-list/index'
+import { DialogListItem } from '@/interface/model/dialog'
+import { VList, Virtualizer } from 'virtua'
+import { ScrollArea } from '@/ui/scroll-area'
 
 const DialogList = () => {
-    const chats = useMemo(() => generateChatList(15), [])
+    const [data, setData] = useState<DialogListItem[]>(generateChatList(15))
+
     const sidebarWidth = useConfigStore((state) => state.sidebarWidth)
-    // TODO: 添加虚拟滚动
+
+    // const ref = useRef<VListHandle>(null)
+    // const isPrepend = useRef(false)
+
+    const handleScroll = () => {
+        console.log('end')
+    }
+
     return (
-        <ScrollArea className="flex-1">
-            <div style={{ width: sidebarWidth }}>
-                {chats.map((chat, index) => (
+        // <VList style={{ width: sidebarWidth }} onScroll={handleScroll} itemSize={72}>
+        //     {data.map((chat, index) => (
+        //         <ListItem
+        //             key={index}
+        //             src="https://picsum.photos/56"
+        //             name={chat?.dialog_name}
+        //             description={chat?.last_message?.content}
+        //             right={{
+        //                 date: formatDate(chat?.last_message?.send_at),
+        //                 unreadCount: chat?.dialog_unread_count
+        //             }}
+        //         />
+        //     ))}
+        // </VList>
+        // <ScrollArea className="scroll flex-1 overflow-y-auto">
+        //     <VList className="h-96" itemSize={72} onScrollEnd={handleScroll}>
+        //         {data.map((chat, index) => (
+        //             <ListItem
+        //                 key={index}
+        //                 src="https://picsum.photos/56"
+        //                 name={chat?.dialog_name}
+        //                 description={chat?.last_message?.content}
+        //                 right={{
+        //                     date: formatDate(chat?.last_message?.send_at),
+        //                     unreadCount: chat?.dialog_unread_count
+        //                 }}
+        //             />
+        //         ))}
+        //     </VList>
+        // </ScrollArea>
+        <ScrollArea>
+            <VList style={{ height: 500 }} onScroll={handleScroll} itemSize={72}>
+                {data.map((chat, index) => (
                     <ListItem
                         key={index}
                         src="https://picsum.photos/56"
@@ -38,7 +65,7 @@ const DialogList = () => {
                         }}
                     />
                 ))}
-            </div>
+            </VList>
         </ScrollArea>
     )
 }

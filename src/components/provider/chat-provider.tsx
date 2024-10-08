@@ -1,7 +1,12 @@
 import { ChatContext, ChatContextData, chatState } from '@/context/chat-context'
+import { cn } from '@/lib/utils'
 import { useCallback, useState } from 'react'
 
-const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface ChatProviderProps extends React.HTMLAttributes<HTMLDivElement> {
+    children: React.ReactNode
+}
+
+function ChatProvider({ children, className, ...props }: ChatProviderProps) {
     const [state, setState] = useState(chatState)
 
     const update: ChatContextData['update'] = useCallback(
@@ -18,7 +23,9 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
                 update
             }}
         >
-            {children}
+            <div className={cn('flex flex-col h-full overflow-hidden', className)} {...props}>
+                {children}
+            </div>
         </ChatContext.Provider>
     )
 }

@@ -7,7 +7,7 @@ export interface MessageUserInfo {
     avatar: string
 }
 
-export interface Message {
+export interface DialogLatestMessage {
     /** 消息内容 */
     content: string
     /** 是否阅后即焚 */
@@ -50,7 +50,32 @@ export interface DialogListItem {
     /** 用户 ID */
     user_id?: number
     /** 上一次消息 */
-    last_message: Message
+    last_message: DialogLatestMessage
     /** 草稿 */
     draft?: string
+}
+
+export interface Message extends DialogLatestMessage {
+    /** TODO: 待确认  @ 全体成员 id */
+    at_all_user: boolean
+    /** 创建时间 */
+    create_at: number
+    /** 会话 id */
+    dialog_id: number
+    /** 是否阅后及焚 */
+    is_brun_after_reading: boolean
+    /** 发送状态 */
+    msg_send_state: number
+    /** 已读时间 */
+    read_at?: number
+    /** 接收者 id */
+    receiver_id: string
+    /** 消息类型 */
+    type: number
+    /** 是否 @ 了全部成员 */
+    is_at_all: boolean
+    /** 是否恢复消息 */
+    is_reply: boolean
+    /** 回复的消息 id */
+    reply_id: number
 }

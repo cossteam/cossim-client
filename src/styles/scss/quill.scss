@@ -1,0 +1,22 @@
+.quill-editor {
+    font-size: 1rem;
+    padding: 0 1rem;
+
+    .ql-editor.ql-blank::before {
+        color: rgba(0, 0, 0, 0.5);
+        content: attr(data-placeholder);
+        left: 1rem;
+        pointer-events: none;
+        position: absolute;
+        right: 15px;
+        font-size: 14px;
+    }
+
+    .ql-editor.ql-blank:focus {
+        content: none;
+    }
+
+    :focus-visible {
+        outline: none;
+    }
+}
