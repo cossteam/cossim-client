@@ -13,8 +13,8 @@ function ChatFooter() {
     }
 
     return (
-        <div className="py-3 flex items-center px-4 justify-between w-full shadow-sm flex-shrink-0 relative">
-            <div className="group border-slate-300 bg-foreground/10 w-full min-h-12 py-2 flex justify-between px-3 items-center border bg-slate-50 focus-within:border-slate-500 rounded-lg">
+        <div className="py-3 flex items-end px-4 justify-between w-full shadow-sm flex-shrink-0 relative">
+            <div className="group border-slate-300 bg-foreground/10 w-full py-3 flex justify-between px-3 items-end border bg-slate-50 focus-within:border-slate-500 rounded-lg">
                 <div className="flex items-center space-x-4">
                     <Link className="text-muted-foreground/50 group-focus-within:text-muted-foreground" size={20} />
                     <Image className="text-muted-foreground/50 group-focus-within:text-muted-foreground" size={20} />
@@ -24,7 +24,7 @@ function ChatFooter() {
 
                 <div className="flex-shrink-0">
                     {/* <Send className="text-muted-foreground/50 group-focus-within:text-muted-foreground" size={20} /> */}
-                    <div className="bg-muted-foreground/50 rounded-full p-1.5">
+                    <div className="bg-muted-foreground/50 rounded-full p-0.5">
                         <ArrowUp className="text-white" size={20} />
                     </div>
                 </div>

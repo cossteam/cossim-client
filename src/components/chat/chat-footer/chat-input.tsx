@@ -61,7 +61,7 @@ function ChatInput() {
     }, [])
 
     return (
-        <ScrollArea className="flex-1 relative max-h-[150px]">
+        <ScrollArea className="flex-1 relative max-h-[300px]">
             <div className="quill-editor" ref={textInputRef} />
         </ScrollArea>
     )

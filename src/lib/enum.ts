@@ -1,7 +1,10 @@
 /** 国际化语言 */
 export enum Language {
+    /** 中文简体 */
     ZH_CN = 'zh_CN',
+    /** 中文繁体 */
     ZH_TW = 'zh_TW',
+    /** 英文 */
     EN = 'en'
 }
 

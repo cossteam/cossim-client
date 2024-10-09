@@ -29,7 +29,8 @@
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
         "translate": "node node_modules/vue-auto-translate/server.js",
-        "format": "prettier --write ./src/*"
+        "format": "prettier --write ./src/*",
+        "tauri:dev": "tauri dev"
     },
     "dependencies": {
         "@capacitor-community/safe-area": "^6.0.0-alpha.3",
@@ -78,6 +79,7 @@
     },
     "devDependencies": {
         "@faker-js/faker": "^8.4.1",
+        "@tauri-apps/cli": "^2.0.2",
         "@types/node": "^20.12.12",
         "@types/react": "^18.3.3",
         "@types/react-dom": "^18.3.0",

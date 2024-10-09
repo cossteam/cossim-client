@@ -2,7 +2,7 @@ import { Ellipsis } from 'lucide-react'
 
 function ChatHeader() {
     return (
-        <div className="h-16 border-b flex justify-between items-center w-full px-5 py-2 shadow-sm flex-shrink-0 relative z-[99]">
+        <div className="h-16 border-b flex justify-between items-center w-full px-5 py-2 shadow-sm flex-shrink-0 relative z-50">
             <div className="flex items-center">
                 <p className="">Mircel Jones</p>
             </div>

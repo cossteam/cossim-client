@@ -12,9 +12,9 @@
         font-size: 14px;
     }
 
-    .ql-editor.ql-blank:focus {
-        content: none;
-    }
+    // .ql-editor.ql-blank:focus::before {
+    //     content: none;
+    // }
 
     :focus-visible {
         outline: none;

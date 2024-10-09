@@ -1,5 +1,5 @@
 import { generateMessageList } from '@/mock/data'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { VList, VListHandle } from '@/components/virtual-list/index'
 import ChatContent from './chat-content'
 
@@ -9,10 +9,6 @@ function ChatBody() {
     const isPrepend = useRef(false)
     const shouldStickToBottom = useRef(true)
 
-    useLayoutEffect(() => {
-        isPrepend.current = false
-    })
-
     useEffect(() => {
         if (!ref.current) return
         if (!shouldStickToBottom.current) return
@@ -21,22 +17,22 @@ function ChatBody() {
         })
     }, [items.length])
 
-    useEffect(() => {
-        let canceled = false
-        let timer: ReturnType<typeof setTimeout> | null = null
-        const setTimer = () => {
-            timer = setTimeout(() => {
-                if (canceled) return
-                setItems((p) => [...p, ...generateMessageList(20)])
-                setTimer()
-            }, 5000)
-        }
-        setTimer()
-        return () => {
-            canceled = true
-            if (timer) clearTimeout(timer)
-        }
-    }, [])
+    // useEffect(() => {
+    //     let canceled = false
+    //     let timer: ReturnType<typeof setTimeout> | null = null
+    //     const setTimer = () => {
+    //         timer = setTimeout(() => {
+    //             if (canceled) return
+    //             setItems((p) => [...p, ...generateMessageList(20)])
+    //             setTimer()
+    //         }, 5000)
+    //     }
+    //     setTimer()
+    //     return () => {
+    //         canceled = true
+    //         if (timer) clearTimeout(timer)
+    //     }
+    // }, [])
 
     const handleScroll = (offset: number) => {
         if (!ref.current) return
@@ -52,10 +48,9 @@ function ChatBody() {
 
     return (
         <VList
+            className="bg-gray-50"
             ref={ref}
-            style={{
-                flex: 1
-            }}
+            style={{ flex: 1 }}
             reverse
             shift={isPrepend.current}
             onScroll={handleScroll}

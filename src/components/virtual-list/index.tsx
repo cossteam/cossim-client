@@ -78,6 +78,7 @@ export const VList = forwardRef<VListHandle, VListProps>(
                 onScroll={onScroll}
                 onScrollEnd={onScrollEnd}
                 onRangeChange={onRangeChange}
+                {...attrs}
             >
                 {children}
             </Virtualizer>

@@ -76,8 +76,8 @@ export const generateMessageList = (count: number = 10): Message[] => {
     return Array.from({ length: count }, (_, index) => {
         return {
             at_all_user: faker.datatype.boolean(),
-            // content: faker.lorem.sentence({ min: 10, max: 40 }),
-            content: `内容 ${faker.string.uuid()}`,
+            content: faker.lorem.sentence({ min: 10, max: 40 }),
+            // content: `内容 ${faker.string.uuid()}`,
             create_at: new Date(faker.date.recent()).getTime(),
             dialog_id: 1,
             is_brun_after_reading: faker.datatype.boolean(),
